@@ -25,7 +25,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "02-1234-5678",
         lat: 37.5665,
-        lng: 126.9780
+        lng: 126.9780,
+        kakaoUrl: "https://open.kakao.com/o/some-link1",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "2",
@@ -41,7 +46,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
         contact: "051-9876-5432",
         lat: 35.1796,
-        lng: 129.0756
+        lng: 129.0756,
+        kakaoUrl: "https://open.kakao.com/o/some-link2",
+        processes: [
+            "샘플",
+            "자수"
+        ]
     },
     {
         id: "3",
@@ -57,7 +67,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
         contact: "053-222-3333",
         lat: 35.8714,
-        lng: 128.6014
+        lng: 128.6014,
+        kakaoUrl: "https://open.kakao.com/o/some-link3",
+        processes: [
+            "QC",
+            "다이마루"
+        ]
     },
     {
         id: "4",
@@ -73,7 +88,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
         contact: "032-111-2222",
         lat: 37.4563,
-        lng: 126.7052
+        lng: 126.7052,
+        kakaoUrl: "https://open.kakao.com/o/some-link4",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "5",
@@ -89,7 +109,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "062-333-4444",
         lat: 35.1595,
-        lng: 126.8526
+        lng: 126.8526,
+        kakaoUrl: "https://open.kakao.com/o/some-link5",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "6",
@@ -105,7 +130,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "042-555-6666",
         lat: 36.3504,
-        lng: 127.3845
+        lng: 127.3845,
+        kakaoUrl: "https://open.kakao.com/o/some-link6",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "7",
@@ -121,7 +151,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
         contact: "052-777-8888",
         lat: 35.5384,
-        lng: 129.3114
+        lng: 129.3114,
+        kakaoUrl: "https://open.kakao.com/o/some-link7",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "8",
@@ -137,7 +172,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "031-888-9999",
         lat: 37.4138,
-        lng: 127.5183
+        lng: 127.5183,
+        kakaoUrl: "https://open.kakao.com/o/some-link8",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "9",
@@ -153,7 +193,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
         contact: "033-101-2020",
         lat: 37.8228,
-        lng: 128.1555
+        lng: 128.1555,
+        kakaoUrl: "https://open.kakao.com/o/some-link9",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "10",
@@ -169,7 +214,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
         contact: "043-303-4040",
         lat: 36.6424,
-        lng: 127.4890
+        lng: 127.4890,
+        kakaoUrl: "https://open.kakao.com/o/some-link10",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "11",
@@ -185,7 +235,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
         contact: "041-505-6060",
         lat: 36.7926,
-        lng: 127.1350
+        lng: 127.1350,
+        kakaoUrl: "https://open.kakao.com/o/some-link11",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "12",
@@ -201,7 +256,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "063-606-7070",
         lat: 35.8242,
-        lng: 127.1477
+        lng: 127.1477,
+        kakaoUrl: "https://open.kakao.com/o/some-link12",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "13",
@@ -217,7 +277,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "061-808-9090",
         lat: 34.8118,
-        lng: 126.3922
+        lng: 126.3922,
+        kakaoUrl: "https://open.kakao.com/o/some-link13",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "14",
@@ -233,7 +298,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
         contact: "054-111-2121",
         lat: 36.1195,
-        lng: 128.3446
+        lng: 128.3446,
+        kakaoUrl: "https://open.kakao.com/o/some-link14",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "15",
@@ -249,7 +319,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "055-313-4141",
         lat: 35.2285,
-        lng: 128.6811
+        lng: 128.6811,
+        kakaoUrl: "https://open.kakao.com/o/some-link15",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "16",
@@ -265,7 +340,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "064-707-8080",
         lat: 33.4996,
-        lng: 126.5312
+        lng: 126.5312,
+        kakaoUrl: "https://open.kakao.com/o/some-link16",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "17",
@@ -281,7 +361,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
         contact: "02-1717-1717",
         lat: 37.5700,
-        lng: 127.0095
+        lng: 127.0095,
+        kakaoUrl: "https://open.kakao.com/o/some-link17",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "18",
@@ -297,7 +382,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "051-1818-1818",
         lat: 35.1632,
-        lng: 129.1636
+        lng: 129.1636,
+        kakaoUrl: "https://open.kakao.com/o/some-link18",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "19",
@@ -313,7 +403,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "053-1919-1919",
         lat: 35.8686,
-        lng: 128.5945
+        lng: 128.5945,
+        kakaoUrl: "https://open.kakao.com/o/some-link19",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "20",
@@ -329,7 +424,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "032-2020-2020",
         lat: 37.3891,
-        lng: 126.6445
+        lng: 126.6445,
+        kakaoUrl: "https://open.kakao.com/o/some-link20",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "21",
@@ -345,7 +445,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
         contact: "062-2121-2121",
         lat: 35.1330,
-        lng: 126.9020
+        lng: 126.9020,
+        kakaoUrl: "https://open.kakao.com/o/some-link21",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "22",
@@ -361,7 +466,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
         contact: "042-2222-2222",
         lat: 36.3622,
-        lng: 127.3568
+        lng: 127.3568,
+        kakaoUrl: "https://open.kakao.com/o/some-link22",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "23",
@@ -377,7 +487,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
         contact: "052-2323-2323",
         lat: 35.5833,
-        lng: 129.3600
+        lng: 129.3600,
+        kakaoUrl: "https://open.kakao.com/o/some-link23",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "24",
@@ -393,7 +508,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
         contact: "031-2424-2424",
         lat: 37.2636,
-        lng: 127.0286
+        lng: 127.0286,
+        kakaoUrl: "https://open.kakao.com/o/some-link24",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "25",
@@ -409,7 +529,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "033-2525-2525",
         lat: 37.3422,
-        lng: 127.9207
+        lng: 127.9207,
+        kakaoUrl: "https://open.kakao.com/o/some-link25",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "26",
@@ -425,7 +550,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "043-2626-2626",
         lat: 36.9910,
-        lng: 127.9258
+        lng: 127.9258,
+        kakaoUrl: "https://open.kakao.com/o/some-link26",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     }
 ];
 }}),
@@ -550,22 +680,42 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2
 ;
 ;
 ;
+// 샘플 문의내역 데이터
+const sampleInquiries = [
+    {
+        id: 1,
+        title: "문의 1",
+        content: "문의 내용 1",
+        date: "2024-07-01"
+    },
+    {
+        id: 2,
+        title: "문의 2",
+        content: "문의 내용 2",
+        date: "2024-07-02"
+    }
+];
+const SIDEBAR_MENUS = [
+    "프로필",
+    "문의내역"
+];
 function MyPage() {
     const { user } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$clerk$2f$shared$2f$dist$2f$react$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useUser"])();
+    const [selectedMenu, setSelectedMenu] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("프로필");
+    const [myFactories, setMyFactories] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"]);
     const [editMode, setEditMode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [factoryName, setFactoryName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [factoryDesc, setFactoryDesc] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [editRoleMode, setEditRoleMode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
-    const initialRole = typeof user?.publicMetadata?.role === "string" ? user.publicMetadata.role : "";
-    const [newRole, setNewRole] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(initialRole);
-    const [role, setRole] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(initialRole);
+    const [newRole, setNewRole] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(user?.publicMetadata?.role || "");
+    const [role, setRole] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(user?.publicMetadata?.role || "");
     if (!user) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center",
             children: "로그인 후 이용 가능합니다."
         }, void 0, false, {
             fileName: "[project]/app/my-page/page.tsx",
-            lineNumber: 19,
+            lineNumber: 29,
             columnNumber: 12
         }, this);
     }
@@ -577,7 +727,11 @@ function MyPage() {
     const myFactory = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"].find((f)=>f.ownerUserId === user.id);
     const handleFactoryEdit = (e)=>{
         e.preventDefault();
-        // 실제 상태 관리 필요시 구현
+        setMyFactories((facs)=>facs.map((f)=>f.id === myFactory?.id ? {
+                    ...f,
+                    name: factoryName,
+                    description: factoryDesc
+                } : f));
         setEditMode(false);
     };
     // 역할 변경 핸들러(실제 서비스라면 Supabase users 테이블 업데이트 필요)
@@ -588,404 +742,599 @@ function MyPage() {
     // 실제로는 Supabase users 테이블의 role 필드 업데이트 필요
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "max-w-2xl mx-auto py-8",
+        className: "max-w-[1200px] mx-auto py-16 px-4",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                className: "text-2xl font-bold text-toss-blue mb-6",
+                className: "text-[40px] font-extrabold text-gray-900 mb-2",
                 children: "마이페이지"
             }, void 0, false, {
                 fileName: "[project]/app/my-page/page.tsx",
-                lineNumber: 46,
+                lineNumber: 57,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                className: "text-lg text-gray-500 mb-8",
+                children: "내 정보와 문의내역을 확인할 수 있습니다."
+            }, void 0, false, {
+                fileName: "[project]/app/my-page/page.tsx",
+                lineNumber: 58,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "bg-white rounded-xl shadow p-6 mb-6",
+                className: "flex flex-row gap-8 min-h-[500px]",
                 children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mb-2 font-bold",
-                        children: "내 정보"
-                    }, void 0, false, {
-                        fileName: "[project]/app/my-page/page.tsx",
-                        lineNumber: 48,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mb-1 text-sm",
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
+                        className: "w-1/4 min-w-[220px] bg-white rounded-xl shadow p-6 flex flex-col items-center",
                         children: [
-                            "이메일: ",
-                            user.emailAddresses?.[0]?.emailAddress
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/my-page/page.tsx",
-                        lineNumber: 49,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mb-1 text-sm flex items-center gap-2",
-                        children: [
-                            "역할: ",
-                            role === "designer" ? "디자이너" : role === "factory" ? "공장" : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "text-red-500",
-                                children: "(미선택)"
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                src: user.imageUrl,
+                                alt: "프로필 이미지",
+                                className: "w-20 h-20 rounded-full object-cover border mb-3"
                             }, void 0, false, {
                                 fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 51,
-                                columnNumber: 75
+                                lineNumber: 65,
+                                columnNumber: 11
                             }, this),
-                            (!role || editRoleMode) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-                                onSubmit: handleRoleChange,
-                                className: "flex gap-2 items-center mt-2",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                        value: newRole || "",
-                                        onChange: (e)=>setNewRole(e.target.value),
-                                        className: "border rounded px-3 py-2",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                value: "",
-                                                children: "역할 선택"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 59,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                value: "designer",
-                                                children: "디자이너"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 60,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                value: "factory",
-                                                children: "공장"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 61,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 54,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                        type: "submit",
-                                        className: "bg-toss-blue text-white",
-                                        children: "저장"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 63,
-                                        columnNumber: 15
-                                    }, this),
-                                    role && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                        type: "button",
-                                        variant: "outline",
-                                        onClick: ()=>setEditRoleMode(false),
-                                        children: "취소"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 64,
-                                        columnNumber: 24
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 53,
-                                columnNumber: 13
-                            }, this),
-                            role && !editRoleMode && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                onClick: ()=>{
-                                    setEditRoleMode(true);
-                                    setNewRole(role);
-                                },
-                                className: "ml-2 bg-toss-blue text-white",
-                                children: "역할 변경"
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "font-bold text-lg mb-1",
+                                children: user.fullName || user.username || "이름 없음"
                             }, void 0, false, {
                                 fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 68,
-                                columnNumber: 13
+                                lineNumber: 70,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "text-gray-500 text-sm mb-6",
+                                children: user.emailAddresses?.[0]?.emailAddress
+                            }, void 0, false, {
+                                fileName: "[project]/app/my-page/page.tsx",
+                                lineNumber: 71,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
+                                className: "w-full flex flex-col gap-2",
+                                children: SIDEBAR_MENUS.map((menu)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        className: `w-full text-left px-4 py-2 rounded font-semibold transition-colors ${selectedMenu === menu ? "bg-toss-blue text-white" : "hover:bg-gray-100 text-gray-700"}`,
+                                        onClick: ()=>setSelectedMenu(menu),
+                                        children: menu
+                                    }, menu, false, {
+                                        fileName: "[project]/app/my-page/page.tsx",
+                                        lineNumber: 75,
+                                        columnNumber: 15
+                                    }, this))
+                            }, void 0, false, {
+                                fileName: "[project]/app/my-page/page.tsx",
+                                lineNumber: 73,
+                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/my-page/page.tsx",
-                        lineNumber: 50,
+                        lineNumber: 63,
                         columnNumber: 9
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/app/my-page/page.tsx",
-                lineNumber: 47,
-                columnNumber: 7
-            }, this),
-            role === "designer" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "bg-white rounded-xl shadow p-6 mb-6",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mb-2 font-bold",
-                        children: "내 매칭 요청"
-                    }, void 0, false, {
-                        fileName: "[project]/app/my-page/page.tsx",
-                        lineNumber: 74,
-                        columnNumber: 11
                     }, this),
-                    myDesignerRequests.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "text-gray-500",
-                        children: "보낸 매칭 요청이 없습니다."
-                    }, void 0, false, {
-                        fileName: "[project]/app/my-page/page.tsx",
-                        lineNumber: 76,
-                        columnNumber: 13
-                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
-                        className: "space-y-2",
-                        children: myDesignerRequests.map((req)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                className: "border-b pb-2",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "text-toss-blue font-semibold",
-                                        children: [
-                                            "공장 ID: ",
-                                            req.factoryId
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 81,
-                                        columnNumber: 19
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "text-sm text-gray-700",
-                                        children: req.content
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 82,
-                                        columnNumber: 19
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "text-xs text-gray-500",
-                                        children: [
-                                            "상태: ",
-                                            req.status,
-                                            " | 요청일: ",
-                                            req.createdAt
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 83,
-                                        columnNumber: 19
-                                    }, this)
-                                ]
-                            }, req.id, true, {
-                                fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 80,
-                                columnNumber: 17
-                            }, this))
-                    }, void 0, false, {
-                        fileName: "[project]/app/my-page/page.tsx",
-                        lineNumber: 78,
-                        columnNumber: 13
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/app/my-page/page.tsx",
-                lineNumber: 73,
-                columnNumber: 9
-            }, this),
-            role === "factory" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "bg-white rounded-xl shadow p-6 mb-6",
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                        className: "flex-1 bg-white rounded-xl shadow p-8",
                         children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "mb-2 font-bold",
-                                children: "내 공장 정보"
-                            }, void 0, false, {
-                                fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 93,
-                                columnNumber: 13
-                            }, this),
-                            myFactory ? editMode ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-                                onSubmit: handleFactoryEdit,
-                                className: "flex flex-col gap-2",
+                            selectedMenu === "프로필" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                        value: factoryName,
-                                        onChange: (e)=>setFactoryName(e.target.value),
-                                        placeholder: "공장명",
-                                        className: "border rounded px-3 py-2"
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                        className: "text-2xl font-bold mb-4",
+                                        children: "프로필 정보"
                                     }, void 0, false, {
                                         fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 97,
-                                        columnNumber: 19
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
-                                        value: factoryDesc,
-                                        onChange: (e)=>setFactoryDesc(e.target.value),
-                                        placeholder: "공장 소개",
-                                        className: "border rounded px-3 py-2"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 103,
-                                        columnNumber: 19
+                                        lineNumber: 89,
+                                        columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "flex gap-2",
+                                        className: "mb-2",
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                                type: "submit",
-                                                className: "bg-toss-blue text-white",
-                                                children: "저장"
+                                            "이름: ",
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "font-semibold",
+                                                children: user.fullName || user.username || "이름 없음"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 110,
-                                                columnNumber: 21
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                                type: "button",
-                                                variant: "outline",
-                                                onClick: ()=>setEditMode(false),
-                                                children: "취소"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 111,
-                                                columnNumber: 21
+                                                lineNumber: 90,
+                                                columnNumber: 41
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 109,
-                                        columnNumber: 19
+                                        lineNumber: 90,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-2",
+                                        children: [
+                                            "이메일: ",
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "font-semibold",
+                                                children: user.emailAddresses?.[0]?.emailAddress
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/my-page/page.tsx",
+                                                lineNumber: 91,
+                                                columnNumber: 42
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/my-page/page.tsx",
+                                        lineNumber: 91,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/my-page/page.tsx",
+                                lineNumber: 88,
+                                columnNumber: 13
+                            }, this),
+                            selectedMenu === "문의내역" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                        className: "text-2xl font-bold mb-4",
+                                        children: "문의내역"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/my-page/page.tsx",
+                                        lineNumber: 97,
+                                        columnNumber: 15
+                                    }, this),
+                                    sampleInquiries.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-gray-500",
+                                        children: "문의내역이 없습니다."
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/my-page/page.tsx",
+                                        lineNumber: 99,
+                                        columnNumber: 17
+                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                        className: "space-y-4",
+                                        children: sampleInquiries.map((inq)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                className: "border-b pb-2",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "font-semibold text-toss-blue",
+                                                        children: inq.title
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 104,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "text-gray-700 text-sm mb-1",
+                                                        children: inq.content
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 105,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "text-xs text-gray-400",
+                                                        children: inq.date
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 106,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, inq.id, true, {
+                                                fileName: "[project]/app/my-page/page.tsx",
+                                                lineNumber: 103,
+                                                columnNumber: 21
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/my-page/page.tsx",
+                                        lineNumber: 101,
+                                        columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/my-page/page.tsx",
                                 lineNumber: 96,
-                                columnNumber: 17
-                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "font-bold text-toss-blue mb-1",
-                                        children: myFactory.name
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 116,
-                                        columnNumber: 19
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "text-sm text-gray-700 mb-2",
-                                        children: myFactory.description
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 117,
-                                        columnNumber: 19
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                        onClick: ()=>{
-                                            setEditMode(true);
-                                            setFactoryName(myFactory.name);
-                                            setFactoryDesc(myFactory.description);
-                                        },
-                                        className: "bg-toss-blue text-white",
-                                        children: "수정"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 118,
-                                        columnNumber: 19
-                                    }, this)
-                                ]
-                            }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "text-gray-500",
-                                children: "등록된 공장 정보가 없습니다."
-                            }, void 0, false, {
-                                fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 122,
-                                columnNumber: 15
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/my-page/page.tsx",
-                        lineNumber: 92,
-                        columnNumber: 11
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "bg-white rounded-xl shadow p-6 mb-6",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "mb-2 font-bold",
-                                children: "내 공장에 온 매칭 요청"
-                            }, void 0, false, {
-                                fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 126,
                                 columnNumber: 13
                             }, this),
-                            myFactoryRequests.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "text-gray-500",
-                                children: "받은 매칭 요청이 없습니다."
-                            }, void 0, false, {
-                                fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 128,
-                                columnNumber: 15
-                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
-                                className: "space-y-2",
-                                children: myFactoryRequests.map((req)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                        className: "border-b pb-2",
+                            selectedMenu === "프로필" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "bg-white rounded-xl shadow p-6 mb-6",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "text-toss-blue font-semibold",
-                                                children: [
-                                                    "디자이너 ID: ",
-                                                    req.designerUserId
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 133,
-                                                columnNumber: 21
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "text-sm text-gray-700",
-                                                children: req.content
+                                                className: "mb-2 font-bold",
+                                                children: "내 정보"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 134,
-                                                columnNumber: 21
+                                                lineNumber: 116,
+                                                columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "text-xs text-gray-500",
+                                                className: "mb-1 text-sm",
                                                 children: [
-                                                    "상태: ",
-                                                    req.status,
-                                                    " | 요청일: ",
-                                                    req.createdAt
+                                                    "이메일: ",
+                                                    user.emailAddresses?.[0]?.emailAddress
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 135,
+                                                lineNumber: 117,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "mb-1 text-sm flex items-center gap-2",
+                                                children: [
+                                                    "역할: ",
+                                                    role === "designer" ? "디자이너" : role === "factory" ? "공장" : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "text-red-500",
+                                                        children: "(미선택)"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 119,
+                                                        columnNumber: 83
+                                                    }, this),
+                                                    (!role || editRoleMode) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                                                        onSubmit: handleRoleChange,
+                                                        className: "flex gap-2 items-center mt-2",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                                value: String(newRole) || "",
+                                                                onChange: (e)=>setNewRole(e.target.value),
+                                                                className: "border rounded px-3 py-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                        value: "",
+                                                                        children: "역할 선택"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                                        lineNumber: 123,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                        value: "designer",
+                                                                        children: "디자이너"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                                        lineNumber: 124,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                        value: "factory",
+                                                                        children: "공장"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                                        lineNumber: 125,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 122,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                                type: "submit",
+                                                                className: "bg-toss-blue text-white",
+                                                                children: "저장"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 127,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            role && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                                type: "button",
+                                                                variant: "outline",
+                                                                onClick: ()=>setEditRoleMode(false),
+                                                                children: "취소"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 128,
+                                                                columnNumber: 32
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 121,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    role && !editRoleMode && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                        onClick: ()=>{
+                                                            setEditRoleMode(true);
+                                                            setNewRole(role);
+                                                        },
+                                                        className: "ml-2 bg-toss-blue text-white",
+                                                        children: "역할 변경"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 132,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/my-page/page.tsx",
+                                                lineNumber: 118,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/my-page/page.tsx",
+                                        lineNumber: 115,
+                                        columnNumber: 15
+                                    }, this),
+                                    role === "designer" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "bg-white rounded-xl shadow p-6 mb-6",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "mb-2 font-bold",
+                                                children: "내 매칭 요청"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/my-page/page.tsx",
+                                                lineNumber: 138,
+                                                columnNumber: 19
+                                            }, this),
+                                            myDesignerRequests.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-gray-500",
+                                                children: "보낸 매칭 요청이 없습니다."
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/my-page/page.tsx",
+                                                lineNumber: 140,
+                                                columnNumber: 21
+                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                                className: "space-y-2",
+                                                children: myDesignerRequests.map((req)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                        className: "border-b pb-2",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "text-toss-blue font-semibold",
+                                                                children: [
+                                                                    "공장 ID: ",
+                                                                    req.factoryId
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 145,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "text-sm text-gray-700",
+                                                                children: req.content
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 146,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "text-xs text-gray-500",
+                                                                children: [
+                                                                    "상태: ",
+                                                                    req.status,
+                                                                    " | 요청일: ",
+                                                                    req.createdAt
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 147,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        ]
+                                                    }, req.id, true, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 144,
+                                                        columnNumber: 25
+                                                    }, this))
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/my-page/page.tsx",
+                                                lineNumber: 142,
                                                 columnNumber: 21
                                             }, this)
                                         ]
-                                    }, req.id, true, {
+                                    }, void 0, true, {
                                         fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 132,
-                                        columnNumber: 19
-                                    }, this))
-                            }, void 0, false, {
-                                fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 130,
-                                columnNumber: 15
-                            }, this)
+                                        lineNumber: 137,
+                                        columnNumber: 17
+                                    }, this),
+                                    role === "factory" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "bg-white rounded-xl shadow p-6 mb-6",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "mb-2 font-bold",
+                                                        children: "내 공장 정보"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 157,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    myFactory ? editMode ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                                                        onSubmit: handleFactoryEdit,
+                                                        className: "flex flex-col gap-2",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                value: factoryName,
+                                                                onChange: (e)=>setFactoryName(e.target.value),
+                                                                placeholder: "공장명",
+                                                                className: "border rounded px-3 py-2"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 161,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
+                                                                value: factoryDesc,
+                                                                onChange: (e)=>setFactoryDesc(e.target.value),
+                                                                placeholder: "공장 소개",
+                                                                className: "border rounded px-3 py-2"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 167,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "flex gap-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                                        type: "submit",
+                                                                        className: "bg-toss-blue text-white",
+                                                                        children: "저장"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                                        lineNumber: 174,
+                                                                        columnNumber: 29
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                                        type: "button",
+                                                                        variant: "outline",
+                                                                        onClick: ()=>setEditMode(false),
+                                                                        children: "취소"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                                        lineNumber: 175,
+                                                                        columnNumber: 29
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 173,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 160,
+                                                        columnNumber: 25
+                                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "font-bold text-toss-blue mb-1",
+                                                                children: myFactory.name
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 180,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "text-sm text-gray-700 mb-2",
+                                                                children: myFactory.description
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 181,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                                onClick: ()=>{
+                                                                    setEditMode(true);
+                                                                    setFactoryName(myFactory.name);
+                                                                    setFactoryDesc(myFactory.description);
+                                                                },
+                                                                className: "bg-toss-blue text-white",
+                                                                children: "수정"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 182,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "text-gray-500",
+                                                        children: "등록된 공장 정보가 없습니다."
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 186,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/my-page/page.tsx",
+                                                lineNumber: 156,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "bg-white rounded-xl shadow p-6 mb-6",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "mb-2 font-bold",
+                                                        children: "내 공장에 온 매칭 요청"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 190,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    myFactoryRequests.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "text-gray-500",
+                                                        children: "받은 매칭 요청이 없습니다."
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 192,
+                                                        columnNumber: 23
+                                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                                        className: "space-y-2",
+                                                        children: myFactoryRequests.map((req)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                                className: "border-b pb-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "text-toss-blue font-semibold",
+                                                                        children: [
+                                                                            "디자이너 ID: ",
+                                                                            req.designerUserId
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                                        lineNumber: 197,
+                                                                        columnNumber: 29
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "text-sm text-gray-700",
+                                                                        children: req.content
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                                        lineNumber: 198,
+                                                                        columnNumber: 29
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "text-xs text-gray-500",
+                                                                        children: [
+                                                                            "상태: ",
+                                                                            req.status,
+                                                                            " | 요청일: ",
+                                                                            req.createdAt
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                                        lineNumber: 199,
+                                                                        columnNumber: 29
+                                                                    }, this)
+                                                                ]
+                                                            }, req.id, true, {
+                                                                fileName: "[project]/app/my-page/page.tsx",
+                                                                lineNumber: 196,
+                                                                columnNumber: 27
+                                                            }, this))
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/my-page/page.tsx",
+                                                        lineNumber: 194,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/my-page/page.tsx",
+                                                lineNumber: 189,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true)
+                                ]
+                            }, void 0, true)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/my-page/page.tsx",
-                        lineNumber: 125,
-                        columnNumber: 11
+                        lineNumber: 86,
+                        columnNumber: 9
                     }, this)
                 ]
-            }, void 0, true)
+            }, void 0, true, {
+                fileName: "[project]/app/my-page/page.tsx",
+                lineNumber: 61,
+                columnNumber: 7
+            }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/my-page/page.tsx",
-        lineNumber: 45,
+        lineNumber: 55,
         columnNumber: 5
     }, this);
 }

@@ -1,5 +1,5 @@
 "use client";
-import { notices, Notice } from "@/lib/notices";
+import { notices } from "@/lib/notices";
 import { useState } from "react";
 import Link from "next/link";
 

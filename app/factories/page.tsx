@@ -181,7 +181,7 @@ export default function FactoriesPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="공장명, 키워드로 검색하세요."
-              className="flex-1 min-w-0 border rounded-lg px-4 py-2 focus:border-black focus:outline-none"
+              className="flex-1 min-w-0 border rounded-[0.625rem] px-4 py-2 focus:border-black focus:outline-none"
             />
             <div className="flex bg-gray-100 rounded-lg p-1 mt-2 md:mt-0">
               <button
