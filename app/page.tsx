@@ -10,6 +10,8 @@ import courses from '../lib/courses';
 
 // 메인 페이지 컴포넌트
 export default function Home() {
+  const searchParams = useSearchParams();
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* 메인 배너 - motion.section + 어두운 오버레이 */}
