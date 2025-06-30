@@ -702,7 +702,6 @@ const SIDEBAR_MENUS = [
 function MyPage() {
     const { user } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$clerk$2f$shared$2f$dist$2f$react$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useUser"])();
     const [selectedMenu, setSelectedMenu] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("프로필");
-    const [myFactories, setMyFactories] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"]);
     const [editMode, setEditMode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [factoryName, setFactoryName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [factoryDesc, setFactoryDesc] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
@@ -715,7 +714,7 @@ function MyPage() {
             children: "로그인 후 이용 가능합니다."
         }, void 0, false, {
             fileName: "[project]/app/my-page/page.tsx",
-            lineNumber: 29,
+            lineNumber: 28,
             columnNumber: 12
         }, this);
     }
@@ -727,11 +726,8 @@ function MyPage() {
     const myFactory = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"].find((f)=>f.ownerUserId === user.id);
     const handleFactoryEdit = (e)=>{
         e.preventDefault();
-        setMyFactories((facs)=>facs.map((f)=>f.id === myFactory?.id ? {
-                    ...f,
-                    name: factoryName,
-                    description: factoryDesc
-                } : f));
+        // const [myFactories, setMyFactories] = useState(factories); // 사용되지 않으므로 삭제
+        // const [myFactories, setMyFactories] = useState(facs => facs.map(f => f.id === myFactory?.id ? { ...f, name: factoryName, description: factoryDesc } : f));
         setEditMode(false);
     };
     // 역할 변경 핸들러(실제 서비스라면 Supabase users 테이블 업데이트 필요)

@@ -719,7 +719,6 @@ function MyPage() {
     _s();
     const { user } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$clerk$2f$shared$2f$dist$2f$react$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useUser"])();
     const [selectedMenu, setSelectedMenu] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("프로필");
-    const [myFactories, setMyFactories] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["factories"]);
     const [editMode, setEditMode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [factoryName, setFactoryName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [factoryDesc, setFactoryDesc] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
@@ -732,7 +731,7 @@ function MyPage() {
             children: "로그인 후 이용 가능합니다."
         }, void 0, false, {
             fileName: "[project]/app/my-page/page.tsx",
-            lineNumber: 29,
+            lineNumber: 28,
             columnNumber: 12
         }, this);
     }
@@ -744,11 +743,8 @@ function MyPage() {
     const myFactory = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["factories"].find((f)=>f.ownerUserId === user.id);
     const handleFactoryEdit = (e)=>{
         e.preventDefault();
-        setMyFactories((facs)=>facs.map((f)=>f.id === myFactory?.id ? {
-                    ...f,
-                    name: factoryName,
-                    description: factoryDesc
-                } : f));
+        // const [myFactories, setMyFactories] = useState(factories); // 사용되지 않으므로 삭제
+        // const [myFactories, setMyFactories] = useState(facs => facs.map(f => f.id === myFactory?.id ? { ...f, name: factoryName, description: factoryDesc } : f));
         setEditMode(false);
     };
     // 역할 변경 핸들러(실제 서비스라면 Supabase users 테이블 업데이트 필요)
@@ -1355,7 +1351,7 @@ function MyPage() {
         columnNumber: 5
     }, this);
 }
-_s(MyPage, "bB6s/tpZvqA2ZwANiTVqtu+62C0=", false, function() {
+_s(MyPage, "8D3BNxuKi7b8Wfnn99mPk3Gp1lI=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$clerk$2f$shared$2f$dist$2f$react$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useUser"]
     ];

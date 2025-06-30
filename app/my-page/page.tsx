@@ -17,7 +17,6 @@ type SidebarMenu = typeof SIDEBAR_MENUS[number];
 export default function MyPage() {
   const { user } = useUser();
   const [selectedMenu, setSelectedMenu] = useState<SidebarMenu>("프로필");
-  const [myFactories, setMyFactories] = useState(factories);
   const [editMode, setEditMode] = useState(false);
   const [factoryName, setFactoryName] = useState("");
   const [factoryDesc, setFactoryDesc] = useState("");
@@ -39,7 +38,8 @@ export default function MyPage() {
 
   const handleFactoryEdit = (e: React.FormEvent) => {
     e.preventDefault();
-    setMyFactories(facs => facs.map(f => f.id === myFactory?.id ? { ...f, name: factoryName, description: factoryDesc } : f));
+    // const [myFactories, setMyFactories] = useState(factories); // 사용되지 않으므로 삭제
+    // const [myFactories, setMyFactories] = useState(facs => facs.map(f => f.id === myFactory?.id ? { ...f, name: factoryName, description: factoryDesc } : f));
     setEditMode(false);
   };
 
