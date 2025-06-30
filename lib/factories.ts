@@ -10,6 +10,8 @@ export interface Factory {
   contact: string;
   lat: number;
   lng: number;
+  kakaoUrl: string;
+  processes: string[];
 }
 
 // factories: 봉제공장 샘플 데이터 70개
@@ -28,6 +30,8 @@ export const factories: Factory[] = [
     contact: "02-1234-5678",
     lat: 37.5665,
     lng: 126.9780,
+    kakaoUrl: "https://open.kakao.com/o/some-link1",
+    processes: ["봉제", "나염"],
   },
   {
     id: "2",
@@ -41,6 +45,8 @@ export const factories: Factory[] = [
     contact: "051-9876-5432",
     lat: 35.1796,
     lng: 129.0756,
+    kakaoUrl: "https://open.kakao.com/o/some-link2",
+    processes: ["샘플", "자수"],
   },
   {
     id: "3",
@@ -54,6 +60,8 @@ export const factories: Factory[] = [
     contact: "053-222-3333",
     lat: 35.8714,
     lng: 128.6014,
+    kakaoUrl: "https://open.kakao.com/o/some-link3",
+    processes: ["QC", "다이마루"],
   },
   {
     id: "4",
@@ -67,6 +75,8 @@ export const factories: Factory[] = [
     contact: "032-111-2222",
     lat: 37.4563,
     lng: 126.7052,
+    kakaoUrl: "https://open.kakao.com/o/some-link4",
+    processes: ["봉제", "나염"],
   },
   {
     id: "5",
@@ -80,6 +90,8 @@ export const factories: Factory[] = [
     contact: "062-333-4444",
     lat: 35.1595,
     lng: 126.8526,
+    kakaoUrl: "https://open.kakao.com/o/some-link5",
+    processes: ["봉제", "나염"],
   },
   {
     id: "6",
@@ -93,6 +105,8 @@ export const factories: Factory[] = [
     contact: "042-555-6666",
     lat: 36.3504,
     lng: 127.3845,
+    kakaoUrl: "https://open.kakao.com/o/some-link6",
+    processes: ["봉제", "나염"],
   },
   {
     id: "7",
@@ -106,6 +120,8 @@ export const factories: Factory[] = [
     contact: "052-777-8888",
     lat: 35.5384,
     lng: 129.3114,
+    kakaoUrl: "https://open.kakao.com/o/some-link7",
+    processes: ["봉제", "나염"],
   },
   {
     id: "8",
@@ -119,6 +135,8 @@ export const factories: Factory[] = [
     contact: "031-888-9999",
     lat: 37.4138,
     lng: 127.5183,
+    kakaoUrl: "https://open.kakao.com/o/some-link8",
+    processes: ["봉제", "나염"],
   },
   {
     id: "9",
@@ -132,6 +150,8 @@ export const factories: Factory[] = [
     contact: "033-101-2020",
     lat: 37.8228,
     lng: 128.1555,
+    kakaoUrl: "https://open.kakao.com/o/some-link9",
+    processes: ["봉제", "나염"],
   },
   {
     id: "10",
@@ -145,6 +165,8 @@ export const factories: Factory[] = [
     contact: "043-303-4040",
     lat: 36.6424,
     lng: 127.4890,
+    kakaoUrl: "https://open.kakao.com/o/some-link10",
+    processes: ["봉제", "나염"],
   },
   {
     id: "11",
@@ -158,6 +180,8 @@ export const factories: Factory[] = [
     contact: "041-505-6060",
     lat: 36.7926,
     lng: 127.1350,
+    kakaoUrl: "https://open.kakao.com/o/some-link11",
+    processes: ["봉제", "나염"],
   },
   {
     id: "12",
@@ -171,6 +195,8 @@ export const factories: Factory[] = [
     contact: "063-606-7070",
     lat: 35.8242,
     lng: 127.1477,
+    kakaoUrl: "https://open.kakao.com/o/some-link12",
+    processes: ["봉제", "나염"],
   },
   {
     id: "13",
@@ -184,6 +210,8 @@ export const factories: Factory[] = [
     contact: "061-808-9090",
     lat: 34.8118,
     lng: 126.3922,
+    kakaoUrl: "https://open.kakao.com/o/some-link13",
+    processes: ["봉제", "나염"],
   },
   {
     id: "14",
@@ -197,6 +225,8 @@ export const factories: Factory[] = [
     contact: "054-111-2121",
     lat: 36.1195,
     lng: 128.3446,
+    kakaoUrl: "https://open.kakao.com/o/some-link14",
+    processes: ["봉제", "나염"],
   },
   {
     id: "15",
@@ -210,6 +240,8 @@ export const factories: Factory[] = [
     contact: "055-313-4141",
     lat: 35.2285,
     lng: 128.6811,
+    kakaoUrl: "https://open.kakao.com/o/some-link15",
+    processes: ["봉제", "나염"],
   },
   {
     id: "16",
@@ -223,6 +255,8 @@ export const factories: Factory[] = [
     contact: "064-707-8080",
     lat: 33.4996,
     lng: 126.5312,
+    kakaoUrl: "https://open.kakao.com/o/some-link16",
+    processes: ["봉제", "나염"],
   },
   {
     id: "17",
@@ -236,6 +270,8 @@ export const factories: Factory[] = [
     contact: "02-1717-1717",
     lat: 37.5700,
     lng: 127.0095,
+    kakaoUrl: "https://open.kakao.com/o/some-link17",
+    processes: ["봉제", "나염"],
   },
   {
     id: "18",
@@ -249,6 +285,8 @@ export const factories: Factory[] = [
     contact: "051-1818-1818",
     lat: 35.1632,
     lng: 129.1636,
+    kakaoUrl: "https://open.kakao.com/o/some-link18",
+    processes: ["봉제", "나염"],
   },
   {
     id: "19",
@@ -262,6 +300,8 @@ export const factories: Factory[] = [
     contact: "053-1919-1919",
     lat: 35.8686,
     lng: 128.5945,
+    kakaoUrl: "https://open.kakao.com/o/some-link19",
+    processes: ["봉제", "나염"],
   },
   {
     id: "20",
@@ -275,6 +315,8 @@ export const factories: Factory[] = [
     contact: "032-2020-2020",
     lat: 37.3891,
     lng: 126.6445,
+    kakaoUrl: "https://open.kakao.com/o/some-link20",
+    processes: ["봉제", "나염"],
   },
   {
     id: "21",
@@ -288,6 +330,8 @@ export const factories: Factory[] = [
     contact: "062-2121-2121",
     lat: 35.1330,
     lng: 126.9020,
+    kakaoUrl: "https://open.kakao.com/o/some-link21",
+    processes: ["봉제", "나염"],
   },
   {
     id: "22",
@@ -301,6 +345,8 @@ export const factories: Factory[] = [
     contact: "042-2222-2222",
     lat: 36.3622,
     lng: 127.3568,
+    kakaoUrl: "https://open.kakao.com/o/some-link22",
+    processes: ["봉제", "나염"],
   },
   {
     id: "23",
@@ -314,6 +360,8 @@ export const factories: Factory[] = [
     contact: "052-2323-2323",
     lat: 35.5833,
     lng: 129.3600,
+    kakaoUrl: "https://open.kakao.com/o/some-link23",
+    processes: ["봉제", "나염"],
   },
   {
     id: "24",
@@ -327,6 +375,8 @@ export const factories: Factory[] = [
     contact: "031-2424-2424",
     lat: 37.2636,
     lng: 127.0286,
+    kakaoUrl: "https://open.kakao.com/o/some-link24",
+    processes: ["봉제", "나염"],
   },
   {
     id: "25",
@@ -340,6 +390,8 @@ export const factories: Factory[] = [
     contact: "033-2525-2525",
     lat: 37.3422,
     lng: 127.9207,
+    kakaoUrl: "https://open.kakao.com/o/some-link25",
+    processes: ["봉제", "나염"],
   },
   {
     id: "26",
@@ -353,6 +405,8 @@ export const factories: Factory[] = [
     contact: "043-2626-2626",
     lat: 36.9910,
     lng: 127.9258,
+    kakaoUrl: "https://open.kakao.com/o/some-link26",
+    processes: ["봉제", "나염"],
   },
   // ... (27~70번까지 위 패턴을 참고하여 다양한 지역, 품목, 이미지, 설명, 위도/경도, 연락처, ownerUserId로 실제 데이터 추가)
   // ...

@@ -25,7 +25,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "02-1234-5678",
         lat: 37.5665,
-        lng: 126.9780
+        lng: 126.9780,
+        kakaoUrl: "https://open.kakao.com/o/some-link1",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "2",
@@ -41,7 +46,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
         contact: "051-9876-5432",
         lat: 35.1796,
-        lng: 129.0756
+        lng: 129.0756,
+        kakaoUrl: "https://open.kakao.com/o/some-link2",
+        processes: [
+            "샘플",
+            "자수"
+        ]
     },
     {
         id: "3",
@@ -57,7 +67,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
         contact: "053-222-3333",
         lat: 35.8714,
-        lng: 128.6014
+        lng: 128.6014,
+        kakaoUrl: "https://open.kakao.com/o/some-link3",
+        processes: [
+            "QC",
+            "다이마루"
+        ]
     },
     {
         id: "4",
@@ -73,7 +88,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
         contact: "032-111-2222",
         lat: 37.4563,
-        lng: 126.7052
+        lng: 126.7052,
+        kakaoUrl: "https://open.kakao.com/o/some-link4",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "5",
@@ -89,7 +109,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "062-333-4444",
         lat: 35.1595,
-        lng: 126.8526
+        lng: 126.8526,
+        kakaoUrl: "https://open.kakao.com/o/some-link5",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "6",
@@ -105,7 +130,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "042-555-6666",
         lat: 36.3504,
-        lng: 127.3845
+        lng: 127.3845,
+        kakaoUrl: "https://open.kakao.com/o/some-link6",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "7",
@@ -121,7 +151,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
         contact: "052-777-8888",
         lat: 35.5384,
-        lng: 129.3114
+        lng: 129.3114,
+        kakaoUrl: "https://open.kakao.com/o/some-link7",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "8",
@@ -137,7 +172,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "031-888-9999",
         lat: 37.4138,
-        lng: 127.5183
+        lng: 127.5183,
+        kakaoUrl: "https://open.kakao.com/o/some-link8",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "9",
@@ -153,7 +193,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
         contact: "033-101-2020",
         lat: 37.8228,
-        lng: 128.1555
+        lng: 128.1555,
+        kakaoUrl: "https://open.kakao.com/o/some-link9",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "10",
@@ -169,7 +214,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
         contact: "043-303-4040",
         lat: 36.6424,
-        lng: 127.4890
+        lng: 127.4890,
+        kakaoUrl: "https://open.kakao.com/o/some-link10",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "11",
@@ -185,7 +235,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
         contact: "041-505-6060",
         lat: 36.7926,
-        lng: 127.1350
+        lng: 127.1350,
+        kakaoUrl: "https://open.kakao.com/o/some-link11",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "12",
@@ -201,7 +256,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "063-606-7070",
         lat: 35.8242,
-        lng: 127.1477
+        lng: 127.1477,
+        kakaoUrl: "https://open.kakao.com/o/some-link12",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "13",
@@ -217,7 +277,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "061-808-9090",
         lat: 34.8118,
-        lng: 126.3922
+        lng: 126.3922,
+        kakaoUrl: "https://open.kakao.com/o/some-link13",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "14",
@@ -233,7 +298,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
         contact: "054-111-2121",
         lat: 36.1195,
-        lng: 128.3446
+        lng: 128.3446,
+        kakaoUrl: "https://open.kakao.com/o/some-link14",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "15",
@@ -249,7 +319,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "055-313-4141",
         lat: 35.2285,
-        lng: 128.6811
+        lng: 128.6811,
+        kakaoUrl: "https://open.kakao.com/o/some-link15",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "16",
@@ -265,7 +340,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "064-707-8080",
         lat: 33.4996,
-        lng: 126.5312
+        lng: 126.5312,
+        kakaoUrl: "https://open.kakao.com/o/some-link16",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "17",
@@ -281,7 +361,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
         contact: "02-1717-1717",
         lat: 37.5700,
-        lng: 127.0095
+        lng: 127.0095,
+        kakaoUrl: "https://open.kakao.com/o/some-link17",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "18",
@@ -297,7 +382,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "051-1818-1818",
         lat: 35.1632,
-        lng: 129.1636
+        lng: 129.1636,
+        kakaoUrl: "https://open.kakao.com/o/some-link18",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "19",
@@ -313,7 +403,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "053-1919-1919",
         lat: 35.8686,
-        lng: 128.5945
+        lng: 128.5945,
+        kakaoUrl: "https://open.kakao.com/o/some-link19",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "20",
@@ -329,7 +424,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "032-2020-2020",
         lat: 37.3891,
-        lng: 126.6445
+        lng: 126.6445,
+        kakaoUrl: "https://open.kakao.com/o/some-link20",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "21",
@@ -345,7 +445,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
         contact: "062-2121-2121",
         lat: 35.1330,
-        lng: 126.9020
+        lng: 126.9020,
+        kakaoUrl: "https://open.kakao.com/o/some-link21",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "22",
@@ -361,7 +466,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
         contact: "042-2222-2222",
         lat: 36.3622,
-        lng: 127.3568
+        lng: 127.3568,
+        kakaoUrl: "https://open.kakao.com/o/some-link22",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "23",
@@ -377,7 +487,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
         contact: "052-2323-2323",
         lat: 35.5833,
-        lng: 129.3600
+        lng: 129.3600,
+        kakaoUrl: "https://open.kakao.com/o/some-link23",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "24",
@@ -393,7 +508,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
         contact: "031-2424-2424",
         lat: 37.2636,
-        lng: 127.0286
+        lng: 127.0286,
+        kakaoUrl: "https://open.kakao.com/o/some-link24",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "25",
@@ -409,7 +529,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "033-2525-2525",
         lat: 37.3422,
-        lng: 127.9207
+        lng: 127.9207,
+        kakaoUrl: "https://open.kakao.com/o/some-link25",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "26",
@@ -425,7 +550,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "043-2626-2626",
         lat: 36.9910,
-        lng: 127.9258
+        lng: 127.9258,
+        kakaoUrl: "https://open.kakao.com/o/some-link26",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     }
 ];
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
@@ -675,9 +805,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$clerk$2f$s
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/card.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/button.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
+;
 ;
 ;
 ;
@@ -700,7 +832,7 @@ function FactoryDetailPage({ params }) {
             children: "존재하지 않는 공장입니다."
         }, void 0, false, {
             fileName: "[project]/app/factories/[id]/page.tsx",
-            lineNumber: 20,
+            lineNumber: 21,
             columnNumber: 12
         }, this);
     }
@@ -714,6 +846,29 @@ function FactoryDetailPage({ params }) {
         setShowForm(false);
     // 실제로는 Supabase에 매칭 요청 insert 필요
     };
+    // 카톡 문의하기 버튼 클릭 핸들러
+    const handleKakaoInquiry = ()=>{
+        if (!user) return;
+        // 문의 내역 객체 생성
+        const inquiry = {
+            id: Date.now(),
+            factoryId: factory.id,
+            factoryName: factory.name,
+            date: new Date().toISOString().slice(0, 10),
+            status: "카톡 문의 완료",
+            method: "카카오톡",
+            image: factory.image
+        };
+        // 기존 문의 내역 불러오기
+        const prev = JSON.parse(localStorage.getItem("inquiries") || "[]");
+        // 새 문의 내역 추가
+        localStorage.setItem("inquiries", JSON.stringify([
+            inquiry,
+            ...prev
+        ]));
+        // 카카오톡 오픈채팅/1:1 링크로 이동(예시)
+        window.open(factory.kakaoUrl || "https://open.kakao.com/o/some-link", "_blank");
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "max-w-2xl mx-auto py-8",
         children: [
@@ -726,23 +881,25 @@ function FactoryDetailPage({ params }) {
                             children: factory.name
                         }, void 0, false, {
                             fileName: "[project]/app/factories/[id]/page.tsx",
-                            lineNumber: 40,
+                            lineNumber: 62,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/factories/[id]/page.tsx",
-                        lineNumber: 39,
+                        lineNumber: 61,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
                         children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                 src: factory.image,
                                 alt: factory.name,
+                                width: 600,
+                                height: 224,
                                 className: "rounded-xl mb-4 w-full h-56 object-cover"
                             }, void 0, false, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 43,
+                                lineNumber: 65,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -750,7 +907,7 @@ function FactoryDetailPage({ params }) {
                                 children: factory.description
                             }, void 0, false, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 44,
+                                lineNumber: 66,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -761,7 +918,7 @@ function FactoryDetailPage({ params }) {
                                         children: factory.region
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 46,
+                                        lineNumber: 68,
                                         columnNumber: 13
                                     }, this),
                                     factory.items.map((i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -769,7 +926,7 @@ function FactoryDetailPage({ params }) {
                                             children: i
                                         }, i, false, {
                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                            lineNumber: 47,
+                                            lineNumber: 69,
                                             columnNumber: 37
                                         }, this)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -781,13 +938,13 @@ function FactoryDetailPage({ params }) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 48,
+                                        lineNumber: 70,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 45,
+                                lineNumber: 67,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -798,19 +955,28 @@ function FactoryDetailPage({ params }) {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 50,
+                                lineNumber: 72,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                onClick: handleKakaoInquiry,
+                                className: "w-full bg-yellow-400 text-black rounded-full font-bold py-3 mt-4 hover:bg-yellow-300 transition-colors text-lg",
+                                children: "카톡으로 문의하기"
+                            }, void 0, false, {
+                                fileName: "[project]/app/factories/[id]/page.tsx",
+                                lineNumber: 74,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/factories/[id]/page.tsx",
-                        lineNumber: 42,
+                        lineNumber: 64,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/factories/[id]/page.tsx",
-                lineNumber: 38,
+                lineNumber: 60,
                 columnNumber: 7
             }, this),
             isDesigner && !alreadyRequested && !submitted && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -827,7 +993,7 @@ function FactoryDetailPage({ params }) {
                             required: true
                         }, void 0, false, {
                             fileName: "[project]/app/factories/[id]/page.tsx",
-                            lineNumber: 57,
+                            lineNumber: 86,
                             columnNumber: 15
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -836,13 +1002,13 @@ function FactoryDetailPage({ params }) {
                             children: "매칭 요청 보내기"
                         }, void 0, false, {
                             fileName: "[project]/app/factories/[id]/page.tsx",
-                            lineNumber: 64,
+                            lineNumber: 93,
                             columnNumber: 15
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/factories/[id]/page.tsx",
-                    lineNumber: 56,
+                    lineNumber: 85,
                     columnNumber: 13
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
                     onClick: ()=>setShowForm(true),
@@ -850,12 +1016,12 @@ function FactoryDetailPage({ params }) {
                     children: "매칭 요청하기"
                 }, void 0, false, {
                     fileName: "[project]/app/factories/[id]/page.tsx",
-                    lineNumber: 67,
+                    lineNumber: 96,
                     columnNumber: 13
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/factories/[id]/page.tsx",
-                lineNumber: 54,
+                lineNumber: 83,
                 columnNumber: 9
             }, this),
             alreadyRequested && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -863,7 +1029,7 @@ function FactoryDetailPage({ params }) {
                 children: "이미 매칭 요청을 보냈습니다."
             }, void 0, false, {
                 fileName: "[project]/app/factories/[id]/page.tsx",
-                lineNumber: 72,
+                lineNumber: 101,
                 columnNumber: 9
             }, this),
             submitted && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -871,7 +1037,7 @@ function FactoryDetailPage({ params }) {
                 children: "매칭 요청이 정상적으로 접수되었습니다."
             }, void 0, false, {
                 fileName: "[project]/app/factories/[id]/page.tsx",
-                lineNumber: 75,
+                lineNumber: 104,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -882,18 +1048,18 @@ function FactoryDetailPage({ params }) {
                     children: "← 봉제공장 목록으로"
                 }, void 0, false, {
                     fileName: "[project]/app/factories/[id]/page.tsx",
-                    lineNumber: 78,
+                    lineNumber: 107,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/factories/[id]/page.tsx",
-                lineNumber: 77,
+                lineNumber: 106,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/factories/[id]/page.tsx",
-        lineNumber: 37,
+        lineNumber: 59,
         columnNumber: 5
     }, this);
 }

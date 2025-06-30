@@ -25,13 +25,22 @@ const notices = [
         id: "1",
         title: "플랫폼 오픈 안내",
         content: "의류 디자이너와 봉제공장을 연결하는 플랫폼이 정식 오픈했습니다! 많은 이용 바랍니다.",
-        createdAt: "2024-06-23"
+        createdAt: "2024-06-23",
+        type: "공지"
     },
     {
         id: "2",
         title: "매칭 서비스 베타 오픈",
         content: "봉제공장 매칭 서비스가 베타로 오픈되었습니다. 피드백 환영합니다.",
-        createdAt: "2024-06-24"
+        createdAt: "2024-06-24",
+        type: "일반"
+    },
+    {
+        id: "3",
+        title: "채용공고 안내",
+        content: "동대문 봉제공장에서 생산관리 직원을 채용합니다. 많은 지원 바랍니다.",
+        createdAt: "2024-06-25",
+        type: "채용공고"
     }
 ];
 }}),
@@ -49,15 +58,16 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 ;
 ;
-function NoticeDetailPage({ params }) {
-    const notice = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$notices$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["notices"].find((n)=>n.id === params.id);
+async function NoticeDetailPage({ params }) {
+    const { id } = await params;
+    const notice = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$notices$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["notices"].find((n)=>n.id === id);
     if (!notice) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "max-w-xl mx-auto py-10 px-4 text-center text-gray-500",
             children: "존재하지 않는 공지입니다."
         }, void 0, false, {
             fileName: "[project]/app/notices/[id]/page.tsx",
-            lineNumber: 7,
+            lineNumber: 8,
             columnNumber: 12
         }, this);
     }
@@ -72,7 +82,7 @@ function NoticeDetailPage({ params }) {
                         children: notice.title
                     }, void 0, false, {
                         fileName: "[project]/app/notices/[id]/page.tsx",
-                        lineNumber: 12,
+                        lineNumber: 13,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -80,7 +90,7 @@ function NoticeDetailPage({ params }) {
                         children: notice.createdAt
                     }, void 0, false, {
                         fileName: "[project]/app/notices/[id]/page.tsx",
-                        lineNumber: 13,
+                        lineNumber: 14,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -88,13 +98,13 @@ function NoticeDetailPage({ params }) {
                         children: notice.content
                     }, void 0, false, {
                         fileName: "[project]/app/notices/[id]/page.tsx",
-                        lineNumber: 14,
+                        lineNumber: 15,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/notices/[id]/page.tsx",
-                lineNumber: 11,
+                lineNumber: 12,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -105,18 +115,18 @@ function NoticeDetailPage({ params }) {
                     children: "← 공지사항 목록으로"
                 }, void 0, false, {
                     fileName: "[project]/app/notices/[id]/page.tsx",
-                    lineNumber: 17,
+                    lineNumber: 18,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/notices/[id]/page.tsx",
-                lineNumber: 16,
+                lineNumber: 17,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/notices/[id]/page.tsx",
-        lineNumber: 10,
+        lineNumber: 11,
         columnNumber: 5
     }, this);
 }

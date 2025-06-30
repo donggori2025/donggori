@@ -1,4 +1,14 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
+  "/factories/[id]/page": "app/factories/[id]/page.js",
+  "/factories/page": "app/factories/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/matching/page": "app/matching/page.js",
+  "/my-page/inquiries/page": "app/my-page/inquiries/page.js",
+  "/my-page/page": "app/my-page/page.js",
+  "/my-page/profile/[[...rest]]/page": "app/my-page/profile/[[...rest]]/page.js",
+  "/my-page/profile/page": "app/my-page/profile/page.js",
+  "/notices/[id]/page": "app/notices/[id]/page.js",
+  "/notices/page": "app/notices/page.js",
   "/page": "app/page.js"
 }
