@@ -120,3 +120,59 @@
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  @apply bg-white;
+  font-family: 'Pretendard', 'Noto Sans KR', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+.header {
+  background: #3182f6;
+  color: #fff;
+  padding: 24px 32px;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: -1px;
+}
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(49,130,246,0.08);
+  padding: 32px;
+  margin-bottom: 24px;
+  transition: box-shadow 0.2s;
+}
+.card:hover {
+  box-shadow: 0 4px 16px rgba(49,130,246,0.16);
+}
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 12px;
+}
+.card-desc {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+.btn {
+  background: #3182f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn:hover {
+  background: #2563eb;
+}
