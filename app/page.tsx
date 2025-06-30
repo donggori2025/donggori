@@ -15,30 +15,30 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* 메인 배너 - motion.section + 어두운 오버레이 */}
-      <motion.section
-        className="relative w-full h-[420px] flex items-center justify-center bg-white overflow-hidden"
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-      >
-        {/* 배경 이미지는 section 전체를 absolute로 덮음 */}
-        <img
-          src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1920&q=80"
-          alt="봉제공장 배경"
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-80"
-          style={{ zIndex: 1 }}
-          draggable={false}
-        />
-        {/* 어두운 투명 오버레이 */}
-        <div className="absolute inset-0 bg-black/40" style={{ zIndex: 2 }} />
-        {/* 텍스트는 중앙 1200px로 제한, z-10 */}
-        <div className="relative z-10 w-full">
-          <div className="max-w-[1200px] mx-auto px-4 text-center text-white">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 drop-shadow-lg">동고리<br />동대문구 지역의 패션봉제공장과 디자이너들을 연결하는<br />패션봉제 올인원 플랫폼입니다.</h1>
-          </div>
+      <section className="relative h-64 flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-500">
+        <div className="absolute inset-0 bg-black opacity-40" />
+        <div className="relative z-10 flex flex-col items-center">
+          <Image src="/logo_0624.svg" alt="동고리 로고" width={100} height={32} className="h-8 mb-1" />
+          <div className="text-lg font-bold text-white mb-1">동고리</div>
+          <div className="text-xs text-gray-200">봉제공장 매칭 플랫폼</div>
         </div>
-      </motion.section>
+      </section>
+      <nav className="flex flex-row items-center gap-4 text-sm text-gray-700 font-medium mt-4 justify-center">
+        <Link href="/factories" className="hover:underline">봉제공장 찾기</Link>
+        <span className="text-gray-300">|</span>
+        <Link href="/matching" className="hover:underline">AI 매칭</Link>
+        <span className="text-gray-300">|</span>
+        <Link href="/notices" className="hover:underline">공지사항</Link>
+      </nav>
+      <nav className="flex flex-row items-center gap-4 text-sm text-gray-500 mt-2 justify-center">
+        <Link href="#" className="hover:underline">고객센터</Link>
+        <span className="text-gray-300">|</span>
+        <Link href="#" className="hover:underline">제휴문의</Link>
+        <span className="text-gray-300">|</span>
+        <Link href="#" className="hover:underline">이용약관</Link>
+        <span className="text-gray-300">|</span>
+        <Link href="#" className="hover:underline">개인정보처리방침</Link>
+      </nav>
 
       {/* 센터 소개 섹션 - motion.section */}
       <motion.section
