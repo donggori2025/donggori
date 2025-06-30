@@ -178,26 +178,26 @@ export default function Home() {
           <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 border-b border-gray-200 pb-4">
             {/* 좌측 메뉴 */}
             <nav className="flex flex-row items-center gap-4 text-sm text-gray-700 font-medium">
-              <a href="/factories" className="hover:underline">봉제공장 찾기</a>
+              <Link href="/factories" className="hover:underline">봉제공장 찾기</Link>
               <span className="text-gray-300">|</span>
-              <a href="/matching" className="hover:underline">AI 매칭</a>
+              <Link href="/matching" className="hover:underline">AI 매칭</Link>
               <span className="text-gray-300">|</span>
-              <a href="/notices" className="hover:underline">공지사항</a>
+              <Link href="/notices" className="hover:underline">공지사항</Link>
             </nav>
             {/* 우측 메뉴 */}
             <nav className="flex flex-row items-center gap-4 text-sm text-gray-500">
-              <a href="#" className="hover:underline">고객센터</a>
+              <Link href="#" className="hover:underline">고객센터</Link>
               <span className="text-gray-300">|</span>
-              <a href="#" className="hover:underline">제휴문의</a>
+              <Link href="#" className="hover:underline">제휴문의</Link>
               <span className="text-gray-300">|</span>
-              <a href="#" className="hover:underline">이용약관</a>
+              <Link href="#" className="hover:underline">이용약관</Link>
               <span className="text-gray-300">|</span>
-              <a href="#" className="hover:underline">개인정보처리방침</a>
+              <Link href="#" className="hover:underline">개인정보처리방침</Link>
             </nav>
           </div>
           {/* 중앙: 로고, 서비스명, 협회명 등 안내 */}
           <div className="flex flex-col items-center gap-2 py-2">
-            <img src="/logo_0624.svg" alt="동고리 로고" className="h-8 mb-1" />
+            <Image src="/logo_0624.svg" alt="동고리 로고" width={100} height={32} className="h-8 mb-1" />
             <div className="text-lg font-bold text-gray-800 mb-1">동고리</div>
             <div className="text-xs text-gray-500 text-center">
               (사)DDM패션봉제산업연합회 &nbsp;|&nbsp; (사)동대문패션봉제발전산업협의회 &nbsp;|&nbsp; (사)동대문구의류봉제산업연합회
