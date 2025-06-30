@@ -40,7 +40,7 @@ export default function MyCoursesPage() {
     );
   }
 
-  const purchasedCourses = courses.filter((c) => myCourses.includes(c.id));
+  const purchasedCourses = courses.filter((c) => myCourses.includes(String(c.id)));
 
   return (
     <div className="max-w-2xl mx-auto mt-12">
@@ -51,13 +51,17 @@ export default function MyCoursesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {purchasedCourses.map((course) => (
-            <Link key={course.id} href={`/courses/${course.id}`} className="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
-              <div className="font-bold text-lg text-toss-blue mb-2">{course.title}</div>
-              <div className="text-sm text-gray-500 mb-2">{course.description}</div>
-              <div className="text-right font-semibold">{course.price.toLocaleString()}원</div>
-            </Link>
-          ))}
+          {purchasedCourses.map((course) => {
+            const title = typeof (course as any).title === 'string' ? (course as any).title : (course as any).name ?? '';
+            const price = typeof (course as any).price === 'number' ? (course as any).price : 0;
+            return (
+              <Link key={course.id} href={`/courses/${course.id}`} className="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
+                <div className="font-bold text-lg text-toss-blue mb-2">{title}</div>
+                <div className="text-sm text-gray-500 mb-2">{course.description}</div>
+                <div className="text-right font-semibold">{price.toLocaleString()}원</div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>
