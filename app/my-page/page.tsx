@@ -11,8 +11,9 @@ export default function MyPage() {
   const [factoryName, setFactoryName] = useState("");
   const [factoryDesc, setFactoryDesc] = useState("");
   const [editRoleMode, setEditRoleMode] = useState(false);
-  const [newRole, setNewRole] = useState(user?.publicMetadata?.role || "");
-  const [role, setRole] = useState(user?.publicMetadata?.role || "");
+  const initialRole = typeof user?.publicMetadata?.role === "string" ? user.publicMetadata.role : "";
+  const [newRole, setNewRole] = useState<string>(initialRole);
+  const [role, setRole] = useState<string>(initialRole);
 
   if (!user) {
     return <div className="max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center">로그인 후 이용 가능합니다.</div>;
@@ -50,7 +51,11 @@ export default function MyPage() {
           역할: {role === "designer" ? "디자이너" : role === "factory" ? "공장" : <span className="text-red-500">(미선택)</span>}
           {(!role || editRoleMode) && (
             <form onSubmit={handleRoleChange} className="flex gap-2 items-center mt-2">
-              <select value={newRole || ""} onChange={e => setNewRole(e.target.value)} className="border rounded px-3 py-2">
+              <select
+                value={newRole || ""}
+                onChange={e => setNewRole((e.target as HTMLSelectElement).value)}
+                className="border rounded px-3 py-2"
+              >
                 <option value="">역할 선택</option>
                 <option value="designer">디자이너</option>
                 <option value="factory">공장</option>

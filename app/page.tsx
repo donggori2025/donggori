@@ -8,8 +8,6 @@ import { motion } from "framer-motion";
 
 // 메인 페이지 컴포넌트
 export default function Home() {
-  const searchParams = useSearchParams();
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* 메인 배너 - motion.section + 어두운 오버레이 */}
@@ -113,7 +111,7 @@ export default function Home() {
               { key: 3, left: true,  title: "원하는 의류 넣고\n의뢰서 작성하면", strong: "매칭 준비 끝." },
               { key: 4, left: false, title: "봉제공장에서\n확인하고 연락오면", strong: "제작 준비 끝." },
               { key: 5, left: true,  title: "원하는 의류 넣고\n의뢰서 작성하면", strong: "매칭 준비 끝." },
-            ].map((step, idx) => (
+            ].map((step) => (
               <div
                 key={step.key}
                 className={`flex flex-col md:flex-row items-center justify-between gap-6 ${step.left ? '' : 'md:flex-row-reverse'}`}

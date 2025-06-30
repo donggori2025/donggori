@@ -39,8 +39,13 @@ export default function CustomSignUpPage() {
       }
     } catch (err: unknown) {
       // 타입가드로 에러 메시지 추출
-      if (typeof err === "object" && err !== null && "errors" in err && Array.isArray((err as any).errors)) {
-        setError((err as any).errors?.[0]?.message || "회원가입 중 오류가 발생했습니다.");
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "errors" in err &&
+        Array.isArray((err as { errors?: unknown }).errors)
+      ) {
+        setError((err as { errors?: { message?: string }[] }).errors?.[0]?.message || "회원가입 중 오류가 발생했습니다.");
       } else if (err instanceof Error) {
         setError(err.message);
       } else {
