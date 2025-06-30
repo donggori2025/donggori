@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FactoryMap from "@/components/FactoryMap";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 
 const processOptions = ["봉제", "다이마루", "직기"];
 const itemOptions = ["티셔츠", "셔츠", "원피스", "바지", "점퍼", "코트", "자켓"];
@@ -167,7 +168,7 @@ export default function FactoriesPage() {
                 <Link key={factory.id} href={`/factories/${factory.id}`} className="group">
                   <Card className="rounded-xl shadow-sm border bg-white hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
                     <CardContent className="flex-1 flex flex-col p-4">
-                      <img src={factory.image} alt={factory.name} className="rounded-xl mb-3 h-32 w-full object-cover" />
+                      <Image src={factory.image} alt={factory.name} width={400} height={128} className="rounded-xl mb-3 h-32 w-full object-cover" />
                       <div className="flex gap-2 mb-2">
                         <span className="bg-toss-gray text-toss-blue rounded px-2 py-1 text-xs font-bold">{factory.region}</span>
                         {factory.items.slice(0, 2).map(i => <span key={i} className="bg-toss-gray rounded px-2 py-1 text-xs">{i}</span>)}
@@ -203,7 +204,7 @@ export default function FactoriesPage() {
             {/* 선택된 공장 카드 */}
             {selectedFactory && (
               <div className="flex gap-4 items-center">
-                <img src={selectedFactory.image} alt={selectedFactory.name} className="w-32 h-24 object-cover rounded-xl" />
+                <Image src={selectedFactory.image} alt={selectedFactory.name} width={128} height={96} className="w-32 h-24 object-cover rounded-xl" />
                 <div className="flex-1">
                   <div className="flex gap-2 mb-1">
                     <span className="bg-toss-gray text-toss-blue rounded px-2 py-1 text-xs font-bold">{selectedFactory.region}</span>

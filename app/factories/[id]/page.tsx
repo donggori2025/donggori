@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function FactoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -40,7 +41,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           <CardTitle className="text-xl font-bold text-toss-blue">{factory.name}</CardTitle>
         </CardHeader>
         <CardContent>
-          <img src={factory.image} alt={factory.name} className="rounded-xl mb-4 w-full h-56 object-cover" />
+          <Image src={factory.image} alt={factory.name} width={600} height={224} className="rounded-xl mb-4 w-full h-56 object-cover" />
           <div className="mb-2 text-gray-700">{factory.description}</div>
           <div className="flex flex-wrap gap-2 text-xs mb-2">
             <span className="bg-toss-gray rounded px-2 py-1">{factory.region}</span>
