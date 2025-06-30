@@ -5,7 +5,6 @@ import {
   SignInButton,
   SignedIn,
   SignedOut,
-  UserButton,
   useUser,
 } from "@clerk/nextjs";
 import { useState } from "react";
