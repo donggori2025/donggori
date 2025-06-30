@@ -25,7 +25,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "02-1234-5678",
         lat: 37.5665,
-        lng: 126.9780
+        lng: 126.9780,
+        kakaoUrl: "https://open.kakao.com/o/some-link1",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "2",
@@ -41,7 +46,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
         contact: "051-9876-5432",
         lat: 35.1796,
-        lng: 129.0756
+        lng: 129.0756,
+        kakaoUrl: "https://open.kakao.com/o/some-link2",
+        processes: [
+            "샘플",
+            "자수"
+        ]
     },
     {
         id: "3",
@@ -57,7 +67,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
         contact: "053-222-3333",
         lat: 35.8714,
-        lng: 128.6014
+        lng: 128.6014,
+        kakaoUrl: "https://open.kakao.com/o/some-link3",
+        processes: [
+            "QC",
+            "다이마루"
+        ]
     },
     {
         id: "4",
@@ -73,7 +88,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
         contact: "032-111-2222",
         lat: 37.4563,
-        lng: 126.7052
+        lng: 126.7052,
+        kakaoUrl: "https://open.kakao.com/o/some-link4",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "5",
@@ -89,7 +109,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "062-333-4444",
         lat: 35.1595,
-        lng: 126.8526
+        lng: 126.8526,
+        kakaoUrl: "https://open.kakao.com/o/some-link5",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "6",
@@ -105,7 +130,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "042-555-6666",
         lat: 36.3504,
-        lng: 127.3845
+        lng: 127.3845,
+        kakaoUrl: "https://open.kakao.com/o/some-link6",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "7",
@@ -121,7 +151,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
         contact: "052-777-8888",
         lat: 35.5384,
-        lng: 129.3114
+        lng: 129.3114,
+        kakaoUrl: "https://open.kakao.com/o/some-link7",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "8",
@@ -137,7 +172,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "031-888-9999",
         lat: 37.4138,
-        lng: 127.5183
+        lng: 127.5183,
+        kakaoUrl: "https://open.kakao.com/o/some-link8",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "9",
@@ -153,7 +193,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
         contact: "033-101-2020",
         lat: 37.8228,
-        lng: 128.1555
+        lng: 128.1555,
+        kakaoUrl: "https://open.kakao.com/o/some-link9",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "10",
@@ -169,7 +214,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
         contact: "043-303-4040",
         lat: 36.6424,
-        lng: 127.4890
+        lng: 127.4890,
+        kakaoUrl: "https://open.kakao.com/o/some-link10",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "11",
@@ -185,7 +235,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
         contact: "041-505-6060",
         lat: 36.7926,
-        lng: 127.1350
+        lng: 127.1350,
+        kakaoUrl: "https://open.kakao.com/o/some-link11",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "12",
@@ -201,7 +256,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "063-606-7070",
         lat: 35.8242,
-        lng: 127.1477
+        lng: 127.1477,
+        kakaoUrl: "https://open.kakao.com/o/some-link12",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "13",
@@ -217,7 +277,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "061-808-9090",
         lat: 34.8118,
-        lng: 126.3922
+        lng: 126.3922,
+        kakaoUrl: "https://open.kakao.com/o/some-link13",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "14",
@@ -233,7 +298,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
         contact: "054-111-2121",
         lat: 36.1195,
-        lng: 128.3446
+        lng: 128.3446,
+        kakaoUrl: "https://open.kakao.com/o/some-link14",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "15",
@@ -249,7 +319,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "055-313-4141",
         lat: 35.2285,
-        lng: 128.6811
+        lng: 128.6811,
+        kakaoUrl: "https://open.kakao.com/o/some-link15",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "16",
@@ -265,7 +340,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "064-707-8080",
         lat: 33.4996,
-        lng: 126.5312
+        lng: 126.5312,
+        kakaoUrl: "https://open.kakao.com/o/some-link16",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "17",
@@ -281,7 +361,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
         contact: "02-1717-1717",
         lat: 37.5700,
-        lng: 127.0095
+        lng: 127.0095,
+        kakaoUrl: "https://open.kakao.com/o/some-link17",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "18",
@@ -297,7 +382,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
         contact: "051-1818-1818",
         lat: 35.1632,
-        lng: 129.1636
+        lng: 129.1636,
+        kakaoUrl: "https://open.kakao.com/o/some-link18",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "19",
@@ -313,7 +403,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "053-1919-1919",
         lat: 35.8686,
-        lng: 128.5945
+        lng: 128.5945,
+        kakaoUrl: "https://open.kakao.com/o/some-link19",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "20",
@@ -329,7 +424,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "032-2020-2020",
         lat: 37.3891,
-        lng: 126.6445
+        lng: 126.6445,
+        kakaoUrl: "https://open.kakao.com/o/some-link20",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "21",
@@ -345,7 +445,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
         contact: "062-2121-2121",
         lat: 35.1330,
-        lng: 126.9020
+        lng: 126.9020,
+        kakaoUrl: "https://open.kakao.com/o/some-link21",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "22",
@@ -361,7 +466,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
         contact: "042-2222-2222",
         lat: 36.3622,
-        lng: 127.3568
+        lng: 127.3568,
+        kakaoUrl: "https://open.kakao.com/o/some-link22",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "23",
@@ -377,7 +487,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
         contact: "052-2323-2323",
         lat: 35.5833,
-        lng: 129.3600
+        lng: 129.3600,
+        kakaoUrl: "https://open.kakao.com/o/some-link23",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "24",
@@ -393,7 +508,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
         contact: "031-2424-2424",
         lat: 37.2636,
-        lng: 127.0286
+        lng: 127.0286,
+        kakaoUrl: "https://open.kakao.com/o/some-link24",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "25",
@@ -409,7 +529,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
         contact: "033-2525-2525",
         lat: 37.3422,
-        lng: 127.9207
+        lng: 127.9207,
+        kakaoUrl: "https://open.kakao.com/o/some-link25",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     },
     {
         id: "26",
@@ -425,7 +550,12 @@ const factories = [
         image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
         contact: "043-2626-2626",
         lat: 36.9910,
-        lng: 127.9258
+        lng: 127.9258,
+        kakaoUrl: "https://open.kakao.com/o/some-link26",
+        processes: [
+            "봉제",
+            "나염"
+        ]
     }
 ];
 }}),
@@ -682,7 +812,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/button.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$FactoryMap$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/FactoryMap.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ArrowPathIcon$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowPathIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/@heroicons/react/24/outline/esm/ArrowPathIcon.js [app-ssr] (ecmascript) <export default as ArrowPathIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$list$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__List$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/list.js [app-ssr] (ecmascript) <export default as List>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Map$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/map.js [app-ssr] (ecmascript) <export default as Map>");
 "use client";
+;
+;
 ;
 ;
 ;
@@ -694,7 +829,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$
 const processOptions = [
     "봉제",
     "다이마루",
-    "직기"
+    "직기",
+    "샘플",
+    "나염",
+    "자수",
+    "QC"
 ];
 const itemOptions = [
     "티셔츠",
@@ -710,6 +849,27 @@ const regionOptions = [
     "부산",
     "대구"
 ];
+// 태그별 색상 매핑 함수
+function getTagColor(tag) {
+    switch(tag){
+        case "봉제":
+            return "bg-blue-100 text-blue-700";
+        case "나염":
+            return "bg-orange-100 text-orange-700";
+        case "자수":
+            return "bg-green-100 text-green-700";
+        case "샘플":
+            return "bg-purple-100 text-purple-700";
+        case "QC":
+            return "bg-pink-100 text-pink-700";
+        case "다이마루":
+            return "bg-yellow-100 text-yellow-700";
+        case "직기":
+            return "bg-cyan-100 text-cyan-700";
+        default:
+            return "bg-gray-100 text-gray-700";
+    }
+}
 function FactoriesPage() {
     const [search, setSearch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [selectedProcess, setSelectedProcess] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
@@ -719,6 +879,14 @@ function FactoriesPage() {
     const [view, setView] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("list");
     const perPage = 9;
     const [selectedFactoryId, setSelectedFactoryId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"][0]?.id || "");
+    // 아코디언 열림/닫힘 상태 관리
+    const [openFilter, setOpenFilter] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({
+        process: true,
+        region: true,
+        item: true,
+        moq: false,
+        equipment: false
+    });
     // 샘플 필터링(실제 필터링 로직은 추후 확장)
     let filtered = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"].filter((f)=>{
         return (!search || f.name.includes(search) || f.description.includes(search)) && (selectedRegion.length === 0 || selectedRegion.includes(f.region)) && (selectedItem.length === 0 || f.items.some((i)=>selectedItem.includes(i)));
@@ -743,645 +911,822 @@ function FactoriesPage() {
     // 지도 뷰에서 선택된 공장 정보
     const selectedFactory = filtered.find((f)=>f.id === selectedFactoryId) || filtered[0];
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "flex max-w-7xl mx-auto py-8 gap-8",
+        className: "max-w-[1200px] mx-auto py-16 flex flex-col gap-8",
         children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
-                className: "w-64 shrink-0 hidden lg:block",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "bg-white rounded-xl shadow p-6 mb-6",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "font-bold mb-4 flex items-center justify-between",
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                        className: "text-[40px] font-extrabold text-gray-900 mb-2",
+                        children: "봉제공장 찾기"
+                    }, void 0, false, {
+                        fileName: "[project]/app/factories/page.tsx",
+                        lineNumber: 76,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: "text-lg text-gray-500",
+                        children: "퀄리티 좋은 의류 제작, 지금 바로 견적을 요청해보세요."
+                    }, void 0, false, {
+                        fileName: "[project]/app/factories/page.tsx",
+                        lineNumber: 77,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/factories/page.tsx",
+                lineNumber: 75,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex gap-8",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
+                        className: "w-64 shrink-0 hidden lg:block",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "bg-white rounded-xl mb-6 py-2",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    children: "필터"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 53,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    onClick: ()=>{
-                                        setSelectedProcess([]);
-                                        setSelectedRegion([]);
-                                        setSelectedItem([]);
-                                    },
-                                    className: "flex items-center gap-1 text-xs text-gray-500 hover:text-black px-2 py-1 rounded transition",
-                                    title: "필터 초기화",
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "font-bold mb-4 flex items-center justify-between",
                                     children: [
-                                        typeof __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ArrowPathIcon$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowPathIcon$3e$__["ArrowPathIcon"] !== 'undefined' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ArrowPathIcon$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowPathIcon$3e$__["ArrowPathIcon"], {
-                                            className: "w-4 h-4"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 61,
-                                            columnNumber: 17
-                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-lg",
-                                            children: "↻"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 63,
-                                            columnNumber: 17
-                                        }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "sr-only",
-                                            children: "초기화"
+                                            children: "필터"
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 65,
+                                            lineNumber: 84,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            onClick: ()=>{
+                                                setSelectedProcess([]);
+                                                setSelectedRegion([]);
+                                                setSelectedItem([]);
+                                            },
+                                            className: "flex items-center gap-1 text-xs text-gray-500 hover:text-black px-2 py-1 rounded transition",
+                                            title: "필터 초기화",
+                                            children: [
+                                                typeof __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ArrowPathIcon$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowPathIcon$3e$__["ArrowPathIcon"] !== 'undefined' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ArrowPathIcon$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowPathIcon$3e$__["ArrowPathIcon"], {
+                                                    className: "w-4 h-4"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 91,
+                                                    columnNumber: 19
+                                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-lg",
+                                                    children: "↻"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 93,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "sr-only",
+                                                    children: "초기화"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 95,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 85,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 54,
+                                    lineNumber: 83,
                                     columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 52,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mb-4",
-                            children: [
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("hr", {
+                                    className: "my-3 border-gray-200"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/factories/page.tsx",
+                                    lineNumber: 98,
+                                    columnNumber: 13
+                                }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "font-semibold text-sm mb-2",
+                                    className: "mb-6",
                                     children: [
-                                        "공정",
-                                        selectedProcess.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "ml-1 text-black",
-                                            children: [
-                                                "(",
-                                                selectedProcess.length,
-                                                ")"
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 71,
-                                            columnNumber: 17
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 69,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex flex-wrap gap-2",
-                                    children: processOptions.map((opt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                            size: "sm",
-                                            variant: selectedProcess.includes(opt) ? "default" : "outline",
-                                            className: "rounded-full px-4",
-                                            onClick: ()=>setSelectedProcess(selectedProcess.includes(opt) ? selectedProcess.filter((p)=>p !== opt) : [
-                                                    ...selectedProcess,
-                                                    opt
-                                                ]),
-                                            children: opt
-                                        }, opt, false, {
-                                            fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 76,
-                                            columnNumber: 17
-                                        }, this))
-                                }, void 0, false, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 74,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 68,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mb-4",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "font-semibold text-sm mb-2",
-                                    children: [
-                                        "지역",
-                                        selectedRegion.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "ml-1 text-black",
-                                            children: [
-                                                "(",
-                                                selectedRegion.length,
-                                                ")"
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 84,
-                                            columnNumber: 17
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 82,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex flex-wrap gap-2",
-                                    children: regionOptions.map((opt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                            size: "sm",
-                                            variant: selectedRegion.includes(opt) ? "default" : "outline",
-                                            className: "rounded-full px-4",
-                                            onClick: ()=>setSelectedRegion(selectedRegion.includes(opt) ? selectedRegion.filter((r)=>r !== opt) : [
-                                                    ...selectedRegion,
-                                                    opt
-                                                ]),
-                                            children: opt
-                                        }, opt, false, {
-                                            fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 89,
-                                            columnNumber: 17
-                                        }, this))
-                                }, void 0, false, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 87,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 81,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mb-4",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "font-semibold text-sm mb-2",
-                                    children: [
-                                        "주요 품목",
-                                        selectedItem.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "ml-1 text-black",
-                                            children: [
-                                                "(",
-                                                selectedItem.length,
-                                                ")"
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 97,
-                                            columnNumber: 17
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 95,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex flex-wrap gap-2",
-                                    children: itemOptions.map((opt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                            size: "sm",
-                                            variant: selectedItem.includes(opt) ? "default" : "outline",
-                                            className: "rounded-full px-4",
-                                            onClick: ()=>setSelectedItem(selectedItem.includes(opt) ? selectedItem.filter((i)=>i !== opt) : [
-                                                    ...selectedItem,
-                                                    opt
-                                                ]),
-                                            children: opt
-                                        }, opt, false, {
-                                            fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 102,
-                                            columnNumber: 17
-                                        }, this))
-                                }, void 0, false, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 100,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 94,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mb-2 font-semibold text-sm",
-                            children: "MOQ(최소수량)"
-                        }, void 0, false, {
-                            fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 108,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mb-6",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                type: "number",
-                                className: "border rounded px-3 py-2 w-full",
-                                placeholder: "예: 100",
-                                disabled: true
-                            }, void 0, false, {
-                                fileName: "[project]/app/factories/page.tsx",
-                                lineNumber: 110,
-                                columnNumber: 13
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 109,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mb-2 font-semibold text-sm",
-                            children: "주요 설비"
-                        }, void 0, false, {
-                            fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 112,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mb-6",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                type: "text",
-                                className: "border rounded px-3 py-2 w-full",
-                                placeholder: "예: 오버록",
-                                disabled: true
-                            }, void 0, false, {
-                                fileName: "[project]/app/factories/page.tsx",
-                                lineNumber: 114,
-                                columnNumber: 13
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 113,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/app/factories/page.tsx",
-                    lineNumber: 51,
-                    columnNumber: 9
-                }, this)
-            }, void 0, false, {
-                fileName: "[project]/app/factories/page.tsx",
-                lineNumber: 50,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-                className: "flex-1 min-w-0",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex-1 flex flex-wrap gap-2 items-center",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                    value: search,
-                                    onChange: (e)=>setSearch(e.target.value),
-                                    placeholder: "공장명, 키워드로 검색하세요.",
-                                    className: "border rounded px-4 py-2 w-full md:w-80"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 122,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                    variant: view === "map" ? "outline" : "default",
-                                    size: "sm",
-                                    className: "rounded-full",
-                                    onClick: ()=>setView("list"),
-                                    children: "목록"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 129,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                    variant: view === "map" ? "default" : "outline",
-                                    size: "sm",
-                                    className: "rounded-full",
-                                    onClick: ()=>setView("map"),
-                                    children: "지도"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 135,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 121,
-                            columnNumber: 11
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/app/factories/page.tsx",
-                        lineNumber: 120,
-                        columnNumber: 9
-                    }, this),
-                    badges.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex flex-wrap gap-2 mb-4",
-                        children: [
-                            badges.map((b, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "bg-black text-white rounded-full px-3 py-1 text-xs font-semibold flex items-center gap-1",
-                                    children: [
-                                        b.value,
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                            onClick: ()=>{
-                                                if (b.type === "process") setSelectedProcess(selectedProcess.filter((p)=>p !== b.value));
-                                                if (b.type === "region") setSelectedRegion(selectedRegion.filter((r)=>r !== b.value));
-                                                if (b.type === "item") setSelectedItem(selectedItem.filter((i)=>i !== b.value));
-                                            },
-                                            className: "ml-1",
-                                            children: "×"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 149,
-                                            columnNumber: 17
-                                        }, this)
-                                    ]
-                                }, i, true, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 147,
-                                    columnNumber: 15
-                                }, this)),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                size: "sm",
-                                variant: "ghost",
-                                onClick: ()=>{
-                                    setSelectedProcess([]);
-                                    setSelectedRegion([]);
-                                    setSelectedItem([]);
-                                },
-                                children: "전체 해제"
-                            }, void 0, false, {
-                                fileName: "[project]/app/factories/page.tsx",
-                                lineNumber: 156,
-                                columnNumber: 13
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/factories/page.tsx",
-                        lineNumber: 145,
-                        columnNumber: 11
-                    }, this),
-                    view === "list" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6",
-                                children: [
-                                    filtered.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "col-span-3 text-center text-gray-400",
-                                        children: "검색 결과가 없습니다."
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/factories/page.tsx",
-                                        lineNumber: 164,
-                                        columnNumber: 17
-                                    }, this),
-                                    filtered.map((factory)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                            href: `/factories/${factory.id}`,
-                                            className: "group",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
-                                                className: "rounded-xl shadow-sm border bg-white hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col",
-                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
-                                                    className: "flex-1 flex flex-col p-4",
+                                            className: "w-full flex justify-between items-center font-bold text-[16px] mb-2",
+                                            onClick: ()=>setOpenFilter((f)=>({
+                                                        ...f,
+                                                        process: !f.process
+                                                    })),
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "flex items-center",
                                                     children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                                            src: factory.image,
-                                                            alt: factory.name,
-                                                            className: "rounded-xl mb-3 h-32 w-full object-cover"
+                                                        "공정",
+                                                        selectedProcess.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "ml-2 bg-black text-white w-5 h-5 text-xs flex items-center justify-center rounded-full",
+                                                            children: selectedProcess.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 170,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "flex gap-2 mb-2",
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    className: "bg-toss-gray text-toss-blue rounded px-2 py-1 text-xs font-bold",
-                                                                    children: factory.region
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/app/factories/page.tsx",
-                                                                    lineNumber: 172,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                factory.items.slice(0, 2).map((i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "bg-toss-gray rounded px-2 py-1 text-xs",
-                                                                        children: i
-                                                                    }, i, false, {
-                                                                        fileName: "[project]/app/factories/page.tsx",
-                                                                        lineNumber: 173,
-                                                                        columnNumber: 61
-                                                                    }, this))
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 171,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "font-bold text-base mb-1 group-hover:text-toss-blue transition-colors",
-                                                            children: factory.name
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 175,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "text-xs text-gray-500 mb-1 line-clamp-2",
-                                                            children: factory.description
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 176,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "text-xs text-gray-500 mb-1",
-                                                            children: [
-                                                                "MOQ(최소수량): ",
-                                                                factory.minOrder
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 177,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "text-xs text-gray-400",
-                                                            children: [
-                                                                "주요 품목: ",
-                                                                factory.items.join(", ")
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 178,
-                                                            columnNumber: 23
+                                                            lineNumber: 104,
+                                                            columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 169,
-                                                    columnNumber: 21
+                                                    lineNumber: 102,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    style: {
+                                                        display: "inline-block",
+                                                        transform: openFilter.process ? "none" : "rotate(180deg)"
+                                                    },
+                                                    children: "⌃"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 107,
+                                                    columnNumber: 17
                                                 }, this)
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/factories/page.tsx",
-                                                lineNumber: 168,
-                                                columnNumber: 19
-                                            }, this)
-                                        }, factory.id, false, {
+                                            ]
+                                        }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 167,
+                                            lineNumber: 101,
+                                            columnNumber: 15
+                                        }, this),
+                                        openFilter.process && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex flex-wrap gap-2",
+                                            children: processOptions.map((opt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                    size: "sm",
+                                                    variant: selectedProcess.includes(opt) ? "default" : "outline",
+                                                    className: "rounded-full px-4",
+                                                    onClick: ()=>setSelectedProcess(selectedProcess.includes(opt) ? selectedProcess.filter((p)=>p !== opt) : [
+                                                            ...selectedProcess,
+                                                            opt
+                                                        ]),
+                                                    children: opt
+                                                }, opt, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 112,
+                                                    columnNumber: 21
+                                                }, this))
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 110,
                                             columnNumber: 17
-                                        }, this))
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/factories/page.tsx",
-                                lineNumber: 162,
-                                columnNumber: 13
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex justify-center items-center gap-2 mt-8",
-                                children: Array.from({
-                                    length: totalPages
-                                }, (_, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                        size: "icon",
-                                        variant: page === i + 1 ? "default" : "outline",
-                                        className: "rounded-full w-8 h-8 p-0",
-                                        onClick: ()=>setPage(i + 1),
-                                        children: i + 1
-                                    }, i, false, {
-                                        fileName: "[project]/app/factories/page.tsx",
-                                        lineNumber: 187,
-                                        columnNumber: 17
-                                    }, this))
-                            }, void 0, false, {
-                                fileName: "[project]/app/factories/page.tsx",
-                                lineNumber: 185,
-                                columnNumber: 13
-                            }, this)
-                        ]
-                    }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "bg-white rounded-xl shadow p-4",
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/factories/page.tsx",
+                                    lineNumber: 100,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "mb-6",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            className: "w-full flex justify-between items-center font-bold text-[16px] mb-2",
+                                            onClick: ()=>setOpenFilter((f)=>({
+                                                        ...f,
+                                                        region: !f.region
+                                                    })),
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "flex items-center",
+                                                    children: [
+                                                        "지역",
+                                                        selectedRegion.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "ml-2 bg-black text-white w-5 h-5 text-xs flex items-center justify-center rounded-full",
+                                                            children: selectedRegion.length
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/factories/page.tsx",
+                                                            lineNumber: 123,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 121,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    style: {
+                                                        display: "inline-block",
+                                                        transform: openFilter.region ? "none" : "rotate(180deg)"
+                                                    },
+                                                    children: "⌃"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 126,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 120,
+                                            columnNumber: 15
+                                        }, this),
+                                        openFilter.region && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex flex-wrap gap-2",
+                                            children: regionOptions.map((opt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                    size: "sm",
+                                                    variant: selectedRegion.includes(opt) ? "default" : "outline",
+                                                    className: "rounded-full px-4",
+                                                    onClick: ()=>setSelectedRegion(selectedRegion.includes(opt) ? selectedRegion.filter((r)=>r !== opt) : [
+                                                            ...selectedRegion,
+                                                            opt
+                                                        ]),
+                                                    children: opt
+                                                }, opt, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 131,
+                                                    columnNumber: 21
+                                                }, this))
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 129,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/factories/page.tsx",
+                                    lineNumber: 119,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "mb-6",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            className: "w-full flex justify-between items-center font-bold text-[16px] mb-2",
+                                            onClick: ()=>setOpenFilter((f)=>({
+                                                        ...f,
+                                                        item: !f.item
+                                                    })),
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "flex items-center",
+                                                    children: [
+                                                        "주요 품목",
+                                                        selectedItem.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "ml-2 bg-black text-white w-5 h-5 text-xs flex items-center justify-center rounded-full",
+                                                            children: selectedItem.length
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/factories/page.tsx",
+                                                            lineNumber: 142,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 140,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    style: {
+                                                        display: "inline-block",
+                                                        transform: openFilter.item ? "none" : "rotate(180deg)"
+                                                    },
+                                                    children: "⌃"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 145,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 139,
+                                            columnNumber: 15
+                                        }, this),
+                                        openFilter.item && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex flex-wrap gap-2",
+                                            children: itemOptions.map((opt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                    size: "sm",
+                                                    variant: selectedItem.includes(opt) ? "default" : "outline",
+                                                    className: "rounded-full px-4",
+                                                    onClick: ()=>setSelectedItem(selectedItem.includes(opt) ? selectedItem.filter((i)=>i !== opt) : [
+                                                            ...selectedItem,
+                                                            opt
+                                                        ]),
+                                                    children: opt
+                                                }, opt, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 150,
+                                                    columnNumber: 21
+                                                }, this))
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 148,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/factories/page.tsx",
+                                    lineNumber: 138,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "mb-6",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            className: "w-full flex justify-between items-center font-bold text-[16px] mb-2",
+                                            onClick: ()=>setOpenFilter((f)=>({
+                                                        ...f,
+                                                        moq: !f.moq
+                                                    })),
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    children: "MOQ(최소수량)"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 159,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    style: {
+                                                        display: "inline-block",
+                                                        transform: openFilter.moq ? "none" : "rotate(180deg)"
+                                                    },
+                                                    children: "⌃"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 160,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 158,
+                                            columnNumber: 15
+                                        }, this),
+                                        openFilter.moq && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            type: "number",
+                                            className: "border rounded px-3 py-2 w-full",
+                                            placeholder: "예: 100",
+                                            disabled: true
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 163,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/factories/page.tsx",
+                                    lineNumber: 157,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "mb-6",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            className: "w-full flex justify-between items-center font-bold text-[16px] mb-2",
+                                            onClick: ()=>setOpenFilter((f)=>({
+                                                        ...f,
+                                                        equipment: !f.equipment
+                                                    })),
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    children: "주요 설비"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 169,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    style: {
+                                                        display: "inline-block",
+                                                        transform: openFilter.equipment ? "none" : "rotate(180deg)"
+                                                    },
+                                                    children: "⌃"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 170,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 168,
+                                            columnNumber: 15
+                                        }, this),
+                                        openFilter.equipment && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            type: "text",
+                                            className: "border rounded px-3 py-2 w-full",
+                                            placeholder: "예: 오버록",
+                                            disabled: true
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 173,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/factories/page.tsx",
+                                    lineNumber: 167,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/factories/page.tsx",
+                            lineNumber: 82,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/app/factories/page.tsx",
+                        lineNumber: 81,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                        className: "flex-1 min-w-0",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "w-full h-[420px] rounded-xl overflow-hidden mb-4",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$FactoryMap$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                    factories: filtered,
-                                    selectedFactoryId: selectedFactoryId,
-                                    onSelectFactory: setSelectedFactoryId,
-                                    height: "420px"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 196,
-                                    columnNumber: 15
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/app/factories/page.tsx",
-                                lineNumber: 195,
-                                columnNumber: 13
-                            }, this),
-                            selectedFactory && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex gap-4 items-center",
+                                className: "flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4",
                                 children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                        src: selectedFactory.image,
-                                        alt: selectedFactory.name,
-                                        className: "w-32 h-24 object-cover rounded-xl"
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        value: search,
+                                        onChange: (e)=>setSearch(e.target.value),
+                                        placeholder: "공장명, 키워드로 검색하세요.",
+                                        className: "flex-1 min-w-0 border rounded-lg px-4 py-2 focus:border-black focus:outline-none"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/page.tsx",
-                                        lineNumber: 206,
-                                        columnNumber: 17
+                                        lineNumber: 180,
+                                        columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "flex-1",
+                                        className: "flex bg-gray-100 rounded-lg p-1 mt-2 md:mt-0",
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex gap-2 mb-1",
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                className: `px-4 py-1 rounded-lg transition flex items-center gap-2 ${view === 'list' ? 'bg-white text-[#333] font-semibold shadow' : 'bg-transparent text-[#555] font-normal'}`,
+                                                onClick: ()=>setView('list'),
                                                 children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "bg-toss-gray text-toss-blue rounded px-2 py-1 text-xs font-bold",
-                                                        children: selectedFactory.region
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$list$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__List$3e$__["List"], {
+                                                        size: 28,
+                                                        strokeWidth: view === 'list' ? 2.5 : 2,
+                                                        className: `${view === 'list' ? 'text-[#222]' : 'text-[#bbb]'} scale-80`
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/factories/page.tsx",
-                                                        lineNumber: 209,
-                                                        columnNumber: 21
+                                                        lineNumber: 191,
+                                                        columnNumber: 17
                                                     }, this),
-                                                    selectedFactory.items.slice(0, 2).map((i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "bg-toss-gray rounded px-2 py-1 text-xs",
-                                                            children: i
-                                                        }, i, false, {
-                                                            fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 210,
-                                                            columnNumber: 65
-                                                        }, this))
+                                                    "목록"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/factories/page.tsx",
-                                                lineNumber: 208,
-                                                columnNumber: 19
+                                                lineNumber: 187,
+                                                columnNumber: 15
                                             }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "font-bold text-base mb-1",
-                                                children: selectedFactory.name
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/factories/page.tsx",
-                                                lineNumber: 212,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "text-xs text-gray-500 mb-1 line-clamp-2",
-                                                children: selectedFactory.description
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/factories/page.tsx",
-                                                lineNumber: 213,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "text-xs text-gray-500 mb-1",
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                className: `px-4 py-1 rounded-lg transition flex items-center gap-2 ${view === 'map' ? 'bg-white text-[#333] font-semibold shadow' : 'bg-transparent text-[#555] font-normal'}`,
+                                                onClick: ()=>setView('map'),
                                                 children: [
-                                                    "MOQ(최소수량): ",
-                                                    selectedFactory.minOrder
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Map$3e$__["Map"], {
+                                                        size: 28,
+                                                        strokeWidth: view === 'map' ? 2.5 : 2,
+                                                        className: `${view === 'map' ? 'text-[#222]' : 'text-[#bbb]'} scale-80`
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/factories/page.tsx",
+                                                        lineNumber: 198,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    "지도"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/factories/page.tsx",
-                                                lineNumber: 214,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "text-xs text-gray-400",
-                                                children: [
-                                                    "주요 품목: ",
-                                                    selectedFactory.items.join(", ")
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/app/factories/page.tsx",
-                                                lineNumber: 215,
-                                                columnNumber: 19
+                                                lineNumber: 194,
+                                                columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/factories/page.tsx",
-                                        lineNumber: 207,
-                                        columnNumber: 17
+                                        lineNumber: 186,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/factories/page.tsx",
+                                lineNumber: 179,
+                                columnNumber: 11
+                            }, this),
+                            badges.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex flex-wrap gap-2 mb-4",
+                                children: [
+                                    badges.map((b, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "bg-black text-white rounded-full px-3 py-1 text-[14px] font-semibold flex items-center gap-1",
+                                            children: [
+                                                b.value,
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    onClick: ()=>{
+                                                        if (b.type === "process") setSelectedProcess(selectedProcess.filter((p)=>p !== b.value));
+                                                        if (b.type === "region") setSelectedRegion(selectedRegion.filter((r)=>r !== b.value));
+                                                        if (b.type === "item") setSelectedItem(selectedItem.filter((i)=>i !== b.value));
+                                                    },
+                                                    className: "ml-1",
+                                                    children: "×"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 209,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, i, true, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 207,
+                                            columnNumber: 17
+                                        }, this)),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                        size: "sm",
+                                        variant: "ghost",
+                                        onClick: ()=>{
+                                            setSelectedProcess([]);
+                                            setSelectedRegion([]);
+                                            setSelectedItem([]);
+                                        },
+                                        children: "전체 해제"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/factories/page.tsx",
+                                        lineNumber: 216,
+                                        columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/page.tsx",
                                 lineNumber: 205,
-                                columnNumber: 15
+                                columnNumber: 13
+                            }, this),
+                            view === "list" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6",
+                                        children: [
+                                            filtered.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "col-span-3 text-center text-gray-400",
+                                                children: "검색 결과가 없습니다."
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/factories/page.tsx",
+                                                lineNumber: 224,
+                                                columnNumber: 19
+                                            }, this),
+                                            filtered.map((factory)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                    href: `/factories/${factory.id}`,
+                                                    className: "group",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
+                                                        className: "rounded-xl shadow-sm border bg-white hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col",
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
+                                                            className: "flex-1 flex flex-col p-4",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                    src: factory.image,
+                                                                    alt: factory.name,
+                                                                    width: 400,
+                                                                    height: 128,
+                                                                    className: "rounded-xl mb-3 h-32 w-full object-cover"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/factories/page.tsx",
+                                                                    lineNumber: 230,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "flex gap-2 mb-2 flex-wrap",
+                                                                    children: [
+                                                                        factory.processes?.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: `rounded px-2 py-1 text-xs font-bold ${getTagColor(tag)}`,
+                                                                                children: tag
+                                                                            }, tag, false, {
+                                                                                fileName: "[project]/app/factories/page.tsx",
+                                                                                lineNumber: 234,
+                                                                                columnNumber: 29
+                                                                            }, this)),
+                                                                        factory.items.slice(0, 2).map((i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "bg-gray-100 text-gray-700 rounded px-2 py-1 text-xs",
+                                                                                children: i
+                                                                            }, i, false, {
+                                                                                fileName: "[project]/app/factories/page.tsx",
+                                                                                lineNumber: 237,
+                                                                                columnNumber: 63
+                                                                            }, this))
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/factories/page.tsx",
+                                                                    lineNumber: 231,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "font-bold text-base mb-1 group-hover:text-toss-blue transition-colors",
+                                                                    children: factory.name
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/factories/page.tsx",
+                                                                    lineNumber: 239,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "text-xs text-gray-500 mb-1 line-clamp-2",
+                                                                    children: factory.description
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/factories/page.tsx",
+                                                                    lineNumber: 240,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "text-xs text-gray-500 mb-1",
+                                                                    children: [
+                                                                        "MOQ(최소수량): ",
+                                                                        factory.minOrder
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/factories/page.tsx",
+                                                                    lineNumber: 241,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "text-xs text-gray-400",
+                                                                    children: [
+                                                                        "주요 품목: ",
+                                                                        factory.items.join(", ")
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/factories/page.tsx",
+                                                                    lineNumber: 242,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/factories/page.tsx",
+                                                            lineNumber: 229,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/factories/page.tsx",
+                                                        lineNumber: 228,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                }, factory.id, false, {
+                                                    fileName: "[project]/app/factories/page.tsx",
+                                                    lineNumber: 227,
+                                                    columnNumber: 19
+                                                }, this))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/factories/page.tsx",
+                                        lineNumber: 222,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex justify-center items-center gap-2 mt-8",
+                                        children: Array.from({
+                                            length: totalPages
+                                        }, (_, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                size: "icon",
+                                                variant: page === i + 1 ? "default" : "outline",
+                                                className: "rounded-full w-8 h-8 p-0",
+                                                onClick: ()=>setPage(i + 1),
+                                                children: i + 1
+                                            }, i, false, {
+                                                fileName: "[project]/app/factories/page.tsx",
+                                                lineNumber: 251,
+                                                columnNumber: 19
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/factories/page.tsx",
+                                        lineNumber: 249,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "bg-white rounded-xl shadow p-4",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "w-full h-[420px] rounded-xl overflow-hidden mb-4",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$FactoryMap$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                            factories: filtered,
+                                            selectedFactoryId: selectedFactoryId,
+                                            onSelectFactory: setSelectedFactoryId
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/factories/page.tsx",
+                                            lineNumber: 260,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/factories/page.tsx",
+                                        lineNumber: 259,
+                                        columnNumber: 15
+                                    }, this),
+                                    selectedFactory && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex gap-4 items-center",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                src: selectedFactory.image,
+                                                alt: selectedFactory.name,
+                                                width: 128,
+                                                height: 96,
+                                                className: "w-32 h-24 object-cover rounded-xl"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/factories/page.tsx",
+                                                lineNumber: 269,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "flex-1",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex gap-2 mb-1 flex-wrap",
+                                                        children: [
+                                                            selectedFactory.processes?.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: `rounded px-2 py-1 text-xs font-bold ${getTagColor(tag)}`,
+                                                                    children: tag
+                                                                }, tag, false, {
+                                                                    fileName: "[project]/app/factories/page.tsx",
+                                                                    lineNumber: 273,
+                                                                    columnNumber: 25
+                                                                }, this)),
+                                                            selectedFactory.items.slice(0, 2).map((i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "bg-gray-100 text-gray-700 rounded px-2 py-1 text-xs",
+                                                                    children: i
+                                                                }, i, false, {
+                                                                    fileName: "[project]/app/factories/page.tsx",
+                                                                    lineNumber: 275,
+                                                                    columnNumber: 67
+                                                                }, this))
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/factories/page.tsx",
+                                                        lineNumber: 271,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "font-bold text-base mb-1",
+                                                        children: selectedFactory.name
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/factories/page.tsx",
+                                                        lineNumber: 277,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "text-xs text-gray-500 mb-1 line-clamp-2",
+                                                        children: selectedFactory.description
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/factories/page.tsx",
+                                                        lineNumber: 278,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "text-xs text-gray-500 mb-1",
+                                                        children: [
+                                                            "MOQ(최소수량): ",
+                                                            selectedFactory.minOrder
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/factories/page.tsx",
+                                                        lineNumber: 279,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "text-xs text-gray-400",
+                                                        children: [
+                                                            "주요 품목: ",
+                                                            selectedFactory.items.join(", ")
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/factories/page.tsx",
+                                                        lineNumber: 280,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/factories/page.tsx",
+                                                lineNumber: 270,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/factories/page.tsx",
+                                        lineNumber: 268,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/factories/page.tsx",
+                                lineNumber: 257,
+                                columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/factories/page.tsx",
-                        lineNumber: 193,
-                        columnNumber: 11
+                        lineNumber: 178,
+                        columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/factories/page.tsx",
-                lineNumber: 119,
+                lineNumber: 80,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/factories/page.tsx",
-        lineNumber: 48,
+        lineNumber: 73,
         columnNumber: 5
     }, this);
-}
+} // 주니어 개발자 설명:
+ // - getTagColor 함수로 태그별 색상을 쉽게 관리할 수 있습니다.
+ // - 필터 아코디언은 useState로 열림/닫힘 상태를 관리하며, 버튼 클릭 시 토글됩니다.
+ // - 카드 내 태그는 map으로 렌더링하며, 공정/나염/자수 등은 색상, 주요 품목은 회색으로 구분합니다.
+ // - Tailwind CSS로 스타일을 빠르게 적용할 수 있습니다. 
 }}),
 
 };

@@ -6,27 +6,43 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
+  useUser,
 } from "@clerk/nextjs";
+import { useState } from "react";
+import { UserIcon } from "lucide-react";
 
 export default function Header() {
+  // 햄버거 메뉴 오픈/닫힘 상태 관리
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useUser();
+
+  // 네비게이션 메뉴 항목
+  const navMenu = [
+    { href: "/factories", label: "봉제공장 찾기" },
+    { href: "/matching", label: "매칭" },
+    { href: "/notices", label: "공지사항" },
+  ];
+
   return (
-    <header className="w-full bg-white border-b sticky top-0 z-10">
-      <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between px-4 py-4">
+    <header className="w-full bg-white border-b sticky top-0 z-[9999]">
+      <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between py-4">
+        {/* 로고 */}
         <Link href="/" className="select-none" aria-label="동고리 홈">
           <Image
-            src="/logo_0624.svg"
+            src="/logo_donggori.png"
             alt="동고리 로고"
             width={113}
             height={47}
             priority
-            style={{ width: 113, height: 47 }}
+            className="h-12 w-auto scale-80"
           />
         </Link>
-        <div className="flex items-center gap-8">
-          <nav className="hidden md:flex gap-6 text-base font-medium text-[#222222]">
-            <Link href="/factories" className="hover:text-[#222222] hover:font-bold transition-colors">봉제공장 찾기</Link>
-            <Link href="/matching" className="hover:text-[#222222] hover:font-bold transition-colors">매칭</Link>
-            <Link href="/notices" className="hover:text-[#222222] hover:font-bold transition-colors">공지사항</Link>
+        {/* 데스크탑 메뉴: md 이상에서만 보임 */}
+        <div className="hidden md:flex items-center gap-8">
+          <nav className="flex gap-6 text-base font-medium text-[#222222]">
+            {navMenu.map((item) => (
+              <Link key={item.href} href={item.href} className="hover:text-[#222222] hover:font-bold transition-colors">{item.label}</Link>
+            ))}
           </nav>
           <div className="flex items-center gap-2">
             <SignedOut>
@@ -35,13 +51,91 @@ export default function Header() {
               </SignInButton>
             </SignedOut>
             <SignedIn>
-              <Link href="/my-page" className="flex items-center">
-                <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: 'w-9 h-9' } }} />
+              {/* UserButton 드롭다운 대신 직접 아바타 렌더링, 클릭 시 문의 내역으로 이동 */}
+              <Link href="/my-page/inquiries" className="flex items-center">
+                <img
+                  src={user?.imageUrl}
+                  alt="프로필"
+                  className="w-9 h-9 rounded-full border border-gray-300 object-cover hover:ring-2 hover:ring-toss-blue transition"
+                />
               </Link>
             </SignedIn>
           </div>
         </div>
+        {/* 모바일: md 미만에서만 햄버거 버튼 보임 */}
+        <div className="md:hidden flex items-center">
+          <button
+            aria-label="메뉴 열기"
+            className="p-2 rounded hover:bg-gray-100 focus:outline-none"
+            onClick={() => setMenuOpen(true)}
+          >
+            {/* 햄버거 아이콘 (SVG) */}
+            <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+        {/* 드로어 메뉴: 햄버거 버튼 클릭 시 노출, md 이상에서는 숨김 */}
+        {menuOpen && (
+          <div className="fixed inset-0 z-50 flex items-start justify-end md:hidden">
+            {/* 오버레이 */}
+            <div
+              className="absolute inset-0 bg-black/10"
+              onClick={() => setMenuOpen(false)}
+              aria-label="오버레이 클릭 시 메뉴 닫기"
+            />
+            {/* 사이드 드로어 메뉴 */}
+            <div className="relative w-64 bg-white h-full shadow-lg p-6 animate-slide-in-right flex flex-col gap-6">
+              {/* 닫기 버튼 */}
+              <button
+                className="absolute top-4 right-4 p-2 rounded hover:bg-gray-100"
+                aria-label="메뉴 닫기"
+                onClick={() => setMenuOpen(false)}
+              >
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              {/* 메뉴 그룹 */}
+              <div className="flex flex-col gap-4 mt-8">
+                {navMenu.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="py-2 px-2 rounded hover:bg-gray-100 text-gray-800"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+              {/* 로그인/회원가입 버튼 */}
+              <div className="flex gap-2 mt-4">
+                <SignedOut>
+                  <SignInButton>
+                    <button className="flex-1 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800">로그인/회원가입</button>
+                  </SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  <Link href="/my-page" className="flex-1 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 text-gray-800 py-2">
+                    마이페이지
+                  </Link>
+                </SignedIn>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+      {/* 사이드 드로어 애니메이션 (Tailwind에 없으므로 직접 정의 필요) */}
+      <style>{`
+        @keyframes slide-in-right {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        .animate-slide-in-right {
+          animation: slide-in-right 0.2s ease;
+        }
+      `}</style>
     </header>
   );
 } 

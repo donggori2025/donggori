@@ -5,6 +5,7 @@ import {
   ClerkProvider,
 } from "@clerk/nextjs";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,6 +16,14 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// Clerk 기본 메뉴 한글화(특히 UserButton의 'Manage account' → '프로필')
+const koLocalization = {
+  userButton: {
+    action__manageAccount: "프로필",
+    action__signOut: "로그아웃",
+  },
+};
 
 export const metadata: Metadata = {
   title: "의류 디자이너-봉제공장 매칭 플랫폼",
@@ -27,13 +36,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider localization={koLocalization}>
       <html lang="ko">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-toss-gray min-h-screen`}>
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-toss-gray min-h-screen flex flex-col`}>
           <Header />
-          <main className="w-full">{children}</main>
-      </body>
-    </html>
+          <main className="w-full flex-1">{children}</main>
+          <Footer />
+        </body>
+      </html>
     </ClerkProvider>
   );
 }

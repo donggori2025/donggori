@@ -34,6 +34,27 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     // 실제로는 Supabase에 매칭 요청 insert 필요
   };
 
+  // 카톡 문의하기 버튼 클릭 핸들러
+  const handleKakaoInquiry = () => {
+    if (!user) return;
+    // 문의 내역 객체 생성
+    const inquiry = {
+      id: Date.now(), // 고유값(타임스탬프)
+      factoryId: factory.id,
+      factoryName: factory.name,
+      date: new Date().toISOString().slice(0, 10),
+      status: "카톡 문의 완료",
+      method: "카카오톡",
+      image: factory.image,
+    };
+    // 기존 문의 내역 불러오기
+    const prev = JSON.parse(localStorage.getItem("inquiries") || "[]");
+    // 새 문의 내역 추가
+    localStorage.setItem("inquiries", JSON.stringify([inquiry, ...prev]));
+    // 카카오톡 오픈채팅/1:1 링크로 이동(예시)
+    window.open(factory.kakaoUrl || "https://open.kakao.com/o/some-link", "_blank");
+  };
+
   return (
     <div className="max-w-2xl mx-auto py-8">
       <Card className="mb-6">
@@ -49,6 +70,13 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             <span className="bg-toss-gray rounded px-2 py-1">최소 {factory.minOrder}장</span>
           </div>
           <div className="mb-2 text-sm text-gray-500">연락처: {factory.contact}</div>
+          {/* 카톡 문의하기 버튼 */}
+          <Button
+            onClick={handleKakaoInquiry}
+            className="w-full bg-yellow-400 text-black rounded-full font-bold py-3 mt-4 hover:bg-yellow-300 transition-colors text-lg"
+          >
+            카톡으로 문의하기
+          </Button>
         </CardContent>
       </Card>
       {isDesigner && !alreadyRequested && !submitted && (
