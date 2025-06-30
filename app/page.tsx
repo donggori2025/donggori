@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import ... from '../../lib/courses'
+import courses from '../lib/courses';
 
 // 메인 페이지 컴포넌트
 export default function Home() {
