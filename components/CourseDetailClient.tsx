@@ -1,7 +1,6 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
 import LikeButton from "./LikeButton";
-import PaymentButton from "./PaymentButton";
 import CourseImage from "./CourseImage";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -34,14 +33,6 @@ export default function CourseDetailClient({ course }: { course: Course }) {
             <Link href="/">목록으로</Link>
           </Button>
         </div>
-        {user && (
-          <PaymentButton
-            orderId={`order_${course.id}_${user.id}`}
-            amount={course.price}
-            orderName={course.title}
-            customerName={user.fullName || user.username || "회원"}
-          />
-        )}
         {!user && (
           <div className="mt-4 text-center text-gray-400 text-sm">로그인 후 결제할 수 있습니다.</div>
         )}
