@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { motion } from "framer-motion";
+import ... from '../../lib/courses'
 
 // 메인 페이지 컴포넌트
 export default function Home() {
