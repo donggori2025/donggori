@@ -5,6 +5,14 @@ import { supabase } from "@/lib/supabaseClient";
 import { courses } from "@/lib/courses";
 import Link from "next/link";
 
+type CourseLike = {
+  id: string | number;
+  name?: string;
+  title?: string;
+  description: string;
+  price?: number;
+};
+
 export default function MyCoursesPage() {
   const { user } = useUser();
   const [myCourses, setMyCourses] = useState<string[]>([]);
@@ -51,9 +59,9 @@ export default function MyCoursesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {purchasedCourses.map((course) => {
-            const title = typeof (course as any).title === 'string' ? (course as any).title : (course as any).name ?? '';
-            const price = typeof (course as any).price === 'number' ? (course as any).price : 0;
+          {purchasedCourses.map((course: CourseLike) => {
+            const title = course.title ?? course.name ?? '';
+            const price = course.price ?? 0;
             return (
               <Link key={course.id} href={`/courses/${course.id}`} className="block bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
                 <div className="font-bold text-lg text-toss-blue mb-2">{title}</div>
