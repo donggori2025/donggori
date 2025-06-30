@@ -1,11 +1,11 @@
 "use client";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { motion } from "framer-motion";
-import { useSearchParams } from "next/navigation";
 import courses from '../lib/courses';
 
 // 메인 페이지 컴포넌트
