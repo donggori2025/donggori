@@ -1,13 +1,12 @@
 "use client";
 import { useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { user } = useUser();
   const orderId = searchParams.get("orderId");
   const paymentKey = searchParams.get("paymentKey");

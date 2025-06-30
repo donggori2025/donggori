@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 
 interface CourseImageProps {
   src: string;
@@ -23,9 +24,11 @@ export default function CourseImage({ src, alt, className }: CourseImageProps) {
   }
 
   return (
-    <img
+    <Image
       src={src}
       alt={alt}
+      width={400}
+      height={240}
       className={className}
       onError={() => setError(true)}
     />

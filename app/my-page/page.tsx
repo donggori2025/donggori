@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 
 export default function MyPage() {
   const { user } = useUser();
-  const [myFactories, setMyFactories] = useState(factories);
   const [editMode, setEditMode] = useState(false);
   const [factoryName, setFactoryName] = useState("");
   const [factoryDesc, setFactoryDesc] = useState("");
@@ -29,7 +28,7 @@ export default function MyPage() {
 
   const handleFactoryEdit = (e: React.FormEvent) => {
     e.preventDefault();
-    setMyFactories(facs => facs.map(f => f.id === myFactory?.id ? { ...f, name: factoryName, description: factoryDesc } : f));
+    // 실제 상태 관리 필요시 구현
     setEditMode(false);
   };
 
