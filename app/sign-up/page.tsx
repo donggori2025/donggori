@@ -37,8 +37,15 @@ export default function CustomSignUpPage() {
       } else {
         setError("회원가입에 실패했습니다. 다시 시도해 주세요.");
       }
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "회원가입 중 오류가 발생했습니다.");
+    } catch (err: unknown) {
+      // 타입가드로 에러 메시지 추출
+      if (typeof err === "object" && err !== null && "errors" in err && Array.isArray((err as any).errors)) {
+        setError((err as any).errors?.[0]?.message || "회원가입 중 오류가 발생했습니다.");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("회원가입 중 알 수 없는 오류가 발생했습니다.");
+      }
     } finally {
       setLoading(false);
     }
