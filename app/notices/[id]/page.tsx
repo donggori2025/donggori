@@ -1,8 +1,9 @@
 import { notices } from "@/lib/notices";
 import Link from "next/link";
 
-export default function NoticeDetailPage({ params }: { params: { id: string } }) {
-  const notice = notices.find(n => n.id === params.id);
+export default async function NoticeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const notice = notices.find(n => n.id === id);
   if (!notice) {
     return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 공지입니다.</div>;
   }
