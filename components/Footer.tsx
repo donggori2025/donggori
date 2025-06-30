@@ -8,9 +8,6 @@ import React, { useState } from "react";
 // - 스타일은 Tailwind CSS를 사용합니다.
 
 const Footer = () => {
-  // 햄버거 메뉴 오픈/닫힘 상태 관리
-  const [menuOpen, setMenuOpen] = useState(false);
-
   // 메뉴 항목(왼쪽/오른쪽 메뉴)
   const leftMenu = [
     { href: "/factories", label: "봉제공장 찾기" },

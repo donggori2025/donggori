@@ -9,11 +9,11 @@ import {
   useUser,
 } from "@clerk/nextjs";
 import { useState } from "react";
-import { UserIcon } from "lucide-react";
 
 export default function Header() {
   // 햄버거 메뉴 오픈/닫힘 상태 관리
   const [menuOpen, setMenuOpen] = useState(false);
+  // Clerk에서 현재 로그인한 사용자 정보 가져오기
   const { user } = useUser();
 
   // 네비게이션 메뉴 항목
@@ -24,17 +24,17 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full bg-white border-b sticky top-0 z-[9999]">
-      <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between py-4">
+    <header className="w-full bg-white border-b sticky top-0 z-10">
+      <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between px-10 py-4">
         {/* 로고 */}
         <Link href="/" className="select-none" aria-label="동고리 홈">
           <Image
-            src="/logo_donggori.png"
+            src="/logo_0624.svg"
             alt="동고리 로고"
             width={113}
             height={47}
             priority
-            className="h-12 w-auto scale-80"
+            style={{ width: 113, height: 47 }}
           />
         </Link>
         {/* 데스크탑 메뉴: md 이상에서만 보임 */}
@@ -45,20 +45,23 @@ export default function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            {/* 로그인 전: 로그인/회원가입 버튼 노출 */}
             <SignedOut>
               <SignInButton>
                 <button className="text-base font-medium text-white bg-[#222222] px-3 py-1 rounded hover:bg-[#444] transition-colors">로그인/회원가입</button>
               </SignInButton>
             </SignedOut>
+            {/* 로그인 후: 프로필 이미지(아바타) 클릭 시 마이페이지로 이동 */}
             <SignedIn>
-              {/* UserButton 드롭다운 대신 직접 아바타 렌더링, 클릭 시 문의 내역으로 이동 */}
-              <Link href="/my-page/inquiries" className="flex items-center">
-                <img
-                  src={user?.imageUrl}
-                  alt="프로필"
-                  className="w-9 h-9 rounded-full border border-gray-300 object-cover hover:ring-2 hover:ring-toss-blue transition"
-                />
-              </Link>
+              {user && (
+                <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
+                  <img
+                    src={user.imageUrl}
+                    alt="프로필 이미지"
+                    className="w-9 h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
+                  />
+                </Link>
+              )}
             </SignedIn>
           </div>
         </div>
@@ -109,7 +112,7 @@ export default function Header() {
                   </Link>
                 ))}
               </div>
-              {/* 로그인/회원가입 버튼 */}
+              {/* 로그인/회원가입 또는 프로필 이미지 */}
               <div className="flex gap-2 mt-4">
                 <SignedOut>
                   <SignInButton>
@@ -117,9 +120,16 @@ export default function Header() {
                   </SignInButton>
                 </SignedOut>
                 <SignedIn>
-                  <Link href="/my-page" className="flex-1 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 text-gray-800 py-2">
-                    마이페이지
-                  </Link>
+                  {user && (
+                    <Link href="/my-page" className="flex-1 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 text-gray-800 py-2">
+                      <img
+                        src={user.imageUrl}
+                        alt="프로필 이미지"
+                        className="w-7 h-7 rounded-full object-cover border border-gray-200 mr-2"
+                      />
+                      마이페이지
+                    </Link>
+                  )}
                 </SignedIn>
               </div>
             </div>
