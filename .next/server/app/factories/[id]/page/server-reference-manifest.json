@@ -1,0 +1,49 @@
+{
+  "node": {
+    "7f180961c157a3fb9e04aa51a1c605e10c7b6fa523": {
+      "workers": {
+        "app/factories/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/factories/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/factories/[id]/page": "action-browser"
+      }
+    },
+    "7f8768823e710e1b8192d5ce77e18fdfd7ac490af0": {
+      "workers": {
+        "app/factories/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/factories/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/factories/[id]/page": "action-browser"
+      }
+    },
+    "7fc25ad023b1219560abed7da4cd8b45296b1df72e": {
+      "workers": {
+        "app/factories/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/factories/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/factories/[id]/page": "action-browser"
+      }
+    },
+    "7f4b7fa0076e69d45b85acbbb1e3faa094e6a4a12e": {
+      "workers": {
+        "app/factories/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/factories/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/factories/[id]/page": "action-browser"
+      }
+    }
+  },
+  "edge": {}
+}
