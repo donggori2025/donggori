@@ -11,8 +11,9 @@ interface RawCourse {
   image?: string;
 }
 
-export default async function CourseDetailPage({ params }: { params: { id: string } }) {
-  const raw: RawCourse | undefined = courses.find((c: RawCourse) => String(c.id) === String(params.id));
+export default async function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const raw: RawCourse | undefined = courses.find((c: RawCourse) => String(c.id) === String(id));
   if (!raw) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 강의입니다.</div>;
   // Course 타입에 맞게 변환
   const course: Course = {
