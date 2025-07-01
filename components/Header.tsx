@@ -8,12 +8,14 @@ import {
   useUser,
 } from "@clerk/nextjs";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   // 햄버거 메뉴 오픈/닫힘 상태 관리
   const [menuOpen, setMenuOpen] = useState(false);
   // Clerk에서 현재 로그인한 사용자 정보 가져오기
   const { user } = useUser();
+  const router = useRouter();
 
   // 네비게이션 메뉴 항목
   const navMenu = [
@@ -23,7 +25,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full bg-white border-b sticky top-0 z-10">
+    <header className="w-full bg-white border-b sticky top-0 z-[9999]">
       <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between px-10 py-4">
         {/* 로고 */}
         <Link href="/" className="select-none" aria-label="동고리 홈">
@@ -46,9 +48,12 @@ export default function Header() {
           <div className="flex items-center gap-2">
             {/* 로그인 전: 로그인/회원가입 버튼 노출 */}
             <SignedOut>
-              <SignInButton>
-                <button className="text-base font-medium text-white bg-[#222222] px-3 py-1 rounded hover:bg-[#444] transition-colors">로그인/회원가입</button>
-              </SignInButton>
+              <button
+                className="text-base font-medium text-white bg-[#222222] px-3 py-1 rounded hover:bg-[#444] transition-colors"
+                onClick={() => router.push("/sign-in")}
+              >
+                로그인/회원가입
+              </button>
             </SignedOut>
             {/* 로그인 후: 프로필 이미지(아바타) 클릭 시 마이페이지로 이동 */}
             <SignedIn>
@@ -114,9 +119,12 @@ export default function Header() {
               {/* 로그인/회원가입 또는 프로필 이미지 */}
               <div className="flex gap-2 mt-4">
                 <SignedOut>
-                  <SignInButton>
-                    <button className="flex-1 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800">로그인/회원가입</button>
-                  </SignInButton>
+                  <button
+                    className="flex-1 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
+                    onClick={() => router.push("/sign-in")}
+                  >
+                    로그인/회원가입
+                  </button>
                 </SignedOut>
                 <SignedIn>
                   {user && (

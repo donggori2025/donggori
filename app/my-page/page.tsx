@@ -1,9 +1,12 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { factories } from "@/lib/factories";
 import { matchRequests } from "@/lib/matchRequests";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 // 샘플 문의내역 데이터
 const sampleInquiries = [
@@ -16,6 +19,8 @@ type SidebarMenu = typeof SIDEBAR_MENUS[number];
 
 export default function MyPage() {
   const { user } = useUser();
+  const { signOut } = useAuth();
+  const router = useRouter();
   const [selectedMenu, setSelectedMenu] = useState<SidebarMenu>("프로필");
   const [editMode, setEditMode] = useState(false);
   const [factoryName, setFactoryName] = useState("");
@@ -23,6 +28,10 @@ export default function MyPage() {
   const [editRoleMode, setEditRoleMode] = useState(false);
   const [newRole, setNewRole] = useState(user?.publicMetadata?.role || "");
   const [role, setRole] = useState(user?.publicMetadata?.role || "");
+  const [editImageMode, setEditImageMode] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   if (!user) {
     return <div className="max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center">로그인 후 이용 가능합니다.</div>;
@@ -51,30 +60,50 @@ export default function MyPage() {
     // 실제로는 Supabase users 테이블의 role 필드 업데이트 필요
   };
 
+  // 프로필 이미지 변경 핸들러
+  const handleImageChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !imageFile) return;
+    setLoading(true);
+    try {
+      await user.setProfileImage({ file: imageFile });
+      setEditImageMode(false);
+      setImageFile(null);
+      setImagePreview(null);
+    } catch (err) {
+      alert("프로필 이미지 변경 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 이미지 파일 선택 시 미리보기
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  console.log("Clerk user 객체:", user);
+
   return (
     <div className="max-w-[1200px] mx-auto py-16 px-4">
-      {/* 공지사항과 동일한 제목 스타일 */}
       <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">마이페이지</h1>
       <p className="text-lg text-gray-500 mb-8">내 정보와 문의내역을 확인할 수 있습니다.</p>
-
-      {/* 2단 레이아웃: 좌측 사이드바 + 우측 컨텐츠 */}
       <div className="flex flex-row gap-8 min-h-[500px]">
-        {/* 좌측 사이드바 */}
+        {/* 왼쪽 사이드바: 메뉴만 */}
         <aside className="w-1/4 min-w-[220px] bg-white rounded-xl shadow p-6 flex flex-col items-center">
-          {/* 프로필 정보 */}
-          <img
-            src={user.imageUrl}
-            alt="프로필 이미지"
-            className="w-20 h-20 rounded-full object-cover border mb-3"
-          />
-          <div className="font-bold text-lg mb-1">{user.fullName || user.username || "이름 없음"}</div>
-          <div className="text-gray-500 text-sm mb-6">{user.emailAddresses?.[0]?.emailAddress}</div>
-          {/* 사이드 메뉴 */}
-          <nav className="w-full flex flex-col gap-2">
+          <nav className="w-full flex flex-col gap-2 mb-6">
             {SIDEBAR_MENUS.map((menu) => (
               <button
                 key={menu}
-                className={`w-full text-left px-4 py-2 rounded font-semibold transition-colors ${selectedMenu === menu ? "bg-toss-blue text-white" : "hover:bg-gray-100 text-gray-700"}`}
+                className={`w-full text-left px-4 py-2 rounded transition-colors
+                  ${selectedMenu === menu
+                    ? "bg-gray-100 text-black font-bold"
+                    : "text-gray-700 hover:bg-gray-100"}
+                `}
                 onClick={() => setSelectedMenu(menu)}
               >
                 {menu}
@@ -82,36 +111,46 @@ export default function MyPage() {
             ))}
           </nav>
         </aside>
-        {/* 우측 컨텐츠 */}
+        {/* 오른쪽 메인 컨텐츠 */}
         <section className="flex-1 bg-white rounded-xl shadow p-8">
           {selectedMenu === "프로필" && (
             <div>
-              <h2 className="text-2xl font-bold mb-4">프로필 정보</h2>
-              <div className="mb-2">이름: <span className="font-semibold">{user.fullName || user.username || "이름 없음"}</span></div>
-              <div className="mb-2">이메일: <span className="font-semibold">{user.emailAddresses?.[0]?.emailAddress}</span></div>
-              {/* 추가 정보 필요시 여기에 추가 */}
-            </div>
-          )}
-          {selectedMenu === "문의내역" && (
-            <div>
-              <h2 className="text-2xl font-bold mb-4">문의내역</h2>
-              {sampleInquiries.length === 0 ? (
-                <div className="text-gray-500">문의내역이 없습니다.</div>
-              ) : (
-                <ul className="space-y-4">
-                  {sampleInquiries.map((inq) => (
-                    <li key={inq.id} className="border-b pb-2">
-                      <div className="font-semibold text-toss-blue">{inq.title}</div>
-                      <div className="text-gray-700 text-sm mb-1">{inq.content}</div>
-                      <div className="text-xs text-gray-400">{inq.date}</div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-          {selectedMenu === "프로필" && (
-            <>
+              {/* 프로필 사진, 변경 UI, 이메일, 로그아웃 버튼 */}
+              <div className="flex flex-col items-center mb-8">
+                <img
+                  src={user.imageUrl}
+                  alt="프로필 이미지"
+                  className="w-24 h-24 rounded-full object-cover border mb-3"
+                />
+                {/* 프로필 이미지 변경 버튼 */}
+                {!editImageMode ? (
+                  <button className="text-xs text-blue-500 underline mb-2" onClick={() => setEditImageMode(true)}>
+                    프로필 사진 변경
+                  </button>
+                ) : (
+                  <form onSubmit={handleImageChange} className="flex flex-col items-center gap-2 mb-2">
+                    <input type="file" accept="image/*" onChange={handleFileInput} />
+                    {imagePreview && (
+                      <img src={imagePreview} alt="미리보기" className="w-16 h-16 rounded-full object-cover border" />
+                    )}
+                    <div className="flex gap-2">
+                      <button type="submit" className="text-xs bg-toss-blue text-white px-2 py-1 rounded" disabled={loading}>저장</button>
+                      <button type="button" className="text-xs bg-gray-200 px-2 py-1 rounded" onClick={() => { setEditImageMode(false); setImageFile(null); setImagePreview(null); }}>취소</button>
+                    </div>
+                  </form>
+                )}
+                <div className="text-gray-700 text-base mb-2">{user.emailAddresses?.[0]?.emailAddress}</div>
+                <button
+                  className="w-full mt-2 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold transition"
+                  onClick={async () => {
+                    await signOut();
+                    router.push("/");
+                  }}
+                >
+                  로그아웃
+                </button>
+              </div>
+              {/* 기존 프로필 정보(역할 등) */}
               <div className="bg-white rounded-xl shadow p-6 mb-6">
                 <div className="mb-2 font-bold">내 정보</div>
                 <div className="mb-1 text-sm">이메일: {user.emailAddresses?.[0]?.emailAddress}</div>
@@ -133,6 +172,7 @@ export default function MyPage() {
                   )}
                 </div>
               </div>
+              {/* 이하 기존 내용 유지 */}
               {role === "designer" && (
                 <div className="bg-white rounded-xl shadow p-6 mb-6">
                   <div className="mb-2 font-bold">내 매칭 요청</div>
@@ -186,25 +226,44 @@ export default function MyPage() {
                       <div className="text-gray-500">등록된 공장 정보가 없습니다.</div>
                     )}
                   </div>
-                  <div className="bg-white rounded-xl shadow p-6 mb-6">
-                    <div className="mb-2 font-bold">내 공장에 온 매칭 요청</div>
-                    {myFactoryRequests.length === 0 ? (
-                      <div className="text-gray-500">받은 매칭 요청이 없습니다.</div>
-                    ) : (
-                      <ul className="space-y-2">
-                        {myFactoryRequests.map(req => (
-                          <li key={req.id} className="border-b pb-2">
-                            <div className="text-toss-blue font-semibold">디자이너 ID: {req.designerUserId}</div>
-                            <div className="text-sm text-gray-700">{req.content}</div>
-                            <div className="text-xs text-gray-500">상태: {req.status} | 요청일: {req.createdAt}</div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
                 </>
               )}
-            </>
+            </div>
+          )}
+          {selectedMenu === "문의내역" && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">문의내역</h2>
+              {/* localStorage에서 내 문의내역 불러오기 */}
+              {(() => {
+                if (!user) return <div className="text-gray-500">로그인 후 이용 가능합니다.</div>;
+                const allInquiries = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("inquiries") || "[]") : [];
+                // user.id가 있는 경우만 필터 (향후 Clerk 연동 시 user.id 저장 필요)
+                const myInquiries = allInquiries.filter((inq: any) => inq.userId === user.id);
+                if (myInquiries.length === 0) {
+                  return <div className="text-gray-500">문의내역이 없습니다.</div>;
+                }
+                return (
+                  <ul className="space-y-4">
+                    {myInquiries.map((inq: any) => (
+                      <Link
+                        key={inq.id}
+                        href={inq.factoryId ? `/factories/${inq.factoryId}` : "#"}
+                        className="block border-b pb-2 flex items-center gap-4 rounded-lg hover:bg-gray-50 cursor-pointer transition"
+                        style={{ textDecoration: "none", color: "inherit" }}
+                      >
+                        <img src={inq.image} alt="공장 이미지" className="w-16 h-16 rounded object-cover bg-gray-100" />
+                        <div className="flex-1">
+                          <div className="font-semibold text-toss-blue">{inq.factoryName}</div>
+                          <div className="text-gray-700 text-sm mb-1">카카오톡 문의</div>
+                          <div className="text-xs text-gray-400">{inq.date}</div>
+                        </div>
+                        <span className="px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-700">카톡 문의 완료</span>
+                      </Link>
+                    ))}
+                  </ul>
+                );
+              })()}
+            </div>
           )}
         </section>
       </div>
