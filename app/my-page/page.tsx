@@ -52,9 +52,6 @@ export default function MyPage() {
   // 내 매칭 내역
   const myDesignerRequests = matchRequests.filter(r => r.designerUserId === user.id);
   const myFactoryIds = factories.filter(f => f.ownerUserId === user.id).map(f => f.id);
-  const myFactoryRequests = matchRequests.filter(r => myFactoryIds.includes(r.factoryId));
-
-  // 내 공장 정보(공장회원만)
   const myFactory = factories.find(f => f.ownerUserId === user.id);
 
   const handleFactoryEdit = (e: React.FormEvent) => {
@@ -82,7 +79,7 @@ export default function MyPage() {
       setEditImageMode(false);
       setImageFile(null);
       setImagePreview(null);
-    } catch (err) {
+    } catch {
       alert("프로필 이미지 변경 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);

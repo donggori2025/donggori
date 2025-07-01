@@ -81,8 +81,8 @@ export default function SignUpPage() {
       setVerificationSent(true);
       setVerificationCode("");
       startTimer();
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "이메일 인증 요청 중 오류가 발생했습니다.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "이메일 인증 요청 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -96,8 +96,8 @@ export default function SignUpPage() {
       await signUp?.prepareEmailAddressVerification({ strategy: "email_code" });
       setVerificationCode("");
       startTimer();
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "인증번호 재요청 중 오류가 발생했습니다.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "인증번호 재요청 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -116,8 +116,8 @@ export default function SignUpPage() {
       } else {
         setError("인증 코드가 올바르지 않습니다.");
       }
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "이메일 인증 중 오류가 발생했습니다.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "이메일 인증 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -143,10 +143,9 @@ export default function SignUpPage() {
       }
       await setActive({ session: signUp.createdSessionId });
       router.push("/");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(
-        err?.errors?.[0]?.message ||
-        err?.message ||
+        err instanceof Error ? err.message :
         "예상치 못한 오류가 발생했습니다. 새로고침 후 다시 시도해주세요."
       );
     } finally {

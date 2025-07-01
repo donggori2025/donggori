@@ -3,7 +3,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSignIn } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader } from "lucide-react";
 
 export default function SignInPage() {
@@ -14,7 +13,6 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
-  const router = useRouter();
 
   // 소셜 로그인 핸들러
   const handleSocial = async (provider: any) => {
