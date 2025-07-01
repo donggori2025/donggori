@@ -51,7 +51,6 @@ export default function MyPage() {
 
   // 내 매칭 내역
   const myDesignerRequests = matchRequests.filter(r => r.designerUserId === user.id);
-  const myFactoryIds = factories.filter(f => f.ownerUserId === user.id).map(f => f.id);
   const myFactory = factories.find(f => f.ownerUserId === user.id);
 
   const handleFactoryEdit = (e: React.FormEvent) => {
