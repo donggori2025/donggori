@@ -14,15 +14,21 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
 
+  type OAuthStrategy = 'oauth_google' | 'oauth_facebook' | 'oauth_github' | 'oauth_twitter' | 'oauth_gitlab' | 'oauth_bitbucket' | 'oauth_linkedin' | 'oauth_apple' | 'oauth_discord' | 'oauth_twitch' | 'oauth_slack' | 'oauth_tiktok' | 'oauth_kakao' | 'oauth_naver' | 'oauth_line' | 'oauth_yahoo' | 'oauth_wechat' | 'oauth_weibo' | 'oauth_baidu' | 'oauth_gitee' | 'oauth_instagram' | 'oauth_salesforce' | 'oauth_spotify' | 'oauth_wordpress' | 'oauth_yandex' | 'oauth_zoom';
+
   // 소셜 로그인 핸들러
-  const handleSocial = async (provider: any) => {
+  const handleSocial = async (provider: OAuthStrategy) => {
     setError("");
     if (!isLoaded) return;
     setLoading(true);
     try {
-      await signIn.authenticateWithRedirect(provider);
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "소셜 로그인 중 오류가 발생했습니다.");
+      await signIn.authenticateWithRedirect({
+        strategy: provider as any,
+        redirectUrl: typeof window !== 'undefined' ? window.location.origin + '/sso-callback' : '/sso-callback',
+        redirectUrlComplete: typeof window !== 'undefined' ? window.location.origin : '/',
+      });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "소셜 로그인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
