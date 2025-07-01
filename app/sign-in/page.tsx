@@ -29,7 +29,7 @@ export default function SignInPage() {
   };
 
   // 로그인 폼 제출
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     if (!isLoaded) return;
@@ -41,8 +41,8 @@ export default function SignInPage() {
       } else {
         setError("추가 인증이 필요합니다.");
       }
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "이메일 또는 비밀번호가 올바르지 않습니다.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "이메일 또는 비밀번호가 올바르지 않습니다.");
     } finally {
       setLoading(false);
     }
