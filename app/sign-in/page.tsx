@@ -23,7 +23,7 @@ export default function SignInPage() {
     setLoading(true);
     try {
       await signIn.authenticateWithRedirect({
-        strategy: provider as any,
+        strategy: provider as unknown as Parameters<typeof signIn.authenticateWithRedirect>[0]['strategy'],
         redirectUrl: typeof window !== 'undefined' ? window.location.origin + '/sso-callback' : '/sso-callback',
         redirectUrlComplete: typeof window !== 'undefined' ? window.location.origin : '/',
       });
