@@ -3,6 +3,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {
   ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
 } from "@clerk/nextjs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -36,11 +41,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={koLocalization}>
+    <ClerkProvider>
       <html lang="ko">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-toss-gray min-h-screen flex flex-col`}>
           <Header />
-          <main className="w-full flex-1">{children}</main>
+          <main className="w-full flex-1">
+            {children}
+          </main>
           <Footer />
         </body>
       </html>

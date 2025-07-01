@@ -40,6 +40,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     // 문의 내역 객체 생성
     const inquiry = {
       id: Date.now(), // 고유값(타임스탬프)
+      userId: user.id,
       factoryId: factory.id,
       factoryName: factory.name,
       date: new Date().toISOString().slice(0, 10),
