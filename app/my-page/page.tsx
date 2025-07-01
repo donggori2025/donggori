@@ -7,15 +7,27 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 // 샘플 문의내역 데이터
-const sampleInquiries = [
-  { id: 1, title: "문의 1", content: "문의 내용 1", date: "2024-07-01" },
-  { id: 2, title: "문의 2", content: "문의 내용 2", date: "2024-07-02" },
-];
+// const sampleInquiries = [
+//   { id: 1, title: "문의 1", content: "문의 내용 1", date: "2024-07-01" },
+//   { id: 2, title: "문의 2", content: "문의 내용 2", date: "2024-07-02" },
+// ];
 
 const SIDEBAR_MENUS = ["프로필", "문의내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
+
+interface Inquiry {
+  id: number;
+  userId: string;
+  factoryId: string;
+  factoryName: string;
+  date: string;
+  status: string;
+  method: string;
+  image: string;
+}
 
 export default function MyPage() {
   const { user } = useUser();
@@ -117,9 +129,11 @@ export default function MyPage() {
             <div>
               {/* 프로필 사진, 변경 UI, 이메일, 로그아웃 버튼 */}
               <div className="flex flex-col items-center mb-8">
-                <img
+                <Image
                   src={user.imageUrl}
                   alt="프로필 이미지"
+                  width={96}
+                  height={96}
                   className="w-24 h-24 rounded-full object-cover border mb-3"
                 />
                 {/* 프로필 이미지 변경 버튼 */}
@@ -131,7 +145,7 @@ export default function MyPage() {
                   <form onSubmit={handleImageChange} className="flex flex-col items-center gap-2 mb-2">
                     <input type="file" accept="image/*" onChange={handleFileInput} />
                     {imagePreview && (
-                      <img src={imagePreview} alt="미리보기" className="w-16 h-16 rounded-full object-cover border" />
+                      <Image src={imagePreview} alt="미리보기" width={64} height={64} className="w-16 h-16 rounded-full object-cover border" />
                     )}
                     <div className="flex gap-2">
                       <button type="submit" className="text-xs bg-toss-blue text-white px-2 py-1 rounded" disabled={loading}>저장</button>
@@ -236,22 +250,22 @@ export default function MyPage() {
               {/* localStorage에서 내 문의내역 불러오기 */}
               {(() => {
                 if (!user) return <div className="text-gray-500">로그인 후 이용 가능합니다.</div>;
-                const allInquiries = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("inquiries") || "[]") : [];
+                const allInquiries: Inquiry[] = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("inquiries") || "[]") : [];
                 // user.id가 있는 경우만 필터 (향후 Clerk 연동 시 user.id 저장 필요)
-                const myInquiries = allInquiries.filter((inq: any) => inq.userId === user.id);
+                const myInquiries = allInquiries.filter((inq) => inq.userId === user.id);
                 if (myInquiries.length === 0) {
                   return <div className="text-gray-500">문의내역이 없습니다.</div>;
                 }
                 return (
                   <ul className="space-y-4">
-                    {myInquiries.map((inq: any) => (
+                    {myInquiries.map((inq) => (
                       <Link
                         key={inq.id}
                         href={inq.factoryId ? `/factories/${inq.factoryId}` : "#"}
                         className="block border-b pb-2 flex items-center gap-4 rounded-lg hover:bg-gray-50 cursor-pointer transition"
                         style={{ textDecoration: "none", color: "inherit" }}
                       >
-                        <img src={inq.image} alt="공장 이미지" className="w-16 h-16 rounded object-cover bg-gray-100" />
+                        <Image src={inq.image} alt="공장 이미지" width={64} height={64} className="w-16 h-16 rounded object-cover bg-gray-100" />
                         <div className="flex-1">
                           <div className="font-semibold text-toss-blue">{inq.factoryName}</div>
                           <div className="text-gray-700 text-sm mb-1">카카오톡 문의</div>

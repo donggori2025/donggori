@@ -1,12 +1,15 @@
 import React from "react";
+import Image from "next/image";
 
 const HeroSection = () => (
   <section className="w-full relative h-[420px] flex items-center justify-center overflow-hidden">
     {/* 배경 이미지 */}
-    <img
+    <Image
       src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1200&q=80"
       alt="봉제공장 배경"
       className="absolute inset-0 w-full h-full object-cover z-0"
+      width={128}
+      height={128}
     />
     {/* 어두운 오버레이 */}
     <div className="absolute inset-0 bg-black/60 z-10" />

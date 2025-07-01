@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 interface ContentCardProps {
   title: string;
@@ -9,7 +10,7 @@ interface ContentCardProps {
 const ContentCard: React.FC<ContentCardProps> = ({ title, description, imageUrl }) => (
   <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 p-6 flex flex-col items-start">
     {imageUrl && (
-      <img src={imageUrl} alt={title} className="w-full h-40 object-cover rounded-xl mb-4" />
+      <Image src={imageUrl} alt={title} width={128} height={128} className="w-full h-40 object-cover rounded-xl mb-4" />
     )}
     <h3 className="text-xl font-bold mb-2">{title}</h3>
     <p className="text-gray-600 mb-4">{description}</p>

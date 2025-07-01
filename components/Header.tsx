@@ -59,9 +59,11 @@ export default function Header() {
             <SignedIn>
               {user && (
                 <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
-                  <img
+                  <Image
                     src={user.imageUrl}
                     alt="프로필 이미지"
+                    width={40}
+                    height={40}
                     className="w-9 h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
                   />
                 </Link>
@@ -129,9 +131,11 @@ export default function Header() {
                 <SignedIn>
                   {user && (
                     <Link href="/my-page" className="flex-1 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 text-gray-800 py-2">
-                      <img
+                      <Image
                         src={user.imageUrl}
                         alt="프로필 이미지"
+                        width={40}
+                        height={40}
                         className="w-7 h-7 rounded-full object-cover border border-gray-200 mr-2"
                       />
                       마이페이지

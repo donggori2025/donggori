@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 // 더미 문의 내역 데이터
 const inquiries = [
@@ -42,7 +43,7 @@ export default function InquiryList() {
         {inquiries.map((inq) => (
           <div key={inq.id} className="flex bg-white rounded-xl shadow p-6 items-center gap-6">
             {/* 공장 이미지 */}
-            <img src={inq.image} alt="공장 이미지" className="w-28 h-28 rounded-lg object-cover bg-gray-100" />
+            <Image src={inq.image} alt="공장 이미지" className="w-28 h-28 rounded-lg object-cover bg-gray-100" width={112} height={112} />
             {/* 문의 정보 */}
             <div className="flex-1">
               <div className="text-lg font-semibold mb-1">{inq.factoryName}</div>
