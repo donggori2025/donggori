@@ -65,7 +65,7 @@ export default function SignInPage() {
           type="email"
           placeholder="이메일을 입력해주세요."
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           required
           className="border rounded px-3 py-2"
         />
@@ -75,7 +75,7 @@ export default function SignInPage() {
             type={showPassword ? "text" : "password"}
             placeholder="비밀번호를 입력해주세요."
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             required
             className="flex-1 outline-none bg-transparent"
             style={{ minWidth: 0 }}
@@ -95,7 +95,7 @@ export default function SignInPage() {
             <input
               type="checkbox"
               checked={remember}
-              onChange={e => setRemember(e.target.checked)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRemember(e.target.checked)}
               id="remember"
               className="w-4 h-4"
             />
