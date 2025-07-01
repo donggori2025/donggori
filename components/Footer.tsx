@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 // Footer 컴포넌트: 사이트 하단에 고정적으로 표시되는 정보 영역입니다.
 // - md 미만에서는 햄버거 버튼이 나타나고, 클릭 시 전체 메뉴와 로그인/회원가입 버튼이 드롭다운으로 노출됩니다.
@@ -41,7 +42,7 @@ const Footer = () => {
         </nav>
         {/* 로고 */}
         <div className="mb-2">
-          <img src="/logo_0624.svg" alt="동고리 로고" className="w-8 h-8 mx-auto" />
+          <Image src="/logo_0624.svg" alt="동고리 로고" width={32} height={32} className="w-8 h-8 mx-auto" />
         </div>
         {/* 협회 정보 */}
         <div className="text-xs text-gray-500 mb-1 text-center">

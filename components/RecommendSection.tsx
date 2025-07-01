@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const cards = [
   {
@@ -22,9 +23,11 @@ const RecommendSection = () => (
             key={idx}
             className="relative rounded-2xl overflow-hidden h-56 flex items-center justify-center group shadow-lg cursor-pointer"
           >
-            <img
+            <Image
               src={card.image}
               alt={card.label}
+              width={112}
+              height={112}
               className="absolute inset-0 w-full h-full object-cover z-0 group-hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-black/40 z-10" />
