@@ -126,14 +126,13 @@ export default function MatchingPage() {
   }
 
   // 추천 결과 렌더링 (공장 리스트 + 의뢰하기 버튼)
-  function renderRecommendation(chat: any[]) {
-    // 추천 메시지 이후 answer 타입 3개가 추천 공장
-    const recIdx = chat.findIndex((m: any) => m.text.includes("추천드려요"));
+  function renderRecommendation(chat: { type: "question" | "answer"; text: string }[]) {
+    const recIdx = chat.findIndex((m) => m.text.includes("추천드려요"));
     if (recIdx === -1) return null;
     const factoriesToShow = chat.slice(recIdx + 1, recIdx + 4);
     return (
       <div className="mt-6 space-y-4">
-        {factoriesToShow.map((msg: any, i: number) => (
+        {factoriesToShow.map((msg, i) => (
           <div key={i} className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3 border">
             <span>{msg.text}</span>
             <Button
