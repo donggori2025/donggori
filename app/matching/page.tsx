@@ -49,6 +49,7 @@ export default function MatchingPage() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   // 채팅 메시지(질문/답변 순서대로)
   const [chat, setChat] = useState<{ type: "question" | "answer"; text: string }[]>([
+    { type: "question", text: "반갑습니다:) 동고리가 봉제공장을 추천해드릴게요!" },
     { type: "question", text: QUESTIONS[0].question },
   ]);
   // user 변수 제거 (사용하지 않음)
@@ -210,11 +211,11 @@ export default function MatchingPage() {
 
   // 왼쪽: 질문/선택지, 오른쪽: 채팅
   return (
-    <div className="w-full max-w-[1200px] mx-auto min-h-screen bg-gray-50 flex flex-row gap-8">
+    <div className="w-full max-w-[1200px] mx-auto min-h-screen bg-gray-50 flex flex-row gap-4 p-2">
       {/* 페이드 전환용 wrapper */}
-      <div className={`flex flex-row gap-8 flex-1 items-start justify-center mt-12 transition-opacity duration-700 ${showResult || loading ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`flex flex-row gap-4 flex-1 items-start justify-center mt-12 transition-opacity duration-700 px-1 ${showResult || loading ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         {/* 왼쪽: 질문/선택지 */}
-        <div className="w-full max-w-xl bg-white rounded-xl shadow-md p-8 flex flex-col gap-6">
+        <div className="w-full max-w-xl bg-white rounded-xl shadow-md p-4 flex flex-col gap-6">
           <div className="text-xl font-bold mb-2">AI 매칭</div>
           <div className="text-gray-500 text-sm mb-4">몇 가지 정보를 알려주시면, 가장 적합한 3개의 봉제공장을 추천해드립니다.</div>
           <div className="flex gap-2 mb-4">
@@ -256,10 +257,10 @@ export default function MatchingPage() {
           </div>
         </div>
         {/* 오른쪽: 채팅 */}
-        <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6 min-h-[500px] flex flex-col gap-2">
+        <div className="w-full max-w-md bg-gray-100 rounded-xl shadow-md p-4 min-h-[500px] flex flex-col gap-2">
           {chat.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.type === "question" ? "justify-start" : "justify-end"}`}>
-              <div className={`relative px-4 py-2 rounded-2xl text-base ${msg.type === "question" ? "bg-gray-100 text-gray-800" : "bg-[#222222] text-white"}`}>
+              <div className={`relative px-4 py-2 rounded-2xl text-base ${msg.type === "question" ? "bg-white text-black" : "bg-[#222222] text-white"}`}>
                 {msg.text}
                 {/* 답변(선택지) 말풍선에만 수정 버튼 노출 */}
                 {msg.type === "answer" && idx === chat.findLastIndex(m => m.type === "answer") && step > 0 && (
