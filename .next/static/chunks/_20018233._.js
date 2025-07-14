@@ -691,6 +691,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/button.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
@@ -702,21 +703,12 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+;
 // 샘플 문의내역 데이터
-const sampleInquiries = [
-    {
-        id: 1,
-        title: "문의 1",
-        content: "문의 내용 1",
-        date: "2024-07-01"
-    },
-    {
-        id: 2,
-        title: "문의 2",
-        content: "문의 내용 2",
-        date: "2024-07-02"
-    }
-];
+// const sampleInquiries = [
+//   { id: 1, title: "문의 1", content: "문의 내용 1", date: "2024-07-01" },
+//   { id: 2, title: "문의 2", content: "문의 내용 2", date: "2024-07-02" },
+// ];
 const SIDEBAR_MENUS = [
     "프로필",
     "문의내역"
@@ -743,15 +735,12 @@ function MyPage() {
             children: "로그인 후 이용 가능합니다."
         }, void 0, false, {
             fileName: "[project]/app/my-page/page.tsx",
-            lineNumber: 37,
+            lineNumber: 49,
             columnNumber: 12
         }, this);
     }
     // 내 매칭 내역
     const myDesignerRequests = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$matchRequests$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["matchRequests"].filter((r)=>r.designerUserId === user.id);
-    const myFactoryIds = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["factories"].filter((f)=>f.ownerUserId === user.id).map((f)=>f.id);
-    const myFactoryRequests = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$matchRequests$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["matchRequests"].filter((r)=>myFactoryIds.includes(r.factoryId));
-    // 내 공장 정보(공장회원만)
     const myFactory = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["factories"].find((f)=>f.ownerUserId === user.id);
     const handleFactoryEdit = (e)=>{
         e.preventDefault();
@@ -778,7 +767,7 @@ function MyPage() {
             setEditImageMode(false);
             setImageFile(null);
             setImagePreview(null);
-        } catch (err) {
+        } catch  {
             alert("프로필 이미지 변경 중 오류가 발생했습니다.");
         } finally{
             setLoading(false);
@@ -801,7 +790,7 @@ function MyPage() {
                 children: "마이페이지"
             }, void 0, false, {
                 fileName: "[project]/app/my-page/page.tsx",
-                lineNumber: 93,
+                lineNumber: 101,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -809,7 +798,7 @@ function MyPage() {
                 children: "내 정보와 문의내역을 확인할 수 있습니다."
             }, void 0, false, {
                 fileName: "[project]/app/my-page/page.tsx",
-                lineNumber: 94,
+                lineNumber: 102,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -827,17 +816,17 @@ function MyPage() {
                                     children: menu
                                 }, menu, false, {
                                     fileName: "[project]/app/my-page/page.tsx",
-                                    lineNumber: 100,
+                                    lineNumber: 108,
                                     columnNumber: 15
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/app/my-page/page.tsx",
-                            lineNumber: 98,
+                            lineNumber: 106,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/my-page/page.tsx",
-                        lineNumber: 97,
+                        lineNumber: 105,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -848,13 +837,15 @@ function MyPage() {
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "flex flex-col items-center mb-8",
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                 src: user.imageUrl,
                                                 alt: "프로필 이미지",
+                                                width: 96,
+                                                height: 96,
                                                 className: "w-24 h-24 rounded-full object-cover border mb-3"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 120,
+                                                lineNumber: 128,
                                                 columnNumber: 17
                                             }, this),
                                             !editImageMode ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -863,7 +854,7 @@ function MyPage() {
                                                 children: "프로필 사진 변경"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 127,
+                                                lineNumber: 137,
                                                 columnNumber: 19
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
                                                 onSubmit: handleImageChange,
@@ -875,16 +866,18 @@ function MyPage() {
                                                         onChange: handleFileInput
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/my-page/page.tsx",
-                                                        lineNumber: 132,
+                                                        lineNumber: 142,
                                                         columnNumber: 21
                                                     }, this),
-                                                    imagePreview && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                    imagePreview && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                         src: imagePreview,
                                                         alt: "미리보기",
+                                                        width: 64,
+                                                        height: 64,
                                                         className: "w-16 h-16 rounded-full object-cover border"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/my-page/page.tsx",
-                                                        lineNumber: 134,
+                                                        lineNumber: 144,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -897,7 +890,7 @@ function MyPage() {
                                                                 children: "저장"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                                lineNumber: 137,
+                                                                lineNumber: 147,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -911,19 +904,19 @@ function MyPage() {
                                                                 children: "취소"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                                lineNumber: 138,
+                                                                lineNumber: 148,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/my-page/page.tsx",
-                                                        lineNumber: 136,
+                                                        lineNumber: 146,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 131,
+                                                lineNumber: 141,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -931,7 +924,7 @@ function MyPage() {
                                                 children: user.emailAddresses?.[0]?.emailAddress
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 142,
+                                                lineNumber: 152,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -943,13 +936,13 @@ function MyPage() {
                                                 children: "로그아웃"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 143,
+                                                lineNumber: 153,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 119,
+                                        lineNumber: 127,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -960,7 +953,7 @@ function MyPage() {
                                                 children: "내 정보"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 155,
+                                                lineNumber: 165,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -971,7 +964,7 @@ function MyPage() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 156,
+                                                lineNumber: 166,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -983,7 +976,7 @@ function MyPage() {
                                                         children: "(미선택)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/my-page/page.tsx",
-                                                        lineNumber: 158,
+                                                        lineNumber: 168,
                                                         columnNumber: 83
                                                     }, this),
                                                     (!role || editRoleMode) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1000,7 +993,7 @@ function MyPage() {
                                                                         children: "역할 선택"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/my-page/page.tsx",
-                                                                        lineNumber: 162,
+                                                                        lineNumber: 172,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1008,7 +1001,7 @@ function MyPage() {
                                                                         children: "디자이너"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/my-page/page.tsx",
-                                                                        lineNumber: 163,
+                                                                        lineNumber: 173,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1016,13 +1009,13 @@ function MyPage() {
                                                                         children: "공장"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/my-page/page.tsx",
-                                                                        lineNumber: 164,
+                                                                        lineNumber: 174,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                                lineNumber: 161,
+                                                                lineNumber: 171,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1031,7 +1024,7 @@ function MyPage() {
                                                                 children: "저장"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                                lineNumber: 166,
+                                                                lineNumber: 176,
                                                                 columnNumber: 23
                                                             }, this),
                                                             role && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1041,13 +1034,13 @@ function MyPage() {
                                                                 children: "취소"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                                lineNumber: 167,
+                                                                lineNumber: 177,
                                                                 columnNumber: 32
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/my-page/page.tsx",
-                                                        lineNumber: 160,
+                                                        lineNumber: 170,
                                                         columnNumber: 21
                                                     }, this),
                                                     role && !editRoleMode && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1059,19 +1052,19 @@ function MyPage() {
                                                         children: "역할 변경"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/my-page/page.tsx",
-                                                        lineNumber: 171,
+                                                        lineNumber: 181,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 157,
+                                                lineNumber: 167,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 154,
+                                        lineNumber: 164,
                                         columnNumber: 15
                                     }, this),
                                     role === "designer" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1082,7 +1075,7 @@ function MyPage() {
                                                 children: "내 매칭 요청"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 178,
+                                                lineNumber: 188,
                                                 columnNumber: 19
                                             }, this),
                                             myDesignerRequests.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1090,7 +1083,7 @@ function MyPage() {
                                                 children: "보낸 매칭 요청이 없습니다."
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 180,
+                                                lineNumber: 190,
                                                 columnNumber: 21
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
                                                 className: "space-y-2",
@@ -1105,7 +1098,7 @@ function MyPage() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                                lineNumber: 185,
+                                                                lineNumber: 195,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1113,7 +1106,7 @@ function MyPage() {
                                                                 children: req.content
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                                lineNumber: 186,
+                                                                lineNumber: 196,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1126,24 +1119,24 @@ function MyPage() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                                lineNumber: 187,
+                                                                lineNumber: 197,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, req.id, true, {
                                                         fileName: "[project]/app/my-page/page.tsx",
-                                                        lineNumber: 184,
+                                                        lineNumber: 194,
                                                         columnNumber: 25
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 182,
+                                                lineNumber: 192,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 177,
+                                        lineNumber: 187,
                                         columnNumber: 17
                                     }, this),
                                     role === "factory" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1155,7 +1148,7 @@ function MyPage() {
                                                     children: "내 공장 정보"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/my-page/page.tsx",
-                                                    lineNumber: 197,
+                                                    lineNumber: 207,
                                                     columnNumber: 21
                                                 }, this),
                                                 myFactory ? editMode ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1169,7 +1162,7 @@ function MyPage() {
                                                             className: "border rounded px-3 py-2"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/my-page/page.tsx",
-                                                            lineNumber: 201,
+                                                            lineNumber: 211,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -1179,7 +1172,7 @@ function MyPage() {
                                                             className: "border rounded px-3 py-2"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/my-page/page.tsx",
-                                                            lineNumber: 207,
+                                                            lineNumber: 217,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1191,7 +1184,7 @@ function MyPage() {
                                                                     children: "저장"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/my-page/page.tsx",
-                                                                    lineNumber: 214,
+                                                                    lineNumber: 224,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1201,19 +1194,19 @@ function MyPage() {
                                                                     children: "취소"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/my-page/page.tsx",
-                                                                    lineNumber: 215,
+                                                                    lineNumber: 225,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/my-page/page.tsx",
-                                                            lineNumber: 213,
+                                                            lineNumber: 223,
                                                             columnNumber: 27
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/my-page/page.tsx",
-                                                    lineNumber: 200,
+                                                    lineNumber: 210,
                                                     columnNumber: 25
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                     children: [
@@ -1222,7 +1215,7 @@ function MyPage() {
                                                             children: myFactory.name
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/my-page/page.tsx",
-                                                            lineNumber: 220,
+                                                            lineNumber: 230,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1230,7 +1223,7 @@ function MyPage() {
                                                             children: myFactory.description
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/my-page/page.tsx",
-                                                            lineNumber: 221,
+                                                            lineNumber: 231,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1243,7 +1236,7 @@ function MyPage() {
                                                             children: "수정"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/my-page/page.tsx",
-                                                            lineNumber: 222,
+                                                            lineNumber: 232,
                                                             columnNumber: 27
                                                         }, this)
                                                     ]
@@ -1252,20 +1245,20 @@ function MyPage() {
                                                     children: "등록된 공장 정보가 없습니다."
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/my-page/page.tsx",
-                                                    lineNumber: 226,
+                                                    lineNumber: 236,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/my-page/page.tsx",
-                                            lineNumber: 196,
+                                            lineNumber: 206,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 117,
+                                lineNumber: 125,
                                 columnNumber: 13
                             }, this),
                             selectedMenu === "문의내역" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1275,7 +1268,7 @@ function MyPage() {
                                         children: "문의내역"
                                     }, void 0, false, {
                                         fileName: "[project]/app/my-page/page.tsx",
-                                        lineNumber: 235,
+                                        lineNumber: 245,
                                         columnNumber: 15
                                     }, this),
                                     (()=>{
@@ -1284,7 +1277,7 @@ function MyPage() {
                                             children: "로그인 후 이용 가능합니다."
                                         }, void 0, false, {
                                             fileName: "[project]/app/my-page/page.tsx",
-                                            lineNumber: 238,
+                                            lineNumber: 248,
                                             columnNumber: 35
                                         }, this);
                                         const allInquiries = ("TURBOPACK compile-time truthy", 1) ? JSON.parse(localStorage.getItem("inquiries") || "[]") : ("TURBOPACK unreachable", undefined);
@@ -1296,7 +1289,7 @@ function MyPage() {
                                                 children: "문의내역이 없습니다."
                                             }, void 0, false, {
                                                 fileName: "[project]/app/my-page/page.tsx",
-                                                lineNumber: 243,
+                                                lineNumber: 253,
                                                 columnNumber: 26
                                             }, this);
                                         }
@@ -1310,13 +1303,15 @@ function MyPage() {
                                                         color: "inherit"
                                                     },
                                                     children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                             src: inq.image,
                                                             alt: "공장 이미지",
+                                                            width: 64,
+                                                            height: 64,
                                                             className: "w-16 h-16 rounded object-cover bg-gray-100"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/my-page/page.tsx",
-                                                            lineNumber: 254,
+                                                            lineNumber: 264,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1327,7 +1322,7 @@ function MyPage() {
                                                                     children: inq.factoryName
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/my-page/page.tsx",
-                                                                    lineNumber: 256,
+                                                                    lineNumber: 266,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1335,7 +1330,7 @@ function MyPage() {
                                                                     children: "카카오톡 문의"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/my-page/page.tsx",
-                                                                    lineNumber: 257,
+                                                                    lineNumber: 267,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1343,13 +1338,13 @@ function MyPage() {
                                                                     children: inq.date
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/my-page/page.tsx",
-                                                                    lineNumber: 258,
+                                                                    lineNumber: 268,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/my-page/page.tsx",
-                                                            lineNumber: 255,
+                                                            lineNumber: 265,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1357,43 +1352,43 @@ function MyPage() {
                                                             children: "카톡 문의 완료"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/my-page/page.tsx",
-                                                            lineNumber: 260,
+                                                            lineNumber: 270,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, inq.id, true, {
                                                     fileName: "[project]/app/my-page/page.tsx",
-                                                    lineNumber: 248,
+                                                    lineNumber: 258,
                                                     columnNumber: 23
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/my-page/page.tsx",
-                                            lineNumber: 246,
+                                            lineNumber: 256,
                                             columnNumber: 19
                                         }, this);
                                     })()
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/my-page/page.tsx",
-                                lineNumber: 234,
+                                lineNumber: 244,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/my-page/page.tsx",
-                        lineNumber: 115,
+                        lineNumber: 123,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/my-page/page.tsx",
-                lineNumber: 95,
+                lineNumber: 103,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/my-page/page.tsx",
-        lineNumber: 92,
+        lineNumber: 100,
         columnNumber: 5
     }, this);
 }
