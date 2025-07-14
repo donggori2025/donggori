@@ -450,7 +450,7 @@ export default function FactoriesPage() {
           {/* 선택된 필터 뱃지 (오른쪽 컨테이너 내) */}
           {badges.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
-              {badges.map((b, i) => (
+              {badges.map((b) => (
                 <span key={b.key + b.val} className="bg-black text-white rounded-full px-3 py-1 text-[14px] font-semibold flex items-center gap-1">
                   {b.val}
                   <button onClick={() => setSelected(sel => ({
@@ -469,8 +469,11 @@ export default function FactoriesPage() {
             {view === 'list' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {Array.isArray(filtered) && filtered.length > 0 ? (
-                  filtered.map((f: Factory, idx: number) => (
-                    f ? (
+                  filtered.map((f: Factory & Record<string, any>, idx: number) => {
+                    const mainItems: string = [f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt]
+                      .filter((v): v is string => typeof v === 'string' && v.length > 0)
+                      .join(', ') || '-';
+                    return (
                       <div key={f.id ?? idx} className="border rounded-xl p-0 bg-white shadow overflow-hidden flex flex-col">
                         {/* 이미지 영역 */}
                         <div className="w-full h-40 bg-gray-100 flex items-center justify-center overflow-hidden">
@@ -484,21 +487,24 @@ export default function FactoriesPage() {
                         <div className="p-4 flex-1 flex flex-col">
                           {/* 태그 영역 */}
                           <div className="flex gap-2 mb-2 flex-wrap">
-                            {Array.isArray(f.processes) && f.processes.map((tag: string) => (
-                              <span key={tag} className={`rounded px-2 py-1 text-xs font-bold ${getTagColor(tag)}`}>{tag}</span>
+                            {Array.isArray(f.processes) && f.processes.filter(Boolean).map((tag) => (
+                              <span key={String(tag ?? '')} className={`rounded px-2 py-1 text-xs font-bold ${getTagColor(String(tag ?? ''))}`}>{String(tag ?? '')}</span>
                             ))}
                           </div>
-                          <div className="font-bold text-base mb-1">{f.company_name ?? '이름 없음'}</div>
+                          {/* 카드 리스트 내 */}
+                          <div className="font-bold text-base mb-1">{f.name ?? '이름 없음'}</div>
                           <div className="text-xs text-gray-500 mb-1 line-clamp-2">{f.intro ?? '설명 없음'}</div>
                           <div className="text-xs text-gray-500 mb-1">지역: {f.admin_district ?? '-'}</div>
                           <div className="text-xs text-gray-500 mb-1">연락처: {f.phone_number ?? '-'}</div>
-                          <div className="text-xs text-gray-500 mb-1">MOQ(최소 주문 수량): {f.moq ?? '-'}</div>
-                          {/* 카드 정보 영역에서 주요 품목(main_fabrics) 표기 라인 제거 */}
-                          <div className="text-xs text-gray-400">위치: 위도 {f.lat ?? '-'}, 경도 {f.lng ?? '-'}</div>
+                          <div className="text-xs text-gray-500 mb-1">MOQ(최소 주문 수량): {typeof f.moq === 'number' ? String(f.moq) : '-'}</div>
+                          <div className="text-xs text-gray-500 mb-1">월생산량: {typeof f.monthly_capacity === 'number' ? String(f.monthly_capacity) : '-'}</div>
+                          {/* 카드 리스트 map 내부 */}
+                          <div className="text-xs text-gray-500 mb-1">주요 품목: {mainItems}</div>
+                          <div className="text-xs text-gray-400">위치: 위도 {typeof f.lat === 'number' ? String(f.lat) : '-'}, 경도 {typeof f.lng === 'number' ? String(f.lng) : '-'}</div>
                         </div>
                       </div>
-                    ) : null
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="text-center py-20 text-gray-400 text-lg col-span-3">공장 데이터가 없습니다.</div>
                 )}
