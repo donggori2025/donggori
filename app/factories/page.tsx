@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { ArrowPathIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { List, Map as MapIcon } from "lucide-react";
+import type { Factory } from "@/lib/factories";
 
 // 태그별 색상 매핑 함수
 function getTagColor(tag: string) {
@@ -21,7 +22,7 @@ function getTagColor(tag: string) {
 }
 
 export default function FactoriesPage() {
-  const [factories, setFactories] = useState<any[]>([]);
+  const [factories, setFactories] = useState<Factory[]>([]);
   const [loading, setLoading] = useState(true);
 
   // 검색 상태
@@ -468,7 +469,7 @@ export default function FactoriesPage() {
             {view === 'list' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {Array.isArray(filtered) && filtered.length > 0 ? (
-                  filtered.map((f: any, idx: number) => (
+                  filtered.map((f: Factory, idx: number) => (
                     f ? (
                       <div key={f.id ?? idx} className="border rounded-xl p-0 bg-white shadow overflow-hidden flex flex-col">
                         {/* 이미지 영역 */}
@@ -483,8 +484,8 @@ export default function FactoriesPage() {
                         <div className="p-4 flex-1 flex flex-col">
                           {/* 태그 영역 */}
                           <div className="flex gap-2 mb-2 flex-wrap">
-                            {Array.isArray(f.processes) && f.processes.map((tag: string, i: number) => (
-                              <span key={tag + i} className={`rounded px-2 py-1 text-xs font-bold ${getTagColor(tag)}`}>{tag}</span>
+                            {Array.isArray(f.processes) && f.processes.map((tag: string) => (
+                              <span key={tag} className={`rounded px-2 py-1 text-xs font-bold ${getTagColor(tag)}`}>{tag}</span>
                             ))}
                           </div>
                           <div className="font-bold text-base mb-1">{f.company_name ?? '이름 없음'}</div>
