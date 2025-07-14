@@ -12,6 +12,30 @@ export interface Factory {
   lng: number;
   kakaoUrl: string;
   processes: string[];
+  // DB 연동용 확장 필드 (옵셔널)
+  business_type?: string;
+  equipment?: string;
+  sewing_machines?: string;
+  pattern_machines?: string;
+  special_machines?: string;
+  top_items_upper?: string;
+  top_items_lower?: string;
+  top_items_outer?: string;
+  top_items_dress_skirt?: string;
+  top_items_bag?: string;
+  top_items_fashion_accessory?: string;
+  top_items_underwear?: string;
+  top_items_sports_leisure?: string;
+  top_items_pet?: string;
+  moq?: number;
+  monthly_capacity?: number;
+  admin_district?: string;
+  intro?: string;
+  phone_number?: string;
+  factory_type?: string;
+  main_fabrics?: string;
+  distribution?: string;
+  delivery?: string;
 }
 
 // factories: 봉제공장 샘플 데이터 70개
