@@ -2,18 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import type { Factory } from "@/lib/factories";
-import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import FactoryMap from "@/components/FactoryMap";
 import { ArrowPathIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import Image from "next/image";
 import { List, Map as MapIcon } from "lucide-react";
 
-function getUnique<T>(arr: T[]): T[] {
-  return Array.from(new Set(arr));
-}
 // 태그별 색상 매핑 함수
 function getTagColor(tag: string) {
   switch (tag) {
@@ -70,13 +62,6 @@ export default function FactoriesPage() {
   // 목록/지도 뷰 상태
   const [view, setView] = useState<'list' | 'map'>('list');
 
-  // 장비 카테고리 정의 (예시)
-  const equipmentCategories = [
-    { key: 'sewing_machines', label: '재봉기계' },
-    { key: 'pattern_machines', label: '패턴기' },
-    { key: 'special_machines', label: '특수기' },
-  ];
-
   // 옵션 동적 추출 함수 (중복 없는 값, 분리 처리)
   function getOptions(key: string): string[] {
     if (key === 'business_type' || key === 'distribution' || key === 'delivery') {
@@ -90,7 +75,7 @@ export default function FactoriesPage() {
       all.forEach(str => {
         const [cat, vals] = str.split(':').map(s => s.trim());
         if (cat && vals) {
-          byCategory[cat] = [...(byCategory[cat] || []), ...vals.split(',').map(v => v.trim())];
+          byCategory[cat] = [...(byCategory[cat] || []), ...vals.split(',').map((v: string) => v.trim())];
         }
       });
       // 중복 제거
@@ -241,7 +226,7 @@ export default function FactoriesPage() {
               </button>
               {openFilter.process && (
                 <div className="flex flex-wrap gap-2 pb-2">
-                  {processesOptions.map((opt: any) => (
+                  {processesOptions.map((opt: string) => (
                     <Button
                       key={opt}
                       size="sm"
@@ -268,7 +253,7 @@ export default function FactoriesPage() {
               </button>
               {openFilter.region && (
                 <div className="flex flex-wrap gap-2 pb-2">
-                  {regionOptions.map((opt: any) => (
+                  {regionOptions.map((opt: string) => (
                     <Button
                       key={opt}
                       size="sm"
@@ -322,7 +307,7 @@ export default function FactoriesPage() {
               </button>
               {openFilter.sewing_machines && (
                 <div className="flex flex-wrap gap-2 pb-2">
-                  {sewingMachineOptions.map((opt: any) => (
+                  {sewingMachineOptions.map((opt: string) => (
                     <Button
                       key={opt}
                       size="sm"
@@ -349,7 +334,7 @@ export default function FactoriesPage() {
               </button>
               {openFilter.pattern_machines && (
                 <div className="flex flex-wrap gap-2 pb-2">
-                  {patternMachineOptions.map((opt: any) => (
+                  {patternMachineOptions.map((opt: string) => (
                     <Button
                       key={opt}
                       size="sm"
@@ -376,7 +361,7 @@ export default function FactoriesPage() {
               </button>
               {openFilter.special_machines && (
                 <div className="flex flex-wrap gap-2 pb-2">
-                  {specialMachineOptions.map((opt: any) => (
+                  {specialMachineOptions.map((opt: string) => (
                     <Button
                       key={opt}
                       size="sm"
@@ -403,7 +388,7 @@ export default function FactoriesPage() {
               </button>
               {openFilter.items && (
                 <div className="flex flex-wrap gap-2 pb-2">
-                  {itemOptionsAll.map((opt: any) => (
+                  {itemOptionsAll.map((opt: string) => (
                     <Button
                       key={opt}
                       size="sm"
@@ -498,7 +483,7 @@ export default function FactoriesPage() {
                         <div className="p-4 flex-1 flex flex-col">
                           {/* 태그 영역 */}
                           <div className="flex gap-2 mb-2 flex-wrap">
-                            {Array.isArray(f.processes) && f.processes.map((tag: any, i: any) => (
+                            {Array.isArray(f.processes) && f.processes.map((tag: string, i: number) => (
                               <span key={tag + i} className={`rounded px-2 py-1 text-xs font-bold ${getTagColor(tag)}`}>{tag}</span>
                             ))}
                           </div>
