@@ -20,8 +20,10 @@ export default function NoticesPage() {
   return (
     <div className="max-w-[1200px] mx-auto py-16 px-4">
       {/* 상단 제목/설명 */}
-      <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">공지사항</h1>
-      <p className="text-lg text-gray-500 mb-8">동고리의 다양한 소식들을 확인해보세요.</p>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">공지사항</h1>
+        <p className="text-lg text-gray-500 mb-8">동고리의 다양한 소식들을 확인해보세요.</p>
+      </div>
 
       {/* 탭 메뉴 */}
       <div className="flex gap-8 border-b border-gray-200 mb-6 text-lg font-semibold">

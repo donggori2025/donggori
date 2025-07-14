@@ -11,58 +11,20 @@ __turbopack_context__.s({
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 ;
 const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-        className: "w-full relative h-[420px] flex items-center justify-center overflow-hidden",
-        children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
-                src: "/250402_동대문구 봄꽃 패션쇼 영상.mp4",
-                autoPlay: true,
-                loop: true,
-                muted: true,
-                playsInline: true,
-                className: "absolute inset-0 w-full h-full object-cover z-0"
-            }, void 0, false, {
-                fileName: "[project]/components/HeroSection.tsx",
-                lineNumber: 6,
-                columnNumber: 5
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "absolute inset-0 bg-black/60 z-10"
-            }, void 0, false, {
-                fileName: "[project]/components/HeroSection.tsx",
-                lineNumber: 15,
-                columnNumber: 5
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "relative z-20 flex flex-col items-center justify-center text-center px-4",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                    className: "text-[48px] font-extrabold text-white mb-4 drop-shadow-lg",
-                    children: [
-                        "동고리는",
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
-                            fileName: "[project]/components/HeroSection.tsx",
-                            lineNumber: 19,
-                            columnNumber: 13
-                        }, this),
-                        "동대문구 지역의 패션봉제공장과 디자이너들을 연결하는",
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
-                            fileName: "[project]/components/HeroSection.tsx",
-                            lineNumber: 20,
-                            columnNumber: 37
-                        }, this),
-                        "패션봉제 올인원 플랫폼 입니다."
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/components/HeroSection.tsx",
-                    lineNumber: 18,
-                    columnNumber: 7
-                }, this)
-            }, void 0, false, {
-                fileName: "[project]/components/HeroSection.tsx",
-                lineNumber: 17,
-                columnNumber: 5
-            }, this)
-        ]
-    }, void 0, true, {
+        className: "w-full relative h-[600px] flex items-center justify-center overflow-hidden",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
+            src: "/250402_동대문구 봄꽃 패션쇼 영상.mp4",
+            autoPlay: true,
+            loop: true,
+            muted: true,
+            playsInline: true,
+            className: "absolute inset-0 w-full h-full object-cover z-0"
+        }, void 0, false, {
+            fileName: "[project]/components/HeroSection.tsx",
+            lineNumber: 6,
+            columnNumber: 5
+        }, this)
+    }, void 0, false, {
         fileName: "[project]/components/HeroSection.tsx",
         lineNumber: 4,
         columnNumber: 3
