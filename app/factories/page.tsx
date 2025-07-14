@@ -67,7 +67,7 @@ export default function FactoriesPage() {
   function getOptions(key: string): string[] {
     if (key === 'business_type' || key === 'distribution' || key === 'delivery') {
       const values = factories.flatMap(f => (f[key] ? String(f[key]).split(',').map((v: string) => v.trim()) : []));
-      return Array.from(new Set(values.filter(Boolean)));
+      return Array.from(new Set(values.filter((v): v is string => typeof v === 'string' && Boolean(v))));
     }
     if (key === 'equipment') {
       // |로 카테고리 분리, :로 카테고리명/값 분리, 쉼표로 하위 항목 분리
@@ -87,27 +87,24 @@ export default function FactoriesPage() {
       return [];
     }
     if (key === 'sewing_machines' || key === 'pattern_machines' || key === 'special_machines') {
-      // 쉼표로 분리, 중복 없이
       const values = factories.flatMap(f => (f[key] ? String(f[key]).split(',').map((v: string) => v.trim()) : []));
-      return Array.from(new Set(values.filter(Boolean)));
+      return Array.from(new Set(values.filter((v): v is string => typeof v === 'string' && Boolean(v))));
     }
     if (key === 'items') {
-      // 품목: top_items_* + 쉼표 분리, 중복 없이
       const arr = factories.flatMap(f => [
         f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt, f.top_items_bag, f.top_items_fashion_accessory, f.top_items_underwear, f.top_items_sports_leisure, f.top_items_pet
-      ].filter(Boolean));
+      ].filter((v): v is string => typeof v === 'string' && Boolean(v)));
       const commaSplit = arr.flatMap(i => String(i).split(',').map((v: string) => v.trim()));
-      return Array.from(new Set(commaSplit.filter(Boolean)));
+      return Array.from(new Set(commaSplit.filter((v): v is string => typeof v === 'string' && Boolean(v))));
     }
     if (key === 'processes') {
-      // 공정: 쉼표로 분리, 중복 없이
       const values = factories.flatMap(f => (f.processes ? String(f.processes).split(',').map((v: string) => v.trim()) : []));
-      return Array.from(new Set(values.filter(Boolean)));
+      return Array.from(new Set(values.filter((v): v is string => typeof v === 'string' && Boolean(v))));
     }
     const values = factories.map(f => f[key]);
     // 항상 배열 반환 보장
     if (Array.isArray(values)) {
-      return Array.from(new Set(values.flat ? values.flat().filter(Boolean) : values.filter(Boolean)));
+      return Array.from(new Set(values.flatMap((v) => typeof v === 'string' ? [v] : [])));
     }
     return [];
   }
@@ -119,37 +116,37 @@ export default function FactoriesPage() {
     const searchMatch = !search ||
       (f.company_name && f.company_name.includes(search)) ||
       (f.intro && f.intro.includes(search)) ||
-      itemList.some(i => i && i.includes(search));
+      itemList.some(i => typeof i === 'string' && i && i.includes(search));
     // MOQ/월생산량 range 필터
     const moqMatch = selected.moq.length === 0 || selected.moq.some(rangeLabel => {
       const range = moqRanges.find(r => r.label === rangeLabel);
-      return range && f.moq >= range.min && f.moq <= range.max;
+      return range && typeof f.moq === 'number' && f.moq >= range.min && f.moq <= range.max;
     });
     const monthlyCapacityMatch = selected.monthly_capacity.length === 0 || selected.monthly_capacity.some(rangeLabel => {
       const range = monthlyCapacityRanges.find(r => r.label === rangeLabel);
-      return range && f.monthly_capacity >= range.min && f.monthly_capacity <= range.max;
+      return range && typeof f.monthly_capacity === 'number' && f.monthly_capacity >= range.min && f.monthly_capacity <= range.max;
     });
     // business_type, distribution, delivery, equipment 분리 필터
     const businessTypeArr = f.business_type ? String(f.business_type).split(',').map((v: string) => v.trim()) : [];
-    const distributionArr = f.distribution ? String(f.distribution).split(',').map((v: string) => v.trim()) : [];
-    const deliveryArr = f.delivery ? String(f.delivery).split(',').map((v: string) => v.trim()) : [];
-    const equipmentArr = f.equipment ? String(f.equipment).split('|').map((v: string) => v.trim()) : [];
+    const distributionArr = f.distribution ? String(f.distribution).split(',').map((v: string) => v.trim()).filter((v): v is string => typeof v === 'string') : [];
+    const deliveryArr = f.delivery ? String(f.delivery).split(',').map((v: string) => v.trim()).filter((v): v is string => typeof v === 'string') : [];
+    const equipmentArr = f.equipment ? String(f.equipment).split('|').map((v: string) => v.trim()).filter((v): v is string => typeof v === 'string') : [];
     return (
       searchMatch &&
       (selected.admin_district.length === 0 || selected.admin_district.includes(f.admin_district)) &&
       moqMatch &&
       monthlyCapacityMatch &&
-      (selected.business_type.length === 0 || businessTypeArr.some((v: string) => selected.business_type.includes(v))) &&
-      (selected.distribution.length === 0 || distributionArr.some((v: string) => selected.distribution.includes(v))) &&
-      (selected.delivery.length === 0 || deliveryArr.some((v: string) => selected.delivery.includes(v))) &&
-      (selected.items.length === 0 || itemList.some(i => selected.items.includes(i))) &&
-      (selected.equipment.length === 0 || equipmentArr.some((v: string) => selected.equipment.includes(v))) &&
-      (selected.sewing_machines.length === 0 || selected.sewing_machines.includes(f.sewing_machines)) &&
-      (selected.pattern_machines.length === 0 || selected.pattern_machines.includes(f.pattern_machines)) &&
-      (selected.special_machines.length === 0 || selected.special_machines.includes(f.special_machines)) &&
-      (selected.factory_type.length === 0 || selected.factory_type.includes(f.factory_type)) &&
-      (selected.main_fabrics.length === 0 || selected.main_fabrics.includes(f.main_fabrics)) &&
-      (selected.processes.length === 0 || selected.processes.includes(f.processes))
+      (selected.business_type.length === 0 || businessTypeArr.filter((v): v is string => typeof v === 'string').some(v => selected.business_type.includes(v))) &&
+      (selected.distribution.length === 0 || distributionArr.filter((v): v is string => typeof v === 'string').some(v => selected.distribution.includes(v))) &&
+      (selected.delivery.length === 0 || deliveryArr.filter((v): v is string => typeof v === 'string').some(v => selected.delivery.includes(v))) &&
+      (selected.items.length === 0 || itemList.filter((i): i is string => typeof i === 'string').some(i => selected.items.includes(i))) &&
+      (selected.equipment.length === 0 || equipmentArr.filter((v): v is string => typeof v === 'string').some(v => selected.equipment.includes(v))) &&
+      (selected.sewing_machines.length === 0 || (typeof f.sewing_machines === 'string' && selected.sewing_machines.includes(f.sewing_machines))) &&
+      (selected.pattern_machines.length === 0 || (typeof f.pattern_machines === 'string' && selected.pattern_machines.includes(f.pattern_machines))) &&
+      (selected.special_machines.length === 0 || (typeof f.special_machines === 'string' && selected.special_machines.includes(f.special_machines))) &&
+      (selected.factory_type.length === 0 || (typeof f.factory_type === 'string' && selected.factory_type.includes(f.factory_type))) &&
+      (selected.main_fabrics.length === 0 || (typeof f.main_fabrics === 'string' && selected.main_fabrics.includes(f.main_fabrics))) &&
+      (selected.processes.length === 0 || (typeof f.processes === 'string' && selected.processes.includes(f.processes)))
     );
   });
 
@@ -469,7 +466,7 @@ export default function FactoriesPage() {
             {view === 'list' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {Array.isArray(filtered) && filtered.length > 0 ? (
-                  filtered.map((f: Factory & Record<string, any>, idx: number) => {
+                  filtered.map((f: Factory, idx: number) => {
                     const mainItems: string = [f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt]
                       .filter((v): v is string => typeof v === 'string' && v.length > 0)
                       .join(', ') || '-';
