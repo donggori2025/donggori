@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { factories } from "@/lib/factories";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 // 8단계 질문/선택지 샘플 데이터
 const QUESTIONS = [
@@ -35,17 +36,15 @@ const QUESTIONS = [
     question: "특별히 원하는 공장 조건이 있나요?",
     options: ["소량생산 가능", "빠른 납기", "고품질", "저렴한 단가", "상관없음"],
   },
-  {
-    question: "추가 요청사항이 있나요?",
-    options: ["없음", "있음(상세 입력)"],
-  },
+  // 마지막 질문(추가 요청사항)은 제거함
 ];
 
 export default function MatchingPage() {
   // 현재 질문 인덱스
   const [step, setStep] = useState(0);
   // 사용자가 선택한 답변들
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<string[][]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   // 채팅 메시지(질문/답변 순서대로)
   const [chat, setChat] = useState<{ type: "question" | "answer"; text: string }[]>([
     { type: "question", text: QUESTIONS[0].question },
@@ -53,15 +52,28 @@ export default function MatchingPage() {
   const { user } = useUser();
   const router = useRouter();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [recommended, setRecommended] = useState<any[]>([]);
 
   // 선택지 클릭 시
-  const handleOptionClick = (option: string) => {
-    const newAnswers = [...answers, option];
+  const handleOptionToggle = (option: string) => {
+    setSelectedOptions(prev =>
+      prev.includes(option)
+        ? prev.filter(o => o !== option)
+        : [...prev, option]
+    );
+  };
+
+  const handleConfirm = () => {
+    if (selectedOptions.length === 0) return;
+    const newAnswers = [...answers, selectedOptions];
     setAnswers(newAnswers);
     setChat(prev => [
       ...prev,
-      { type: "answer", text: option },
+      { type: "answer", text: selectedOptions.join(", ") },
     ]);
+    setSelectedOptions([]);
     // 다음 질문이 있으면 추가
     if (step + 1 < QUESTIONS.length) {
       setTimeout(() => {
@@ -69,21 +81,45 @@ export default function MatchingPage() {
           ...prev,
           { type: "question", text: QUESTIONS[step + 1].question },
         ]);
-        setStep(step + 1);
-      }, 400); // 채팅 느낌을 위해 약간의 딜레이
+        setStep(prev => prev + 1);
+      }, 400);
     } else {
       // 8개 완료 시 추천 결과 노출
+      setLoading(true);
       setTimeout(() => {
-        const recommended = getRecommendedFactories(newAnswers);
+        const rec = getRecommendedFactories(newAnswers.map(a => a.join(", ")));
+        setRecommended(rec);
+        setLoading(false);
+        setShowResult(true);
+      }, 1500);
+    }
+  };
+
+  // 건너뛰기(선택 없이 다음 단계)
+  const handleSkip = () => {
+    const newAnswers = [...answers, []];
+    setAnswers(newAnswers);
+    setChat(prev => [
+      ...prev,
+      { type: "answer", text: "(건너뜀)" },
+    ]);
+    setSelectedOptions([]);
+    if (step + 1 < QUESTIONS.length) {
+      setTimeout(() => {
         setChat(prev => [
           ...prev,
-          { type: "question", text: "가장 적합한 봉제공장 3곳을 추천드려요!" },
-          ...recommended.map(f => ({
-            type: "answer" as const,
-            text: `${f.name} (매칭 점수: ${f.score})`,
-          })),
+          { type: "question", text: QUESTIONS[step + 1].question },
         ]);
-      }, 600);
+        setStep(prev => prev + 1);
+      }, 400);
+    } else {
+      setLoading(true);
+      setTimeout(() => {
+        const rec = getRecommendedFactories(newAnswers.map(a => a.join(", ")));
+        setRecommended(rec);
+        setLoading(false);
+        setShowResult(true);
+      }, 1500);
     }
   };
 
@@ -125,64 +161,116 @@ export default function MatchingPage() {
       .slice(0, 3);
   }
 
-  // 추천 결과 렌더링 (공장 리스트 + 의뢰하기 버튼)
-  function renderRecommendation(chat: { type: "question" | "answer"; text: string }[]) {
-    const recIdx = chat.findIndex((m) => m.text.includes("추천드려요"));
-    if (recIdx === -1) return null;
-    const factoriesToShow = chat.slice(recIdx + 1, recIdx + 4);
+  // 추천 결과 카드 UI
+  function renderResultCards() {
     return (
-      <div className="mt-6 space-y-4">
-        {factoriesToShow.map((msg, i) => (
-          <div key={i} className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3 border">
-            <span>{msg.text}</span>
-            <Button
-              onClick={() => {
-                if (!user) setShowLoginModal(true);
-                else alert("의뢰 기능은 추후 구현 예정입니다.");
-              }}
-              className="ml-4"
-            >
-              의뢰하기
-            </Button>
-          </div>
-        ))}
+      <div className="w-full flex flex-col items-center justify-center min-h-[500px] animate-fade-in">
+        <div className="text-2xl font-bold mb-6">가장 적합한 봉제공장 3곳을 추천드려요!</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full max-w-3xl">
+          {recommended.map((f, i) => (
+            <div key={f.id} className="bg-white rounded-xl shadow-md p-6 flex flex-col items-start border border-gray-200 w-full">
+              {f.image && (
+                <img src={f.image} alt={f.name} className="w-full h-40 object-cover rounded-lg mb-4" />
+              )}
+              <div className="text-lg font-bold mb-2">{f.name}</div>
+              <div className="text-gray-500 text-sm mb-2">매칭 점수: {f.score}</div>
+              <div className="text-gray-700 mb-2">{f.description}</div>
+              <div className="text-gray-400 text-xs mb-4">최소 주문: {f.minOrder}장</div>
+              <Button className="w-full mt-auto" onClick={() => router.push(`/factories/${f.id}`)}>
+                의뢰하기
+              </Button>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
+  // 로딩 스피너 UI
+  function renderLoading() {
+    return (
+      <div className="w-full flex flex-col items-center justify-center min-h-[500px] animate-fade-in">
+        <div className="w-16 h-16 border-4 border-gray-300 border-t-[#222222] rounded-full animate-spin mb-6"></div>
+        <div className="text-lg font-semibold">추천 결과를 분석 중입니다...</div>
+      </div>
+    );
+  }
+
+  // 이전 단계로 돌아가기 (수정)
+  const handleEdit = (editStep: number) => {
+    setStep(editStep);
+    setSelectedOptions(answers[editStep] || []);
+    setAnswers(answers.slice(0, editStep));
+    setChat(chat.slice(0, 1 + editStep * 2)); // 질문/답변 쌍이므로
+    setShowResult(false);
+    setLoading(false);
+  };
+
   // 왼쪽: 질문/선택지, 오른쪽: 채팅
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* 왼쪽: 질문/선택지 */}
-      <div className="w-full max-w-xl mx-auto mt-12 bg-white rounded-xl shadow-md p-8 flex flex-col gap-6">
-        <div className="text-xl font-bold mb-2">AI 매칭</div>
-        <div className="text-gray-500 text-sm mb-4">몇 가지 정보를 알려주시면, 가장 적합한 3개의 봉제공장을 추천해드립니다.</div>
-        <div className="flex gap-2 mb-4">
-          {QUESTIONS.map((_, idx) => (
-            <div key={idx} className={`h-1 w-8 rounded-full ${idx <= step ? "bg-toss-blue" : "bg-gray-200"}`}></div>
-          ))}
+    <div className="w-full max-w-[1200px] mx-auto min-h-screen bg-gray-50 flex flex-row gap-8">
+      {/* 페이드 전환용 wrapper */}
+      <div className={`flex flex-row gap-8 flex-1 items-start justify-center mt-12 transition-opacity duration-700 ${showResult || loading ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        {/* 왼쪽: 질문/선택지 */}
+        <div className="w-full max-w-xl bg-white rounded-xl shadow-md p-8 flex flex-col gap-6">
+          <div className="text-xl font-bold mb-2">AI 매칭</div>
+          <div className="text-gray-500 text-sm mb-4">몇 가지 정보를 알려주시면, 가장 적합한 3개의 봉제공장을 추천해드립니다.</div>
+          <div className="flex gap-2 mb-4">
+            {QUESTIONS.map((_, idx) => (
+              <div key={idx} className={`h-1 w-8 rounded-full ${idx <= step ? "bg-[#222222]" : "bg-gray-200"}`}></div>
+            ))}
+          </div>
+          <div className="text-sm text-gray-400 mb-2">{step + 1} of {QUESTIONS.length}</div>
+          <div className="text-lg font-semibold mb-4">{QUESTIONS[step].question}</div>
+          <div className="grid grid-cols-2 gap-3 mb-2">
+            {QUESTIONS[step].options.map(option => (
+              <button
+                key={option}
+                type="button"
+                className={`rounded-lg py-4 px-6 text-base font-medium border transition flex items-center justify-center gap-2
+                  ${selectedOptions.includes(option)
+                    ? "bg-[#222222] text-white border-[#222222]"
+                    : "bg-white text-[#222222] border-gray-200 hover:bg-gray-100"}
+                `}
+                onClick={() => handleOptionToggle(option)}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+          {/* 하단 나가기/건너뛰기 */}
+          <div className="flex justify-between items-center mt-6">
+            <button className="text-sm underline text-[#222222]" onClick={() => router.push("/")}>나가기</button>
+            <div className="flex gap-2">
+              <Button variant="ghost" className="text-[#222222]" onClick={handleSkip}>건너뛰기</Button>
+              <Button
+                className="bg-[#222222] text-white px-6"
+                onClick={handleConfirm}
+                disabled={selectedOptions.length === 0}
+              >
+                다음
+              </Button>
+            </div>
+          </div>
         </div>
-        <div className="text-sm text-gray-400 mb-2">{step + 1} of {QUESTIONS.length}</div>
-        <div className="text-lg font-semibold mb-4">{QUESTIONS[step].question}</div>
-        <div className="grid grid-cols-2 gap-3">
-          {QUESTIONS[step].options.map(option => (
-            <Button key={option} className="bg-gray-100 text-gray-800 rounded-lg py-4 text-base font-medium hover:bg-toss-blue hover:text-white transition" onClick={() => handleOptionClick(option)}>
-              {option}
-            </Button>
-          ))}
-        </div>
-      </div>
-      {/* 오른쪽: 채팅 */}
-      <div className="flex-1 flex flex-col items-center justify-start mt-12">
+        {/* 오른쪽: 채팅 */}
         <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6 min-h-[500px] flex flex-col gap-2">
           {chat.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.type === "question" ? "justify-start" : "justify-end"}`}>
-              <div className={`px-4 py-2 rounded-2xl text-base ${msg.type === "question" ? "bg-gray-100 text-gray-800" : "bg-toss-blue text-white"}`}>
+              <div className={`relative px-4 py-2 rounded-2xl text-base ${msg.type === "question" ? "bg-gray-100 text-gray-800" : "bg-[#222222] text-white"}`}>
                 {msg.text}
+                {/* 답변(선택지) 말풍선에만 수정 버튼 노출 */}
+                {msg.type === "answer" && idx === chat.findLastIndex(m => m.type === "answer") && step > 0 && (
+                  <button
+                    className="absolute right-2 bottom-[-18px] text-xs text-gray-400 underline hover:text-[#222222]"
+                    onClick={() => handleEdit(Math.floor(idx / 2))}
+                  >
+                    수정
+                  </button>
+                )}
               </div>
             </div>
           ))}
-          {renderRecommendation(chat)}
         </div>
         {/* 로그인 필요 모달 */}
         {showLoginModal && (
@@ -196,6 +284,18 @@ export default function MatchingPage() {
           </div>
         )}
       </div>
+      {/* 로딩 화면 */}
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-50 transition-opacity duration-700 animate-fade-in">
+          {renderLoading()}
+        </div>
+      )}
+      {/* 추천 결과 화면 */}
+      {showResult && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-50 transition-opacity duration-700 animate-fade-in">
+          {renderResultCards()}
+        </div>
+      )}
     </div>
   );
 } 

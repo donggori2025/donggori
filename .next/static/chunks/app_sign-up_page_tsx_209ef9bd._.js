@@ -110,7 +110,7 @@ function SignUpPage() {
             setVerificationCode("");
             startTimer();
         } catch (err) {
-            setError(err.errors?.[0]?.message || "이메일 인증 요청 중 오류가 발생했습니다.");
+            setError(err instanceof Error ? err.message : "이메일 인증 요청 중 오류가 발생했습니다.");
         } finally{
             setLoading(false);
         }
@@ -126,7 +126,7 @@ function SignUpPage() {
             setVerificationCode("");
             startTimer();
         } catch (err) {
-            setError(err.errors?.[0]?.message || "인증번호 재요청 중 오류가 발생했습니다.");
+            setError(err instanceof Error ? err.message : "인증번호 재요청 중 오류가 발생했습니다.");
         } finally{
             setLoading(false);
         }
@@ -147,7 +147,7 @@ function SignUpPage() {
                 setError("인증 코드가 올바르지 않습니다.");
             }
         } catch (err) {
-            setError(err.errors?.[0]?.message || "이메일 인증 중 오류가 발생했습니다.");
+            setError(err instanceof Error ? err.message : "이메일 인증 중 오류가 발생했습니다.");
         } finally{
             setLoading(false);
         }
@@ -175,7 +175,7 @@ function SignUpPage() {
             });
             router.push("/");
         } catch (err) {
-            setError(err?.errors?.[0]?.message || err?.message || "예상치 못한 오류가 발생했습니다. 새로고침 후 다시 시도해주세요.");
+            setError(err instanceof Error ? err.message : "예상치 못한 오류가 발생했습니다. 새로고침 후 다시 시도해주세요.");
         } finally{
             setLoading(false);
         }
@@ -204,7 +204,7 @@ function SignUpPage() {
                         className: "mb-2"
                     }, void 0, false, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 173,
+                        lineNumber: 172,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -216,13 +216,13 @@ function SignUpPage() {
                                 children: "GORI"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 174,
+                                lineNumber: 173,
                                 columnNumber: 73
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 174,
+                        lineNumber: 173,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -230,7 +230,7 @@ function SignUpPage() {
                         children: "봉제공장이 필요한 순간, 동고리"
                     }, void 0, false, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 175,
+                        lineNumber: 174,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -243,19 +243,19 @@ function SignUpPage() {
                                 children: "회원가입"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 177,
+                                lineNumber: 176,
                                 columnNumber: 24
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 176,
+                        lineNumber: 175,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/sign-up/page.tsx",
-                lineNumber: 172,
+                lineNumber: 171,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -267,7 +267,7 @@ function SignUpPage() {
                         className: "mb-2"
                     }, void 0, false, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 183,
+                        lineNumber: 182,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -275,7 +275,7 @@ function SignUpPage() {
                         children: "이메일"
                     }, void 0, false, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 184,
+                        lineNumber: 183,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -291,7 +291,7 @@ function SignUpPage() {
                                 disabled: emailVerified
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 186,
+                                lineNumber: 185,
                                 columnNumber: 11
                             }, this),
                             !emailVerified && !verificationSent && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -302,7 +302,7 @@ function SignUpPage() {
                                 children: "이메일 인증"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 196,
+                                lineNumber: 195,
                                 columnNumber: 13
                             }, this),
                             verificationSent && !emailVerified && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -312,7 +312,7 @@ function SignUpPage() {
                                 children: "인증코드 발송됨"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 201,
+                                lineNumber: 200,
                                 columnNumber: 13
                             }, this),
                             emailVerified && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -320,13 +320,13 @@ function SignUpPage() {
                                 children: "인증완료"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 206,
+                                lineNumber: 205,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 185,
+                        lineNumber: 184,
                         columnNumber: 9
                     }, this),
                     verificationSent && !emailVerified && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -340,7 +340,7 @@ function SignUpPage() {
                                 className: "border rounded px-3 py-2 flex-1"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 212,
+                                lineNumber: 211,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -351,7 +351,7 @@ function SignUpPage() {
                                 children: "인증 확인"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 219,
+                                lineNumber: 218,
                                 columnNumber: 13
                             }, this),
                             !canResend ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -359,7 +359,7 @@ function SignUpPage() {
                                 children: formatTime(timer)
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 224,
+                                lineNumber: 223,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 type: "button",
@@ -369,13 +369,13 @@ function SignUpPage() {
                                 children: "인증번호 재요청"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 226,
+                                lineNumber: 225,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 211,
+                        lineNumber: 210,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -383,7 +383,7 @@ function SignUpPage() {
                         children: "비밀번호"
                     }, void 0, false, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 232,
+                        lineNumber: 231,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -396,7 +396,7 @@ function SignUpPage() {
                         disabled: !emailVerified
                     }, void 0, false, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 233,
+                        lineNumber: 232,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -404,7 +404,7 @@ function SignUpPage() {
                         children: "비밀번호 확인"
                     }, void 0, false, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 242,
+                        lineNumber: 241,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -417,7 +417,7 @@ function SignUpPage() {
                         disabled: !emailVerified
                     }, void 0, false, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 243,
+                        lineNumber: 242,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -435,7 +435,7 @@ function SignUpPage() {
                                         required: true
                                     }, void 0, false, {
                                         fileName: "[project]/app/sign-up/page.tsx",
-                                        lineNumber: 256,
+                                        lineNumber: 255,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -444,13 +444,13 @@ function SignUpPage() {
                                         children: "전체 동의"
                                     }, void 0, false, {
                                         fileName: "[project]/app/sign-up/page.tsx",
-                                        lineNumber: 264,
+                                        lineNumber: 263,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 255,
+                                lineNumber: 254,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -468,7 +468,7 @@ function SignUpPage() {
                                                 required: true
                                             }, void 0, false, {
                                                 fileName: "[project]/app/sign-up/page.tsx",
-                                                lineNumber: 268,
+                                                lineNumber: 267,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -478,13 +478,13 @@ function SignUpPage() {
                                                 children: "이용약관 동의(필수)"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/sign-up/page.tsx",
-                                                lineNumber: 276,
+                                                lineNumber: 275,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/sign-up/page.tsx",
-                                        lineNumber: 267,
+                                        lineNumber: 266,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -499,7 +499,7 @@ function SignUpPage() {
                                                 required: true
                                             }, void 0, false, {
                                                 fileName: "[project]/app/sign-up/page.tsx",
-                                                lineNumber: 279,
+                                                lineNumber: 278,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -509,13 +509,13 @@ function SignUpPage() {
                                                 children: "개인정보이용동의(필수)"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/sign-up/page.tsx",
-                                                lineNumber: 287,
+                                                lineNumber: 286,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/sign-up/page.tsx",
-                                        lineNumber: 278,
+                                        lineNumber: 277,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -529,7 +529,7 @@ function SignUpPage() {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/sign-up/page.tsx",
-                                                lineNumber: 290,
+                                                lineNumber: 289,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -539,25 +539,25 @@ function SignUpPage() {
                                                 children: "마케팅정보활용동의(선택)"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/sign-up/page.tsx",
-                                                lineNumber: 297,
+                                                lineNumber: 296,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/sign-up/page.tsx",
-                                        lineNumber: 289,
+                                        lineNumber: 288,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 266,
+                                lineNumber: 265,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 253,
+                        lineNumber: 252,
                         columnNumber: 9
                     }, this),
                     error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -565,7 +565,7 @@ function SignUpPage() {
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 301,
+                        lineNumber: 300,
                         columnNumber: 19
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -575,7 +575,7 @@ function SignUpPage() {
                         children: loading ? "가입 중..." : "회원가입"
                     }, void 0, false, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 302,
+                        lineNumber: 301,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -585,7 +585,7 @@ function SignUpPage() {
                                 className: "flex-1 h-px bg-gray-200"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 320,
+                                lineNumber: 319,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -593,20 +593,20 @@ function SignUpPage() {
                                 children: "SNS 계정으로 로그인/회원가입"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 321,
+                                lineNumber: 320,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "flex-1 h-px bg-gray-200"
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 322,
+                                lineNumber: 321,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 319,
+                        lineNumber: 318,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -623,12 +623,12 @@ function SignUpPage() {
                                     height: 28
                                 }, void 0, false, {
                                     fileName: "[project]/app/sign-up/page.tsx",
-                                    lineNumber: 328,
+                                    lineNumber: 327,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 326,
+                                lineNumber: 325,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -642,12 +642,12 @@ function SignUpPage() {
                                     height: 28
                                 }, void 0, false, {
                                     fileName: "[project]/app/sign-up/page.tsx",
-                                    lineNumber: 332,
+                                    lineNumber: 331,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 330,
+                                lineNumber: 329,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -661,30 +661,30 @@ function SignUpPage() {
                                     height: 28
                                 }, void 0, false, {
                                     fileName: "[project]/app/sign-up/page.tsx",
-                                    lineNumber: 336,
+                                    lineNumber: 335,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/sign-up/page.tsx",
-                                lineNumber: 334,
+                                lineNumber: 333,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/sign-up/page.tsx",
-                        lineNumber: 325,
+                        lineNumber: 324,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/sign-up/page.tsx",
-                lineNumber: 181,
+                lineNumber: 180,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/sign-up/page.tsx",
-        lineNumber: 170,
+        lineNumber: 169,
         columnNumber: 5
     }, this);
 }
