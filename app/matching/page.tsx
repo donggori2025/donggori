@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { factories } from "@/lib/factories";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import type { Factory } from "@/lib/factories";
+import Image from "next/image";
 
 // 8단계 질문/선택지 샘플 데이터
 const QUESTIONS = [
@@ -39,6 +40,8 @@ const QUESTIONS = [
   // 마지막 질문(추가 요청사항)은 제거함
 ];
 
+type ScoredFactory = Factory & { score: number };
+
 export default function MatchingPage() {
   // 현재 질문 인덱스
   const [step, setStep] = useState(0);
@@ -49,12 +52,12 @@ export default function MatchingPage() {
   const [chat, setChat] = useState<{ type: "question" | "answer"; text: string }[]>([
     { type: "question", text: QUESTIONS[0].question },
   ]);
-  const { user } = useUser();
+  // user 변수 제거 (사용하지 않음)
   const router = useRouter();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [recommended, setRecommended] = useState<any[]>([]);
+  const [recommended, setRecommended] = useState<ScoredFactory[]>([]);
 
   // 선택지 클릭 시
   const handleOptionToggle = (option: string) => {
@@ -167,10 +170,10 @@ export default function MatchingPage() {
       <div className="w-full flex flex-col items-center justify-center min-h-[500px] animate-fade-in">
         <div className="text-2xl font-bold mb-6">가장 적합한 봉제공장 3곳을 추천드려요!</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full max-w-3xl">
-          {recommended.map((f, i) => (
+          {recommended.map((f) => (
             <div key={f.id} className="bg-white rounded-xl shadow-md p-6 flex flex-col items-start border border-gray-200 w-full">
               {f.image && (
-                <img src={f.image} alt={f.name} className="w-full h-40 object-cover rounded-lg mb-4" />
+                <Image src={f.image} alt={f.name} width={400} height={160} className="w-full h-40 object-cover rounded-lg mb-4" />
               )}
               <div className="text-lg font-bold mb-2">{f.name}</div>
               <div className="text-gray-500 text-sm mb-2">매칭 점수: {f.score}</div>

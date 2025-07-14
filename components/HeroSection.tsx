@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 
 const HeroSection = () => (
   <section className="w-full relative h-[420px] flex items-center justify-center overflow-hidden">
