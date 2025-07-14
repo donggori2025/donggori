@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { factories } from "@/lib/factories";
-import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import type { Factory } from "@/lib/factories";
 import Image from "next/image";
