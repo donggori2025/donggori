@@ -36,6 +36,7 @@ export interface Factory {
   main_fabrics?: string;
   distribution?: string;
   delivery?: string;
+  [key: string]: any;
 }
 
 // factories: 봉제공장 샘플 데이터 70개
