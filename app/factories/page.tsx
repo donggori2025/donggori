@@ -476,7 +476,7 @@ export default function FactoriesPage() {
                         <div className="w-full h-40 bg-gray-100 flex items-center justify-center overflow-hidden">
                           <img
                             src={f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length]}
-                            alt={f.company_name ?? '공장 이미지'}
+                            alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
                             className="object-cover w-full h-full"
                           />
                         </div>
