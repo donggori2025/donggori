@@ -114,8 +114,8 @@ export default function FactoriesPage() {
     const itemList = [f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt, f.top_items_bag, f.top_items_fashion_accessory, f.top_items_underwear, f.top_items_sports_leisure, f.top_items_pet];
     // 검색어 필터
     const searchMatch = !search ||
-      (f.company_name && f.company_name.includes(search)) ||
-      (f.intro && f.intro.includes(search)) ||
+      (typeof f.company_name === 'string' && f.company_name.includes(search)) ||
+      (typeof f.intro === 'string' && f.intro.includes(search)) ||
       itemList.some(i => typeof i === 'string' && i && i.includes(search));
     // MOQ/월생산량 range 필터
     const moqMatch = selected.moq.length === 0 || selected.moq.some(rangeLabel => {
