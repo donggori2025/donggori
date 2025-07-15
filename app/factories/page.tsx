@@ -133,7 +133,7 @@ export default function FactoriesPage() {
     const equipmentArr = f.equipment ? String(f.equipment).split('|').map((v: string) => v.trim()).filter((v): v is string => typeof v === 'string') : [];
     return (
       searchMatch &&
-      (selected.admin_district.length === 0 || selected.admin_district.includes(f.admin_district)) &&
+      (selected.admin_district.length === 0 || (typeof f.admin_district === 'string' && selected.admin_district.includes(f.admin_district))) &&
       moqMatch &&
       monthlyCapacityMatch &&
       (selected.business_type.length === 0 || businessTypeArr.filter((v): v is string => typeof v === 'string').some(v => selected.business_type.includes(v))) &&
