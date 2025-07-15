@@ -43,7 +43,10 @@ function ChatBubble({ text, type, isTyping, showCursor, onEdit }: { text: string
 export default function MatchingPage() {
   // 공장 데이터 state
   const [factories, setFactories] = useState<Factory[]>([]);
-  const [loadingFactories, setLoadingFactories] = useState(true);
+  const [loadingFactories, setLoadingFactories] = useState(false);
+  const [error, setError] = useState(null);
+  const [showResultMsg1, setShowResultMsg1] = useState(false);
+  const [showResultMsg2, setShowResultMsg2] = useState(false);
 
   useEffect(() => {
     async function fetchFactories() {
@@ -156,8 +159,6 @@ type ScoredFactory = Factory & { score: number };
   const [resultLoading, setResultLoading] = useState(false);
   // 채팅 스크롤 ref
   const chatScrollRef = useRef<HTMLDivElement>(null);
-  const [showResultMsg1, setShowResultMsg1] = useState(false);
-  const [showResultMsg2, setShowResultMsg2] = useState(false);
 
   // 데모 이미지 배열(공장 찾기와 동일)
   const DEMO_IMAGES = [
