@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import type { Factory } from "@/lib/factories";
-import Image from "next/image";
 
 // factories 데이터에서 옵션 추출 유틸(공장 찾기에서 복사)
 const moqRanges = [
@@ -93,7 +92,6 @@ type ScoredFactory = Factory & { score: number };
   const [introDone, setIntroDone] = useState(false);
 
   // 인트로 타이핑 상태 추가
-  const [typingIdx, setTypingIdx] = useState(0); // 현재 인트로 메시지 인덱스
   const [typingText, setTypingText] = useState(""); // 현재 타이핑 중인 텍스트
   // introMessages를 useMemo로 관리
   const introMessages = useMemo(() => [
@@ -108,10 +106,9 @@ type ScoredFactory = Factory & { score: number };
     // 인트로 타이핑 효과
     setChat([]);
     setIntroDone(false);
-    setTypingIdx(0);
     setTypingText("");
     setIntroStep(0);
-    let timers: NodeJS.Timeout[] = [];
+    const timers: NodeJS.Timeout[] = [];
     let currentMsgIdx = 0;
     let currentCharIdx = 0;
     function typeNextChar() {
@@ -153,7 +150,6 @@ type ScoredFactory = Factory & { score: number };
   // user 변수 제거 (사용하지 않음)
   const router = useRouter();
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recommended, setRecommended] = useState<ScoredFactory[]>([]);
   // 추천 결과 로딩 상태 추가
@@ -286,7 +282,7 @@ type ScoredFactory = Factory & { score: number };
       return false;
     });
     // 3개 미만이면 랜덤으로 채움
-    let result = matched.slice(0, 3).map(f => ({ ...f, score: 1 }));
+    const result = matched.slice(0, 3).map(f => ({ ...f, score: 1 }));
     if (result.length < 3) {
       const others = factories.filter(f => !matched.includes(f));
       while (result.length < 3 && others.length > 0) {
@@ -371,7 +367,6 @@ type ScoredFactory = Factory & { score: number };
 
   // 이전 단계로 돌아가기 (수정)
   const handleEdit = (editStep: number) => {
-    setShowResult(false);
     setLoading(false);
     setStep(editStep);
     setSelectedOptions(answers[editStep] || []);
@@ -381,7 +376,6 @@ type ScoredFactory = Factory & { score: number };
 
   // 추천 결과(매칭 완료) 시 왼쪽 하단에 '직접 찾기'와 '다시하기' 버튼을 추가합니다. '직접 찾기'는 /factories로 이동, '다시하기'는 매칭 상태(answers, step, chat 등) 초기화. 버튼은 Figma 예시처럼 스타일링(직접 찾기: 흰색, 다시하기: 검정 배경, 아이콘 포함)합니다.
   const handleRestart = () => {
-    setShowResult(false);
     setLoading(false);
     setStep(0);
     setAnswers([]);
@@ -406,7 +400,7 @@ type ScoredFactory = Factory & { score: number };
     } else {
       if (resultLoading) setResultLoading(false);
     }
-  }, [answers, QUESTIONS.length, recommended.length, resultLoading]);
+  }, [answers, QUESTIONS.length, recommended.length, resultLoading, getRecommendedFactories]);
 
   // 채팅 자동 스크롤 useEffect
   useEffect(() => {
