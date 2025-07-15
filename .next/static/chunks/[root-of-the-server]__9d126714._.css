@@ -805,10 +805,6 @@
     width: calc(var(--spacing) * 96);
   }
 
-  .w-\[350px\] {
-    width: 350px;
-  }
-
   .w-full {
     width: 100%;
   }
@@ -2123,12 +2119,6 @@
   }
 
   @media (width >= 48rem) {
-    .md\:w-\[400px\] {
-      width: 400px;
-    }
-  }
-
-  @media (width >= 48rem) {
     .md\:grid-cols-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -2175,12 +2165,6 @@
   @media (width >= 64rem) {
     .lg\:block {
       display: block;
-    }
-  }
-
-  @media (width >= 64rem) {
-    .lg\:w-\[420px\] {
-      width: 420px;
     }
   }
 
