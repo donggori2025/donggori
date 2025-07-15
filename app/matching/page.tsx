@@ -43,17 +43,11 @@ function ChatBubble({ text, type, isTyping, showCursor, onEdit }: { text: string
 export default function MatchingPage() {
   // 공장 데이터 state
   const [factories, setFactories] = useState<Factory[]>([]);
-  const [loadingFactories, setLoadingFactories] = useState(false);
-  const [error, setError] = useState(null);
-  const [showResultMsg1, setShowResultMsg1] = useState(false);
-  const [showResultMsg2, setShowResultMsg2] = useState(false);
 
   useEffect(() => {
     async function fetchFactories() {
-      setLoadingFactories(true);
-      const { data, error } = await supabase.from("donggori").select("*");
+      const { data } = await supabase.from("donggori").select("*");
       setFactories(data ?? []);
-      setLoadingFactories(false);
     }
     fetchFactories();
   }, []);
@@ -525,22 +519,22 @@ type ScoredFactory = Factory & { score: number };
             </div>
           )}
           {/* 결과 안내 메시지(답변 말풍선) - 두 개로 분리, 순차 등장 */}
-          {showResultMsg1 && (
-            <div className="flex justify-end">
-              <ChatBubble
-                text={`가장 적합한 봉제공장은\n${recommended.map(f => (typeof f.name === 'string' && f.name) ? f.name : (typeof f.company_name === 'string' && f.company_name) ? f.company_name : '이름 없음').join(', ')} 입니다!`}
-                type="answer"
-              />
-            </div>
-          )}
-          {showResultMsg2 && (
-            <div className="flex justify-end">
-              <ChatBubble
-                text={`봉제를 진행할 공장을 선택하여\n공정을 시작해보세요:)`}
-                type="answer"
-              />
-            </div>
-          )}
+          {/* showResultMsg1 && ( */}
+          {/*   <div className="flex justify-end"> */}
+          {/*     <ChatBubble */}
+          {/*       text={`가장 적합한 봉제공장은\n${recommended.map(f => (typeof f.name === 'string' && f.name) ? f.name : (typeof f.company_name === 'string' && f.company_name) ? f.company_name : '이름 없음').join(', ')} 입니다!`} */}
+          {/*       type="answer" */}
+          {/*     /> */}
+          {/*   </div> */}
+          {/* ) */}
+          {/* showResultMsg2 && ( */}
+          {/*   <div className="flex justify-end"> */}
+          {/*     <ChatBubble */}
+          {/*       text={`봉제를 진행할 공장을 선택하여\n공정을 시작해보세요:)`} */}
+          {/*       type="answer" */}
+          {/*     /> */}
+          {/*   </div> */}
+          {/* ) */}
         </div>
       </div>
       {/* 로그인 필요 모달 */}
