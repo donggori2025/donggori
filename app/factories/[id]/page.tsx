@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { Factory } from "@/lib/factories";
+import { useRouter } from "next/navigation";
 
 export default function FactoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { user } = useUser();
@@ -67,6 +68,54 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     typeof val === "string"
       ? val.split(/,|\|| /).map((v) => v.trim()).filter(Boolean)
       : [];
+
+  // 상품(서비스) 정보
+  const serviceData = {
+    standard: {
+      title: "Standard",
+      subtitle: "봉제공정",
+      price: "39,000원 (VAT 포함)",
+      features: [
+        "텍스트형 시안 1종",
+        "슬로건 제작",
+        "평생 A/S",
+        "원본, 저작, 재산권 이전",
+        "샘플비 10,000원",
+        "장단 단가 16,800원"
+      ]
+    },
+    deluxe: {
+      title: "Deluxe",
+      subtitle: "패턴/샘플 + 공장",
+      price: "89,000원 (VAT 포함)",
+      features: [
+        "패턴 제작",
+        "샘플 제작",
+        "봉제 공정",
+        "품질 검수",
+        "배송 서비스",
+        "기술 지원"
+      ]
+    },
+    premium: {
+      title: "Premium",
+      subtitle: "올인원(기획/디자인~)",
+      price: "159,000원 (VAT 포함)",
+      features: [
+        "기획 및 디자인",
+        "패턴 제작",
+        "샘플 제작",
+        "봉제 공정",
+        "품질 검수",
+        "배송 서비스",
+        "마케팅 지원"
+      ]
+    }
+  };
+  const [selectedService, setSelectedService] = useState<'standard'|'deluxe'|'premium'>('standard');
+  const currentService = serviceData[selectedService];
+
+  const router = useRouter();
 
   return (
     <div className="max-w-[1400px] mx-auto py-10 px-2 md:px-6">
@@ -187,8 +236,41 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
         <div className="w-full md:w-[380px] flex-shrink-0">
           <div className="bg-white rounded-2xl p-6 mb-6 border border-gray-200">
             <div className="font-bold text-lg mb-2">{factory.company_name}</div>
-            <div className="text-xs text-gray-500 mb-2">봉제공장</div>
-            <Button className="w-full bg-yellow-400 text-black rounded-full font-bold py-2 mt-4">문의하기</Button>
+            <div className="text-xs text-gray-500 mb-4">봉제공장</div>
+            {/* 상품 선택 탭 */}
+            <div className="flex gap-2 mb-4">
+              {(['standard','deluxe','premium'] as const).map((key) => (
+                <button
+                  key={key}
+                  className={`flex-1 py-2 rounded-lg font-bold border transition text-sm ${selectedService===key ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-yellow-100'}`}
+                  onClick={()=>setSelectedService(key)}
+                >
+                  {serviceData[key].title}
+                </button>
+              ))}
+            </div>
+            {/* 선택된 상품 정보 */}
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <div className="font-semibold">{currentService.title}</div>
+                  <div className="text-xs text-gray-500">{currentService.subtitle}</div>
+                </div>
+                <div className="text-sm font-semibold text-blue-600">{currentService.price}</div>
+              </div>
+              <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
+                {currentService.features.map((feature, index) => (
+                  <li key={index}>{feature}</li>
+                ))}
+              </ul>
+            </div>
+            {/* 의뢰하기 버튼 */}
+            <Button
+              className="w-full bg-yellow-400 text-black rounded-full font-bold py-2 mt-2"
+              onClick={()=>router.push(`/factories/${factory.id}/request?service=${selectedService}`)}
+            >
+              의뢰하기
+            </Button>
           </div>
         </div>
       </div>
