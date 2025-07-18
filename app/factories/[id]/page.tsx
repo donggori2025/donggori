@@ -241,7 +241,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
               {(['standard','deluxe','premium'] as const).map((key) => (
                 <button
                   key={key}
-                  className={`flex-1 py-2 rounded-lg font-bold border transition text-sm ${selectedService===key ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-yellow-100'}`}
+                  className={`flex-1 py-2 rounded-lg font-bold border transition text-sm ${selectedService===key ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-200'}`}
                   onClick={()=>setSelectedService(key)}
                 >
                   {serviceData[key].title}
@@ -255,7 +255,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                   <div className="font-semibold">{currentService.title}</div>
                   <div className="text-xs text-gray-500">{currentService.subtitle}</div>
                 </div>
-                <div className="text-sm font-semibold text-blue-600">{currentService.price}</div>
+                <div className="text-sm font-semibold text-black">{currentService.price}</div>
               </div>
               <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
                 {currentService.features.map((feature, index) => (
@@ -265,7 +265,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             </div>
             {/* 의뢰하기 버튼 */}
             <Button
-              className="w-full bg-yellow-400 text-black rounded-full font-bold py-2 mt-2"
+              className="w-full bg-black text-white rounded-full font-bold py-2 mt-2"
               onClick={()=>router.push(`/factories/${factory.id}/request?service=${selectedService}`)}
             >
               의뢰하기

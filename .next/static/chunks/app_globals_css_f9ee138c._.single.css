@@ -413,8 +413,20 @@
     z-index: 9999;
   }
 
+  .col-span-1 {
+    grid-column: span 1 / span 1;
+  }
+
+  .col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+
   .col-span-3 {
     grid-column: span 3 / span 3;
+  }
+
+  .col-span-7 {
+    grid-column: span 7 / span 7;
   }
 
   .col-start-2 {
@@ -798,6 +810,10 @@
     max-width: 420px;
   }
 
+  .max-w-\[900px\] {
+    max-width: 900px;
+  }
+
   .max-w-\[1200px\] {
     max-width: 1200px;
   }
@@ -913,6 +929,10 @@
 
   .grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .grid-cols-12 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
   }
 
   .grid-rows-\[20px_1fr_20px\] {
@@ -1166,6 +1186,11 @@
     border-bottom-width: 1px;
   }
 
+  .border-b-2 {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 2px;
+  }
+
   .border-none {
     --tw-border-style: none;
     border-style: none;
@@ -1180,6 +1205,10 @@
     border-color: #333;
   }
 
+  .border-black {
+    border-color: var(--color-black);
+  }
+
   .border-black\/\[\.08\] {
     border-color: #00000014;
   }
@@ -1188,6 +1217,10 @@
     .border-black\/\[\.08\] {
       border-color: color-mix(in oklab, var(--color-black) 8%, transparent);
     }
+  }
+
+  .border-gray-100 {
+    border-color: var(--color-gray-100);
   }
 
   .border-gray-200 {
@@ -1276,6 +1309,10 @@
 
   .bg-blue-50 {
     background-color: var(--color-blue-50);
+  }
+
+  .bg-blue-100 {
+    background-color: var(--color-blue-100);
   }
 
   .bg-blue-500 {
@@ -1609,6 +1646,10 @@
     font-size: 16px;
   }
 
+  .text-\[32px\] {
+    font-size: 32px;
+  }
+
   .text-\[40px\] {
     font-size: 40px;
   }
@@ -1905,6 +1946,12 @@
     --tw-enter-opacity: 0;
   }
 
+  @media (hover: hover) {
+    .group-hover\:underline:is(:where(.group):hover *) {
+      text-decoration-line: underline;
+    }
+  }
+
   .focus-within\:ring-2:focus-within {
     --tw-ring-shadow: var(--tw-ring-inset, ) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
@@ -2013,6 +2060,12 @@
   @media (hover: hover) {
     .hover\:bg-gray-100:hover {
       background-color: var(--color-gray-100);
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:bg-gray-200:hover {
+      background-color: var(--color-gray-200);
     }
   }
 

@@ -841,7 +841,7 @@ function FactoryDetailPage({ params }) {
                                         'deluxe',
                                         'premium'
                                     ].map((key)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                            className: `flex-1 py-2 rounded-lg font-bold border transition text-sm ${selectedService === key ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-yellow-100'}`,
+                                            className: `flex-1 py-2 rounded-lg font-bold border transition text-sm ${selectedService === key ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-200'}`,
                                             onClick: ()=>setSelectedService(key),
                                             children: serviceData[key].title
                                         }, key, false, {
@@ -885,7 +885,7 @@ function FactoryDetailPage({ params }) {
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "text-sm font-semibold text-blue-600",
+                                                    className: "text-sm font-semibold text-black",
                                                     children: currentService.price
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/[id]/page.tsx",
@@ -919,7 +919,7 @@ function FactoryDetailPage({ params }) {
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
-                                    className: "w-full bg-yellow-400 text-black rounded-full font-bold py-2 mt-2",
+                                    className: "w-full bg-black text-white rounded-full font-bold py-2 mt-2",
                                     onClick: ()=>router.push(`/factories/${factory.id}/request?service=${selectedService}`),
                                     children: "의뢰하기"
                                 }, void 0, false, {
