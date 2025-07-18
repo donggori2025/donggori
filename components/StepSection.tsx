@@ -1,65 +1,69 @@
 import React from "react";
 
-const steps = [
+const trustCards = [
   {
-    left: "원하는 의류 넣고\n의뢰서 작성하면\n매칭 준비 끝.",
-    right: "제작 준비 상."
+    icon: "📧",
+    title: "의류 생산도 이제 올인원으로",
+    desc: "샘플 제작에서 본생산까지 한번에"
   },
   {
-    left: "봉제공장에서\n확인하고 연락오면\n제작 준비 끝.",
-    right: "매칭 준비 끝."
+    icon: "⭐",
+    title: "5단계로 찾는 간단한 의뢰 방식",
+    desc: "AI 매칭 기능으로 나에게 딱 맞는 봉제공장을 찾아보세요"
   },
   {
-    left: "원하는 의류 넣고\n의뢰서 작성하면\n매칭 준비 끝.",
-    right: "제작 준비 끝."
-  },
-  {
-    left: "봉제공장에서\n확인하고 연락오면\n제작 준비 끝.",
-    right: "매칭 준비 끝."
-  },
-  {
-    left: "원하는 의류 넣고\n의뢰서 작성하면\n매칭 준비 끝.",
-    right: "제작 준비 끝."
+    icon: "🏁",
+    title: "AI의 추천을 받아보세요",
+    desc: "내가 찾는 기술이 있는 가장 비슷한 3개의 봉제공장을 추천드려요"
   },
 ];
 
 const StepSection = () => (
-  <section className="w-full bg-gray-50 py-16">
-    <div className="max-w-[1200px] mx-auto px-4 flex flex-col items-center">
-      <div className="text-center mb-8">
-        <span className="inline-block bg-gray-200 text-gray-800 text-xs font-bold rounded px-2 py-1 mb-2">동고리에서는</span>
-        <h2 className="text-2xl md:text-3xl font-extrabold mb-2">5단계로 봉제공장 매칭이 이뤄져요!</h2>
+  <section className="w-full bg-white py-16 min-h-[600px] flex items-center">
+    <div className="max-w-[1400px] mx-auto px-4">
+      {/* 상단 섹션 */}
+      <div className="mb-12">
+        {/* Why us 태그 */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
+            Why us?
+          </div>
+          <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
+        </div>
+        
+        {/* 제목과 설명 */}
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          <div className="flex-1">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              공장 탐색 시간을 줄여주는 매칭 프로세스
+            </h2>
+          </div>
+          <div className="flex-1 lg:max-w-[500px]">
+            <p className="text-lg text-gray-600 leading-relaxed">
+              1,000 여 개의 데이터를 활용하여 만들고자 하는 의류에 딱 맞는 봉제공장을 추천하여 공장 탐색 시간을 줄여드립니다.
+            </p>
+          </div>
+        </div>
       </div>
-      <div className="w-full flex flex-col gap-8">
-        {steps.map((step, idx) => (
-          <div
-            key={idx}
-            className={`flex flex-col md:flex-row ${idx % 2 === 1 ? 'md:flex-row-reverse' : ''} items-center gap-8`}
-          >
-            {/* 텍스트 */}
-            <div className={`flex-1 flex items-center ${idx % 2 === 1 ? 'justify-end' : 'justify-start'}`}>
-              <span className={`text-[48px] font-semibold whitespace-pre-line ${idx % 2 === 1 ? 'text-right' : 'text-left'}`}>{
-                step.left.split('\n').map((line, i, arr) => (
-                  <span
-                    key={i}
-                    className={
-                      i === 0
-                        ? 'text-gray-400' // 첫 줄 연한 회색
-                        : i === arr.length - 1 && line.includes('매칭 준비 끝')
-                        ? 'text-black font-bold' // 마지막 줄(매칭 준비 끝) 볼드
-                        : 'text-gray-700' // 나머지
-                    }
-                  >
-                    {line}
-                    {i !== arr.length - 1 && <br />}
-                  </span>
-                ))
-              }</span>
+
+      {/* 하단 카드 섹션 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {trustCards.map((card, idx) => (
+          <div key={idx} className="bg-gray-50 rounded-xl p-6">
+            {/* 아이콘 */}
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
+              <span className="text-xl">{card.icon}</span>
             </div>
-            {/* 박스 */}
-            <div className={`flex-1 flex items-center ${idx % 2 === 1 ? 'justify-start' : 'justify-end'}`}>
-              <div className="w-96 h-96 bg-gray-300 rounded-lg" />
-            </div>
+            
+            {/* 제목 */}
+            <h3 className="text-xl font-bold mb-3">
+              {card.title}
+            </h3>
+            
+            {/* 설명 */}
+            <p className="text-gray-600 leading-relaxed">
+              {card.desc}
+            </p>
           </div>
         ))}
       </div>

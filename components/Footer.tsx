@@ -23,8 +23,8 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-[#fafafa] border-t border-gray-200 py-8 mt-16">
-      <div className="max-w-[1200px] mx-auto flex flex-col items-center gap-2 px-10">
+    <footer className="w-full bg-[#fafafa] border-t border-gray-200 py-8 px-6 mt-16">
+      <div className="max-w-[1400px] mx-auto flex flex-col items-center gap-2 px-10">
         {/* nav: md 이상에서만 flex, md 미만에서는 hidden */}
         <nav className="hidden md:flex w-full justify-between items-center mb-4 text-sm text-gray-700">
           {/* 왼쪽 메뉴 그룹 */}

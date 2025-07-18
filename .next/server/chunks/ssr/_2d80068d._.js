@@ -36,7 +36,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$
 const buttonVariants = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$class$2d$variance$2d$authority$2f$dist$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["cva"])("inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive", {
     variants: {
         variant: {
-            default: "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
+            default: "bg-[#333333] text-white shadow-xs hover:bg-[#333333]/90",
             destructive: "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
             outline: "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
             secondary: "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
@@ -653,79 +653,96 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$imag
 ;
 ;
 ;
-// 8단계 질문/선택지 샘플 데이터
-const QUESTIONS = [
+// factories 데이터에서 옵션 추출 유틸(공장 찾기에서 복사)
+const moqRanges = [
     {
-        question: "어떤 원단을 원하시나요?",
-        options: [
-            "나염",
-            "직기/우븐",
-            "다이마루",
-            "편물",
-            "데님",
-            "전사"
-        ]
+        label: "0-50",
+        min: 0,
+        max: 50
     },
     {
-        question: "주문 수량은 얼마인가요?",
-        options: [
-            "100장 미만",
-            "100~500장",
-            "500~1000장",
-            "1000장 이상"
-        ]
+        label: "51-100",
+        min: 51,
+        max: 100
     },
     {
-        question: "희망 납기일은 언제인가요?",
-        options: [
-            "1주일 이내",
-            "2주 이내",
-            "1달 이내",
-            "상관없음"
-        ]
+        label: "101-300",
+        min: 101,
+        max: 300
     },
     {
-        question: "원하는 봉제 방식은?",
-        options: [
-            "오버록",
-            "쌍침",
-            "삼봉",
-            "오바로크+쌍침",
-            "기타"
-        ]
-    },
-    {
-        question: "의류 종류는 무엇인가요?",
-        options: [
-            "티셔츠",
-            "맨투맨",
-            "후드",
-            "바지",
-            "원피스",
-            "기타"
-        ]
-    },
-    {
-        question: "예상 단가는?",
-        options: [
-            "1만원 미만",
-            "1~2만원",
-            "2~3만원",
-            "3만원 이상"
-        ]
-    },
-    {
-        question: "특별히 원하는 공장 조건이 있나요?",
-        options: [
-            "소량생산 가능",
-            "빠른 납기",
-            "고품질",
-            "저렴한 단가",
-            "상관없음"
-        ]
+        label: "301+",
+        min: 301,
+        max: Infinity
     }
 ];
+function getOptions(key) {
+    if (key === 'admin_district') {
+        return Array.from(new Set(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"].map((f)=>f.admin_district).filter((v)=>typeof v === 'string' && Boolean(v))));
+    }
+    if (key === 'processes') {
+        return Array.from(new Set(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"].flatMap((f)=>f.processes ? String(f.processes).split(',').map((v)=>v.trim()) : []).filter((v)=>typeof v === 'string' && Boolean(v))));
+    }
+    if (key === 'sewing_machines' || key === 'pattern_machines' || key === 'special_machines') {
+        return Array.from(new Set(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"].flatMap((f)=>f[key] ? String(f[key]).split(',').map((v)=>v.trim()) : []).filter((v)=>typeof v === 'string' && Boolean(v))));
+    }
+    if (key === 'items') {
+        const arr = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"].flatMap((f)=>[
+                f.top_items_upper,
+                f.top_items_lower,
+                f.top_items_outer,
+                f.top_items_dress_skirt,
+                f.top_items_bag,
+                f.top_items_fashion_accessory,
+                f.top_items_underwear,
+                f.top_items_sports_leisure,
+                f.top_items_pet
+            ].filter((v)=>typeof v === 'string' && Boolean(v)));
+        return Array.from(new Set(arr.flatMap((i)=>String(i).split(',').map((v)=>v.trim())).filter((v)=>typeof v === 'string' && Boolean(v))));
+    }
+    return [];
+}
 function MatchingPage() {
+    // 동적 질문/옵션 useMemo는 반드시 함수 내부에서 호출
+    const QUESTIONS = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>[
+            {
+                question: "어떤 공정을 원하시나요?",
+                key: "processes",
+                options: getOptions("processes")
+            },
+            {
+                question: "지역을 선택하세요",
+                key: "admin_district",
+                options: getOptions("admin_district")
+            },
+            {
+                question: "MOQ(최소 주문 수량)을 선택하세요",
+                key: "moq",
+                options: moqRanges.map((r)=>r.label)
+            },
+            {
+                question: "재봉기를 선택하세요",
+                key: "sewing_machines",
+                options: getOptions("sewing_machines")
+            },
+            {
+                question: "패턴기를 선택하세요",
+                key: "pattern_machines",
+                options: getOptions("pattern_machines")
+            },
+            {
+                question: "특수기를 선택하세요",
+                key: "special_machines",
+                options: getOptions("special_machines")
+            },
+            {
+                question: "어떤 품목을 원하시나요?",
+                key: "items",
+                options: getOptions("items")
+            }
+        ], [
+        __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["factories"]
+    ]);
     // 현재 질문 인덱스
     const [step, setStep] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(0);
     // 사용자가 선택한 답변들
@@ -840,7 +857,7 @@ function MatchingPage() {
             if (f.processes.some((p)=>answers[0] && answers[0].includes(p))) score++;
             // 1: 수량
             if (answers[1]) {
-                if (answers[1] === "100장 미만" && f.minOrder <= 100 || answers[1] === "100~500장" && f.minOrder <= 500 || answers[1] === "500~1000장" && f.minOrder <= 1000 || answers[1] === "1000장 이상" && f.minOrder > 1000) score++;
+                if (answers[1] === "0-50" && f.minOrder <= 50 || answers[1] === "51-100" && f.minOrder <= 100 || answers[1] === "101-300" && f.minOrder <= 300 || answers[1] === "301+" && f.minOrder > 300) score++;
             }
             // 3: 봉제방식
             if (f.processes.some((p)=>answers[3] && answers[3].includes(p))) score++;
@@ -866,7 +883,7 @@ function MatchingPage() {
                     children: "가장 적합한 봉제공장 3곳을 추천드려요!"
                 }, void 0, false, {
                     fileName: "[project]/app/matching/page.tsx",
-                    lineNumber: 171,
+                    lineNumber: 174,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -882,7 +899,7 @@ function MatchingPage() {
                                     className: "w-full h-40 object-cover rounded-lg mb-4"
                                 }, void 0, false, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 176,
+                                    lineNumber: 179,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -890,7 +907,7 @@ function MatchingPage() {
                                     children: f.name
                                 }, void 0, false, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 178,
+                                    lineNumber: 181,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -901,7 +918,7 @@ function MatchingPage() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 179,
+                                    lineNumber: 182,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -909,7 +926,7 @@ function MatchingPage() {
                                     children: f.description
                                 }, void 0, false, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 180,
+                                    lineNumber: 183,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -921,7 +938,7 @@ function MatchingPage() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 181,
+                                    lineNumber: 184,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -930,24 +947,24 @@ function MatchingPage() {
                                     children: "의뢰하기"
                                 }, void 0, false, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 182,
+                                    lineNumber: 185,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, f.id, true, {
                             fileName: "[project]/app/matching/page.tsx",
-                            lineNumber: 174,
+                            lineNumber: 177,
                             columnNumber: 13
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/app/matching/page.tsx",
-                    lineNumber: 172,
+                    lineNumber: 175,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/matching/page.tsx",
-            lineNumber: 170,
+            lineNumber: 173,
             columnNumber: 7
         }, this);
     }
@@ -960,7 +977,7 @@ function MatchingPage() {
                     className: "w-16 h-16 border-4 border-gray-300 border-t-[#222222] rounded-full animate-spin mb-6"
                 }, void 0, false, {
                     fileName: "[project]/app/matching/page.tsx",
-                    lineNumber: 196,
+                    lineNumber: 199,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -968,13 +985,13 @@ function MatchingPage() {
                     children: "추천 결과를 분석 중입니다..."
                 }, void 0, false, {
                     fileName: "[project]/app/matching/page.tsx",
-                    lineNumber: 197,
+                    lineNumber: 200,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/matching/page.tsx",
-            lineNumber: 195,
+            lineNumber: 198,
             columnNumber: 7
         }, this);
     }
@@ -1002,7 +1019,7 @@ function MatchingPage() {
                                 children: "AI 매칭"
                             }, void 0, false, {
                                 fileName: "[project]/app/matching/page.tsx",
-                                lineNumber: 219,
+                                lineNumber: 222,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1010,7 +1027,7 @@ function MatchingPage() {
                                 children: "몇 가지 정보를 알려주시면, 가장 적합한 3개의 봉제공장을 추천해드립니다."
                             }, void 0, false, {
                                 fileName: "[project]/app/matching/page.tsx",
-                                lineNumber: 220,
+                                lineNumber: 223,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1019,12 +1036,12 @@ function MatchingPage() {
                                         className: `h-1 w-8 rounded-full ${idx <= step ? "bg-[#222222]" : "bg-gray-200"}`
                                     }, idx, false, {
                                         fileName: "[project]/app/matching/page.tsx",
-                                        lineNumber: 223,
+                                        lineNumber: 226,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/matching/page.tsx",
-                                lineNumber: 221,
+                                lineNumber: 224,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1036,7 +1053,7 @@ function MatchingPage() {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/matching/page.tsx",
-                                lineNumber: 226,
+                                lineNumber: 229,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1044,7 +1061,7 @@ function MatchingPage() {
                                 children: QUESTIONS[step].question
                             }, void 0, false, {
                                 fileName: "[project]/app/matching/page.tsx",
-                                lineNumber: 227,
+                                lineNumber: 230,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1058,12 +1075,12 @@ function MatchingPage() {
                                         children: option
                                     }, option, false, {
                                         fileName: "[project]/app/matching/page.tsx",
-                                        lineNumber: 230,
+                                        lineNumber: 233,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/matching/page.tsx",
-                                lineNumber: 228,
+                                lineNumber: 231,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1075,7 +1092,7 @@ function MatchingPage() {
                                         children: "나가기"
                                     }, void 0, false, {
                                         fileName: "[project]/app/matching/page.tsx",
-                                        lineNumber: 246,
+                                        lineNumber: 249,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1088,7 +1105,7 @@ function MatchingPage() {
                                                 children: "건너뛰기"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/matching/page.tsx",
-                                                lineNumber: 248,
+                                                lineNumber: 251,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1098,25 +1115,25 @@ function MatchingPage() {
                                                 children: "다음"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/matching/page.tsx",
-                                                lineNumber: 249,
+                                                lineNumber: 252,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/matching/page.tsx",
-                                        lineNumber: 247,
+                                        lineNumber: 250,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/matching/page.tsx",
-                                lineNumber: 245,
+                                lineNumber: 248,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/matching/page.tsx",
-                        lineNumber: 218,
+                        lineNumber: 221,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1133,23 +1150,23 @@ function MatchingPage() {
                                             children: "수정"
                                         }, void 0, false, {
                                             fileName: "[project]/app/matching/page.tsx",
-                                            lineNumber: 267,
+                                            lineNumber: 270,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 263,
+                                    lineNumber: 266,
                                     columnNumber: 15
                                 }, this)
                             }, idx, false, {
                                 fileName: "[project]/app/matching/page.tsx",
-                                lineNumber: 262,
+                                lineNumber: 265,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/app/matching/page.tsx",
-                        lineNumber: 260,
+                        lineNumber: 263,
                         columnNumber: 9
                     }, this),
                     showLoginModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1162,7 +1179,7 @@ function MatchingPage() {
                                     children: "로그인 후 이용 가능합니다"
                                 }, void 0, false, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 282,
+                                    lineNumber: 285,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1170,7 +1187,7 @@ function MatchingPage() {
                                     children: "의뢰하기는 로그인 후 이용하실 수 있습니다."
                                 }, void 0, false, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 283,
+                                    lineNumber: 286,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1179,7 +1196,7 @@ function MatchingPage() {
                                     children: "로그인 화면으로 이동"
                                 }, void 0, false, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 284,
+                                    lineNumber: 287,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1189,24 +1206,24 @@ function MatchingPage() {
                                     children: "닫기"
                                 }, void 0, false, {
                                     fileName: "[project]/app/matching/page.tsx",
-                                    lineNumber: 285,
+                                    lineNumber: 288,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/matching/page.tsx",
-                            lineNumber: 281,
+                            lineNumber: 284,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/matching/page.tsx",
-                        lineNumber: 280,
+                        lineNumber: 283,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/matching/page.tsx",
-                lineNumber: 216,
+                lineNumber: 219,
                 columnNumber: 7
             }, this),
             loading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1214,7 +1231,7 @@ function MatchingPage() {
                 children: renderLoading()
             }, void 0, false, {
                 fileName: "[project]/app/matching/page.tsx",
-                lineNumber: 292,
+                lineNumber: 295,
                 columnNumber: 9
             }, this),
             showResult && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1222,13 +1239,13 @@ function MatchingPage() {
                 children: renderResultCards()
             }, void 0, false, {
                 fileName: "[project]/app/matching/page.tsx",
-                lineNumber: 298,
+                lineNumber: 301,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/matching/page.tsx",
-        lineNumber: 214,
+        lineNumber: 217,
         columnNumber: 5
     }, this);
 }

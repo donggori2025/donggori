@@ -24,12 +24,12 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full bg-white border-b sticky top-0 z-[9999]">
-      <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between px-10 py-4">
+    <header className="w-full bg-white border-b px-6 sticky top-0 z-[9999]">
+      <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-4 justify-between">
         {/* 로고 */}
         <Link href="/" className="select-none" aria-label="동고리 홈">
           <Image
-            src="/logo_0624.svg"
+            src="/logo_donggori.svg"
             alt="동고리 로고"
             width={113}
             height={47}

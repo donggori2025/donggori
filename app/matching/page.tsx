@@ -380,22 +380,21 @@ type ScoredFactory = Factory & { score: number };
     setRecommended([]); // 결과 초기화
   };
 
-  // 결과 로딩 자동 전환 useEffect
+  // 답변이 모두 끝나면 분석 로딩 후 결과 노출
   useEffect(() => {
     if (answers.length === QUESTIONS.length) {
-      if (recommended.length === 0 && !resultLoading) {
-        setResultLoading(true);
-        const timer = setTimeout(() => {
-          const rec = getRecommendedFactories(answers.map(a => a.join(", ")));
-          setRecommended(rec);
-          setResultLoading(false);
-        }, 2500); // 로딩 시간을 2.5초로 늘림
-        return () => clearTimeout(timer);
-      }
+      setResultLoading(true);
+      const timer = setTimeout(() => {
+        const rec = getRecommendedFactories(answers.map(a => a.join(", ")));
+        setRecommended(rec);
+        setResultLoading(false);
+      }, 2200); // 2.2초 분석 로딩
+      return () => clearTimeout(timer);
     } else {
-      if (resultLoading) setResultLoading(false);
+      setResultLoading(false);
     }
-  }, [answers, QUESTIONS.length, recommended.length, resultLoading, getRecommendedFactories]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [answers.length]);
 
   // 채팅 자동 스크롤 useEffect
   useEffect(() => {
@@ -404,18 +403,49 @@ type ScoredFactory = Factory & { score: number };
     }
   }, [chat, recommended, resultLoading]);
 
+  // --- [추가: 결과 안내 메시지 상태] ---
+  const [showResultMsg1, setShowResultMsg1] = useState(false);
+  const [showResultMsg2, setShowResultMsg2] = useState(false);
+
+  // --- [결과 안내 메시지 타이밍 제어 useEffect 수정] ---
+  useEffect(() => {
+    if (
+      answers.length === QUESTIONS.length &&
+      recommended.length > 0 &&
+      !resultLoading
+    ) {
+      setShowResultMsg1(false);
+      setShowResultMsg2(false);
+      const t1 = setTimeout(() => setShowResultMsg1(true), 500); // 0.5초 후 첫 메시지
+      const t2 = setTimeout(() => setShowResultMsg2(true), 1500); // 1.5초 후 두 번째 메시지
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    } else {
+      setShowResultMsg1(false);
+      setShowResultMsg2(false);
+    }
+  }, [answers.length, recommended, resultLoading]);
+
+  // 결과 안내 메시지 등장 시 채팅창 자동 스크롤
+  useEffect(() => {
+    if ((showResultMsg1 || showResultMsg2) && chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [showResultMsg1, showResultMsg2]);
+
   // 왼쪽: 질문/선택지 or 결과 카드 or 로딩
   return (
-    <div className="w-full min-h-screen bg-[#F4F5F7] flex flex-col items-center justify-start overflow-x-hidden py-16">
+    <div className="w-full min-h-screen bg-[#F4F5F7] flex flex-col items-center justify-start overflow-x-hidden py-16 px-6">
       <div className="w-full max-w-[1400px] mx-auto flex flex-row gap-4 items-start justify-center flex-1 transition-opacity duration-700 px-1 overflow-hidden bg-[#F4F5F7] pb-0 mb-0" style={{ minHeight: '84vh' }}>
         {/* 왼쪽: 질문/선택지 or 결과 카드 or 로딩 */}
         <div className="flex-[2] bg-white rounded-2xl shadow border p-6 flex flex-col h-[100vh] max-h-[80vh]">
           {answers.length === QUESTIONS.length ? (
-            resultLoading || recommended.length === 0 ? (
-              // 결과 로딩 UI
+            resultLoading ? (
               <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] animate-fade-in">
                 <div className="w-16 h-16 border-4 border-gray-300 border-t-[#222222] rounded-full animate-spin mb-6"></div>
-                <div className="text-lg font-semibold">가장 적합한 봉제공장 찾는 중...</div>
+                <div className="text-lg font-semibold">추천 결과를 분석 중입니다...</div>
               </div>
             ) : (
               <div className="flex flex-col flex-1 justify-between h-full">
@@ -519,22 +549,22 @@ type ScoredFactory = Factory & { score: number };
             </div>
           )}
           {/* 결과 안내 메시지(답변 말풍선) - 두 개로 분리, 순차 등장 */}
-          {/* showResultMsg1 && ( */}
-          {/*   <div className="flex justify-end"> */}
-          {/*     <ChatBubble */}
-          {/*       text={`가장 적합한 봉제공장은\n${recommended.map(f => (typeof f.name === 'string' && f.name) ? f.name : (typeof f.company_name === 'string' && f.company_name) ? f.company_name : '이름 없음').join(', ')} 입니다!`} */}
-          {/*       type="answer" */}
-          {/*     /> */}
-          {/*   </div> */}
-          {/* ) */}
-          {/* showResultMsg2 && ( */}
-          {/*   <div className="flex justify-end"> */}
-          {/*     <ChatBubble */}
-          {/*       text={`봉제를 진행할 공장을 선택하여\n공정을 시작해보세요:)`} */}
-          {/*       type="answer" */}
-          {/*     /> */}
-          {/*   </div> */}
-          {/* ) */}
+          {showResultMsg1 && recommended.length > 0 && (
+            <div className="flex justify-end">
+              <ChatBubble
+                text={`가장 적합한 봉제공장은\n${recommended.map(f => (typeof f.name === 'string' && f.name) ? f.name : (typeof f.company_name === 'string' && f.company_name) ? f.company_name : '이름 없음').join(', ')} 입니다!`}
+                type="answer"
+              />
+            </div>
+          )}
+          {showResultMsg2 && (
+            <div className="flex justify-end">
+              <ChatBubble
+                text={`봉제를 진행할 공장을 선택하여\n공정을 시작해보세요:)`}
+                type="answer"
+              />
+            </div>
+          )}
         </div>
       </div>
       {/* 로그인 필요 모달 */}
