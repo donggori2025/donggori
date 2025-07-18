@@ -45,7 +45,7 @@ export default function NoticesPage() {
           {sorted.length === 0 ? (
             <li className="py-12 text-center text-gray-400">등록된 공지사항이 없습니다.</li>
           ) : (
-            sorted.map((notice, idx) => (
+            sorted.map((notice) => (
               <li key={notice.id} className="grid grid-cols-12 items-center py-3 border-b border-gray-100 hover:bg-gray-50 transition group">
                 <div className="col-span-1 text-center text-gray-400">{notice.id}</div>
                 <div className="col-span-2 text-center">
