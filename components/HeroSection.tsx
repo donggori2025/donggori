@@ -6,7 +6,7 @@ const HeroSection = () => (
       {/* 왼쪽: 동영상 */}
       <div className="flex-[0_0_70%] min-w-0 flex items-end md:items-center justify-center relative overflow-hidden bg-white rounded-3xl rounded-bl-none" style={{height: '480px'}}>
         <video
-          src="/250402_동대문구_압축.mp4"
+          src="/250402_dongdaemun_compressed.mp4"
           autoPlay
           loop
           muted
