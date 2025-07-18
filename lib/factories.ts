@@ -1,3 +1,5 @@
+import { supabase } from "./supabaseClient";
+
 export interface Factory {
   id: string;
   name: string;
@@ -7,6 +9,7 @@ export interface Factory {
   minOrder: number;
   description: string;
   image: string;
+  images?: string[]; // 여러 장의 이미지 지원
   contact: string;
   lat: number;
   lng: number;
@@ -52,6 +55,12 @@ export const factories: Factory[] = [
     minOrder: 100,
     description: "서울 도심에 위치한 20년 경력의 봉제공장입니다.",
     image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80"
+    ],
     contact: "02-1234-5678",
     lat: 37.5665,
     lng: 126.9780,
@@ -67,6 +76,11 @@ export const factories: Factory[] = [
     minOrder: 200,
     description: "최신 설비와 숙련된 인력을 보유한 부산 봉제공장.",
     image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80"
+    ],
     contact: "051-9876-5432",
     lat: 35.1796,
     lng: 129.0756,
@@ -82,6 +96,10 @@ export const factories: Factory[] = [
     minOrder: 50,
     description: "소량 생산도 가능한 대구의 섬유/봉제 전문 공방.",
     image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80"
+    ],
     contact: "053-222-3333",
     lat: 35.8714,
     lng: 128.6014,
@@ -435,4 +453,14 @@ export const factories: Factory[] = [
   },
   // ... (27~70번까지 위 패턴을 참고하여 다양한 지역, 품목, 이미지, 설명, 위도/경도, 연락처, ownerUserId로 실제 데이터 추가)
   // ...
-]; 
+];
+
+// Supabase에서 봉제공장 데이터를 가져오는 함수
+export async function fetchFactoriesFromDB(): Promise<Factory[]> {
+  const { data, error } = await supabase.from("donggori").select("*");
+  if (error) {
+    console.error("Supabase fetch error:", error);
+    return [];
+  }
+  return (data as Factory[]) || [];
+} 

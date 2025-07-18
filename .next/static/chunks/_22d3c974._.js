@@ -11,17 +11,42 @@ __turbopack_context__.s({
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 ;
 const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-        className: "w-full relative h-[600px] flex items-center justify-center overflow-hidden",
-        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
-            src: "/250402_동대문구 봄꽃 패션쇼 영상.mp4",
-            autoPlay: true,
-            loop: true,
-            muted: true,
-            playsInline: true,
-            className: "absolute inset-0 w-full h-full object-cover z-0"
+        className: "w-screen bg-[#f5f5f5] py-0 md:py-0 relative left-1/2 right-1/2 -mx-[50vw]",
+        style: {
+            left: '50%',
+            right: '50%',
+            marginLeft: '-50vw',
+            marginRight: '-50vw'
+        },
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "w-screen px-0",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "overflow-hidden w-screen",
+                style: {
+                    aspectRatio: '16/4',
+                    height: '420px'
+                },
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
+                    src: "/250402_동대문구 봄꽃 패션쇼 영상.mp4",
+                    autoPlay: true,
+                    loop: true,
+                    muted: true,
+                    playsInline: true,
+                    className: "w-full h-full object-cover",
+                    poster: "/factory-hero.jpg"
+                }, void 0, false, {
+                    fileName: "[project]/components/HeroSection.tsx",
+                    lineNumber: 7,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/components/HeroSection.tsx",
+                lineNumber: 6,
+                columnNumber: 7
+            }, this)
         }, void 0, false, {
             fileName: "[project]/components/HeroSection.tsx",
-            lineNumber: 6,
+            lineNumber: 5,
             columnNumber: 5
         }, this)
     }, void 0, false, {
@@ -46,120 +71,145 @@ __turbopack_context__.s({
     "default": (()=>__TURBOPACK__default__export__)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+;
 ;
 const infoCards = [
     {
-        label: "스마트 제조장비"
+        label: "미래섬유(주)",
+        image: "/factory1.jpg",
+        desc: "최신 설비와 30년 경력의 장인들이 함께하는 고퀄리티 봉제공장.",
+        tags: [
+            "여성복",
+            "소량생산",
+            "퀄리티"
+        ]
     },
     {
-        label: "공용작업장"
+        label: "리얼패션",
+        image: "/factory2.jpg",
+        desc: "다양한 품목과 빠른 납기, 합리적 단가를 자랑하는 인증 공장.",
+        tags: [
+            "남성복",
+            "대량생산",
+            "합리적"
+        ]
     },
     {
-        label: "제품개발"
-    },
-    {
-        label: "일감연계 지원"
+        label: "태산상사",
+        image: "/factory3.jpg",
+        desc: "친환경 소재와 첨단 장비로 트렌디한 제품을 생산합니다.",
+        tags: [
+            "친환경",
+            "트렌디",
+            "첨단장비"
+        ]
     }
 ];
 const InfoSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
         className: "w-full bg-white py-16",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "max-w-[1200px] mx-auto px-4 flex flex-col items-center",
+            className: "max-w-[1400px] mx-auto px-4 flex flex-col items-center",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                    className: "text-[48px] font-extrabold text-center mb-2",
-                    children: "동대문구 패션봉제복합지원센터는"
+                    className: "text-2xl md:text-3xl font-extrabold text-center mb-2",
+                    children: "70+ 개의 인증된 고퀄리티 봉제공장"
                 }, void 0, false, {
                     fileName: "[project]/components/InfoSection.tsx",
-                    lineNumber: 13,
+                    lineNumber: 28,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                     className: "text-lg text-gray-500 text-center mb-8",
                     children: [
-                        "스마트 제조장비, 공용작업장, 제품개발, 일감연계 지원을 통해",
+                        "우리는 70개 이상의 엄정하게 인증된 고퀄리티 봉제공장들과 당신을 연결합니다.",
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                             fileName: "[project]/components/InfoSection.tsx",
-                            lineNumber: 15,
-                            columnNumber: 43
+                            lineNumber: 30,
+                            columnNumber: 52
                         }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                            className: "font-bold text-gray-700",
-                            children: "소공인 혁신시간"
-                        }, void 0, false, {
-                            fileName: "[project]/components/InfoSection.tsx",
-                            lineNumber: 16,
-                            columnNumber: 9
-                        }, this),
-                        "을 조성합니다."
+                        "최고의 파트너를 추천드립니다."
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/InfoSection.tsx",
-                    lineNumber: 14,
+                    lineNumber: 29,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "w-full grid grid-cols-2 md:grid-cols-4 gap-6 mt-4",
+                    className: "w-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-8",
                     children: infoCards.map((card, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex flex-col items-center",
+                            className: "bg-white rounded-2xl shadow-md p-4 flex flex-col items-start",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center mb-3",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                        width: "48",
-                                        height: "48",
-                                        fill: "none",
-                                        viewBox: "0 0 24 24",
-                                        stroke: "currentColor",
-                                        className: "text-gray-400",
-                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
-                                            cx: "12",
-                                            cy: "12",
-                                            r: "10",
-                                            strokeWidth: "2"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/InfoSection.tsx",
-                                            lineNumber: 24,
-                                            columnNumber: 17
-                                        }, this)
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/InfoSection.tsx",
-                                        lineNumber: 23,
-                                        columnNumber: 15
-                                    }, this)
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                    src: card.image,
+                                    alt: card.label,
+                                    width: 400,
+                                    height: 160,
+                                    className: "w-full h-40 object-cover rounded-xl mb-4"
                                 }, void 0, false, {
                                     fileName: "[project]/components/InfoSection.tsx",
-                                    lineNumber: 21,
+                                    lineNumber: 36,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-base font-semibold text-gray-700 text-center",
+                                    className: "text-lg font-bold mb-1",
                                     children: card.label
                                 }, void 0, false, {
                                     fileName: "[project]/components/InfoSection.tsx",
-                                    lineNumber: 27,
+                                    lineNumber: 37,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "text-gray-600 mb-2 text-sm",
+                                    children: card.desc
+                                }, void 0, false, {
+                                    fileName: "[project]/components/InfoSection.tsx",
+                                    lineNumber: 38,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex gap-2 flex-wrap mb-2",
+                                    children: card.tags.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold",
+                                            children: tag
+                                        }, tag, false, {
+                                            fileName: "[project]/components/InfoSection.tsx",
+                                            lineNumber: 41,
+                                            columnNumber: 17
+                                        }, this))
+                                }, void 0, false, {
+                                    fileName: "[project]/components/InfoSection.tsx",
+                                    lineNumber: 39,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, idx, true, {
                             fileName: "[project]/components/InfoSection.tsx",
-                            lineNumber: 20,
+                            lineNumber: 35,
                             columnNumber: 11
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/components/InfoSection.tsx",
-                    lineNumber: 18,
+                    lineNumber: 33,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                    className: "bg-neutral-900 text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-neutral-800 transition",
+                    children: "봉제공장 찾아보기"
+                }, void 0, false, {
+                    fileName: "[project]/components/InfoSection.tsx",
+                    lineNumber: 47,
                     columnNumber: 7
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/InfoSection.tsx",
-            lineNumber: 12,
+            lineNumber: 27,
             columnNumber: 5
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/InfoSection.tsx",
-        lineNumber: 11,
+        lineNumber: 26,
         columnNumber: 3
     }, this);
 _c = InfoSection;
@@ -180,129 +230,90 @@ __turbopack_context__.s({
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 ;
-const steps = [
+const stepCards = [
     {
-        left: "원하는 의류 넣고\n의뢰서 작성하면\n매칭 준비 끝.",
-        right: "제작 준비 상."
+        title: "의류 생산도 이제 온라인으로",
+        desc: "샘플부터 대량생산까지 온라인에서 한번에!"
     },
     {
-        left: "봉제공장에서\n확인하고 연락오면\n제작 준비 끝.",
-        right: "매칭 준비 끝."
+        title: "5단계로 찾는 간단한 의뢰 방식",
+        desc: "AI 질문 가이드에 따라 나에게 딱 맞는 봉제공장을 찾아보세요."
     },
     {
-        left: "원하는 의류 넣고\n의뢰서 작성하면\n매칭 준비 끝.",
-        right: "제작 준비 끝."
-    },
-    {
-        left: "봉제공장에서\n확인하고 연락오면\n제작 준비 끝.",
-        right: "매칭 준비 끝."
-    },
-    {
-        left: "원하는 의류 넣고\n의뢰서 작성하면\n매칭 준비 끝.",
-        right: "제작 준비 끝."
+        title: "AI 추천을 받아보세요",
+        desc: "나의 답변에 따라 최적의 봉제공장 3개를 매칭해드립니다."
     }
 ];
 const StepSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
         className: "w-full bg-gray-50 py-16",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "max-w-[1200px] mx-auto px-4 flex flex-col items-center",
+            className: "max-w-[1400px] mx-auto px-4 flex flex-col items-center",
             children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "text-center mb-8",
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                    className: "text-2xl md:text-3xl font-extrabold text-center mb-2",
+                    children: "매칭 프로세스"
+                }, void 0, false, {
+                    fileName: "[project]/components/StepSection.tsx",
+                    lineNumber: 21,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                    className: "text-lg text-gray-500 text-center mb-8",
                     children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                            className: "inline-block bg-gray-200 text-gray-800 text-xs font-bold rounded px-2 py-1 mb-2",
-                            children: "동고리에서는"
-                        }, void 0, false, {
+                        "1,000여 개의 데이터를 활용해 만들어진",
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                             fileName: "[project]/components/StepSection.tsx",
-                            lineNumber: 30,
-                            columnNumber: 9
+                            lineNumber: 23,
+                            columnNumber: 32
                         }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                            className: "text-2xl md:text-3xl font-extrabold mb-2",
-                            children: "5단계로 봉제공장 매칭이 이뤄져요!"
-                        }, void 0, false, {
-                            fileName: "[project]/components/StepSection.tsx",
-                            lineNumber: 31,
-                            columnNumber: 9
-                        }, this)
+                        "동고리만의 매칭 프로세스를 통해 공정 분석 시간을 줄여드립니다."
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/StepSection.tsx",
-                    lineNumber: 29,
+                    lineNumber: 22,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "w-full flex flex-col gap-8",
-                    children: steps.map((step, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: `flex flex-col md:flex-row ${idx % 2 === 1 ? 'md:flex-row-reverse' : ''} items-center gap-8`,
+                    className: "w-full grid grid-cols-1 md:grid-cols-3 gap-6",
+                    children: stepCards.map((card, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "bg-white rounded-2xl shadow-md p-8 flex flex-col items-start",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: `flex-1 flex items-center ${idx % 2 === 1 ? 'justify-end' : 'justify-start'}`,
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: `text-[48px] font-semibold whitespace-pre-line ${idx % 2 === 1 ? 'text-right' : 'text-left'}`,
-                                        children: step.left.split('\n').map((line, i, arr)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: i === 0 ? 'text-gray-400' // 첫 줄 연한 회색
-                                                 : i === arr.length - 1 && line.includes('매칭 준비 끝') ? 'text-black font-bold' // 마지막 줄(매칭 준비 끝) 볼드
-                                                 : 'text-gray-700' // 나머지
-                                                ,
-                                                children: [
-                                                    line,
-                                                    i !== arr.length - 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
-                                                        fileName: "[project]/components/StepSection.tsx",
-                                                        lineNumber: 54,
-                                                        columnNumber: 46
-                                                    }, this)
-                                                ]
-                                            }, i, true, {
-                                                fileName: "[project]/components/StepSection.tsx",
-                                                lineNumber: 43,
-                                                columnNumber: 19
-                                            }, this))
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/StepSection.tsx",
-                                        lineNumber: 41,
-                                        columnNumber: 15
-                                    }, this)
+                                    className: "text-xl font-bold mb-2",
+                                    children: card.title
                                 }, void 0, false, {
                                     fileName: "[project]/components/StepSection.tsx",
-                                    lineNumber: 40,
+                                    lineNumber: 29,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: `flex-1 flex items-center ${idx % 2 === 1 ? 'justify-start' : 'justify-end'}`,
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "w-96 h-96 bg-gray-300 rounded-lg"
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/StepSection.tsx",
-                                        lineNumber: 61,
-                                        columnNumber: 15
-                                    }, this)
+                                    className: "text-gray-600 text-base",
+                                    children: card.desc
                                 }, void 0, false, {
                                     fileName: "[project]/components/StepSection.tsx",
-                                    lineNumber: 60,
+                                    lineNumber: 30,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, idx, true, {
                             fileName: "[project]/components/StepSection.tsx",
-                            lineNumber: 35,
+                            lineNumber: 28,
                             columnNumber: 11
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/components/StepSection.tsx",
-                    lineNumber: 33,
+                    lineNumber: 26,
                     columnNumber: 7
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/StepSection.tsx",
-            lineNumber: 28,
+            lineNumber: 20,
             columnNumber: 5
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/StepSection.tsx",
-        lineNumber: 27,
+        lineNumber: 19,
         columnNumber: 3
     }, this);
 _c = StepSection;
@@ -325,88 +336,70 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
 ;
 ;
-const cards = [
-    {
-        label: "AI로 추천 받기",
-        image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80"
-    },
-    {
-        label: "카테고리로 직접 찾기",
-        image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80"
-    }
-];
 const RecommendSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-        className: "w-full bg-neutral-900 py-16",
+        className: "w-full bg-white py-16",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "max-w-[1200px] mx-auto px-4 flex flex-col items-center",
+            className: "max-w-[1400px] mx-auto px-4 flex flex-col items-center",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                    className: "text-xl md:text-2xl font-extrabold text-white text-center mb-2",
-                    children: "지금 동고리에서"
+                    className: "text-2xl md:text-3xl font-extrabold text-center mb-2",
+                    children: "AI 매칭으로 딱 맞는 봉제공장 추천"
                 }, void 0, false, {
                     fileName: "[project]/components/RecommendSection.tsx",
-                    lineNumber: 18,
-                    columnNumber: 7
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                    className: "text-lg text-gray-200 text-center mb-8",
-                    children: "최상의 품질의 봉제공장을 만나보세요!"
-                }, void 0, false, {
-                    fileName: "[project]/components/RecommendSection.tsx",
-                    lineNumber: 19,
+                    lineNumber: 7,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "w-full grid grid-cols-1 md:grid-cols-2 gap-8",
-                    children: cards.map((card, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "relative rounded-2xl overflow-hidden h-56 flex items-center justify-center group shadow-lg cursor-pointer",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                    src: card.image,
-                                    alt: card.label,
-                                    width: 112,
-                                    height: 112,
-                                    className: "absolute inset-0 w-full h-full object-cover z-0 group-hover:scale-105 transition-transform duration-300"
-                                }, void 0, false, {
-                                    fileName: "[project]/components/RecommendSection.tsx",
-                                    lineNumber: 26,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "absolute inset-0 bg-black/40 z-10"
-                                }, void 0, false, {
-                                    fileName: "[project]/components/RecommendSection.tsx",
-                                    lineNumber: 33,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "relative z-20 text-white text-2xl font-bold drop-shadow-lg text-center",
-                                    children: card.label
-                                }, void 0, false, {
-                                    fileName: "[project]/components/RecommendSection.tsx",
-                                    lineNumber: 34,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, idx, true, {
-                            fileName: "[project]/components/RecommendSection.tsx",
-                            lineNumber: 22,
-                            columnNumber: 11
-                        }, this))
+                    className: "w-full rounded-2xl overflow-hidden mb-8",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                        src: "/factory-banner.jpg",
+                        alt: "봉제공장 배너",
+                        width: 1200,
+                        height: 320,
+                        className: "w-full h-64 md:h-80 object-cover"
+                    }, void 0, false, {
+                        fileName: "[project]/components/RecommendSection.tsx",
+                        lineNumber: 9,
+                        columnNumber: 9
+                    }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/RecommendSection.tsx",
-                    lineNumber: 20,
+                    lineNumber: 8,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                    className: "text-lg text-gray-500 text-center mb-8",
+                    children: [
+                        "1,000여 개의 데이터를 활용해 매칭하고 있는",
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
+                            fileName: "[project]/components/RecommendSection.tsx",
+                            lineNumber: 12,
+                            columnNumber: 35
+                        }, this),
+                        "이 페이지에 딱 맞는 봉제공장들을 추천하여 공정 분석 시간을 줄여드립니다."
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/components/RecommendSection.tsx",
+                    lineNumber: 11,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                    className: "bg-neutral-900 text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-neutral-800 transition",
+                    children: "AI 추천받기"
+                }, void 0, false, {
+                    fileName: "[project]/components/RecommendSection.tsx",
+                    lineNumber: 15,
                     columnNumber: 7
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/RecommendSection.tsx",
-            lineNumber: 17,
+            lineNumber: 6,
             columnNumber: 5
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/RecommendSection.tsx",
-        lineNumber: 16,
+        lineNumber: 5,
         columnNumber: 3
     }, this);
 _c = RecommendSection;
@@ -438,6 +431,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$RecommendSecti
 ;
 function HomePage() {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
+        className: "px-6",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$HeroSection$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/app/page.tsx",

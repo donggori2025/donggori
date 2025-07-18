@@ -8,7 +8,7 @@ import RecommendSection from "@/components/RecommendSection";
 // 메인 페이지 컴포넌트
 export default function HomePage() {
   return (
-    <main>
+    <main className="px-6">
       <HeroSection />
       <InfoSection />
       <StepSection />
