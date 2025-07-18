@@ -27,15 +27,16 @@ const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
                         height: '480px'
                     },
                     children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("iframe", {
-                            width: "100%",
-                            height: "100%",
-                            src: "https://www.youtube.com/embed/5cANn41cpcU?autoplay=1&mute=1&loop=1&playlist=5cANn41cpcU",
-                            title: "YouTube video player",
-                            frameBorder: "0",
-                            allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
-                            allowFullScreen: true,
-                            className: "w-full h-full object-cover rounded-3xl rounded-bl-none"
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
+                            src: "/250402_동대문구_압축.mp4",
+                            autoPlay: true,
+                            loop: true,
+                            muted: true,
+                            playsInline: true,
+                            className: "w-full h-full object-cover rounded-3xl rounded-bl-none",
+                            style: {
+                                background: '#000'
+                            }
                         }, void 0, false, {
                             fileName: "[project]/components/HeroSection.tsx",
                             lineNumber: 8,
@@ -49,19 +50,19 @@ const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
                                     "디자이너와 봉제공장과의 연결고리,",
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                         fileName: "[project]/components/HeroSection.tsx",
-                                        lineNumber: 19,
+                                        lineNumber: 18,
                                         columnNumber: 78
                                     }, this),
                                     "동고리"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/HeroSection.tsx",
-                                lineNumber: 19,
+                                lineNumber: 18,
                                 columnNumber: 11
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/HeroSection.tsx",
-                            lineNumber: 18,
+                            lineNumber: 17,
                             columnNumber: 9
                         }, this)
                     ]
@@ -88,13 +89,13 @@ const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
                                                 children: "최고의 디자이너"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/HeroSection.tsx",
-                                                lineNumber: 27,
+                                                lineNumber: 26,
                                                 columnNumber: 15
                                             }, this),
                                             "에게",
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                 fileName: "[project]/components/HeroSection.tsx",
-                                                lineNumber: 27,
+                                                lineNumber: 26,
                                                 columnNumber: 61
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -102,13 +103,13 @@ const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
                                                 children: "최고의 봉제공장과 기술자"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/HeroSection.tsx",
-                                                lineNumber: 28,
+                                                lineNumber: 27,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/HeroSection.tsx",
-                                        lineNumber: 26,
+                                        lineNumber: 25,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -117,20 +118,20 @@ const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
                                             "최상의 퀄리티, 최상의 기술력을 보유한",
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                 fileName: "[project]/components/HeroSection.tsx",
-                                                lineNumber: 31,
+                                                lineNumber: 30,
                                                 columnNumber: 36
                                             }, this),
                                             "봉제공장이 함께하는 동고리와 함께 여러분의 꿈을 펼쳐보세요."
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/HeroSection.tsx",
-                                        lineNumber: 30,
+                                        lineNumber: 29,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/HeroSection.tsx",
-                                lineNumber: 25,
+                                lineNumber: 24,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -144,29 +145,29 @@ const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
                                             children: "→"
                                         }, void 0, false, {
                                             fileName: "[project]/components/HeroSection.tsx",
-                                            lineNumber: 38,
+                                            lineNumber: 37,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/HeroSection.tsx",
-                                        lineNumber: 37,
+                                        lineNumber: 36,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/HeroSection.tsx",
-                                lineNumber: 35,
+                                lineNumber: 34,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/HeroSection.tsx",
-                        lineNumber: 24,
+                        lineNumber: 23,
                         columnNumber: 9
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/HeroSection.tsx",
-                    lineNumber: 23,
+                    lineNumber: 22,
                     columnNumber: 7
                 }, this)
             ]
