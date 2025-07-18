@@ -13,6 +13,8 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [factoryId, setFactoryId] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<'standard'|'deluxe'|'premium'>('standard');
+  const router = useRouter();
 
   useEffect(() => {
     (async () => {
@@ -112,10 +114,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       ]
     }
   };
-  const [selectedService, setSelectedService] = useState<'standard'|'deluxe'|'premium'>('standard');
   const currentService = serviceData[selectedService];
-
-  const router = useRouter();
 
   return (
     <div className="max-w-[1400px] mx-auto py-10 px-2 md:px-6">
