@@ -6,17 +6,13 @@ import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
+import { Factory } from "@/lib/factories";
 
 export default function FactoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { user } = useUser();
-  const [factory, setFactory] = useState<any>(null);
+  const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [content, setContent] = useState("");
-  const [submitted, setSubmitted] = useState(false);
   const [factoryId, setFactoryId] = useState<string | null>(null);
-  const [expandedSection, setExpandedSection] = useState<string>("standard");
 
   useEffect(() => {
     (async () => {
@@ -29,7 +25,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     if (!factoryId) return;
     async function fetchFactory() {
       setLoading(true);
-      const { data, error } = await supabase.from("donggori").select("*").eq("id", factoryId).single();
+      const { data } = await supabase.from("donggori").select("*").eq("id", factoryId).single();
       setFactory(data);
       setLoading(false);
     }
@@ -39,13 +35,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   if (loading) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">로딩 중...</div>;
   if (!factory) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 공장입니다.</div>;
 
-  const isDesigner = user?.publicMetadata?.role === "designer";
-  const alreadyRequested = user && matchRequests.some(r => r.factoryId === factory.id && r.designerUserId === user.id);
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setShowForm(false);
-  };
   const handleKakaoInquiry = () => {
     if (!user) return;
     const inquiry = {
@@ -200,107 +189,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           <div className="bg-white rounded-2xl p-6 mb-6 border border-gray-200">
             <div className="font-bold text-lg mb-2">{factory.company_name}</div>
             <div className="text-xs text-gray-500 mb-2">봉제공장</div>
-            
-            {/* Standard 섹션 */}
-            <div className="mb-4">
-              <button 
-                onClick={() => setExpandedSection(expandedSection === "standard" ? "" : "standard")}
-                className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">Standard</span>
-                  <span className="text-xs text-gray-500">봉제공정</span>
-                </div>
-                {expandedSection === "standard" ? (
-                  <ChevronUpIcon className="w-4 h-4 text-gray-500" />
-                ) : (
-                  <ChevronDownIcon className="w-4 h-4 text-gray-500" />
-                )}
-              </button>
-              {expandedSection === "standard" && (
-                <div className="mt-3 p-3 bg-white border border-gray-200 rounded-lg">
-                  <ul className="text-sm text-gray-700 list-disc pl-5 mb-3">
-                    <li>텍스타일 사입 1종</li>
-                    <li>출고전 재작</li>
-                    <li>평생 A/S</li>
-                    <li>원본, 저작, 재설계 이전</li>
-                    <li>샘플비 10,000원</li>
-                    <li>장단 단가 16,800원</li>
-                  </ul>
-                  <Link href={`/factories/${factoryId}/request?service=standard`}>
-                    <Button className="w-full bg-black text-white rounded-lg font-bold py-2">공장 의뢰하기</Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Deluxe 섹션 */}
-            <div className="mb-4">
-              <button 
-                onClick={() => setExpandedSection(expandedSection === "deluxe" ? "" : "deluxe")}
-                className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">Deluxe</span>
-                  <span className="text-xs text-gray-500">패턴/샘플 + 공장</span>
-                </div>
-                {expandedSection === "deluxe" ? (
-                  <ChevronUpIcon className="w-4 h-4 text-gray-500" />
-                ) : (
-                  <ChevronDownIcon className="w-4 h-4 text-gray-500" />
-                )}
-              </button>
-              {expandedSection === "deluxe" && (
-                <div className="mt-3 p-3 bg-white border border-gray-200 rounded-lg">
-                  <ul className="text-sm text-gray-700 list-disc pl-5 mb-3">
-                    <li>패턴 제작</li>
-                    <li>샘플 제작</li>
-                    <li>봉제 공정</li>
-                    <li>품질 검수</li>
-                    <li>배송 서비스</li>
-                    <li>기술 지원</li>
-                  </ul>
-                  <Link href={`/factories/${factoryId}/request?service=deluxe`}>
-                    <Button className="w-full bg-black text-white rounded-lg font-bold py-2">Deluxe 의뢰하기</Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Premium 섹션 */}
-            <div className="mb-4">
-              <button 
-                onClick={() => setExpandedSection(expandedSection === "premium" ? "" : "premium")}
-                className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">Premium</span>
-                  <span className="text-xs text-gray-500">올인원(기획/디자인~)</span>
-                </div>
-                {expandedSection === "premium" ? (
-                  <ChevronUpIcon className="w-4 h-4 text-gray-500" />
-                ) : (
-                  <ChevronDownIcon className="w-4 h-4 text-gray-500" />
-                )}
-              </button>
-              {expandedSection === "premium" && (
-                <div className="mt-3 p-3 bg-white border border-gray-200 rounded-lg">
-                  <ul className="text-sm text-gray-700 list-disc pl-5 mb-3">
-                    <li>기획 및 디자인</li>
-                    <li>패턴 제작</li>
-                    <li>샘플 제작</li>
-                    <li>봉제 공정</li>
-                    <li>품질 검수</li>
-                    <li>배송 서비스</li>
-                    <li>마케팅 지원</li>
-                  </ul>
-                  <Link href={`/factories/${factoryId}/request?service=premium`}>
-                    <Button className="w-full bg-black text-white rounded-lg font-bold py-2">Premium 의뢰하기</Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-
             <Button className="w-full bg-yellow-400 text-black rounded-full font-bold py-2 mt-4">문의하기</Button>
           </div>
         </div>

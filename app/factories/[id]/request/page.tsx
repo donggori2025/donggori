@@ -1,20 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
+import { Factory } from "@/lib/factories";
 
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
-  const { user } = useUser();
   const searchParams = useSearchParams();
-  const [factory, setFactory] = useState<any>(null);
+  const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [factoryId, setFactoryId] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string>("standard");
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
   
   // 폼 상태
   const [formData, setFormData] = useState({
@@ -42,7 +39,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     if (!factoryId) return;
     async function fetchFactory() {
       setLoading(true);
-      const { data, error } = await supabase.from("donggori").select("*").eq("id", factoryId).single();
+      const { data } = await supabase.from("donggori").select("*").eq("id", factoryId).single();
       setFactory(data);
       setLoading(false);
     }
@@ -133,11 +130,11 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }
   };
 
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const handleConfirmExit = () => {
     setShowExitConfirm(false);
     window.history.back();
   };
-
   const handleCancelExit = () => {
     setShowExitConfirm(false);
   };
@@ -361,12 +358,12 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     [필수] 개인정보 취급방침 및 서비스 이용 약관에 동의합니다.
                   </label>
                   <div className="mt-2 space-x-4">
-                                         <Link href="/terms/privacy" className="text-sm text-blue-600 hover:underline">
-                       개인정보 취급방침 &gt;
-                     </Link>
-                     <Link href="/terms/service" className="text-sm text-blue-600 hover:underline">
-                       이용약관 &gt;
-                     </Link>
+                    <Link href="/terms/privacy" className="text-sm text-blue-600 hover:underline">
+                      개인정보 취급방침 &gt;
+                    </Link>
+                    <Link href="/terms/service" className="text-sm text-blue-600 hover:underline">
+                      이용약관 &gt;
+                    </Link>
                   </div>
                 </div>
               </div>
