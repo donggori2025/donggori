@@ -9,20 +9,6 @@ import type { Factory } from "@/lib/factories";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
-// 태그별 색상 매핑 함수
-function getTagColor(tag: string) {
-  switch (tag) {
-    case "봉제": return "bg-blue-100 text-blue-700";
-    case "나염": return "bg-orange-100 text-orange-700";
-    case "자수": return "bg-green-100 text-green-700";
-    case "샘플": return "bg-purple-100 text-purple-700";
-    case "QC": return "bg-pink-100 text-pink-700";
-    case "다이마루": return "bg-yellow-100 text-yellow-700";
-    case "직기": return "bg-cyan-100 text-cyan-700";
-    default: return "bg-gray-100 text-gray-700";
-  }
-}
-
 export default function FactoriesPage() {
   const [factories, setFactories] = useState<Factory[]>([]);
   const [loading, setLoading] = useState(true);
