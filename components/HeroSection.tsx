@@ -12,7 +12,6 @@ const HeroSection = () => (
           muted
           playsInline
           className="w-full h-full object-cover rounded-3xl"
-          style={{ background: '#000' }}
         />
         <div className="absolute left-0 bottom-0 bg-white/80 px-6 py-4 rounded-tr-2xl md:rounded-tr-none md:rounded-br-2xl md:rounded-tl-2xl md:rounded-bl-none shadow md:hidden">
           <div className="text-lg font-bold text-gray-900">디자이너와 봉제공장과의 연결고리,<br/>동고리</div>
