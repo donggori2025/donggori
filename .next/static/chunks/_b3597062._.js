@@ -22,7 +22,7 @@ const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
             className: "w-full max-w-[1400px] mx-auto flex flex-col md:flex-row items-stretch min-h-[480px] gap-0 md:gap-4 px-0",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex-[0_0_70%] min-w-0 flex items-end md:items-center justify-center relative overflow-hidden bg-white rounded-3xl rounded-bl-none",
+                    className: "flex-[0_0_70%] min-w-0 flex items-end md:items-center justify-center relative overflow-hidden bg-white rounded-3xl",
                     style: {
                         height: '480px'
                     },
@@ -33,7 +33,7 @@ const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
                             loop: true,
                             muted: true,
                             playsInline: true,
-                            className: "w-full h-full object-cover rounded-3xl rounded-bl-none",
+                            className: "w-full h-full object-cover rounded-3xl",
                             style: {
                                 background: '#000'
                             }
