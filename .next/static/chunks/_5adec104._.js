@@ -115,9 +115,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$clerk$2f$s
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/ui/button.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
+;
 ;
 ;
 ;
@@ -161,7 +163,7 @@ function FactoryDetailPage({ params }) {
         children: "로딩 중..."
     }, void 0, false, {
         fileName: "[project]/app/factories/[id]/page.tsx",
-        lineNumber: 34,
+        lineNumber: 35,
         columnNumber: 23
     }, this);
     if (!factory) return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -169,7 +171,7 @@ function FactoryDetailPage({ params }) {
         children: "존재하지 않는 공장입니다."
     }, void 0, false, {
         fileName: "[project]/app/factories/[id]/page.tsx",
-        lineNumber: 35,
+        lineNumber: 36,
         columnNumber: 24
     }, this);
     const handleKakaoInquiry = ()=>{
@@ -201,6 +203,52 @@ function FactoryDetailPage({ params }) {
     const images = Array.isArray(factory.images) && factory.images.length > 0 ? factory.images : SAMPLE_IMAGES;
     // 장비/기술 등은 Chip 형태로 분리
     const splitChips = (val)=>typeof val === "string" ? val.split(/,|\|| /).map((v)=>v.trim()).filter(Boolean) : [];
+    // 상품(서비스) 정보
+    const serviceData = {
+        standard: {
+            title: "Standard",
+            subtitle: "봉제공정",
+            price: "39,000원 (VAT 포함)",
+            features: [
+                "텍스트형 시안 1종",
+                "슬로건 제작",
+                "평생 A/S",
+                "원본, 저작, 재산권 이전",
+                "샘플비 10,000원",
+                "장단 단가 16,800원"
+            ]
+        },
+        deluxe: {
+            title: "Deluxe",
+            subtitle: "패턴/샘플 + 공장",
+            price: "89,000원 (VAT 포함)",
+            features: [
+                "패턴 제작",
+                "샘플 제작",
+                "봉제 공정",
+                "품질 검수",
+                "배송 서비스",
+                "기술 지원"
+            ]
+        },
+        premium: {
+            title: "Premium",
+            subtitle: "올인원(기획/디자인~)",
+            price: "159,000원 (VAT 포함)",
+            features: [
+                "기획 및 디자인",
+                "패턴 제작",
+                "샘플 제작",
+                "봉제 공정",
+                "품질 검수",
+                "배송 서비스",
+                "마케팅 지원"
+            ]
+        }
+    };
+    const [selectedService, setSelectedService] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('standard');
+    const currentService = serviceData[selectedService];
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "max-w-[1400px] mx-auto py-10 px-2 md:px-6",
         children: [
@@ -216,17 +264,17 @@ function FactoryDetailPage({ params }) {
                             className: "object-cover w-full h-full"
                         }, void 0, false, {
                             fileName: "[project]/app/factories/[id]/page.tsx",
-                            lineNumber: 77,
+                            lineNumber: 126,
                             columnNumber: 13
                         }, this)
                     }, img + idx, false, {
                         fileName: "[project]/app/factories/[id]/page.tsx",
-                        lineNumber: 76,
+                        lineNumber: 125,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/app/factories/[id]/page.tsx",
-                lineNumber: 74,
+                lineNumber: 123,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -243,7 +291,7 @@ function FactoryDetailPage({ params }) {
                                         children: "패턴"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 87,
+                                        lineNumber: 136,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -251,7 +299,7 @@ function FactoryDetailPage({ params }) {
                                         children: factory.company_name
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 88,
+                                        lineNumber: 137,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -259,7 +307,7 @@ function FactoryDetailPage({ params }) {
                                         children: "연락 가능 · 시간 : 연중무휴"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 89,
+                                        lineNumber: 138,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -269,13 +317,13 @@ function FactoryDetailPage({ params }) {
                                         children: "문의하기"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 90,
+                                        lineNumber: 139,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 86,
+                                lineNumber: 135,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -286,7 +334,7 @@ function FactoryDetailPage({ params }) {
                                         children: "주소"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 94,
+                                        lineNumber: 143,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -294,13 +342,13 @@ function FactoryDetailPage({ params }) {
                                         children: factory.address || '-'
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 95,
+                                        lineNumber: 144,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 93,
+                                lineNumber: 142,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -311,7 +359,7 @@ function FactoryDetailPage({ params }) {
                                         children: "주요 정보"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 99,
+                                        lineNumber: 148,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
@@ -325,20 +373,20 @@ function FactoryDetailPage({ params }) {
                                                             children: "업종"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                                            lineNumber: 103,
+                                                            lineNumber: 152,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                             children: factory.business_type || '-'
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                                            lineNumber: 104,
+                                                            lineNumber: 153,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/[id]/page.tsx",
-                                                    lineNumber: 102,
+                                                    lineNumber: 151,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -348,20 +396,20 @@ function FactoryDetailPage({ params }) {
                                                             children: "공급 브랜드"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                                            lineNumber: 107,
+                                                            lineNumber: 156,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                             children: factory.brands_supplied || '-'
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                                            lineNumber: 108,
+                                                            lineNumber: 157,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/[id]/page.tsx",
-                                                    lineNumber: 106,
+                                                    lineNumber: 155,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -371,20 +419,20 @@ function FactoryDetailPage({ params }) {
                                                             children: "주요 원단"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                                            lineNumber: 111,
+                                                            lineNumber: 160,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                             children: factory.main_fabrics || '-'
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                                            lineNumber: 112,
+                                                            lineNumber: 161,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/[id]/page.tsx",
-                                                    lineNumber: 110,
+                                                    lineNumber: 159,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -394,37 +442,37 @@ function FactoryDetailPage({ params }) {
                                                             children: "최소 주문 수량"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                                            lineNumber: 115,
+                                                            lineNumber: 164,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                             children: factory.MOQ ?? factory.moq ?? factory.minOrder ?? '-'
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                                            lineNumber: 116,
+                                                            lineNumber: 165,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/[id]/page.tsx",
-                                                    lineNumber: 114,
+                                                    lineNumber: 163,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                            lineNumber: 101,
+                                            lineNumber: 150,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 100,
+                                        lineNumber: 149,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 98,
+                                lineNumber: 147,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -435,7 +483,7 @@ function FactoryDetailPage({ params }) {
                                         children: "봉제 장비"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 123,
+                                        lineNumber: 172,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -445,25 +493,25 @@ function FactoryDetailPage({ params }) {
                                                 children: item
                                             }, item + i, false, {
                                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                                lineNumber: 127,
+                                                lineNumber: 176,
                                                 columnNumber: 21
                                             }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "text-gray-400",
                                             children: "-"
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                            lineNumber: 129,
+                                            lineNumber: 178,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 124,
+                                        lineNumber: 173,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 122,
+                                lineNumber: 171,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -474,7 +522,7 @@ function FactoryDetailPage({ params }) {
                                         children: "패턴 장비"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 134,
+                                        lineNumber: 183,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -484,25 +532,25 @@ function FactoryDetailPage({ params }) {
                                                 children: item
                                             }, item + i, false, {
                                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                                lineNumber: 138,
+                                                lineNumber: 187,
                                                 columnNumber: 21
                                             }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "text-gray-400",
                                             children: "-"
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                            lineNumber: 140,
+                                            lineNumber: 189,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 135,
+                                        lineNumber: 184,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 133,
+                                lineNumber: 182,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -513,7 +561,7 @@ function FactoryDetailPage({ params }) {
                                         children: "특수 장비"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 145,
+                                        lineNumber: 194,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -523,25 +571,25 @@ function FactoryDetailPage({ params }) {
                                                 children: item
                                             }, item + i, false, {
                                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                                lineNumber: 149,
+                                                lineNumber: 198,
                                                 columnNumber: 21
                                             }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "text-gray-400",
                                             children: "-"
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/[id]/page.tsx",
-                                            lineNumber: 151,
+                                            lineNumber: 200,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 146,
+                                        lineNumber: 195,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 144,
+                                lineNumber: 193,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -552,7 +600,7 @@ function FactoryDetailPage({ params }) {
                                         children: "제조사 정보"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 156,
+                                        lineNumber: 205,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -565,7 +613,7 @@ function FactoryDetailPage({ params }) {
                                                         children: "행정구역"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                                        lineNumber: 159,
+                                                        lineNumber: 208,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -573,13 +621,13 @@ function FactoryDetailPage({ params }) {
                                                         children: factory.admin_district || '-'
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                                        lineNumber: 160,
+                                                        lineNumber: 209,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                                lineNumber: 158,
+                                                lineNumber: 207,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -589,7 +637,7 @@ function FactoryDetailPage({ params }) {
                                                         children: "월 생산능력"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                                        lineNumber: 163,
+                                                        lineNumber: 212,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -597,13 +645,13 @@ function FactoryDetailPage({ params }) {
                                                         children: factory.monthly_capacity || '-'
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                                        lineNumber: 164,
+                                                        lineNumber: 213,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                                lineNumber: 162,
+                                                lineNumber: 211,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -613,7 +661,7 @@ function FactoryDetailPage({ params }) {
                                                         children: "배송"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                                        lineNumber: 167,
+                                                        lineNumber: 216,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -621,25 +669,25 @@ function FactoryDetailPage({ params }) {
                                                         children: factory.delivery || '-'
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                                        lineNumber: 168,
+                                                        lineNumber: 217,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                                lineNumber: 166,
+                                                lineNumber: 215,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 157,
+                                        lineNumber: 206,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 155,
+                                lineNumber: 204,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -650,7 +698,7 @@ function FactoryDetailPage({ params }) {
                                         children: "소개"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 174,
+                                        lineNumber: 223,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -658,13 +706,13 @@ function FactoryDetailPage({ params }) {
                                         children: factory.intro || '-'
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 175,
+                                        lineNumber: 224,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 173,
+                                lineNumber: 222,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -675,7 +723,7 @@ function FactoryDetailPage({ params }) {
                                         children: "특수 보유 기술"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 179,
+                                        lineNumber: 228,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -683,13 +731,13 @@ function FactoryDetailPage({ params }) {
                                         children: factory.special_tech || '-'
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/[id]/page.tsx",
-                                        lineNumber: 180,
+                                        lineNumber: 229,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 178,
+                                lineNumber: 227,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -700,18 +748,18 @@ function FactoryDetailPage({ params }) {
                                     children: "← 목록으로 돌아가기"
                                 }, void 0, false, {
                                     fileName: "[project]/app/factories/[id]/page.tsx",
-                                    lineNumber: 183,
+                                    lineNumber: 232,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/factories/[id]/page.tsx",
-                                lineNumber: 182,
+                                lineNumber: 231,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/factories/[id]/page.tsx",
-                        lineNumber: 84,
+                        lineNumber: 133,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -724,52 +772,138 @@ function FactoryDetailPage({ params }) {
                                     children: factory.company_name
                                 }, void 0, false, {
                                     fileName: "[project]/app/factories/[id]/page.tsx",
-                                    lineNumber: 189,
+                                    lineNumber: 238,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-xs text-gray-500 mb-2",
+                                    className: "text-xs text-gray-500 mb-4",
                                     children: "봉제공장"
                                 }, void 0, false, {
                                     fileName: "[project]/app/factories/[id]/page.tsx",
-                                    lineNumber: 190,
+                                    lineNumber: 239,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex gap-2 mb-4",
+                                    children: [
+                                        'standard',
+                                        'deluxe',
+                                        'premium'
+                                    ].map((key)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            className: `flex-1 py-2 rounded-lg font-bold border transition text-sm ${selectedService === key ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-yellow-100'}`,
+                                            onClick: ()=>setSelectedService(key),
+                                            children: serviceData[key].title
+                                        }, key, false, {
+                                            fileName: "[project]/app/factories/[id]/page.tsx",
+                                            lineNumber: 243,
+                                            columnNumber: 17
+                                        }, this))
+                                }, void 0, false, {
+                                    fileName: "[project]/app/factories/[id]/page.tsx",
+                                    lineNumber: 241,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "bg-gray-50 rounded-lg p-4 mb-4",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex items-center justify-between mb-2",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "font-semibold",
+                                                            children: currentService.title
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/factories/[id]/page.tsx",
+                                                            lineNumber: 256,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "text-xs text-gray-500",
+                                                            children: currentService.subtitle
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/factories/[id]/page.tsx",
+                                                            lineNumber: 257,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/factories/[id]/page.tsx",
+                                                    lineNumber: 255,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "text-sm font-semibold text-blue-600",
+                                                    children: currentService.price
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/factories/[id]/page.tsx",
+                                                    lineNumber: 259,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/factories/[id]/page.tsx",
+                                            lineNumber: 254,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                            className: "text-sm text-gray-700 list-disc pl-5 space-y-1",
+                                            children: currentService.features.map((feature, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                    children: feature
+                                                }, index, false, {
+                                                    fileName: "[project]/app/factories/[id]/page.tsx",
+                                                    lineNumber: 263,
+                                                    columnNumber: 19
+                                                }, this))
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/factories/[id]/page.tsx",
+                                            lineNumber: 261,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/factories/[id]/page.tsx",
+                                    lineNumber: 253,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
-                                    className: "w-full bg-yellow-400 text-black rounded-full font-bold py-2 mt-4",
-                                    children: "문의하기"
+                                    className: "w-full bg-yellow-400 text-black rounded-full font-bold py-2 mt-2",
+                                    onClick: ()=>router.push(`/factories/${factory.id}/request?service=${selectedService}`),
+                                    children: "의뢰하기"
                                 }, void 0, false, {
                                     fileName: "[project]/app/factories/[id]/page.tsx",
-                                    lineNumber: 191,
+                                    lineNumber: 268,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/factories/[id]/page.tsx",
-                            lineNumber: 188,
+                            lineNumber: 237,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/factories/[id]/page.tsx",
-                        lineNumber: 187,
+                        lineNumber: 236,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/factories/[id]/page.tsx",
-                lineNumber: 82,
+                lineNumber: 131,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/factories/[id]/page.tsx",
-        lineNumber: 72,
+        lineNumber: 121,
         columnNumber: 5
     }, this);
 }
-_s(FactoryDetailPage, "YmyO3SiC0BSJLN/peGILoo9h8xQ=", false, function() {
+_s(FactoryDetailPage, "uxK7HETlWAbpASeY6SBualP8vfA=", false, function() {
     return [
-        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$clerk$2f$shared$2f$dist$2f$react$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useUser"]
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$clerk$2f$shared$2f$dist$2f$react$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useUser"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];
 });
 _c = FactoryDetailPage;

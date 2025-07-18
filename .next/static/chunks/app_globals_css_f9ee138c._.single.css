@@ -1202,6 +1202,10 @@
     border-color: #0000;
   }
 
+  .border-yellow-400 {
+    border-color: var(--color-yellow-400);
+  }
+
   .border-t-\[\#222222\] {
     border-top-color: #222;
   }
@@ -2045,6 +2049,12 @@
       .hover\:bg-secondary\/80:hover {
         background-color: color-mix(in oklab, var(--secondary) 80%, transparent);
       }
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:bg-yellow-100:hover {
+      background-color: var(--color-yellow-100);
     }
   }
 
