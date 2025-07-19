@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
@@ -53,7 +54,7 @@ export default function MatchingPage() {
   }, []);
 
   // factories state 기반 옵션 추출 함수 (함수 내부에서 선언)
-  function getOptions(key: string): string[] {
+  const getOptions = useCallback((key: string): string[] => {
     if (key === 'admin_district') {
       return Array.from(new Set(factories.map((f: Factory) => f.admin_district).filter((v: string | undefined): v is string => typeof v === 'string' && Boolean(v))));
     }
@@ -70,7 +71,7 @@ export default function MatchingPage() {
       return Array.from(new Set(arr.flatMap((i: string) => String(i).split(',').map((v: string) => v.trim())).filter((v: string) => typeof v === 'string' && Boolean(v))));
     }
     return [];
-  }
+  }, [factories]);
 
 type ScoredFactory = Factory & { score: number };
 
@@ -83,7 +84,7 @@ type ScoredFactory = Factory & { score: number };
     { question: "패턴기를 선택하세요", key: "pattern_machines", options: getOptions("pattern_machines") },
     { question: "특수기를 선택하세요", key: "special_machines", options: getOptions("special_machines") },
     { question: "어떤 품목을 원하시나요?", key: "items", options: getOptions("items") },
-  ], [factories]);
+  ], [getOptions]);
   // 채팅 메시지(질문/답변 순서대로)
   const [chat, setChat] = useState<{ type: "question" | "answer"; text: string }[]>([]);
   const [introDone, setIntroDone] = useState(false);
@@ -95,7 +96,7 @@ type ScoredFactory = Factory & { score: number };
     "반갑습니다:)",
     "동고리가 봉제공장을 추천해드릴게요!",
     QUESTIONS[0]?.question || "어떤 공정을 원하시나요?",
-  ], [QUESTIONS[0]?.question]);
+  ], [QUESTIONS]);
   const [introStep, setIntroStep] = useState(0); // 0: 타이핑, 1: ... 표시, 2: 다음 메시지
   const typingTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -251,7 +252,7 @@ type ScoredFactory = Factory & { score: number };
   };
 
   // 추천 알고리즘: 답변과 공장 데이터 매칭 점수 계산
-  function getRecommendedFactories(answers: string[]) {
+  const getRecommendedFactories = useCallback((answers: string[]) => {
     // 선택한 옵션 중 1개라도 일치하는 공장만 후보로 삼고, 그 중 최대 3개만(랜덤 또는 상위 3개) 노출
     // 일치하는 공장이 3개 미만이면 나머지는 랜덤으로 채움
     const matched = factories.filter(f => {
@@ -286,7 +287,7 @@ type ScoredFactory = Factory & { score: number };
       }
     }
     return result;
-  }
+  }, [factories]);
 
   // 추천 결과 카드 UI (공장 정보 상세)
   function renderResultCards() {
@@ -308,10 +309,13 @@ type ScoredFactory = Factory & { score: number };
               <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden flex flex-col border border-gray-200">
                 {/* 이미지 영역 */}
                 <div className="w-full h-40 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl">
-                  <img
+                  <Image
                     src={f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length]}
                     alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
                     className="object-cover w-full h-full rounded-xl"
+                    width={400}
+                    height={160}
+                    priority={idx < 3}
                   />
                 </div>
                 {/* 이미지와 텍스트 사이 gap */}
@@ -393,8 +397,7 @@ type ScoredFactory = Factory & { score: number };
     } else {
       setResultLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [answers.length]);
+  }, [answers.length, QUESTIONS.length, getRecommendedFactories, answers]);
 
   // 채팅 자동 스크롤 useEffect
   useEffect(() => {
@@ -426,7 +429,7 @@ type ScoredFactory = Factory & { score: number };
       setShowResultMsg1(false);
       setShowResultMsg2(false);
     }
-  }, [answers.length, recommended, resultLoading]);
+  }, [answers.length, recommended, resultLoading, QUESTIONS.length]);
 
   // 결과 안내 메시지 등장 시 채팅창 자동 스크롤
   useEffect(() => {
@@ -569,8 +572,8 @@ type ScoredFactory = Factory & { score: number };
       </div>
       {/* 로그인 필요 모달 */}
       {showLoginModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-          <div className="bg-white rounded-xl shadow-lg p-8 max-w-xs w-full text-center">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg p-8 max-w-xs w-full text-center border border-gray-200">
             <div className="text-lg font-bold mb-2">로그인 후 이용 가능합니다</div>
             <div className="text-gray-500 mb-4">의뢰하기는 로그인 후 이용하실 수 있습니다.</div>
             <Button className="w-full mb-2" onClick={() => router.push("/sign-in")}>로그인 화면으로 이동</Button>

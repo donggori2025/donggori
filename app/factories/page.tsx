@@ -8,6 +8,7 @@ import { List, Map as MapIcon } from "lucide-react";
 import type { Factory } from "@/lib/factories";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function FactoriesPage() {
   const [factories, setFactories] = useState<Factory[]>([]);
@@ -517,8 +518,8 @@ export default function FactoriesPage() {
         </aside>
         {/* 모바일 필터 오버레이 */}
         {showMobileFilter && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="bg-white rounded-xl w-[90vw] max-w-md p-6 flex flex-col gap-2 relative">
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="bg-white rounded-xl w-[90vw] max-w-md p-6 flex flex-col gap-2 relative border border-gray-200 shadow-lg">
               <button
                 className="absolute top-2 right-2 text-gray-500 hover:text-black text-2xl"
                 onClick={() => setShowMobileFilter(false)}
@@ -849,10 +850,13 @@ export default function FactoriesPage() {
                       <Link href={`/factories/${f.id}`} key={f.id ?? idx} className="rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer hover:shadow-lg transition-shadow">
                         {/* 이미지 영역 */}
                         <div className="w-full h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl">
-                          <img
+                          <Image
                             src={f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length]}
                             alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
                             className="object-cover w-full h-full rounded-xl"
+                            width={400}
+                            height={224}
+                            priority={idx < 6}
                           />
                         </div>
                         {/* 이미지와 텍스트 사이 gap */}
