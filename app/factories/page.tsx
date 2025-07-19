@@ -88,6 +88,10 @@ export default function FactoriesPage() {
       const values = factories.flatMap(f => (f.processes ? String(f.processes).split(',').map((v: string) => v.trim()) : []));
       return Array.from(new Set(values.filter((v): v is string => typeof v === 'string' && Boolean(v))));
     }
+    if (key === 'main_fabrics') {
+      const values = factories.flatMap(f => (f.main_fabrics ? String(f.main_fabrics).split(',').map((v: string) => v.trim()) : []));
+      return Array.from(new Set(values.filter((v): v is string => typeof v === 'string' && Boolean(v))));
+    }
     const values = factories.map(f => f[key]);
     // 항상 배열 반환 보장
     if (Array.isArray(values)) {
@@ -183,6 +187,7 @@ export default function FactoriesPage() {
   const patternMachineOptions = Array.isArray(getOptions('pattern_machines')) ? getOptions('pattern_machines') : [];
   const specialMachineOptions = Array.isArray(getOptions('special_machines')) ? getOptions('special_machines') : [];
   const itemOptionsAll = Array.isArray(getOptions('items')) ? getOptions('items') : [];
+  const mainFabricsOptions = Array.isArray(getOptions('main_fabrics')) ? getOptions('main_fabrics') : [];
 
   // 카드별 칩을 공장 id 기준으로 고정
   const cardFabricsById = useMemo(() => {
@@ -489,7 +494,22 @@ export default function FactoriesPage() {
               </button>
               {openFilter.main_fabrics && (
                 <div className="flex flex-wrap gap-2 pb-2 mt-3">
-                  {/* 데이터가 없으므로 버튼 없음 */}
+                  {mainFabricsOptions.map((opt: string) => (
+                    <Button
+                      key={opt}
+                      size="sm"
+                      variant={selected.main_fabrics.includes(opt) ? "default" : "outline"}
+                      className="rounded-full border px-4"
+                      onClick={() => setSelected(sel => ({
+                        ...sel,
+                        main_fabrics: sel.main_fabrics.includes(opt)
+                          ? sel.main_fabrics.filter((v: string) => v !== opt)
+                          : [...sel.main_fabrics, opt]
+                      }))}
+                    >
+                      {opt}
+                    </Button>
+                  ))}
                 </div>
               )}
             </div>
@@ -820,7 +840,9 @@ export default function FactoriesPage() {
                       : typeof f.company_name === 'string' && f.company_name
                         ? f.company_name
                         : '이름 없음';
-                    const mainItems: string = Array.isArray(f.items) && f.items.length > 0 ? f.items.join(', ') : '-';
+                    const mainItems = [f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt]
+                      .filter((v) => typeof v === 'string' && v.length > 0)
+                      .join(', ') || '-';
                     const mainFabrics: string = typeof f.main_fabrics === 'string' && f.main_fabrics.length > 0 ? f.main_fabrics : '-';
                     const randomFabrics = cardFabricsById[f.id ?? idx] || [];
                     return (
