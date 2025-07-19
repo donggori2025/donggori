@@ -179,7 +179,7 @@ function NoticesPage() {
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "col-span-2 text-center",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: `inline-block px-2 py-1 rounded-full text-xs font-bold ${notice.type === '공지' ? 'bg-black text-white' : notice.type === '채용공고' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`,
+                                        className: `inline-block px-2 py-1 rounded-full text-xs font-bold ${notice.type === '공지' ? 'bg-red-100 text-red-700' : notice.type === '채용공고' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`,
                                         children: notice.type
                                     }, void 0, false, {
                                         fileName: "[project]/app/notices/page.tsx",

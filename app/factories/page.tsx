@@ -255,7 +255,7 @@ export default function FactoriesPage() {
             {/* 공정 */}
             <div>
               <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, process: !f.process }))}>
-                <span className="font-bold text-[16px] flex items-center gap-1">
+                <span className="font-bold text-[16px] flex items-center gap-3">
                   공정
                   {selected.processes.length > 0 && (
                     <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.processes.length}</span>
@@ -264,7 +264,7 @@ export default function FactoriesPage() {
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.process ? '' : 'rotate-180'}`} />
               </button>
               {openFilter.process && (
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex flex-wrap gap-2 pb-2 mt-3">
                   {processesOptions.map((opt: string) => (
                     <Button
                       key={opt}
@@ -287,7 +287,7 @@ export default function FactoriesPage() {
             {/* 지역 */}
             <div>
               <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, region: !f.region }))}>
-                <span className="font-bold text-[16px] flex items-center gap-1">
+                <span className="font-bold text-[16px] flex items-center gap-3">
                   지역
                   {selected.admin_district.length > 0 && (
                     <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.admin_district.length}</span>
@@ -296,7 +296,7 @@ export default function FactoriesPage() {
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.region ? '' : 'rotate-180'}`} />
               </button>
               {openFilter.region && (
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex flex-wrap gap-2 pb-2 mt-3">
                   {regionOptions.map((opt: string) => (
                     <Button
                       key={opt}
@@ -319,7 +319,7 @@ export default function FactoriesPage() {
             {/* MOQ(최소수량) */}
             <div>
               <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, moq: !f.moq }))}>
-                <span className="font-bold text-[16px] flex items-center gap-1">
+                <span className="font-bold text-[16px] flex items-center gap-3">
                   MOQ(최소수량)
                   {selected.moq.length > 0 && (
                     <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.moq.length}</span>
@@ -328,7 +328,7 @@ export default function FactoriesPage() {
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.moq ? '' : 'rotate-180'}`} />
               </button>
               {openFilter.moq && (
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex flex-wrap gap-2 pb-2 mt-3">
                   {moqRanges.map(opt => (
                     <Button
                       key={opt.label}
@@ -351,7 +351,7 @@ export default function FactoriesPage() {
             {/* 재봉기 */}
             <div>
               <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, sewing_machines: !f.sewing_machines }))}>
-                <span className="font-bold text-[16px] flex items-center gap-1">
+                <span className="font-bold text-[16px] flex items-center gap-3">
                   재봉기
                   {selected.sewing_machines.length > 0 && (
                     <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.sewing_machines.length}</span>
@@ -360,7 +360,7 @@ export default function FactoriesPage() {
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.sewing_machines ? '' : 'rotate-180'}`} />
               </button>
               {openFilter.sewing_machines && (
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex flex-wrap gap-2 pb-2 mt-3">
                   {sewingMachineOptions.map((opt: string) => (
                     <Button
                       key={opt}
@@ -383,7 +383,7 @@ export default function FactoriesPage() {
             {/* 패턴기 */}
             <div>
               <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, pattern_machines: !f.pattern_machines }))}>
-                <span className="font-bold text-[16px] flex items-center gap-1">
+                <span className="font-bold text-[16px] flex items-center gap-3">
                   패턴기
                   {selected.pattern_machines.length > 0 && (
                     <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.pattern_machines.length}</span>
@@ -392,7 +392,7 @@ export default function FactoriesPage() {
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.pattern_machines ? '' : 'rotate-180'}`} />
               </button>
               {openFilter.pattern_machines && (
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex flex-wrap gap-2 pb-2 mt-3">
                   {patternMachineOptions.map((opt: string) => (
                     <Button
                       key={opt}
@@ -415,7 +415,7 @@ export default function FactoriesPage() {
             {/* 특수기 */}
             <div>
               <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, special_machines: !f.special_machines }))}>
-                <span className="font-bold text-[16px] flex items-center gap-1">
+                <span className="font-bold text-[16px] flex items-center gap-3">
                   특수기
                   {selected.special_machines.length > 0 && (
                     <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.special_machines.length}</span>
@@ -424,7 +424,7 @@ export default function FactoriesPage() {
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.special_machines ? '' : 'rotate-180'}`} />
               </button>
               {openFilter.special_machines && (
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex flex-wrap gap-2 pb-2 mt-3">
                   {specialMachineOptions.map((opt: string) => (
                     <Button
                       key={opt}
@@ -447,7 +447,7 @@ export default function FactoriesPage() {
             {/* 품목 */}
             <div>
               <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, items: !f.items }))}>
-                <span className="font-bold text-[16px] flex items-center gap-1">
+                <span className="font-bold text-[16px] flex items-center gap-3">
                   품목
                   {selected.items.length > 0 && (
                     <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.items.length}</span>
@@ -456,7 +456,7 @@ export default function FactoriesPage() {
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.items ? '' : 'rotate-180'}`} />
               </button>
               {openFilter.items && (
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex flex-wrap gap-2 pb-2 mt-3">
                   {itemOptionsAll.map((opt: string) => (
                     <Button
                       key={opt}
@@ -479,7 +479,7 @@ export default function FactoriesPage() {
             {/* 주요 품목 */}
             <div>
               <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, main_fabrics: !f.main_fabrics }))}>
-                <span className="font-bold text-[16px] flex items-center gap-1">
+                <span className="font-bold text-[16px] flex items-center gap-3">
                   주요 원단
                   {selected.main_fabrics.length > 0 && (
                     <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.main_fabrics.length}</span>
@@ -488,7 +488,7 @@ export default function FactoriesPage() {
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`} />
               </button>
               {openFilter.main_fabrics && (
-                <div className="flex flex-wrap gap-2 pb-2">
+                <div className="flex flex-wrap gap-2 pb-2 mt-3">
                   {/* 데이터가 없으므로 버튼 없음 */}
                 </div>
               )}
@@ -524,7 +524,7 @@ export default function FactoriesPage() {
               {/* 공정 */}
               <div>
                 <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, process: !f.process }))}>
-                  <span className="font-bold text-[16px] flex items-center gap-1">
+                  <span className="font-bold text-[16px] flex items-center gap-3">
                     공정
                     {selected.processes.length > 0 && (
                       <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.processes.length}</span>
@@ -533,7 +533,7 @@ export default function FactoriesPage() {
                   <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.process ? '' : 'rotate-180'}`} />
                 </button>
                 {openFilter.process && (
-                  <div className="flex flex-wrap gap-2 pb-2">
+                  <div className="flex flex-wrap gap-2 pb-2 mt-3">
                     {processesOptions.map((opt: string) => (
                       <Button
                         key={opt}
@@ -836,7 +836,7 @@ export default function FactoriesPage() {
                         {/* 이미지와 텍스트 사이 gap */}
                         <div className="mt-4" />
                         {/* 정보 영역 */}
-                        <div className="flex-1 flex flex-col">
+                        <div className="flex-1 flex flex-col p-4">
                           {/* 주요 원단 칩 */}
                           <div className="flex flex-wrap gap-2 mb-2">
                             {randomFabrics.map((chip) => (
