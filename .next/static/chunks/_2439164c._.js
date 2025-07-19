@@ -118,10 +118,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Map$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/map.js [app-client] (ecmascript) <export default as Map>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$shared$2f$lib$2f$app$2d$dynamic$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/shared/lib/app-dynamic.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
 ;
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
+;
 ;
 ;
 ;
@@ -416,7 +418,7 @@ function FactoriesPage() {
                 children: "공장 정보를 불러오는 중입니다..."
             }, void 0, false, {
                 fileName: "[project]/app/factories/page.tsx",
-                lineNumber: 229,
+                lineNumber: 230,
                 columnNumber: 19
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -427,7 +429,7 @@ function FactoriesPage() {
                         children: "봉제공장 찾기"
                     }, void 0, false, {
                         fileName: "[project]/app/factories/page.tsx",
-                        lineNumber: 231,
+                        lineNumber: 232,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -435,13 +437,13 @@ function FactoriesPage() {
                         children: "퀄리티 좋은 의류 제작, 지금 바로 견적을 요청해보세요."
                     }, void 0, false, {
                         fileName: "[project]/app/factories/page.tsx",
-                        lineNumber: 232,
+                        lineNumber: 233,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/factories/page.tsx",
-                lineNumber: 230,
+                lineNumber: 231,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -454,19 +456,19 @@ function FactoriesPage() {
                             children: "🔍"
                         }, void 0, false, {
                             fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 240,
+                            lineNumber: 241,
                             columnNumber: 11
                         }, this),
                         " 필터"
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/factories/page.tsx",
-                    lineNumber: 236,
+                    lineNumber: 237,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/factories/page.tsx",
-                lineNumber: 235,
+                lineNumber: 236,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -484,7 +486,7 @@ function FactoriesPage() {
                                             children: "필터"
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 248,
+                                            lineNumber: 249,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -510,25 +512,25 @@ function FactoriesPage() {
                                                 className: "w-5 h-5"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/factories/page.tsx",
-                                                lineNumber: 256,
+                                                lineNumber: 257,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 249,
+                                            lineNumber: 250,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 247,
+                                    lineNumber: 248,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("hr", {
                                     className: "my-2 border-gray-200"
                                 }, void 0, false, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 259,
+                                    lineNumber: 260,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -549,26 +551,26 @@ function FactoriesPage() {
                                                             children: selected.processes.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 266,
+                                                            lineNumber: 267,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 263,
+                                                    lineNumber: 264,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.process ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 269,
+                                                    lineNumber: 270,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 262,
+                                            lineNumber: 263,
                                             columnNumber: 15
                                         }, this),
                                         openFilter.process && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -587,18 +589,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 274,
+                                                    lineNumber: 275,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 272,
+                                            lineNumber: 273,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 261,
+                                    lineNumber: 262,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -619,26 +621,26 @@ function FactoriesPage() {
                                                             children: selected.admin_district.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 298,
+                                                            lineNumber: 299,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 295,
+                                                    lineNumber: 296,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.region ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 301,
+                                                    lineNumber: 302,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 294,
+                                            lineNumber: 295,
                                             columnNumber: 15
                                         }, this),
                                         openFilter.region && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -657,18 +659,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 306,
+                                                    lineNumber: 307,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 304,
+                                            lineNumber: 305,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 293,
+                                    lineNumber: 294,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -689,26 +691,26 @@ function FactoriesPage() {
                                                             children: selected.moq.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 330,
+                                                            lineNumber: 331,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 327,
+                                                    lineNumber: 328,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.moq ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 333,
+                                                    lineNumber: 334,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 326,
+                                            lineNumber: 327,
                                             columnNumber: 15
                                         }, this),
                                         openFilter.moq && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -727,18 +729,18 @@ function FactoriesPage() {
                                                     children: opt.label
                                                 }, opt.label, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 338,
+                                                    lineNumber: 339,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 336,
+                                            lineNumber: 337,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 325,
+                                    lineNumber: 326,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -759,26 +761,26 @@ function FactoriesPage() {
                                                             children: selected.sewing_machines.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 362,
+                                                            lineNumber: 363,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 359,
+                                                    lineNumber: 360,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.sewing_machines ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 365,
+                                                    lineNumber: 366,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 358,
+                                            lineNumber: 359,
                                             columnNumber: 15
                                         }, this),
                                         openFilter.sewing_machines && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -797,18 +799,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 370,
+                                                    lineNumber: 371,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 368,
+                                            lineNumber: 369,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 357,
+                                    lineNumber: 358,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -829,26 +831,26 @@ function FactoriesPage() {
                                                             children: selected.pattern_machines.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 394,
+                                                            lineNumber: 395,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 391,
+                                                    lineNumber: 392,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.pattern_machines ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 397,
+                                                    lineNumber: 398,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 390,
+                                            lineNumber: 391,
                                             columnNumber: 15
                                         }, this),
                                         openFilter.pattern_machines && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -867,18 +869,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 402,
+                                                    lineNumber: 403,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 400,
+                                            lineNumber: 401,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 389,
+                                    lineNumber: 390,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -899,26 +901,26 @@ function FactoriesPage() {
                                                             children: selected.special_machines.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 426,
+                                                            lineNumber: 427,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 423,
+                                                    lineNumber: 424,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.special_machines ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 429,
+                                                    lineNumber: 430,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 422,
+                                            lineNumber: 423,
                                             columnNumber: 15
                                         }, this),
                                         openFilter.special_machines && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -937,18 +939,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 434,
+                                                    lineNumber: 435,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 432,
+                                            lineNumber: 433,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 421,
+                                    lineNumber: 422,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -969,26 +971,26 @@ function FactoriesPage() {
                                                             children: selected.items.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 458,
+                                                            lineNumber: 459,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 455,
+                                                    lineNumber: 456,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.items ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 461,
+                                                    lineNumber: 462,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 454,
+                                            lineNumber: 455,
                                             columnNumber: 15
                                         }, this),
                                         openFilter.items && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1007,18 +1009,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 466,
+                                                    lineNumber: 467,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 464,
+                                            lineNumber: 465,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 453,
+                                    lineNumber: 454,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1039,26 +1041,26 @@ function FactoriesPage() {
                                                             children: selected.main_fabrics.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 490,
+                                                            lineNumber: 491,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 487,
+                                                    lineNumber: 488,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 493,
+                                                    lineNumber: 494,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 486,
+                                            lineNumber: 487,
                                             columnNumber: 15
                                         }, this),
                                         openFilter.main_fabrics && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1077,35 +1079,35 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 498,
+                                                    lineNumber: 499,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 496,
+                                            lineNumber: 497,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 485,
+                                    lineNumber: 486,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 246,
+                            lineNumber: 247,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/factories/page.tsx",
-                        lineNumber: 245,
+                        lineNumber: 246,
                         columnNumber: 9
                     }, this),
                     showMobileFilter && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40",
+                        className: "fixed inset-0 z-50 flex items-center justify-center",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "bg-white rounded-xl w-[90vw] max-w-md p-6 flex flex-col gap-2 relative",
+                            className: "bg-white rounded-xl w-[90vw] max-w-md p-6 flex flex-col gap-2 relative border border-gray-200 shadow-lg",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     className: "absolute top-2 right-2 text-gray-500 hover:text-black text-2xl",
@@ -1114,7 +1116,7 @@ function FactoriesPage() {
                                     children: "×"
                                 }, void 0, false, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 522,
+                                    lineNumber: 523,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1124,7 +1126,7 @@ function FactoriesPage() {
                                             children: "필터"
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 531,
+                                            lineNumber: 532,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1150,25 +1152,25 @@ function FactoriesPage() {
                                                 className: "w-5 h-5"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/factories/page.tsx",
-                                                lineNumber: 539,
+                                                lineNumber: 540,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 532,
+                                            lineNumber: 533,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 530,
+                                    lineNumber: 531,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("hr", {
                                     className: "my-2 border-gray-200"
                                 }, void 0, false, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 542,
+                                    lineNumber: 543,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1189,26 +1191,26 @@ function FactoriesPage() {
                                                             children: selected.processes.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 550,
+                                                            lineNumber: 551,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 547,
+                                                    lineNumber: 548,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.process ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 553,
+                                                    lineNumber: 554,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 546,
+                                            lineNumber: 547,
                                             columnNumber: 17
                                         }, this),
                                         openFilter.process && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1227,18 +1229,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 558,
+                                                    lineNumber: 559,
                                                     columnNumber: 23
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 556,
+                                            lineNumber: 557,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 545,
+                                    lineNumber: 546,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1259,26 +1261,26 @@ function FactoriesPage() {
                                                             children: selected.admin_district.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 582,
+                                                            lineNumber: 583,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 579,
+                                                    lineNumber: 580,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.region ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 585,
+                                                    lineNumber: 586,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 578,
+                                            lineNumber: 579,
                                             columnNumber: 17
                                         }, this),
                                         openFilter.region && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1297,18 +1299,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 590,
+                                                    lineNumber: 591,
                                                     columnNumber: 23
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 588,
+                                            lineNumber: 589,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 577,
+                                    lineNumber: 578,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1329,26 +1331,26 @@ function FactoriesPage() {
                                                             children: selected.moq.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 614,
+                                                            lineNumber: 615,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 611,
+                                                    lineNumber: 612,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.moq ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 617,
+                                                    lineNumber: 618,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 610,
+                                            lineNumber: 611,
                                             columnNumber: 17
                                         }, this),
                                         openFilter.moq && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1367,18 +1369,18 @@ function FactoriesPage() {
                                                     children: opt.label
                                                 }, opt.label, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 622,
+                                                    lineNumber: 623,
                                                     columnNumber: 23
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 620,
+                                            lineNumber: 621,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 609,
+                                    lineNumber: 610,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1399,26 +1401,26 @@ function FactoriesPage() {
                                                             children: selected.sewing_machines.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 646,
+                                                            lineNumber: 647,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 643,
+                                                    lineNumber: 644,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.sewing_machines ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 649,
+                                                    lineNumber: 650,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 642,
+                                            lineNumber: 643,
                                             columnNumber: 17
                                         }, this),
                                         openFilter.sewing_machines && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1437,18 +1439,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 654,
+                                                    lineNumber: 655,
                                                     columnNumber: 23
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 652,
+                                            lineNumber: 653,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 641,
+                                    lineNumber: 642,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1469,26 +1471,26 @@ function FactoriesPage() {
                                                             children: selected.pattern_machines.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 678,
+                                                            lineNumber: 679,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 675,
+                                                    lineNumber: 676,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.pattern_machines ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 681,
+                                                    lineNumber: 682,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 674,
+                                            lineNumber: 675,
                                             columnNumber: 17
                                         }, this),
                                         openFilter.pattern_machines && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1507,18 +1509,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 686,
+                                                    lineNumber: 687,
                                                     columnNumber: 23
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 684,
+                                            lineNumber: 685,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 673,
+                                    lineNumber: 674,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1539,26 +1541,26 @@ function FactoriesPage() {
                                                             children: selected.special_machines.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 710,
+                                                            lineNumber: 711,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 707,
+                                                    lineNumber: 708,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.special_machines ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 713,
+                                                    lineNumber: 714,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 706,
+                                            lineNumber: 707,
                                             columnNumber: 17
                                         }, this),
                                         openFilter.special_machines && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1577,18 +1579,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 718,
+                                                    lineNumber: 719,
                                                     columnNumber: 23
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 716,
+                                            lineNumber: 717,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 705,
+                                    lineNumber: 706,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1609,26 +1611,26 @@ function FactoriesPage() {
                                                             children: selected.items.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 742,
+                                                            lineNumber: 743,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 739,
+                                                    lineNumber: 740,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.items ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 745,
+                                                    lineNumber: 746,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 738,
+                                            lineNumber: 739,
                                             columnNumber: 17
                                         }, this),
                                         openFilter.items && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1647,18 +1649,18 @@ function FactoriesPage() {
                                                     children: opt
                                                 }, opt, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 750,
+                                                    lineNumber: 751,
                                                     columnNumber: 23
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 748,
+                                            lineNumber: 749,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 737,
+                                    lineNumber: 738,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1679,50 +1681,50 @@ function FactoriesPage() {
                                                             children: selected.main_fabrics.length
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 774,
+                                                            lineNumber: 775,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 771,
+                                                    lineNumber: 772,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$heroicons$2f$react$2f$24$2f$outline$2f$esm$2f$ChevronDownIcon$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDownIcon$3e$__["ChevronDownIcon"], {
                                                     className: `w-5 h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 777,
+                                                    lineNumber: 778,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 770,
+                                            lineNumber: 771,
                                             columnNumber: 17
                                         }, this),
                                         openFilter.main_fabrics && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "flex flex-wrap gap-2 pb-2"
                                         }, void 0, false, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 780,
+                                            lineNumber: 781,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 769,
+                                    lineNumber: 770,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/factories/page.tsx",
-                            lineNumber: 521,
+                            lineNumber: 522,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/factories/page.tsx",
-                        lineNumber: 520,
+                        lineNumber: 521,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1738,7 +1740,7 @@ function FactoriesPage() {
                                         className: "flex-1 w-full border rounded-[0.625rem] px-4 py-2 focus:border-black focus:outline-none"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/page.tsx",
-                                        lineNumber: 792,
+                                        lineNumber: 793,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1752,14 +1754,14 @@ function FactoriesPage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/factories/page.tsx",
-                                                        lineNumber: 803,
+                                                        lineNumber: 804,
                                                         columnNumber: 17
                                                     }, this),
                                                     " 목록"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/factories/page.tsx",
-                                                lineNumber: 799,
+                                                lineNumber: 800,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1770,26 +1772,26 @@ function FactoriesPage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/factories/page.tsx",
-                                                        lineNumber: 809,
+                                                        lineNumber: 810,
                                                         columnNumber: 17
                                                     }, this),
                                                     " 지도"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/factories/page.tsx",
-                                                lineNumber: 805,
+                                                lineNumber: 806,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/factories/page.tsx",
-                                        lineNumber: 798,
+                                        lineNumber: 799,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/page.tsx",
-                                lineNumber: 791,
+                                lineNumber: 792,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1800,7 +1802,7 @@ function FactoriesPage() {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/page.tsx",
-                                lineNumber: 814,
+                                lineNumber: 815,
                                 columnNumber: 11
                             }, this),
                             badges.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1819,13 +1821,13 @@ function FactoriesPage() {
                                                     children: "×"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 821,
+                                                    lineNumber: 822,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, b.key + b.val, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 819,
+                                            lineNumber: 820,
                                             columnNumber: 17
                                         }, this)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1850,13 +1852,13 @@ function FactoriesPage() {
                                         children: "전체 해제"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/page.tsx",
-                                        lineNumber: 827,
+                                        lineNumber: 828,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/factories/page.tsx",
-                                lineNumber: 817,
+                                lineNumber: 818,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1879,25 +1881,28 @@ function FactoriesPage() {
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "w-full h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl",
-                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                         src: f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length],
                                                         alt: typeof f.company_name === 'string' ? f.company_name : '공장 이미지',
-                                                        className: "object-cover w-full h-full rounded-xl"
+                                                        className: "object-cover w-full h-full rounded-xl",
+                                                        width: 400,
+                                                        height: 224,
+                                                        priority: idx < 6
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/factories/page.tsx",
-                                                        lineNumber: 852,
+                                                        lineNumber: 853,
                                                         columnNumber: 27
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 851,
+                                                    lineNumber: 852,
                                                     columnNumber: 25
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "mt-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 859,
+                                                    lineNumber: 863,
                                                     columnNumber: 25
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1914,12 +1919,12 @@ function FactoriesPage() {
                                                                     children: chip.label
                                                                 }, chip.label, false, {
                                                                     fileName: "[project]/app/factories/page.tsx",
-                                                                    lineNumber: 865,
+                                                                    lineNumber: 869,
                                                                     columnNumber: 31
                                                                 }, this))
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 863,
+                                                            lineNumber: 867,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1927,7 +1932,7 @@ function FactoriesPage() {
                                                             children: displayName
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 870,
+                                                            lineNumber: 874,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1942,7 +1947,7 @@ function FactoriesPage() {
                                                                     children: "주요품목"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/factories/page.tsx",
-                                                                    lineNumber: 873,
+                                                                    lineNumber: 877,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1950,13 +1955,13 @@ function FactoriesPage() {
                                                                     children: mainItems
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/factories/page.tsx",
-                                                                    lineNumber: 874,
+                                                                    lineNumber: 878,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 872,
+                                                            lineNumber: 876,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1971,7 +1976,7 @@ function FactoriesPage() {
                                                                     children: "주요원단"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/factories/page.tsx",
-                                                                    lineNumber: 877,
+                                                                    lineNumber: 881,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1979,13 +1984,13 @@ function FactoriesPage() {
                                                                     children: mainFabrics
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/factories/page.tsx",
-                                                                    lineNumber: 878,
+                                                                    lineNumber: 882,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 876,
+                                                            lineNumber: 880,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2001,25 +2006,25 @@ function FactoriesPage() {
                                                                     children: typeof f.moq === 'number' ? f.moq : typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? f.moq : typeof f.minOrder === 'number' ? f.minOrder : '-'
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/factories/page.tsx",
-                                                                    lineNumber: 881,
+                                                                    lineNumber: 885,
                                                                     columnNumber: 43
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/factories/page.tsx",
-                                                            lineNumber: 880,
+                                                            lineNumber: 884,
                                                             columnNumber: 27
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/factories/page.tsx",
-                                                    lineNumber: 861,
+                                                    lineNumber: 865,
                                                     columnNumber: 25
                                                 }, this)
                                             ]
                                         }, f.id ?? idx, true, {
                                             fileName: "[project]/app/factories/page.tsx",
-                                            lineNumber: 849,
+                                            lineNumber: 850,
                                             columnNumber: 23
                                         }, this);
                                     }) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2027,12 +2032,12 @@ function FactoriesPage() {
                                         children: "공장 데이터가 없습니다."
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/page.tsx",
-                                        lineNumber: 888,
+                                        lineNumber: 892,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 835,
+                                    lineNumber: 836,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "w-full h-[600px] bg-gray-100 rounded-xl flex items-center justify-center",
@@ -2043,35 +2048,35 @@ function FactoriesPage() {
                                         height: "600px"
                                     }, void 0, false, {
                                         fileName: "[project]/app/factories/page.tsx",
-                                        lineNumber: 894,
+                                        lineNumber: 898,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/factories/page.tsx",
-                                    lineNumber: 892,
+                                    lineNumber: 896,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/factories/page.tsx",
-                                lineNumber: 833,
+                                lineNumber: 834,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/factories/page.tsx",
-                        lineNumber: 789,
+                        lineNumber: 790,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/factories/page.tsx",
-                lineNumber: 243,
+                lineNumber: 244,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/factories/page.tsx",
-        lineNumber: 228,
+        lineNumber: 229,
         columnNumber: 5
     }, this);
 } // 주니어 개발자 설명:

@@ -1,0 +1,19 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/favicon.ico/route": "/favicon.ico",
+  "/factories/page": "/factories",
+  "/courses/[id]/page": "/courses/[id]",
+  "/factories/[id]/request/page": "/factories/[id]/request",
+  "/my-courses/page": "/my-courses",
+  "/my-page/page": "/my-page",
+  "/matching/page": "/matching",
+  "/notices/[id]/page": "/notices/[id]",
+  "/my-page/profile/[[...rest]]/page": "/my-page/profile/[[...rest]]",
+  "/my-page/inquiries/page": "/my-page/inquiries",
+  "/notices/page": "/notices",
+  "/sign-up/page": "/sign-up",
+  "/sign-in/page": "/sign-in",
+  "/page": "/",
+  "/factories/[id]/page": "/factories/[id]",
+  "/terms/[type]/page": "/terms/[type]"
+}

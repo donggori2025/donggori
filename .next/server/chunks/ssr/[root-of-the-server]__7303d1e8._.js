@@ -437,11 +437,11 @@ const Footer = ()=>{
             label: "제휴문의"
         },
         {
-            href: "#",
+            href: "/terms/service",
             label: "이용약관"
         },
         {
-            href: "#",
+            href: "/terms/privacy",
             label: "개인정보처리방침"
         }
     ];

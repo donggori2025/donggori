@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import { fetchFactoriesFromDB, Factory } from "@/lib/factories";
 import Link from "next/link";
 
@@ -135,10 +136,13 @@ const InfoSection = () => {
                   <Link href={`/factories/${f.id}`} key={`${f.id ?? 'noid'}-${idx}`} className="rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer hover:shadow-lg transition-shadow w-[calc(25%-12px)] flex-shrink-0">
                     {/* 이미지 영역 */}
                     <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl">
-                      <img
+                      <Image
                         src={f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length]}
                         alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
                         className="object-cover w-full h-full rounded-xl"
+                        width={400}
+                        height={192}
+                        priority={idx < 4}
                       />
                     </div>
                     {/* 정보 영역 */}

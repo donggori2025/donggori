@@ -1,0 +1,152 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "dynamicRoutes": [
+    {
+      "page": "/courses/[id]",
+      "regex": "^/courses/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/courses/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/factories/[id]",
+      "regex": "^/factories/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/factories/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/factories/[id]/request",
+      "regex": "^/factories/([^/]+?)/request(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/factories/(?<nxtPid>[^/]+?)/request(?:/)?$"
+    },
+    {
+      "page": "/my-page/profile/[[...rest]]",
+      "regex": "^/my\\-page/profile(?:/(.+?))?(?:/)?$",
+      "routeKeys": {
+        "nxtPrest": "nxtPrest"
+      },
+      "namedRegex": "^/my\\-page/profile(?:/(?<nxtPrest>.+?))?(?:/)?$"
+    },
+    {
+      "page": "/notices/[id]",
+      "regex": "^/notices/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/notices/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/terms/[type]",
+      "regex": "^/terms/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPtype": "nxtPtype"
+      },
+      "namedRegex": "^/terms/(?<nxtPtype>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/factories",
+      "regex": "^/factories(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/factories(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/matching",
+      "regex": "^/matching(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/matching(?:/)?$"
+    },
+    {
+      "page": "/my-courses",
+      "regex": "^/my\\-courses(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/my\\-courses(?:/)?$"
+    },
+    {
+      "page": "/my-page",
+      "regex": "^/my\\-page(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/my\\-page(?:/)?$"
+    },
+    {
+      "page": "/my-page/inquiries",
+      "regex": "^/my\\-page/inquiries(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/my\\-page/inquiries(?:/)?$"
+    },
+    {
+      "page": "/notices",
+      "regex": "^/notices(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/notices(?:/)?$"
+    },
+    {
+      "page": "/sign-in",
+      "regex": "^/sign\\-in(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sign\\-in(?:/)?$"
+    },
+    {
+      "page": "/sign-up",
+      "regex": "^/sign\\-up(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sign\\-up(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "RSC",
+    "varyHeader": "RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch",
+    "prefetchHeader": "Next-Router-Prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "Next-Router-Segment-Prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  },
+  "rewrites": []
+}

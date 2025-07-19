@@ -3,9 +3,11 @@
   "/factories/[id]/page": "app/factories/[id]/page.js",
   "/factories/[id]/request/page": "app/factories/[id]/request/page.js",
   "/factories/page": "app/factories/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/matching/page": "app/matching/page.js",
+  "/my-page/page": "app/my-page/page.js",
   "/notices/[id]/page": "app/notices/[id]/page.js",
   "/notices/page": "app/notices/page.js",
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/sign-in/page": "app/sign-in/page.js",
+  "/terms/[type]/page": "app/terms/[type]/page.js"
 }
