@@ -138,15 +138,15 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-[1400px] mx-auto flex">
+      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row px-4 lg:px-6 pt-8 lg:pt-12">
         {/* 왼쪽: 스크롤 가능한 상세 정보 */}
-        <div className="flex-1 min-w-0 p-6">
+        <div className="flex-1 min-w-0 p-4 lg:p-6 order-2 lg:order-1">
           <div className="bg-white rounded-xl p-6 mb-6">
             {/* 이미지 갤러리 */}
             <div className="mb-6">
               <div className="flex gap-2 overflow-x-auto">
                 {sampleImages.map((image, index) => (
-                  <div key={index} className="relative w-48 h-48 flex-shrink-0 overflow-hidden rounded-lg">
+                  <div key={index} className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 flex-shrink-0 overflow-hidden rounded-lg">
                     <Image
                       src={image}
                       alt={`업장 이미지 ${index + 1}`}
@@ -159,15 +159,15 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* 상단 헤더 */}
-            <div className="bg-gray-50 rounded-lg p-6 mb-6">
-              <div className="flex items-center justify-between">
+            <div className="bg-gray-50 rounded-lg p-4 lg:p-6 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
                     <span className="text-white font-bold text-lg">재</span>
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold">{factory.company_name || "재민상사"}</h1>
-                    <div className="flex items-center gap-4 text-sm text-gray-600 mt-2">
+                    <h1 className="text-xl lg:text-2xl font-bold">{factory.company_name || "재민상사"}</h1>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 mt-2">
                       <span>연락 가능 시간 : 연중무휴</span>
                       <span>응답 시간: 1시간 이내</span>
                       <span>세금계산서 발행 가능</span>
@@ -176,7 +176,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 </div>
                 <Button 
                   onClick={handleKakaoInquiry}
-                  className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-700"
+                  className="bg-gray-800 text-white px-4 lg:px-6 py-2 rounded-lg hover:bg-gray-700 w-full sm:w-auto"
                 >
                   문의하기
                 </Button>
@@ -275,7 +275,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             {/* 플랜 */}
             <div className="mb-6">
               <h2 className="text-lg font-bold mb-3">플랜</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Object.entries(servicePlans).map(([key, plan]) => (
                   <div key={key} className="bg-gray-50 rounded-lg p-4">
                     <h3 className="font-bold text-lg mb-2">{plan.title}</h3>
@@ -322,7 +322,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             {/* 전문가 정보 */}
             <div className="mb-6">
               <h2 className="text-lg font-bold mb-3">전문가 정보</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div className="bg-gray-50 rounded-lg px-4 py-4 text-center">
                   <div className="font-semibold text-gray-600 mb-1">행정동</div>
                   <div className="text-base">{factory.admin_district || "장안동 제2동"}</div>
@@ -361,7 +361,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* 오른쪽: 고정 사이드바 */}
-        <div className="w-80 flex-shrink-0 bg-white border border-gray-200 rounded-lg p-6 m-6 h-fit">
+        <div className="w-full lg:w-80 flex-shrink-0 bg-white border border-gray-200 rounded-lg p-4 lg:p-6 mb-4 lg:mb-6 h-fit order-1 lg:order-2 lg:mt-4">
           {/* 상단 헤더 */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -369,7 +369,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 <span className="text-white font-bold">재</span>
               </div>
               <div>
-                <h3 className="font-bold">{factory.company_name || "재민상사"}</h3>
+                <h3 className="font-bold text-sm lg:text-base">{factory.company_name || "재민상사"}</h3>
                 <p className="text-xs text-gray-500">봉제공장</p>
               </div>
             </div>
@@ -384,7 +384,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 <Share className="w-4 h-4" />
               )}
               {shareCopied && (
-                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
                   링크가 복사되었습니다!
                 </div>
               )}
@@ -397,22 +397,22 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             <div className="bg-gray-50 rounded-lg p-4">
               <button 
                 onClick={() => togglePlan('standard')}
-                className="w-full flex items-center justify-between font-bold text-lg mb-2"
+                className="w-full flex items-center justify-between font-bold text-base lg:text-lg mb-2"
               >
                 Standard
                 {selectedPlan === 'standard' ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
               </button>
               {selectedPlan === 'standard' && (
                 <div className="mt-3">
-                  <ul className="text-sm text-gray-600 space-y-1 mb-4">
+                  <ul className="text-xs lg:text-sm text-gray-600 space-y-1 mb-4">
                     <li>• 텍스트형 시안 1종</li>
                     <li>• 슬로건 제작</li>
                     <li>• 평생 A/S</li>
                     <li>• 원본, 저작, 재산권 이전</li>
                   </ul>
-                  <div className="text-sm text-gray-600 mb-2">샘플비 10,000원</div>
-                  <div className="text-sm text-gray-600 mb-4">장단 단가 16,800원</div>
-                  <Button className="w-full bg-gray-800 text-white rounded-lg py-2">
+                  <div className="text-xs lg:text-sm text-gray-600 mb-2">샘플비 10,000원</div>
+                  <div className="text-xs lg:text-sm text-gray-600 mb-4">장단 단가 16,800원</div>
+                  <Button className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm">
                     <Link href={`/factories/${factoryId}/request?service=standard`} className="w-full">
                       공정 의뢰하기
                     </Link>
@@ -425,14 +425,14 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             <div className="bg-gray-50 rounded-lg p-4">
               <button 
                 onClick={() => togglePlan('deluxe')}
-                className="w-full flex items-center justify-between font-bold text-lg mb-2"
+                className="w-full flex items-center justify-between font-bold text-base lg:text-lg mb-2"
               >
                 Deluxe
                 {selectedPlan === 'deluxe' ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
               </button>
               {selectedPlan === 'deluxe' && (
                 <div className="mt-3">
-                  <ul className="text-sm text-gray-600 space-y-1 mb-4">
+                  <ul className="text-xs lg:text-sm text-gray-600 space-y-1 mb-4">
                     <li>• 패턴 제작</li>
                     <li>• 샘플 제작</li>
                     <li>• 봉제 공정</li>
@@ -440,7 +440,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                     <li>• 배송 서비스</li>
                     <li>• 기술 지원</li>
                   </ul>
-                  <Button className="w-full bg-gray-800 text-white rounded-lg py-2">
+                  <Button className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm">
                     <Link href={`/factories/${factoryId}/request?service=deluxe`} className="w-full">
                       패턴/샘플 의뢰하기
                     </Link>
@@ -453,14 +453,14 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             <div className="bg-gray-50 rounded-lg p-4">
               <button 
                 onClick={() => togglePlan('premium')}
-                className="w-full flex items-center justify-between font-bold text-lg mb-2"
+                className="w-full flex items-center justify-between font-bold text-base lg:text-lg mb-2"
               >
                 Premium
                 {selectedPlan === 'premium' ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
               </button>
               {selectedPlan === 'premium' && (
                 <div className="mt-3">
-                  <ul className="text-sm text-gray-600 space-y-1 mb-4">
+                  <ul className="text-xs lg:text-sm text-gray-600 space-y-1 mb-4">
                     <li>• 기획 및 디자인</li>
                     <li>• 패턴 제작</li>
                     <li>• 샘플 제작</li>
@@ -469,7 +469,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                     <li>• 배송 서비스</li>
                     <li>• 마케팅 지원</li>
                   </ul>
-                  <Button className="w-full bg-gray-800 text-white rounded-lg py-2">
+                  <Button className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm">
                     <Link href={`/factories/${factoryId}/request?service=premium`} className="w-full">
                       올인원 의뢰하기
                     </Link>
@@ -483,7 +483,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           <div className="mt-6">
             <Button 
               onClick={handleKakaoInquiry}
-              className="w-full bg-yellow-400 text-black rounded-lg py-3 font-bold hover:bg-yellow-500"
+              className="w-full bg-yellow-400 text-black rounded-lg py-3 font-bold hover:bg-yellow-500 text-sm lg:text-base"
             >
               💬 문의하기
             </Button>

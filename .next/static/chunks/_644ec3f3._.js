@@ -701,10 +701,12 @@ __turbopack_context__.s({
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$factories$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/factories.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
+;
 ;
 ;
 ;
@@ -856,7 +858,7 @@ const InfoSection = ()=>{
                                 children: "70+ 개의 인증된 고퀄리티 봉제공장"
                             }, void 0, false, {
                                 fileName: "[project]/components/InfoSection.tsx",
-                                lineNumber: 106,
+                                lineNumber: 107,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -864,7 +866,7 @@ const InfoSection = ()=>{
                                 children: "동고리는 70개 이상의 봉제공장 있으며 3곳의 패션봉제협회의 품질인증을 받은 고퀄리티의 봉제를 약속드립니다."
                             }, void 0, false, {
                                 fileName: "[project]/components/InfoSection.tsx",
-                                lineNumber: 107,
+                                lineNumber: 108,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -875,7 +877,7 @@ const InfoSection = ()=>{
                                         children: "봉제공장 찾아보기"
                                     }, void 0, false, {
                                         fileName: "[project]/components/InfoSection.tsx",
-                                        lineNumber: 111,
+                                        lineNumber: 112,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -885,24 +887,24 @@ const InfoSection = ()=>{
                                             children: "→"
                                         }, void 0, false, {
                                             fileName: "[project]/components/InfoSection.tsx",
-                                            lineNumber: 113,
+                                            lineNumber: 114,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/InfoSection.tsx",
-                                        lineNumber: 112,
+                                        lineNumber: 113,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/InfoSection.tsx",
-                                lineNumber: 110,
+                                lineNumber: 111,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/InfoSection.tsx",
-                        lineNumber: 105,
+                        lineNumber: 106,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -927,18 +929,21 @@ const InfoSection = ()=>{
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                 src: f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length],
                                                 alt: typeof f.company_name === 'string' ? f.company_name : '공장 이미지',
-                                                className: "object-cover w-full h-full rounded-xl"
+                                                className: "object-cover w-full h-full rounded-xl",
+                                                width: 400,
+                                                height: 192,
+                                                priority: idx < 4
                                             }, void 0, false, {
                                                 fileName: "[project]/components/InfoSection.tsx",
-                                                lineNumber: 138,
+                                                lineNumber: 139,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/InfoSection.tsx",
-                                            lineNumber: 137,
+                                            lineNumber: 138,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -955,12 +960,12 @@ const InfoSection = ()=>{
                                                             children: chip.label
                                                         }, chip.label, false, {
                                                             fileName: "[project]/components/InfoSection.tsx",
-                                                            lineNumber: 149,
+                                                            lineNumber: 153,
                                                             columnNumber: 27
                                                         }, this))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/InfoSection.tsx",
-                                                    lineNumber: 147,
+                                                    lineNumber: 151,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -968,7 +973,7 @@ const InfoSection = ()=>{
                                                     children: displayName
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/InfoSection.tsx",
-                                                    lineNumber: 154,
+                                                    lineNumber: 158,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -983,7 +988,7 @@ const InfoSection = ()=>{
                                                             children: "주요품목"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/InfoSection.tsx",
-                                                            lineNumber: 157,
+                                                            lineNumber: 161,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -991,13 +996,13 @@ const InfoSection = ()=>{
                                                             children: mainItems
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/InfoSection.tsx",
-                                                            lineNumber: 158,
+                                                            lineNumber: 162,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/InfoSection.tsx",
-                                                    lineNumber: 156,
+                                                    lineNumber: 160,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1013,52 +1018,52 @@ const InfoSection = ()=>{
                                                             children: typeof f.moq === 'number' ? f.moq : typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? Number(f.moq) : typeof f.minOrder === 'number' ? f.minOrder : '-'
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/InfoSection.tsx",
-                                                            lineNumber: 161,
+                                                            lineNumber: 165,
                                                             columnNumber: 39
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/InfoSection.tsx",
-                                                    lineNumber: 160,
+                                                    lineNumber: 164,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/InfoSection.tsx",
-                                            lineNumber: 145,
+                                            lineNumber: 149,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, `${f.id ?? 'noid'}-${idx}`, true, {
                                     fileName: "[project]/components/InfoSection.tsx",
-                                    lineNumber: 135,
+                                    lineNumber: 136,
                                     columnNumber: 19
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/components/InfoSection.tsx",
-                            lineNumber: 120,
+                            lineNumber: 121,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/InfoSection.tsx",
-                        lineNumber: 119,
+                        lineNumber: 120,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/InfoSection.tsx",
-                lineNumber: 103,
+                lineNumber: 104,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/InfoSection.tsx",
-            lineNumber: 102,
+            lineNumber: 103,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/InfoSection.tsx",
-        lineNumber: 101,
+        lineNumber: 102,
         columnNumber: 5
     }, this);
 };

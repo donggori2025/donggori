@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 39, "column": 0}, "map": {"version":3,"sources":["file:///Users/jay/Desktop/donggori/components/CourseImage.tsx"],"sourcesContent":["\"use client\";\n\nimport React, { useState } from \"react\";\n\ninterface CourseImageProps {\n  src: string;\n  alt: string;\n  className?: string;\n}\n\nexport default function CourseImage({ src, alt, className }: CourseImageProps) {\n  const [error, setError] = useState(false);\n\n  if (error) {\n    return (\n      <div\n        className={`flex items-center justify-center bg-gray-200 text-gray-400 ${className}`}\n        style={{ minHeight: 160 }}\n      >\n        이미지 없음\n      </div>\n    );\n  }\n\n  return (\n    <img\n      src={src}\n      alt={alt}\n      className={className}\n      onError={() => setError(true)}\n    />\n  );\n} "],"names":[],"mappings":";;;;AAEA;AAFA;;;AAUe,SAAS,YAAY,EAAE,GAAG,EAAE,GAAG,EAAE,SAAS,EAAoB;IAC3E,MAAM,CAAC,OAAO,SAAS,GAAG,CAAA,GAAA,qMAAA,CAAA,WAAQ,AAAD,EAAE;IAEnC,IAAI,OAAO;QACT,qBACE,8OAAC;YACC,WAAW,CAAC,2DAA2D,EAAE,WAAW;YACpF,OAAO;gBAAE,WAAW;YAAI;sBACzB;;;;;;IAIL;IAEA,qBACE,8OAAC;QACC,KAAK;QACL,KAAK;QACL,WAAW;QACX,SAAS,IAAM,SAAS;;;;;;AAG9B","debugId":null}}]
-}
