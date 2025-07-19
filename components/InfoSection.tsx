@@ -101,11 +101,6 @@ const InfoSection = () => {
     <section className="w-full bg-white py-16 min-h-[600px] flex items-center">
       <div className="max-w-[1400px] mx-auto px-4">
         <div className="flex flex-col items-center text-center">
-          {/* Why us? 칩 + 점 */}
-          <div className="flex items-center gap-2 mb-4">
-            <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">Why us?</span>
-            <span className="w-4 h-4 rounded-full" style={{ background: '#a78bfa' }}></span>
-          </div>
           {/* 상단: 정보 섹션 */}
           <div className="mb-8">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">70+ 개의 인증된 고퀄리티 봉제공장</h2>
@@ -121,7 +116,7 @@ const InfoSection = () => {
           </div>
 
           {/* 하단: 공장 카드 슬라이드 */}
-          <div className="w-full overflow-hidden">
+          <div className="w-full overflow-hidden py-4">
             <div
               className={`flex gap-4 ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''}`}
               style={{ transform: `translateX(${getTranslateX()})` }}
@@ -147,7 +142,7 @@ const InfoSection = () => {
                       />
                     </div>
                     {/* 정보 영역 */}
-                    <div className="flex-1 flex flex-col p-3 text-left">
+                    <div className="flex-1 flex flex-col p-4 text-left">
                       {/* 주요 원단 칩 */}
                       <div className="flex flex-wrap gap-1 mb-2">
                         {randomFabrics.map((chip) => (
@@ -160,7 +155,7 @@ const InfoSection = () => {
                       {/* 주요 품목 */}
                       <div className="text-xs font-bold mb-1 flex items-start" style={{ color: '#333333', opacity: 0.6 }}>
                         <span className="shrink-0 mr-1">주요품목</span>
-                        <span className="font-normal flex-1">{mainItems}</span>
+                        <span className="font-normal flex-1 truncate">{mainItems}</span>
                       </div>
                       <div className="text-xs font-bold text-left" style={{ color: '#333333', opacity: 0.6 }}>
                         MOQ(최소 주문 수량) <span className="font-normal">{typeof f.moq === 'number' ? f.moq : (typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? Number(f.moq) : (typeof f.minOrder === 'number' ? f.minOrder : '-'))}</span>

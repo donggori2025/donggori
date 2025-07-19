@@ -4,6 +4,7 @@ import HeroSection from "@/components/HeroSection";
 import InfoSection from "@/components/InfoSection"; 
 import StepSection from "@/components/StepSection";
 import RecommendSection from "@/components/RecommendSection";
+import NoticesSection from "@/components/NoticesSection";
 
 // 메인 페이지 컴포넌트
 export default function HomePage() {
@@ -13,6 +14,7 @@ export default function HomePage() {
       <InfoSection />
       <StepSection />
       <RecommendSection />
+      <NoticesSection />
       {/* 추가 섹션 예시: */}
       {/* 
       <section className="w-full bg-gray-50 py-16">
@@ -20,7 +22,5 @@ export default function HomePage() {
       </section> 
       */}
     </main>
-
-
   );
 }

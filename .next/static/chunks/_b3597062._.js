@@ -11,7 +11,7 @@ __turbopack_context__.s({
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 ;
 const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-        className: "w-screen bg-white py-0 md:py-0 pt-[80px] md:mt-12 mt-8 relative left-1/2 right-1/2 -mx-[50vw]",
+        className: "w-screen bg-white py-0 md:py-0 relative left-1/2 right-1/2 -mx-[50vw]",
         style: {
             left: '50%',
             right: '50%',
@@ -19,156 +19,55 @@ const HeroSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
             marginRight: '-50vw'
         },
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "w-full max-w-[1400px] mx-auto flex flex-col md:flex-row items-stretch min-h-[480px] gap-0 md:gap-4 px-0",
-            children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex-[0_0_70%] min-w-0 flex items-end md:items-center justify-center relative overflow-hidden bg-white rounded-3xl",
-                    style: {
-                        height: '480px'
-                    },
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
-                            src: "/250402_dongdaemun_compressed_100mb.mp4",
-                            autoPlay: true,
-                            loop: true,
-                            muted: true,
-                            playsInline: true,
-                            className: "w-full h-full object-cover rounded-3xl"
-                        }, void 0, false, {
-                            fileName: "[project]/components/HeroSection.tsx",
-                            lineNumber: 8,
-                            columnNumber: 9
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "absolute left-0 bottom-0 bg-white/80 px-6 py-4 rounded-tr-2xl md:rounded-tr-none md:rounded-br-2xl md:rounded-tl-2xl md:rounded-bl-none shadow md:hidden",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "text-lg font-bold text-gray-900",
-                                children: [
-                                    "디자이너와 봉제공장과의 연결고리,",
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
-                                        fileName: "[project]/components/HeroSection.tsx",
-                                        lineNumber: 17,
-                                        columnNumber: 78
-                                    }, this),
-                                    "동고리"
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/components/HeroSection.tsx",
-                                lineNumber: 17,
-                                columnNumber: 11
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/components/HeroSection.tsx",
-                            lineNumber: 16,
-                            columnNumber: 9
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/components/HeroSection.tsx",
-                    lineNumber: 7,
-                    columnNumber: 7
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex-[0_0_30%] min-w-0 flex flex-col justify-center bg-[#35383B] text-white px-8 md:px-12 py-10 md:py-0 rounded-3xl",
-                    style: {
-                        height: '480px'
-                    },
-                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "max-w-[420px] mx-auto flex flex-col gap-6",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "text-2xl md:text-3xl font-extrabold leading-tight mb-2",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "text-white",
-                                                children: "최고의 디자이너"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/HeroSection.tsx",
-                                                lineNumber: 25,
-                                                columnNumber: 15
-                                            }, this),
-                                            "에게",
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
-                                                fileName: "[project]/components/HeroSection.tsx",
-                                                lineNumber: 25,
-                                                columnNumber: 61
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "text-white",
-                                                children: "최고의 봉제공장과 기술자"
-                                            }, void 0, false, {
-                                                fileName: "[project]/components/HeroSection.tsx",
-                                                lineNumber: 26,
-                                                columnNumber: 15
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/components/HeroSection.tsx",
-                                        lineNumber: 24,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "text-base md:text-lg text-gray-200 mt-4",
-                                        children: [
-                                            "최상의 퀄리티, 최상의 기술력을 보유한",
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
-                                                fileName: "[project]/components/HeroSection.tsx",
-                                                lineNumber: 29,
-                                                columnNumber: 36
-                                            }, this),
-                                            "봉제공장이 함께하는 동고리와 함께 여러분의 꿈을 펼쳐보세요."
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/components/HeroSection.tsx",
-                                        lineNumber: 28,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/components/HeroSection.tsx",
-                                lineNumber: 23,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                className: "mt-2 bg-[#52565A] hover:bg-[#44474A] text-white px-6 py-3 rounded-full font-bold text-base flex items-center gap-2 w-fit transition",
-                                children: [
-                                    "봉제공장 바로찾기",
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "w-6 h-6 flex items-center justify-center rounded-full bg-white ml-2",
-                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-base text-[#35383B]",
-                                            children: "→"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/HeroSection.tsx",
-                                            lineNumber: 36,
-                                            columnNumber: 15
-                                        }, this)
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/HeroSection.tsx",
-                                        lineNumber: 35,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/components/HeroSection.tsx",
-                                lineNumber: 33,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
+            className: "w-full mx-auto flex flex-col md:flex-row items-stretch min-h-[480px] gap-0 md:gap-4 px-0",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex-1 min-w-0 flex items-end md:items-center justify-center relative overflow-hidden bg-white",
+                style: {
+                    height: '480px'
+                },
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("video", {
+                        src: "/250402_dongdaemun_compressed_50mb.mp4",
+                        autoPlay: true,
+                        loop: true,
+                        muted: true,
+                        playsInline: true,
+                        className: "w-full h-full object-cover"
+                    }, void 0, false, {
                         fileName: "[project]/components/HeroSection.tsx",
-                        lineNumber: 22,
+                        lineNumber: 8,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "absolute left-0 bottom-0 bg-white/80 px-6 py-4 rounded-tr-2xl md:rounded-tr-none md:rounded-br-2xl md:rounded-tl-2xl md:rounded-bl-none shadow md:hidden",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "text-lg font-bold text-gray-900",
+                            children: [
+                                "디자이너와 봉제공장과의 연결고리,",
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
+                                    fileName: "[project]/components/HeroSection.tsx",
+                                    lineNumber: 17,
+                                    columnNumber: 78
+                                }, this),
+                                "동고리"
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/HeroSection.tsx",
+                            lineNumber: 17,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/components/HeroSection.tsx",
+                        lineNumber: 16,
                         columnNumber: 9
                     }, this)
-                }, void 0, false, {
-                    fileName: "[project]/components/HeroSection.tsx",
-                    lineNumber: 21,
-                    columnNumber: 7
-                }, this)
-            ]
-        }, void 0, true, {
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/HeroSection.tsx",
+                lineNumber: 7,
+                columnNumber: 7
+            }, this)
+        }, void 0, false, {
             fileName: "[project]/components/HeroSection.tsx",
             lineNumber: 5,
             columnNumber: 5
@@ -950,33 +849,6 @@ const InfoSection = ()=>{
                 className: "flex flex-col items-center text-center",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex items-center gap-2 mb-4",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium",
-                                children: "Why us?"
-                            }, void 0, false, {
-                                fileName: "[project]/components/InfoSection.tsx",
-                                lineNumber: 106,
-                                columnNumber: 13
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "w-4 h-4 rounded-full",
-                                style: {
-                                    background: '#a78bfa'
-                                }
-                            }, void 0, false, {
-                                fileName: "[project]/components/InfoSection.tsx",
-                                lineNumber: 107,
-                                columnNumber: 13
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/components/InfoSection.tsx",
-                        lineNumber: 105,
-                        columnNumber: 11
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mb-8",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -984,7 +856,7 @@ const InfoSection = ()=>{
                                 children: "70+ 개의 인증된 고퀄리티 봉제공장"
                             }, void 0, false, {
                                 fileName: "[project]/components/InfoSection.tsx",
-                                lineNumber: 111,
+                                lineNumber: 106,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -992,7 +864,7 @@ const InfoSection = ()=>{
                                 children: "동고리는 70개 이상의 봉제공장 있으며 3곳의 패션봉제협회의 품질인증을 받은 고퀄리티의 봉제를 약속드립니다."
                             }, void 0, false, {
                                 fileName: "[project]/components/InfoSection.tsx",
-                                lineNumber: 112,
+                                lineNumber: 107,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1003,7 +875,7 @@ const InfoSection = ()=>{
                                         children: "봉제공장 찾아보기"
                                     }, void 0, false, {
                                         fileName: "[project]/components/InfoSection.tsx",
-                                        lineNumber: 116,
+                                        lineNumber: 111,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1013,24 +885,24 @@ const InfoSection = ()=>{
                                             children: "→"
                                         }, void 0, false, {
                                             fileName: "[project]/components/InfoSection.tsx",
-                                            lineNumber: 118,
+                                            lineNumber: 113,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/InfoSection.tsx",
-                                        lineNumber: 117,
+                                        lineNumber: 112,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/InfoSection.tsx",
-                                lineNumber: 115,
+                                lineNumber: 110,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/InfoSection.tsx",
-                        lineNumber: 110,
+                        lineNumber: 105,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1061,12 +933,12 @@ const InfoSection = ()=>{
                                                 className: "object-cover w-full h-full rounded-xl"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/InfoSection.tsx",
-                                                lineNumber: 143,
+                                                lineNumber: 138,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/InfoSection.tsx",
-                                            lineNumber: 142,
+                                            lineNumber: 137,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1083,12 +955,12 @@ const InfoSection = ()=>{
                                                             children: chip.label
                                                         }, chip.label, false, {
                                                             fileName: "[project]/components/InfoSection.tsx",
-                                                            lineNumber: 154,
+                                                            lineNumber: 149,
                                                             columnNumber: 27
                                                         }, this))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/InfoSection.tsx",
-                                                    lineNumber: 152,
+                                                    lineNumber: 147,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1096,7 +968,7 @@ const InfoSection = ()=>{
                                                     children: displayName
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/InfoSection.tsx",
-                                                    lineNumber: 159,
+                                                    lineNumber: 154,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1111,21 +983,21 @@ const InfoSection = ()=>{
                                                             children: "주요품목"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/InfoSection.tsx",
-                                                            lineNumber: 162,
+                                                            lineNumber: 157,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "font-normal flex-1",
+                                                            className: "font-normal flex-1 truncate",
                                                             children: mainItems
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/InfoSection.tsx",
-                                                            lineNumber: 163,
+                                                            lineNumber: 158,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/InfoSection.tsx",
-                                                    lineNumber: 161,
+                                                    lineNumber: 156,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1141,36 +1013,36 @@ const InfoSection = ()=>{
                                                             children: typeof f.moq === 'number' ? f.moq : typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? Number(f.moq) : typeof f.minOrder === 'number' ? f.minOrder : '-'
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/InfoSection.tsx",
-                                                            lineNumber: 166,
+                                                            lineNumber: 161,
                                                             columnNumber: 39
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/InfoSection.tsx",
-                                                    lineNumber: 165,
+                                                    lineNumber: 160,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/InfoSection.tsx",
-                                            lineNumber: 150,
+                                            lineNumber: 145,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, `${f.id ?? 'noid'}-${idx}`, true, {
                                     fileName: "[project]/components/InfoSection.tsx",
-                                    lineNumber: 140,
+                                    lineNumber: 135,
                                     columnNumber: 19
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/components/InfoSection.tsx",
-                            lineNumber: 125,
+                            lineNumber: 120,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/InfoSection.tsx",
-                        lineNumber: 124,
+                        lineNumber: 119,
                         columnNumber: 11
                     }, this)
                 ]
@@ -1233,72 +1105,46 @@ const StepSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "mb-12",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex items-center gap-2 mb-4",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium",
-                                    children: "Why us?"
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex flex-col lg:flex-row gap-8 items-start",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex-1",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                    className: "text-3xl md:text-4xl font-bold mb-4",
+                                    children: "공장 탐색 시간을 줄여주는 매칭 프로세스"
                                 }, void 0, false, {
                                     fileName: "[project]/components/StepSection.tsx",
-                                    lineNumber: 28,
-                                    columnNumber: 11
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "w-4 h-4 bg-gray-300 rounded-full"
-                                }, void 0, false, {
-                                    fileName: "[project]/components/StepSection.tsx",
-                                    lineNumber: 31,
-                                    columnNumber: 11
+                                    lineNumber: 29,
+                                    columnNumber: 13
                                 }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/components/StepSection.tsx",
-                            lineNumber: 27,
-                            columnNumber: 9
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex flex-col lg:flex-row gap-8 items-start",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex-1",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                        className: "text-3xl md:text-4xl font-bold mb-4",
-                                        children: "공장 탐색 시간을 줄여주는 매칭 프로세스"
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/StepSection.tsx",
-                                        lineNumber: 37,
-                                        columnNumber: 13
-                                    }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/components/StepSection.tsx",
+                                lineNumber: 28,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex-1 lg:max-w-[500px]",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "text-lg text-gray-600 leading-relaxed",
+                                    children: "1,000 여 개의 데이터를 활용하여 만들고자 하는 의류에 딱 맞는 봉제공장을 추천하여 공장 탐색 시간을 줄여드립니다."
                                 }, void 0, false, {
                                     fileName: "[project]/components/StepSection.tsx",
-                                    lineNumber: 36,
-                                    columnNumber: 11
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex-1 lg:max-w-[500px]",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "text-lg text-gray-600 leading-relaxed",
-                                        children: "1,000 여 개의 데이터를 활용하여 만들고자 하는 의류에 딱 맞는 봉제공장을 추천하여 공장 탐색 시간을 줄여드립니다."
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/StepSection.tsx",
-                                        lineNumber: 42,
-                                        columnNumber: 13
-                                    }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/components/StepSection.tsx",
-                                    lineNumber: 41,
-                                    columnNumber: 11
+                                    lineNumber: 34,
+                                    columnNumber: 13
                                 }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/components/StepSection.tsx",
-                            lineNumber: 35,
-                            columnNumber: 9
-                        }, this)
-                    ]
-                }, void 0, true, {
+                            }, void 0, false, {
+                                fileName: "[project]/components/StepSection.tsx",
+                                lineNumber: 33,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/StepSection.tsx",
+                        lineNumber: 27,
+                        columnNumber: 9
+                    }, this)
+                }, void 0, false, {
                     fileName: "[project]/components/StepSection.tsx",
                     lineNumber: 25,
                     columnNumber: 7
@@ -1315,12 +1161,12 @@ const StepSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
                                         children: card.icon
                                     }, void 0, false, {
                                         fileName: "[project]/components/StepSection.tsx",
-                                        lineNumber: 55,
+                                        lineNumber: 47,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/StepSection.tsx",
-                                    lineNumber: 54,
+                                    lineNumber: 46,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -1328,7 +1174,7 @@ const StepSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
                                     children: card.title
                                 }, void 0, false, {
                                     fileName: "[project]/components/StepSection.tsx",
-                                    lineNumber: 59,
+                                    lineNumber: 51,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1336,18 +1182,18 @@ const StepSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pro
                                     children: card.desc
                                 }, void 0, false, {
                                     fileName: "[project]/components/StepSection.tsx",
-                                    lineNumber: 64,
+                                    lineNumber: 56,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, idx, true, {
                             fileName: "[project]/components/StepSection.tsx",
-                            lineNumber: 52,
+                            lineNumber: 44,
                             columnNumber: 11
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/components/StepSection.tsx",
-                    lineNumber: 50,
+                    lineNumber: 42,
                     columnNumber: 7
                 }, this)
             ]
@@ -1388,39 +1234,12 @@ const RecommendSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "w-full max-w-[1400px] mx-auto",
             children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex items-center gap-2 mb-4 justify-center",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                            className: "bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium",
-                            children: "Why us?"
-                        }, void 0, false, {
-                            fileName: "[project]/components/RecommendSection.tsx",
-                            lineNumber: 10,
-                            columnNumber: 9
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                            className: "w-4 h-4 rounded-full",
-                            style: {
-                                background: '#a78bfa'
-                            }
-                        }, void 0, false, {
-                            fileName: "[project]/components/RecommendSection.tsx",
-                            lineNumber: 11,
-                            columnNumber: 9
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/components/RecommendSection.tsx",
-                    lineNumber: 9,
-                    columnNumber: 7
-                }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                     className: "text-3xl md:text-4xl font-bold mb-4 text-center",
                     children: "AI 매칭으로 딱 맞는 봉제공장 추천"
                 }, void 0, false, {
                     fileName: "[project]/components/RecommendSection.tsx",
-                    lineNumber: 13,
+                    lineNumber: 8,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1444,17 +1263,17 @@ const RecommendSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5
                             }
                         }, void 0, false, {
                             fileName: "[project]/components/RecommendSection.tsx",
-                            lineNumber: 16,
+                            lineNumber: 11,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/RecommendSection.tsx",
-                        lineNumber: 15,
+                        lineNumber: 10,
                         columnNumber: 9
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/RecommendSection.tsx",
-                    lineNumber: 14,
+                    lineNumber: 9,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1466,14 +1285,14 @@ const RecommendSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5
                                 "1,000여 개의 데이터를 활용해 매칭하고 있는",
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                     fileName: "[project]/components/RecommendSection.tsx",
-                                    lineNumber: 21,
+                                    lineNumber: 16,
                                     columnNumber: 37
                                 }, this),
                                 "이 페이지에 딱 맞는 봉제공장들을 추천하여 공정 분석 시간을 줄여드립니다."
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/RecommendSection.tsx",
-                            lineNumber: 20,
+                            lineNumber: 15,
                             columnNumber: 9
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1488,24 +1307,24 @@ const RecommendSection = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5
                                         children: "→"
                                     }, void 0, false, {
                                         fileName: "[project]/components/RecommendSection.tsx",
-                                        lineNumber: 27,
+                                        lineNumber: 22,
                                         columnNumber: 13
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/RecommendSection.tsx",
-                                    lineNumber: 26,
+                                    lineNumber: 21,
                                     columnNumber: 11
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/RecommendSection.tsx",
-                            lineNumber: 24,
+                            lineNumber: 19,
                             columnNumber: 9
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/RecommendSection.tsx",
-                    lineNumber: 19,
+                    lineNumber: 14,
                     columnNumber: 7
                 }, this)
             ]

@@ -5,11 +5,6 @@ import Link from "next/link";
 const RecommendSection = () => (
   <section className="w-full bg-white py-16 min-h-[600px] flex items-center">
     <div className="w-full max-w-[1400px] mx-auto">
-      {/* Why us? 칩 + 점 */}
-      <div className="flex items-center gap-2 mb-4 justify-center">
-        <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">Why us?</span>
-        <span className="w-4 h-4 rounded-full" style={{ background: '#a78bfa' }}></span>
-      </div>
       <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">AI 매칭으로 딱 맞는 봉제공장 추천</h2>
       <div className="w-full overflow-hidden mb-8 rounded-3xl" style={{ maxWidth: 1400 }}>
         <div style={{ position: 'relative', width: '100%', height: '320px' }} className="rounded-3xl overflow-hidden">

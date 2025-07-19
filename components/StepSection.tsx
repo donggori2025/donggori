@@ -23,14 +23,6 @@ const StepSection = () => (
     <div className="max-w-[1400px] mx-auto px-4">
       {/* 상단 섹션 */}
       <div className="mb-12">
-        {/* Why us 태그 */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
-            Why us?
-          </div>
-          <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
-        </div>
-        
         {/* 제목과 설명 */}
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           <div className="flex-1">

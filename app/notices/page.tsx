@@ -49,7 +49,7 @@ export default function NoticesPage() {
               <li key={notice.id} className="grid grid-cols-12 items-center py-3 border-b border-gray-100 hover:bg-gray-50 transition group">
                 <div className="col-span-1 text-center text-gray-400">{notice.id}</div>
                 <div className="col-span-2 text-center">
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-bold ${notice.type === '공지' ? 'bg-black text-white' : notice.type === '채용공고' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}>{notice.type}</span>
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-bold ${notice.type === '공지' ? 'bg-red-100 text-red-700' : notice.type === '채용공고' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}>{notice.type}</span>
                 </div>
                 <div className="col-span-7 truncate">
                   <Link href={`/notices/${notice.id}`} className="font-medium text-gray-900 group-hover:underline">
