@@ -293,7 +293,7 @@ type ScoredFactory = Factory & { score: number };
   function renderResultCards() {
     return (
       <div className="w-full flex flex-col items-center justify-center min-h-[500px] animate-fade-in">
-        <div className="text-2xl font-bold mb-6">가장 적합한 봉제공장 3곳을 추천드려요!</div>
+        <div className="text-[40px] font-extrabold text-gray-900 mb-2">가장 적합한 봉제공장 3곳을 추천드려요!</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full max-w-3xl">
           {recommended.map((f, idx) => {
             const displayName = typeof f.name === 'string' && f.name

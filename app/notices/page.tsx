@@ -19,7 +19,7 @@ export default function NoticesPage() {
   return (
     <section className="w-full bg-white py-12 min-h-[600px]">
       <div className="max-w-[900px] mx-auto px-4">
-        <h2 className="text-[32px] font-extrabold mb-1">공지사항</h2>
+        <h2 className="text-[40px] font-extrabold text-gray-900 mb-2">공지사항</h2>
         <div className="text-gray-500 mb-6">동고리의 다양한 소식들을 확인해보세요.</div>
         {/* 탭 */}
         <div className="flex gap-2 border-b border-gray-200 mb-2">

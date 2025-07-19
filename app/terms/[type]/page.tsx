@@ -24,7 +24,7 @@ export default function TermsDetailPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-16 px-4">
-      <h1 className="text-2xl font-bold mb-4">{data.title}</h1>
+              <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">{data.title}</h1>
       <pre className="bg-gray-100 rounded p-4 whitespace-pre-wrap text-sm">{data.content}</pre>
     </div>
   );
