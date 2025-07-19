@@ -1,12 +1,8 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
-import { useAuth } from "@clerk/nextjs";
 import { factories } from "@/lib/factories";
 import { matchRequests } from "@/lib/matchRequests";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 
 // 샘플 문의내역 데이터
@@ -58,29 +54,9 @@ const sampleInquiries = [
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
 
-interface Inquiry {
-  id: number;
-  userId: string;
-  factoryId: string;
-  factoryName: string;
-  date: string;
-  status: string;
-  method: string;
-  image: string;
-}
-
 export default function MyPage() {
   const { user } = useUser();
-  const { signOut } = useAuth();
-  const router = useRouter();
   const [selectedMenu, setSelectedMenu] = useState<SidebarMenu>("프로필");
-  const [editMode, setEditMode] = useState(false);
-  const [factoryName, setFactoryName] = useState("");
-  const [factoryDesc, setFactoryDesc] = useState("");
-  const [editImageMode, setEditImageMode] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [name, setName] = useState(user?.firstName || "김한재");
   const [email, setEmail] = useState(user?.emailAddresses?.[0]?.emailAddress || "hanjaekim99@gmail.com");
 
@@ -88,40 +64,7 @@ export default function MyPage() {
     return <div className="max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center">로그인 후 이용 가능합니다.</div>;
   }
 
-  // 내 매칭 내역
-  const myDesignerRequests = matchRequests.filter(r => r.designerUserId === user.id);
-  const myFactory = factories.find(f => f.ownerUserId === user.id);
 
-  const handleFactoryEdit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setEditMode(false);
-  };
-
-  // 프로필 이미지 변경 핸들러
-  const handleImageChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !imageFile) return;
-    setLoading(true);
-    try {
-      await user.setProfileImage({ file: imageFile });
-      setEditImageMode(false);
-      setImageFile(null);
-      setImagePreview(null);
-    } catch {
-      alert("프로필 이미지 변경 중 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 이미지 파일 선택 시 미리보기
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
 
   const handleSaveChanges = () => {
     // 실제로는 API 호출로 데이터 저장
