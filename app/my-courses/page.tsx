@@ -52,7 +52,7 @@ export default function MyCoursesPage() {
 
   return (
     <div className="max-w-2xl mx-auto mt-12 px-6">
-      <h1 className="text-2xl font-bold text-toss-blue mb-6 text-center">내 강의실</h1>
+              <h1 className="text-[40px] font-extrabold text-gray-900 mb-2 text-center">내 강의실</h1>
       {purchasedCourses.length === 0 ? (
         <div className="bg-white rounded-xl shadow-md p-8 text-center text-gray-500">
           아직 구매한 강의가 없습니다.

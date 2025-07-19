@@ -19,7 +19,7 @@ export default function CourseDetailClient({ course }: { course: Course }) {
   return (
     <main className="max-w-xl mx-auto py-10 px-4">
       <div className="bg-white rounded-xl shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-4">{course.title}</h1>
+        <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">{course.title}</h1>
         <CourseImage
           src={course.image || ''}
           alt={course.title}

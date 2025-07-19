@@ -601,7 +601,7 @@ function MatchingPage() {
             className: "w-full flex flex-col items-center justify-center min-h-[500px] animate-fade-in",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "text-2xl font-bold mb-6",
+                    className: "text-[40px] font-extrabold text-gray-900 mb-2",
                     children: "가장 적합한 봉제공장 3곳을 추천드려요!"
                 }, void 0, false, {
                     fileName: "[project]/app/matching/page.tsx",
