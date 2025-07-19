@@ -28,6 +28,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     agreeToTerms: false
   });
 
+  // 새로운 링크 입력을 위한 상태
+  const [newLink, setNewLink] = useState("");
+
   useEffect(() => {
     (async () => {
       const resolved = await params;
@@ -69,12 +72,23 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   };
 
   const handleAddLink = () => {
-    const link = prompt("링크를 입력해주세요:");
-    if (link) {
+    if (newLink.trim()) {
       setFormData(prev => ({
         ...prev,
-        links: [...prev.links, link]
+        links: [...prev.links, newLink.trim()]
       }));
+      setNewLink(""); // 입력 필드 초기화
+    }
+  };
+
+  const handleLinkInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewLink(e.target.value);
+  };
+
+  const handleLinkKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddLink();
     }
   };
 
@@ -215,7 +229,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     placeholder="브랜드명을 입력해주세요."
                     value={formData.brandName}
                     onChange={(e) => handleInputChange("brandName", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                   />
                 </div>
                 <div>
@@ -226,7 +240,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                   />
                 </div>
                 <div>
@@ -237,7 +251,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     value={formData.contact}
                     onChange={(e) => handleInputChange("contact", e.target.value)}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                   />
                 </div>
               </div>
@@ -298,7 +312,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     className="hidden"
                     id="file-upload"
                   />
-                  <label htmlFor="file-upload" className="inline-block px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                  <label htmlFor="file-upload" className="inline-block px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-black focus:border-black">
                     + 파일 업로드
                   </label>
                   {formData.files.length > 0 && (
@@ -309,7 +323,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                           <button
                             type="button"
                             onClick={() => removeFile(index)}
-                            className="text-red-500 hover:text-red-700"
+                            className="text-black hover:text-gray-700"
                           >
                             ×
                           </button>
@@ -320,25 +334,45 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Faddit 작업지시서</label>
-                  {formData.links.map((link, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded mb-2">
-                      <span className="text-sm text-blue-600 truncate">{link}</span>
+                  <div className="space-y-2">
+                    {/* 기존 링크들 */}
+                    {formData.links.map((link, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <span className="text-sm text-blue-600 truncate flex-1">{link}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeLink(index)}
+                          className="text-black hover:text-gray-700 ml-2 px-2 py-1"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                    
+                    {/* 새로운 링크 입력 */}
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="링크를 입력해주세요"
+                        value={newLink}
+                        onChange={handleLinkInputChange}
+                        onKeyPress={handleLinkKeyPress}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                      />
                       <button
                         type="button"
-                        onClick={() => removeLink(index)}
-                        className="text-red-500 hover:text-red-700 ml-2"
+                        onClick={handleAddLink}
+                        disabled={!newLink.trim()}
+                        className={`px-4 py-2 rounded-lg border ${
+                          newLink.trim() 
+                            ? "bg-blue-600 text-white hover:bg-blue-700 border-blue-600" 
+                            : "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                        }`}
                       >
-                        ×
+                        추가
                       </button>
                     </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={handleAddLink}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    + 링크 추가
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -357,11 +391,11 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                   <label htmlFor="agree-terms" className="text-sm">
                     [필수] 개인정보 취급방침 및 서비스 이용 약관에 동의합니다.
                   </label>
-                  <div className="mt-2 space-x-4">
-                    <Link href="/terms/privacy" className="text-sm text-blue-600 hover:underline">
+                  <div className="mt-2 space-y-2">
+                    <Link href="/terms/privacy" className="text-sm text-gray-500 hover:text-gray-700 block">
                       개인정보 취급방침 &gt;
                     </Link>
-                    <Link href="/terms/service" className="text-sm text-blue-600 hover:underline">
+                    <Link href="/terms/service" className="text-sm text-gray-500 hover:text-gray-700 block">
                       이용약관 &gt;
                     </Link>
                   </div>
@@ -373,7 +407,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             <Button
               type="submit"
               disabled={!formData.agreeToTerms}
-              className={`w-full py-3 rounded-lg font-bold ${
+              className={`w-full py-4 rounded-lg font-bold ${
                 formData.agreeToTerms 
                   ? "bg-gray-800 text-white hover:bg-gray-900" 
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -397,7 +431,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                   <div className="font-semibold">{currentService.title}</div>
                   <div className="text-xs text-gray-500">{currentService.subtitle}</div>
                 </div>
-                <div className="text-sm font-semibold text-blue-600">{currentService.price}</div>
+                <div className="text-sm font-semibold text-black">{currentService.price}</div>
               </div>
               <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
                 {currentService.features.map((feature, index) => (
@@ -406,7 +440,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
               </ul>
             </div>
 
-            <Button className="w-full bg-yellow-400 text-black rounded-full font-bold py-2">
+            <Button className="w-full bg-black text-white rounded-full font-bold py-4 hover:bg-gray-800">
               문의하기
             </Button>
           </div>
@@ -415,8 +449,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
       {/* 나가기 확인 팝업 */}
       {showExitConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-lg border border-gray-200">
             <h3 className="text-lg font-bold mb-4">정말 나가시겠습니까?</h3>
             <p className="text-gray-600 mb-6">지금 나가시면 작성하셨던 내용은 저장되지 않습니다.</p>
             <div className="flex gap-3">

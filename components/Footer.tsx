@@ -17,8 +17,8 @@ const Footer = () => {
   const rightMenu = [
     { href: "#", label: "고객센터" },
     { href: "#", label: "제휴문의" },
-    { href: "#", label: "이용약관" },
-    { href: "#", label: "개인정보처리방침" },
+    { href: "/terms/service", label: "이용약관" },
+    { href: "/terms/privacy", label: "개인정보처리방침" },
   ];
 
   return (
