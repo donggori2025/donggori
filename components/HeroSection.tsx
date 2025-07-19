@@ -6,7 +6,7 @@ const HeroSection = () => (
       {/* 동영상 - 전체 너비 */}
       <div className="flex-1 min-w-0 flex items-end md:items-center justify-center relative overflow-hidden bg-white" style={{height: '480px'}}>
         <video
-          src="/250402_dongdaemun_compressed_20mb.mp4"
+          src="https://res.cloudinary.com/dvvqaywkd/video/upload/v1752911173/250402_dongdaemun_compressed_50mb_tcbcpm.mp4"
           autoPlay
           loop
           muted
