@@ -123,8 +123,7 @@ export default function FactoryMyPage() {
         try {
           const images = await getFactoryImages(auth.factoryId);
           setFactoryImages(images);
-        } catch (error) {
-          console.error('공장 이미지 조회 중 오류:', error);
+        } catch {
           setFactoryImages([]);
         }
         
