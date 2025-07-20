@@ -56,7 +56,7 @@ export default function FactoryMyPage() {
         try {
           factory = await getFactoryDataFromDB(auth.factoryId);
           console.log('Factory data from DB:', factory);
-        } catch (error) {
+        } catch {
           console.log('DB 연결 실패, 임시 데이터 사용');
           // 임시 데이터 사용
           factory = {
