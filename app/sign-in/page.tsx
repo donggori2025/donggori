@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSignIn } from "@clerk/nextjs";
 import { Eye, EyeOff, Loader } from "lucide-react";
+import { validateFactoryLogin, getFactoryAuthWithRealName } from "@/lib/factoryAuth";
+import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -13,6 +15,7 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
+  const router = useRouter();
 
   type OAuthStrategy = 'oauth_google' | 'oauth_facebook' | 'oauth_github' | 'oauth_twitter' | 'oauth_gitlab' | 'oauth_bitbucket' | 'oauth_linkedin' | 'oauth_apple' | 'oauth_discord' | 'oauth_twitch' | 'oauth_slack' | 'oauth_tiktok' | 'oauth_kakao' | 'oauth_naver' | 'oauth_line' | 'oauth_yahoo' | 'oauth_wechat' | 'oauth_weibo' | 'oauth_baidu' | 'oauth_gitee' | 'oauth_instagram' | 'oauth_salesforce' | 'oauth_spotify' | 'oauth_wordpress' | 'oauth_yandex' | 'oauth_zoom';
 
@@ -38,12 +41,28 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    if (!isLoaded) return;
     setLoading(true);
+    
     try {
+      // 먼저 봉제공장 로그인 시도
+      const factoryAuth = await getFactoryAuthWithRealName(email, password);
+      if (factoryAuth) {
+              // 봉제공장 로그인 성공 (실제 DB 공장명 포함)
+      localStorage.setItem('factoryAuth', JSON.stringify(factoryAuth));
+      localStorage.setItem('userType', 'factory');
+      // 메인페이지로 리다이렉트
+      window.location.href = '/';
+      return;
+      }
+      
+      // 봉제공장 로그인이 실패하면 일반 사용자 로그인 시도
+      if (!isLoaded) return;
+      
       const res = await signIn.create({ identifier: email, password });
       if (res.status === "complete") {
-        window.location.replace("/");
+        localStorage.setItem('userType', 'user');
+        // 메인페이지로 리다이렉트
+        window.location.href = '/';
       } else {
         setError("추가 인증이 필요합니다.");
       }
@@ -68,8 +87,8 @@ export default function SignInPage() {
       <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-xl shadow p-8 flex flex-col gap-4">
         <label className="text-sm font-semibold">이메일</label>
         <input
-          type="email"
-          placeholder="이메일을 입력해주세요."
+          type="text"
+          placeholder="이메일 또는 봉제공장 아이디를 입력해주세요."
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           required

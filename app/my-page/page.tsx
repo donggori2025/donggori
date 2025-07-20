@@ -1,78 +1,123 @@
 "use client";
-import { useUser } from "@clerk/nextjs";
-import { useState } from "react";
+import { useUser, useClerk } from "@clerk/nextjs";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-
-// 샘플 문의내역 데이터
-const sampleInquiries = [
-  {
-    id: 1,
-    factoryName: "재민상사",
-    date: "25.05.06",
-    image: "/bozhin-karaivanov-p1jldJ9tZ6c-unsplash (1).jpg",
-    tags: ["패턴", "샘플", "봉제"],
-    details: {
-      mainItems: "브랜드 남방, 원피스, 자켓, 코트",
-      mainFabric: "다이마루",
-      moq: "100",
-      sampleFee: "100,000원",
-      unitPrice: "16,800원(10%)"
-    }
-  },
-  {
-    id: 2,
-    factoryName: "태산상사",
-    date: "25.05.10",
-    image: "/logo_donggori.png",
-    tags: ["봉제"],
-    details: {
-      mainItems: "브랜드 남방, 원피스, 자켓, 코트",
-      mainFabric: "다이마루",
-      moq: "100",
-      sampleFee: "100,000원",
-      unitPrice: "16,800원(10%)"
-    }
-  },
-  {
-    id: 3,
-    factoryName: "회기상사",
-    date: "25.05.16",
-    image: "/logo_donggori.svg",
-    tags: ["패턴", "샘플"],
-    details: {
-      mainItems: "브랜드 남방, 원피스, 자켓, 코트",
-      mainFabric: "다이마루",
-      moq: "100",
-      sampleFee: "100,000원",
-      unitPrice: "16,800원(10%)"
-    }
-  }
-];
+import { useRouter } from "next/navigation";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
 
 export default function MyPage() {
   const { user } = useUser();
+  const { signOut } = useClerk();
+  const router = useRouter();
   const [selectedMenu, setSelectedMenu] = useState<SidebarMenu>("프로필");
-  const [name, setName] = useState(user?.firstName || "김한재");
-  const [email, setEmail] = useState(user?.emailAddresses?.[0]?.emailAddress || "hanjaekim99@gmail.com");
+  
+  // 원본 데이터와 현재 데이터를 분리
+  const [originalName, setOriginalName] = useState(user?.firstName || "김한재");
+  const [originalEmail, setOriginalEmail] = useState(user?.emailAddresses?.[0]?.emailAddress || "hanjaekim99@gmail.com");
+  
+  const [name, setName] = useState(originalName);
+  const [email, setEmail] = useState(originalEmail);
+  
+  // 변경사항이 있는지 확인
+  const hasChanges = name !== originalName || email !== originalEmail;
+
+  // 원본 데이터가 변경되면 현재 데이터도 업데이트
+  useEffect(() => {
+    setOriginalName(user?.firstName || "김한재");
+    setOriginalEmail(user?.emailAddresses?.[0]?.emailAddress || "hanjaekim99@gmail.com");
+    setName(user?.firstName || "김한재");
+    setEmail(user?.emailAddresses?.[0]?.emailAddress || "hanjaekim99@gmail.com");
+  }, [user]);
 
   if (!user) {
     return <div className="max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center">로그인 후 이용 가능합니다.</div>;
   }
 
-
-
-  const handleSaveChanges = () => {
-    // 실제로는 API 호출로 데이터 저장
-    alert("변경사항이 저장되었습니다.");
+  const handleSaveChanges = async () => {
+    try {
+      console.log("업데이트 시작 - 현재 이름:", name);
+      console.log("현재 사용자 정보:", user);
+      
+      if (!user) {
+        alert("사용자 정보를 찾을 수 없습니다.");
+        return;
+      }
+      
+      // Clerk를 사용하여 사용자 정보 업데이트
+      const updatedUser = await user.update({
+        firstName: name,
+      });
+      
+      console.log("업데이트된 사용자:", updatedUser);
+      
+      // 원본 데이터 업데이트
+      setOriginalName(name);
+      setOriginalEmail(email);
+      
+      alert("변경사항이 저장되었습니다.");
+    } catch (error) {
+      console.error("프로필 업데이트 중 오류가 발생했습니다:", error);
+      const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+      
+      // 오류가 발생해도 로컬 상태는 업데이트
+      setOriginalName(name);
+      setOriginalEmail(email);
+      
+      alert(`프로필 업데이트에 실패했습니다: ${errorMessage}\n\n로컬 상태는 업데이트되었습니다.`);
+    }
   };
 
   const handleWithdraw = () => {
     if (confirm("정말 탈퇴하시겠습니까?")) {
       // 실제로는 탈퇴 처리
       alert("탈퇴 처리가 완료되었습니다.");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.push("/");
+    } catch (error) {
+      console.error("로그아웃 중 오류가 발생했습니다:", error);
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // 파일 크기 확인 (5MB = 5 * 1024 * 1024 bytes)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert("파일 크기가 5MB를 초과합니다. 더 작은 파일을 선택해주세요.");
+      event.target.value = ''; // 파일 선택 초기화
+      return;
+    }
+
+    try {
+      console.log("이미지 업로드 시작:", file);
+      
+      if (!user) {
+        alert("사용자 정보를 찾을 수 없습니다.");
+        return;
+      }
+
+      // Clerk를 사용하여 프로필 이미지 업데이트
+      await user.setProfileImage({ file });
+      
+      console.log("이미지 업로드 완료");
+      alert("프로필 이미지가 업데이트되었습니다.");
+      
+      // 파일 선택 초기화
+      event.target.value = '';
+    } catch (error) {
+      console.error("이미지 업로드 중 오류가 발생했습니다:", error);
+      const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+      alert(`이미지 업로드에 실패했습니다: ${errorMessage}`);
+      event.target.value = ''; // 파일 선택 초기화
     }
   };
 
@@ -84,7 +129,7 @@ export default function MyPage() {
       <p className="text-lg text-gray-500 mb-8">내 정보와 문의내역을 확인할 수 있습니다.</p>
       <div className="flex flex-row gap-8 min-h-[500px]">
         {/* 왼쪽 사이드바: 메뉴만 */}
-        <aside className="w-1/4 min-w-[220px] bg-white rounded-xl shadow p-6 flex flex-col items-center">
+        <aside className="w-1/4 min-w-[220px] bg-white rounded-xl shadow p-6 flex flex-col">
           <nav className="w-full flex flex-col gap-2 mb-6">
             {SIDEBAR_MENUS.map((menu) => (
               <button
@@ -100,9 +145,18 @@ export default function MyPage() {
               </button>
             ))}
           </nav>
+          {/* 로그아웃 버튼을 맨 아래에 추가 */}
+          <div className="mt-auto pt-4 border-t border-gray-200">
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-2 rounded text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              로그아웃
+            </button>
+          </div>
         </aside>
-        {/* 오른쪽 메인 컨텐츠 */}
-        <section className="flex-1 bg-white rounded-xl shadow p-8">
+        {/* 오른쪽 메인 컨텐츠 - border 제거 */}
+        <section className="flex-1 bg-white rounded-xl p-8">
           {selectedMenu === "프로필" && (
             <div>
               <h2 className="text-2xl font-bold mb-8">프로필</h2>
@@ -119,10 +173,18 @@ export default function MyPage() {
                   />
                 </div>
                 <div className="flex-1">
-                  <div className="text-xl font-semibold mb-2">{name}</div>
+                  <div className="text-xl font-semibold mb-2">{originalName}</div>
                   <div className="flex gap-4 text-sm">
                     <button className="text-blue-600 hover:underline">사진 삭제</button>
-                    <button className="text-blue-600 hover:underline">사진 업로드</button>
+                    <label className="text-blue-600 hover:underline cursor-pointer">
+                      사진 업로드
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
                   </div>
                 </div>
               </div>
@@ -154,13 +216,18 @@ export default function MyPage() {
               <div className="flex justify-between items-center">
                 <button
                   onClick={handleWithdraw}
-                  className="text-gray-600 hover:text-gray-800 transition-colors"
+                  className="text-red-600 hover:text-red-800 transition-colors"
                 >
                   탈퇴하기
                 </button>
                 <button
                   onClick={handleSaveChanges}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg transition-colors"
+                  disabled={!hasChanges}
+                  className={`px-6 py-2 rounded-lg transition-colors ${
+                    hasChanges 
+                      ? "bg-black hover:bg-gray-800 text-white" 
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
                 >
                   변경사항 저장
                 </button>
@@ -171,67 +238,8 @@ export default function MyPage() {
           {selectedMenu === "문의내역" && (
             <div>
               <h2 className="text-2xl font-bold mb-8">문의내역</h2>
-              <div className="space-y-6">
-                {sampleInquiries.map((inquiry) => (
-                  <div key={inquiry.id} className="flex gap-4 p-4 border border-gray-200 rounded-lg">
-                    {/* 이미지 */}
-                    <div className="w-24 h-24 flex-shrink-0">
-                      <Image
-                        src={inquiry.image}
-                        alt={inquiry.factoryName}
-                        width={96}
-                        height={96}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-                    
-                    {/* 내용 */}
-                    <div className="flex-1">
-                      {/* 태그들 */}
-                      <div className="flex gap-2 mb-2">
-                        {inquiry.tags.map((tag, index) => (
-                          <span
-                            key={index}
-                            className={`px-2 py-1 text-xs rounded ${
-                              tag === "패턴" ? "bg-purple-200 text-purple-800" :
-                              tag === "샘플" ? "bg-green-200 text-green-800" :
-                              "bg-blue-200 text-blue-800"
-                            }`}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      
-                      {/* 회사명 */}
-                      <h3 className="font-bold text-lg mb-2">{inquiry.factoryName}</h3>
-                      
-                      {/* 상세 정보 */}
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <p>주요품목 {inquiry.details.mainItems}</p>
-                        <p>주요원단 {inquiry.details.mainFabric}</p>
-                        <p>MOQ(최소 주문 수량) {inquiry.details.moq}</p>
-                        <p>샘플비 {inquiry.details.sampleFee}</p>
-                        <p>장단 단가 {inquiry.details.unitPrice}</p>
-                      </div>
-                    </div>
-                    
-                    {/* 오른쪽 액션 영역 */}
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="text-xs text-gray-500">문의일 {inquiry.date}</div>
-                      <div className="flex flex-col gap-2">
-                        <button className="flex items-center gap-1 px-3 py-1 bg-white border border-gray-300 rounded text-sm">
-                          <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                          문의하기
-                        </button>
-                        <button className="flex items-center gap-1 px-3 py-1 bg-gray-800 text-white rounded text-sm">
-                          <span className="text-white">📁</span>
-                          의뢰하기
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="text-center py-20 text-gray-400 text-lg">
+                문의내역이 없습니다.
               </div>
             </div>
           )}
@@ -239,67 +247,8 @@ export default function MyPage() {
           {selectedMenu === "의뢰내역" && (
             <div>
               <h2 className="text-2xl font-bold mb-8">의뢰내역</h2>
-              <div className="space-y-6">
-                {sampleInquiries.map((inquiry) => (
-                  <div key={inquiry.id} className="flex gap-4 p-4 border border-gray-200 rounded-lg">
-                    {/* 이미지 */}
-                    <div className="w-24 h-24 flex-shrink-0">
-                      <Image
-                        src={inquiry.image}
-                        alt={inquiry.factoryName}
-                        width={96}
-                        height={96}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-                    
-                    {/* 내용 */}
-                    <div className="flex-1">
-                      {/* 태그들 */}
-                      <div className="flex gap-2 mb-2">
-                        {inquiry.tags.map((tag, index) => (
-                          <span
-                            key={index}
-                            className={`px-2 py-1 text-xs rounded ${
-                              tag === "패턴" ? "bg-purple-200 text-purple-800" :
-                              tag === "샘플" ? "bg-green-200 text-green-800" :
-                              "bg-blue-200 text-blue-800"
-                            }`}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      
-                      {/* 회사명 */}
-                      <h3 className="font-bold text-lg mb-2">{inquiry.factoryName}</h3>
-                      
-                      {/* 상세 정보 */}
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <p>주요품목 {inquiry.details.mainItems}</p>
-                        <p>주요원단 {inquiry.details.mainFabric}</p>
-                        <p>MOQ(최소 주문 수량) {inquiry.details.moq}</p>
-                        <p>샘플비 {inquiry.details.sampleFee}</p>
-                        <p>장단 단가 {inquiry.details.unitPrice}</p>
-                      </div>
-                    </div>
-                    
-                    {/* 오른쪽 액션 영역 */}
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="text-xs text-gray-500">문의일 {inquiry.date}</div>
-                      <div className="flex flex-col gap-2">
-                        <button className="flex items-center gap-1 px-3 py-1 bg-white border border-gray-300 rounded text-sm">
-                          <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                          문의하기
-                        </button>
-                        <button className="flex items-center gap-1 px-3 py-1 bg-gray-800 text-white rounded text-sm">
-                          <span className="text-white">📁</span>
-                          의뢰하기
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="text-center py-20 text-gray-400 text-lg">
+                의뢰내역이 없습니다.
               </div>
             </div>
           )}

@@ -108,11 +108,14 @@ const InfoSection = () => {
             <p className="text-lg text-gray-500 mb-6">
               동고리는 70개 이상의 봉제공장 있으며 3곳의 패션봉제협회의 품질인증을 받은 고퀄리티의 봉제를 약속드립니다.
             </p>
-            <Link href="/factories" className="inline-flex items-center bg-neutral-100 text-black px-8 py-3 rounded-[1000px] font-bold text-lg hover:bg-neutral-200 transition shadow-none gap-2 mx-auto w-fit">
-              <span>봉제공장 찾아보기</span>
-              <span className="w-6 h-6 flex items-center justify-center rounded-full bg-black">
-                <span className="text-base text-white">→</span>
+            <Link href="/matching" className="inline-flex items-center bg-neutral-600 text-white px-8 py-3 rounded-[1000px] font-bold text-lg hover:bg-neutral-500 transition shadow-none gap-2 mx-auto w-fit relative overflow-hidden group">
+              <span className="relative z-10">봉제공장 매칭받기</span>
+              <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white relative z-10">
+                <span className="text-base text-black">→</span>
               </span>
+              {/* Glow 효과 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-[1000px] animate-glow-pulse blur-sm"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 rounded-[1000px] animate-glow blur-md scale-110"></div>
             </Link>
           </div>
 
