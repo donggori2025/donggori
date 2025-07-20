@@ -13,29 +13,44 @@ export default function RequestDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 로컬스토리지에서 봉제공장 인증 정보 확인
-    const storedAuth = localStorage.getItem('factoryAuth');
-    const userType = localStorage.getItem('userType');
+    const fetchRequestData = async () => {
+      // 로컬스토리지에서 봉제공장 인증 정보 확인
+      const storedAuth = localStorage.getItem('factoryAuth');
+      const userType = localStorage.getItem('userType');
+      
+      if (!storedAuth || userType !== 'factory') {
+        router.push('/sign-in');
+        return;
+      }
+      
+      try {
+        // 의뢰내역 상세 정보 가져오기
+        const requestData = await getMatchRequestById(requestId);
+        if (requestData) {
+          setRequest(requestData);
+        }
+      } catch (error) {
+        console.error('의뢰내역 조회 중 오류:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    if (!storedAuth || userType !== 'factory') {
-      router.push('/sign-in');
-      return;
-    }
-    
-    // 의뢰내역 상세 정보 가져오기
-    const requestData = getMatchRequestById(requestId);
-    if (requestData) {
-      setRequest(requestData);
-    }
-    setLoading(false);
+    fetchRequestData();
   }, [requestId, router]);
 
-  const handleStatusUpdate = (newStatus: MatchRequest['status']) => {
+  const handleStatusUpdate = async (newStatus: MatchRequest['status']) => {
     if (!request) return;
     
-    if (updateMatchRequestStatus(request.id, newStatus)) {
-      setRequest({ ...request, status: newStatus });
-      alert(`의뢰가 ${newStatus === 'accepted' ? '수락' : '거절'}되었습니다.`);
+    try {
+      const success = await updateMatchRequestStatus(request.id, newStatus);
+      if (success) {
+        setRequest({ ...request, status: newStatus });
+        alert(`의뢰가 ${newStatus === 'accepted' ? '수락' : '거절'}되었습니다.`);
+      }
+    } catch (error) {
+      console.error('상태 업데이트 중 오류:', error);
+      alert('상태 업데이트에 실패했습니다.');
     }
   };
 
