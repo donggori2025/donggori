@@ -12,13 +12,16 @@ export default function FactoryMyPage() {
   const router = useRouter();
   const [selectedMenu, setSelectedMenu] = useState<SidebarMenu>("프로필");
   const [factoryAuth, setFactoryAuth] = useState<{ factoryId: string; factoryName: string } | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [factoryData, setFactoryData] = useState<{ id: string; name: string; company_name?: string; [key: string]: any } | null>(null);
   const [matchRequests, setMatchRequests] = useState<MatchRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   // 폼 데이터 상태
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [originalData, setOriginalData] = useState<{ [key: string]: any }>({});
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [formData, setFormData] = useState<{ [key: string]: any }>({});
   
   // 이미지 관리 상태
@@ -112,7 +115,8 @@ export default function FactoryMyPage() {
         try {
           const requests = await getMatchRequestsByFactoryId(auth.factoryId);
           setMatchRequests(requests);
-        } catch {
+        } catch (error) {
+          console.error('의뢰내역 조회 중 오류:', error);
           setMatchRequests([]);
         }
         
