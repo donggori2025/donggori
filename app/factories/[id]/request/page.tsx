@@ -132,9 +132,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           factory_id: factoryId,
           factory_name: factory?.name || '',
           status: 'pending',
-          items: [], // 의뢰 품목은 별도 필드로 관리
-          quantity: 0, // 수량은 별도 필드로 관리
-          description: `브랜드: ${formData.brandName || '미입력'}`,
+          items: [selectedService], // 선택된 서비스를 품목으로 저장
+          quantity: 1, // 기본 수량
+          description: `브랜드: ${formData.brandName || '미입력'}\n연락처: ${formData.contact}`,
           contact: formData.contact,
           deadline: '', // 납기일은 별도 필드로 관리
           budget: '', // 예산은 별도 필드로 관리
@@ -147,7 +147,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             packaging: formData.packaging,
             files: formData.files.map(f => f.name),
             links: formData.links,
-            selectedService: selectedService
+            selectedService: selectedService,
+            serviceDetails: serviceData[selectedService as keyof typeof serviceData]
           }),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
