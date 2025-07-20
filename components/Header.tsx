@@ -17,7 +17,7 @@ export default function Header() {
   const { user } = useUser();
   const router = useRouter();
   const [userType, setUserType] = useState<string | null>(null);
-  const [factoryAuth, setFactoryAuth] = useState<any>(null);
+  const [factoryAuth, setFactoryAuth] = useState<{ factoryId: string; factoryName: string } | null>(null);
   const [actualFactoryName, setActualFactoryName] = useState<string | null>(null);
   const [factoryProfileImage, setFactoryProfileImage] = useState<string | null>(null);
 
@@ -33,7 +33,7 @@ export default function Header() {
       // 실제 공장명과 프로필 이미지 가져오기
       if (auth && auth.factoryId) {
         getFactoryNameFromDB(auth.factoryId).then(name => {
-          setActualFactoryName(name);
+          if (name) setActualFactoryName(name);
         });
         
         getFactoryProfileImage(auth.factoryId).then(image => {

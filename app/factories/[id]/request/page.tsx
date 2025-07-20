@@ -123,7 +123,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
     try {
       // Supabase에 의뢰 데이터 저장
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('match_requests')
         .insert({
           user_id: `user_${Date.now()}`, // 임시 사용자 ID

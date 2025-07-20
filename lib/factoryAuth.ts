@@ -224,7 +224,7 @@ export function getRealFactoryName(factoryId: string): string {
 }
 
 // 공장 정보 업데이트 (DB에)
-export async function updateFactoryData(factoryId: string, updateData: any) {
+export async function updateFactoryData(factoryId: string, updateData: { [key: string]: any }) {
   try {
     const { data, error } = await supabase
       .from('donggori')
@@ -306,7 +306,7 @@ export async function uploadFactoryImage(file: File, factoryId: string): Promise
     const fileName = `${factoryId}_${Date.now()}.${fileExt}`;
     const filePath = `factory-images/${fileName}`;
 
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('factory-images')
       .upload(filePath, file);
 
