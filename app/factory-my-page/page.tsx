@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getFactoryDataFromDB, updateFactoryData, getRealFactoryName, getFactoryImages, updateFactoryImages, uploadFactoryImage, deleteFactoryImage } from "@/lib/factoryAuth";
-import { getMatchRequestsByFactoryId, getMatchRequestsByStatus, updateMatchRequestStatus, MatchRequest } from "@/lib/matchRequests";
+import { getMatchRequestsByFactoryId, updateMatchRequestStatus, MatchRequest } from "@/lib/matchRequests";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];

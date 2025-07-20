@@ -13,7 +13,12 @@ import Image from "next/image";
 export default function FactoriesPage() {
   const [factoriesData, setFactoriesData] = useState<Factory[]>(factories);
   const [loading, setLoading] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<any>(null);
+  const [connectionStatus, setConnectionStatus] = useState<{
+    success: boolean;
+    count?: number;
+    error?: string;
+    message?: string;
+  } | null>(null);
 
   // 검색 상태
   const [search, setSearch] = useState("");
