@@ -6,8 +6,9 @@ import {
   SignedOut,
   useUser,
 } from "@clerk/nextjs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getFactoryNameFromDB, getFactoryProfileImage } from "@/lib/factoryAuth";
 
 export default function Header() {
   // 햄버거 메뉴 오픈/닫힘 상태 관리
@@ -15,11 +16,37 @@ export default function Header() {
   // Clerk에서 현재 로그인한 사용자 정보 가져오기
   const { user } = useUser();
   const router = useRouter();
+  const [userType, setUserType] = useState<string | null>(null);
+  const [factoryAuth, setFactoryAuth] = useState<any>(null);
+  const [actualFactoryName, setActualFactoryName] = useState<string | null>(null);
+  const [factoryProfileImage, setFactoryProfileImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUserType = localStorage.getItem('userType');
+    const storedFactoryAuth = localStorage.getItem('factoryAuth');
+    
+    setUserType(storedUserType);
+    if (storedFactoryAuth) {
+      const auth = JSON.parse(storedFactoryAuth);
+      setFactoryAuth(auth);
+      
+      // 실제 공장명과 프로필 이미지 가져오기
+      if (auth && auth.factoryId) {
+        getFactoryNameFromDB(auth.factoryId).then(name => {
+          setActualFactoryName(name);
+        });
+        
+        getFactoryProfileImage(auth.factoryId).then(image => {
+          setFactoryProfileImage(image);
+        });
+      }
+    }
+  }, []);
 
   // 네비게이션 메뉴 항목
   const navMenu = [
     { href: "/factories", label: "봉제공장 찾기" },
-    { href: "/matching", label: "매칭" },
+    { href: "/matching", label: "AI 매칭" },
     { href: "/notices", label: "공지사항" },
   ];
 
@@ -41,18 +68,22 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-8">
           <nav className="flex gap-6 text-base font-medium text-[#222222]">
             {navMenu.map((item) => (
-              <Link key={item.href} href={item.href} className="hover:text-[#222222] hover:font-bold transition-colors">{item.label}</Link>
+              <Link key={item.href} href={item.href} className={`hover:text-[#222222] hover:font-bold transition-colors ${item.label === "AI 매칭" ? "ai-matching-glow" : ""}`}>
+                {item.label}
+              </Link>
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            {/* 로그인 전: 로그인/회원가입 버튼 노출 */}
+            {/* 로그인 전: 로그인/회원가입 버튼 노출 (봉제공장 로그인이 아닐 때만) */}
             <SignedOut>
-              <button
-                className="text-base font-medium text-white bg-[#222222] px-3 py-1 rounded hover:bg-[#444] transition-colors"
-                onClick={() => router.push("/sign-in")}
-              >
-                로그인/회원가입
-              </button>
+              {userType !== 'factory' && (
+                <button
+                  className="text-base font-medium text-white bg-[#222222] px-3 py-1 rounded hover:bg-[#444] transition-colors"
+                  onClick={() => router.push("/sign-in")}
+                >
+                  로그인/회원가입
+                </button>
+              )}
             </SignedOut>
             {/* 로그인 후: 프로필 이미지(아바타) 클릭 시 마이페이지로 이동 */}
             <SignedIn>
@@ -68,6 +99,18 @@ export default function Header() {
                 </Link>
               )}
             </SignedIn>
+            {/* 봉제공장 로그인 후: 프로필 이미지 클릭 시 공장 마이페이지로 이동 */}
+            {userType === 'factory' && factoryAuth && (
+              <Link href="/factory-my-page" className="flex items-center" aria-label="공장 마이페이지로 이동">
+                <Image
+                  src={factoryProfileImage || "/logo_donggori.png"}
+                  alt="공장 프로필 이미지"
+                  width={40}
+                  height={40}
+                  className="w-9 h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
+                />
+              </Link>
+            )}
           </div>
         </div>
         {/* 모바일: md 미만에서만 햄버거 버튼 보임 */}
@@ -120,12 +163,14 @@ export default function Header() {
               {/* 로그인/회원가입 또는 프로필 이미지 */}
               <div className="flex gap-2 mt-4">
                 <SignedOut>
-                  <button
-                    className="flex-1 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
-                    onClick={() => router.push("/sign-in")}
-                  >
-                    로그인/회원가입
-                  </button>
+                  {userType !== 'factory' && (
+                    <button
+                      className="flex-1 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
+                      onClick={() => router.push("/sign-in")}
+                    >
+                      로그인/회원가입
+                    </button>
+                  )}
                 </SignedOut>
                 <SignedIn>
                   {user && (
@@ -141,6 +186,19 @@ export default function Header() {
                     </Link>
                   )}
                 </SignedIn>
+                {/* 봉제공장 로그인 후 모바일 메뉴 */}
+                {userType === 'factory' && factoryAuth && (
+                  <Link href="/factory-my-page" className="flex-1 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 text-gray-800 py-2">
+                    <Image
+                      src={factoryProfileImage || "/logo_donggori.png"}
+                      alt="공장 프로필 이미지"
+                      width={40}
+                      height={40}
+                      className="w-7 h-7 rounded-full object-cover border border-gray-200 mr-2"
+                    />
+                    공장 마이페이지
+                  </Link>
+                )}
               </div>
             </div>
           </div>

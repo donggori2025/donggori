@@ -106,7 +106,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) {
       alert("이름을 입력해주세요.");
@@ -120,8 +120,67 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       alert("개인정보 취급방침 및 서비스 이용 약관에 동의해주세요.");
       return;
     }
-    // TODO: 공장 사장님에게 전달하는 로직 구현
-    console.log("의뢰 제출:", formData);
+
+    try {
+      // Supabase에 의뢰 데이터 저장
+      const { data, error } = await supabase
+        .from('match_requests')
+        .insert({
+          user_id: `user_${Date.now()}`, // 임시 사용자 ID
+          user_email: `${formData.name}@example.com`, // 임시 이메일
+          user_name: formData.name,
+          factory_id: factoryId,
+          factory_name: factory?.name || '',
+          status: 'pending',
+          items: [], // 의뢰 품목은 별도 필드로 관리
+          quantity: 0, // 수량은 별도 필드로 관리
+          description: `브랜드: ${formData.brandName || '미입력'}`,
+          contact: formData.contact,
+          deadline: '', // 납기일은 별도 필드로 관리
+          budget: '', // 예산은 별도 필드로 관리
+          additional_info: JSON.stringify({
+            brandName: formData.brandName,
+            sample: formData.sample,
+            pattern: formData.pattern,
+            qc: formData.qc,
+            finishing: formData.finishing,
+            packaging: formData.packaging,
+            files: formData.files.map(f => f.name),
+            links: formData.links,
+            selectedService: selectedService
+          }),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('의뢰 제출 중 오류:', error);
+        alert('의뢰 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
+        return;
+      }
+
+      alert('의뢰가 성공적으로 제출되었습니다!');
+      // 성공 후 폼 초기화
+      setFormData({
+        brandName: "",
+        name: "",
+        contact: "",
+        sample: "미보유",
+        pattern: "미보유", 
+        qc: "미희망",
+        finishing: "미희망",
+        packaging: "미희망",
+        files: [],
+        links: [],
+        agreeToTerms: false
+      });
+      
+    } catch (error) {
+      console.error('의뢰 제출 중 오류:', error);
+      alert('의뢰 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
   };
 
   const handleExitClick = () => {
