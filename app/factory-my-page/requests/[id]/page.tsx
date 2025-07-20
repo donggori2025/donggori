@@ -284,7 +284,7 @@ export default function RequestDetailPage() {
                       )}
                     </div>
                   );
-                } catch (error) {
+                } catch {
                   return <p className="text-gray-900">상세 정보를 불러올 수 없습니다.</p>;
                 }
               })()}
