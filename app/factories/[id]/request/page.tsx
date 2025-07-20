@@ -132,8 +132,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           factory_id: factoryId,
           factory_name: factory?.name || '',
           status: 'pending',
-          items: [selectedService], // 선택된 서비스를 품목으로 저장
-          quantity: 1, // 기본 수량
+          items: [], // 의뢰 품목은 별도 필드로 관리
+          quantity: 0, // 수량은 별도 필드로 관리
           description: `브랜드: ${formData.brandName || '미입력'}\n연락처: ${formData.contact}`,
           contact: formData.contact,
           deadline: '', // 납기일은 별도 필드로 관리
@@ -148,7 +148,23 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             files: formData.files.map(f => f.name),
             links: formData.links,
             selectedService: selectedService,
-            serviceDetails: serviceData[selectedService as keyof typeof serviceData]
+            serviceDetails: {
+              standard: {
+                title: "Standard",
+                subtitle: "봉제공정",
+                price: "39,000원 (VAT 포함)"
+              },
+              deluxe: {
+                title: "Deluxe", 
+                subtitle: "패턴/샘플 + 공장",
+                price: "89,000원 (VAT 포함)"
+              },
+              premium: {
+                title: "Premium",
+                subtitle: "올인원(기획/디자인~)",
+                price: "159,000원 (VAT 포함)"
+              }
+            }
           }),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()

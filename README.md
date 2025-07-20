@@ -1,37 +1,130 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 동고리 (Donggori) - 봉제공장 매칭 플랫폼
 
-## Getting Started
+봉제공장과 의류 제작 의뢰자를 연결하는 플랫폼입니다.
 
-First, run the development server:
+## 주요 기능
+
+- 🏭 봉제공장 검색 및 필터링
+- 📋 공정 의뢰 시스템
+- 👤 봉제공장 마이페이지
+- 💬 실시간 의뢰 관리
+
+## 시작하기
+
+### 1. 환경 변수 설정
+
+프로젝트 루트에 `.env.local` 파일을 생성하고 Supabase 설정을 추가하세요:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# .env.local
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-url.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Supabase 프로젝트 설정
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. [Supabase](https://supabase.com)에서 새 프로젝트 생성
+2. `donggori` 테이블 생성 (봉제공장 정보)
+3. `match_requests` 테이블 생성 (의뢰 내역)
+4. `factory_auth` 테이블 생성 (공장 인증)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. 개발 서버 실행
 
-## Learn More
+```bash
+# Bun 사용 (권장)
+bun dev
 
-To learn more about Next.js, take a look at the following resources:
+# 또는 다른 패키지 매니저
+npm run dev
+# yarn dev
+# pnpm dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인하세요.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 데이터베이스 스키마
 
-## Deploy on Vercel
+### donggori 테이블 (봉제공장 정보)
+```sql
+CREATE TABLE donggori (
+  id SERIAL PRIMARY KEY,
+  company_name TEXT,
+  admin_district TEXT,
+  phone_number TEXT,
+  business_type TEXT,
+  factory_type TEXT,
+  moq INTEGER,
+  monthly_capacity INTEGER,
+  top_items_upper TEXT,
+  top_items_lower TEXT,
+  top_items_outer TEXT,
+  top_items_dress_skirt TEXT,
+  top_items_bag TEXT,
+  top_items_fashion_accessory TEXT,
+  top_items_underwear TEXT,
+  top_items_sports_leisure TEXT,
+  top_items_pet TEXT,
+  sewing_machines TEXT,
+  pattern_machines TEXT,
+  special_machines TEXT,
+  main_fabrics TEXT,
+  processes TEXT,
+  delivery TEXT,
+  distribution TEXT,
+  intro TEXT,
+  description TEXT,
+  kakao_url TEXT,
+  lat DECIMAL,
+  lng DECIMAL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### match_requests 테이블 (의뢰 내역)
+```sql
+CREATE TABLE match_requests (
+  id SERIAL PRIMARY KEY,
+  user_id TEXT,
+  user_email TEXT,
+  user_name TEXT,
+  factory_id TEXT,
+  factory_name TEXT,
+  status TEXT DEFAULT 'pending',
+  items TEXT[],
+  quantity INTEGER,
+  description TEXT,
+  contact TEXT,
+  deadline TEXT,
+  budget TEXT,
+  additional_info JSONB,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# donggori
+## 기술 스택
+
+- **Frontend**: Next.js 14, React, TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: Supabase (PostgreSQL)
+- **Package Manager**: Bun
+- **Deployment**: Vercel
+
+## 개발 가이드
+
+### Supabase 연결 문제 해결
+
+1. 환경 변수가 올바르게 설정되었는지 확인
+2. Supabase 프로젝트 URL과 Anon Key 확인
+3. 데이터베이스 테이블이 생성되었는지 확인
+4. RLS (Row Level Security) 설정 확인
+
+### 데이터 로딩
+
+- Supabase 연결이 실패하면 하드코딩된 샘플 데이터를 사용
+- 연결 상태는 페이지 상단에 표시됩니다
+
+## 라이센스
+
+MIT License

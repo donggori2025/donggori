@@ -132,16 +132,13 @@ export default function RequestDetailPage() {
             <div>
               <p className="text-sm font-medium text-gray-700">의뢰일</p>
               <p className="text-lg text-gray-900">
-                {request.created_at ? 
-                  new Date(request.created_at).toLocaleDateString('ko-KR', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  }) : 
-                  request.requestDate || '날짜 없음'
-                }
+                {request.created_at ? new Date(request.created_at).toLocaleDateString('ko-KR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                }) : request.requestDate || '날짜 없음'}
               </p>
             </div>
           </div>
@@ -151,41 +148,6 @@ export default function RequestDetailPage() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">의뢰 내용</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">브랜드명</p>
-              <p className="text-lg text-gray-900">
-                {request.additional_info ? 
-                  (() => {
-                    try {
-                      const additionalInfo = JSON.parse(request.additional_info);
-                      return additionalInfo.brandName || '미입력';
-                    } catch {
-                      return '미입력';
-                    }
-                  })() : '미입력'
-                }
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">선택 서비스</p>
-              <p className="text-lg text-gray-900">
-                {request.additional_info ? 
-                  (() => {
-                    try {
-                      const additionalInfo = JSON.parse(request.additional_info);
-                      const serviceMap = {
-                        'standard': 'Standard (봉제공정)',
-                        'deluxe': 'Deluxe (패턴/샘플 + 공장)',
-                        'premium': 'Premium (올인원)'
-                      };
-                      return serviceMap[additionalInfo.selectedService as keyof typeof serviceMap] || '미선택';
-                    } catch {
-                      return '미선택';
-                    }
-                  })() : '미선택'
-                }
-              </p>
-            </div>
             <div>
               <p className="text-sm font-medium text-gray-700 mb-2">제작 품목</p>
               <p className="text-lg text-gray-900">{request.items.join(", ")}</p>
@@ -220,64 +182,109 @@ export default function RequestDetailPage() {
         {/* 추가 요청사항 */}
         {request.additional_info && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">상세 정보</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">상세 요청사항</h2>
             <div className="bg-gray-50 rounded-lg p-6">
               {(() => {
                 try {
                   const additionalInfo = JSON.parse(request.additional_info);
                   return (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700 mb-1">샘플 보유 여부</p>
-                          <p className="text-gray-900">{additionalInfo.sample || '미보유'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-700 mb-1">패턴 보유 여부</p>
-                          <p className="text-gray-900">{additionalInfo.pattern || '미보유'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-700 mb-1">QC 서비스</p>
-                          <p className="text-gray-900">{additionalInfo.qc || '미희망'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-700 mb-1">시아게 서비스</p>
-                          <p className="text-gray-900">{additionalInfo.finishing || '미희망'}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-700 mb-1">포장 서비스</p>
-                          <p className="text-gray-900">{additionalInfo.packaging || '미희망'}</p>
+                    <div className="space-y-6">
+                      {/* 브랜드 정보 */}
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-3">브랜드 정보</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-700">브랜드명</p>
+                            <p className="text-gray-900">{additionalInfo.brandName || '미입력'}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-700">선택 서비스</p>
+                            <p className="text-gray-900">
+                              {(() => {
+                                const serviceMap = {
+                                  'standard': 'Standard (봉제공정)',
+                                  'deluxe': 'Deluxe (패턴/샘플 + 공장)',
+                                  'premium': 'Premium (올인원)'
+                                };
+                                return serviceMap[additionalInfo.selectedService as keyof typeof serviceMap] || '미선택';
+                              })()}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                      
-                      {additionalInfo.links && additionalInfo.links.length > 0 && (
+
+                      {/* 보유 현황 */}
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-3">보유 현황</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-700">샘플</p>
+                            <p className="text-gray-900">{additionalInfo.sample || '미보유'}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-700">패턴</p>
+                            <p className="text-gray-900">{additionalInfo.pattern || '미보유'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 추가 서비스 */}
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-3">추가 서비스</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-700">QC</p>
+                            <p className="text-gray-900">{additionalInfo.qc || '미희망'}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-700">시아게</p>
+                            <p className="text-gray-900">{additionalInfo.finishing || '미희망'}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-700">포장</p>
+                            <p className="text-gray-900">{additionalInfo.packaging || '미희망'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 첨부 파일 */}
+                      {additionalInfo.files && additionalInfo.files.length > 0 && (
                         <div>
-                          <p className="text-sm font-medium text-gray-700 mb-2">참고 링크</p>
-                          <div className="space-y-1">
-                            {additionalInfo.links.map((link: string, index: number) => (
-                              <p key={index} className="text-gray-900 break-all">
-                                <a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                                  {link}
-                                </a>
-                              </p>
+                          <h3 className="text-lg font-medium text-gray-900 mb-3">첨부 파일</h3>
+                          <div className="space-y-2">
+                            {additionalInfo.files.map((file: string, index: number) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-gray-500">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span className="text-gray-900">{file}</span>
+                              </div>
                             ))}
                           </div>
                         </div>
                       )}
-                      
-                      {additionalInfo.files && additionalInfo.files.length > 0 && (
+
+                      {/* 참고 링크 */}
+                      {additionalInfo.links && additionalInfo.links.length > 0 && (
                         <div>
-                          <p className="text-sm font-medium text-gray-700 mb-2">첨부 파일</p>
-                          <div className="space-y-1">
-                            {additionalInfo.files.map((file: string, index: number) => (
-                              <p key={index} className="text-gray-900">{file}</p>
+                          <h3 className="text-lg font-medium text-gray-900 mb-3">참고 링크</h3>
+                          <div className="space-y-2">
+                            {additionalInfo.links.map((link: string, index: number) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-gray-500">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                <a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">
+                                  {link}
+                                </a>
+                              </div>
                             ))}
                           </div>
                         </div>
                       )}
                     </div>
                   );
-                } catch {
+                } catch (error) {
                   return <p className="text-gray-900">상세 정보를 불러올 수 없습니다.</p>;
                 }
               })()}

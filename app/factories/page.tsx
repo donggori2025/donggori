@@ -1,18 +1,19 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { ArrowPathIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { List, Map as MapIcon } from "lucide-react";
-import type { Factory } from "@/lib/factories";
+import { factories, fetchFactoriesFromDB, type Factory } from "@/lib/factories";
+import { testSupabaseConnection } from "@/lib/supabaseClient";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function FactoriesPage() {
-  const [factories, setFactories] = useState<Factory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [factoriesData, setFactoriesData] = useState<Factory[]>(factories);
+  const [loading, setLoading] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<any>(null);
 
   // 검색 상태
   const [search, setSearch] = useState("");
@@ -54,12 +55,12 @@ export default function FactoriesPage() {
   // 옵션 동적 추출 함수 (중복 없는 값, 분리 처리)
   function getOptions(key: string): string[] {
     if (key === 'business_type' || key === 'distribution' || key === 'delivery') {
-      const values = factories.flatMap(f => (f[key] ? String(f[key]).split(',').map((v: string) => v.trim()) : []));
+      const values = factoriesData.flatMap(f => (f[key] ? String(f[key]).split(',').map((v: string) => v.trim()) : []));
       return Array.from(new Set(values.filter((v): v is string => typeof v === 'string' && Boolean(v))));
     }
     if (key === 'equipment') {
       // |로 카테고리 분리, :로 카테고리명/값 분리, 쉼표로 하위 항목 분리
-      const all = factories.flatMap(f => (f.equipment ? String(f.equipment).split('|').map((v: string) => v.trim()) : []));
+      const all = factoriesData.flatMap(f => (f.equipment ? String(f.equipment).split('|').map((v: string) => v.trim()) : []));
       const byCategory: Record<string, string[]> = {};
       all.forEach(str => {
         const [cat, vals] = str.split(':').map(s => s.trim());
@@ -75,25 +76,25 @@ export default function FactoriesPage() {
       return [];
     }
     if (key === 'sewing_machines' || key === 'pattern_machines' || key === 'special_machines') {
-      const values = factories.flatMap(f => (f[key] ? String(f[key]).split(',').map((v: string) => v.trim()) : []));
+      const values = factoriesData.flatMap(f => (f[key] ? String(f[key]).split(',').map((v: string) => v.trim()) : []));
       return Array.from(new Set(values.filter((v): v is string => typeof v === 'string' && Boolean(v))));
     }
     if (key === 'items') {
-      const arr = factories.flatMap(f => [
+      const arr = factoriesData.flatMap(f => [
         f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt, f.top_items_bag, f.top_items_fashion_accessory, f.top_items_underwear, f.top_items_sports_leisure, f.top_items_pet
       ].filter((v): v is string => typeof v === 'string' && Boolean(v)));
       const commaSplit = arr.flatMap(i => String(i).split(',').map((v: string) => v.trim()));
       return Array.from(new Set(commaSplit.filter((v): v is string => typeof v === 'string' && Boolean(v))));
     }
     if (key === 'processes') {
-      const values = factories.flatMap(f => (f.processes ? String(f.processes).split(',').map((v: string) => v.trim()) : []));
+      const values = factoriesData.flatMap(f => (f.processes ? String(f.processes).split(',').map((v: string) => v.trim()) : []));
       return Array.from(new Set(values.filter((v): v is string => typeof v === 'string' && Boolean(v))));
     }
     if (key === 'main_fabrics') {
-      const values = factories.flatMap(f => (f.main_fabrics ? String(f.main_fabrics).split(',').map((v: string) => v.trim()) : []));
+      const values = factoriesData.flatMap(f => (f.main_fabrics ? String(f.main_fabrics).split(',').map((v: string) => v.trim()) : []));
       return Array.from(new Set(values.filter((v): v is string => typeof v === 'string' && Boolean(v))));
     }
-    const values = factories.map(f => f[key]);
+    const values = factoriesData.map(f => f[key]);
     // 항상 배열 반환 보장
     if (Array.isArray(values)) {
       return Array.from(new Set(values.flatMap((v) => typeof v === 'string' ? [v] : [])));
@@ -102,7 +103,7 @@ export default function FactoriesPage() {
   }
 
   // 필터링 로직 (여러 값 중 하나라도 포함되면 통과, range/검색 포함)
-  const filtered = factories.filter(f => {
+  const filtered = factoriesData.filter(f => {
     const itemList = [f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt, f.top_items_bag, f.top_items_fashion_accessory, f.top_items_underwear, f.top_items_sports_leisure, f.top_items_pet];
     // 검색어 필터
     const searchMatch = !search ||
@@ -162,14 +163,44 @@ export default function FactoriesPage() {
   });
 
   useEffect(() => {
-    async function fetchFactories() {
+    const loadFactories = async () => {
       setLoading(true);
-      const { data, error } = await supabase.from("donggori").select("*");
-      console.log("공장 데이터:", data, error);
-      setFactories(data ?? []);
-      setLoading(false);
-    }
-    fetchFactories();
+      try {
+        // Supabase 연결 테스트
+        const connectionTest = await testSupabaseConnection();
+        console.log('Supabase 연결 테스트 결과:', connectionTest);
+        
+        if (!connectionTest.success) {
+          console.error('Supabase 연결 실패:', connectionTest.error);
+          setConnectionStatus(connectionTest);
+          setFactoriesData(factories);
+          setLoading(false);
+          return;
+        }
+        
+        // Supabase에서 데이터 가져오기 시도
+        const dbFactories = await fetchFactoriesFromDB();
+        
+        if (dbFactories.length > 0) {
+          console.log('Supabase에서 데이터를 성공적으로 가져왔습니다:', dbFactories.length);
+          setFactoriesData(dbFactories);
+          setConnectionStatus({ success: true, count: dbFactories.length });
+        } else {
+          console.log('Supabase 데이터가 없어 하드코딩된 데이터를 사용합니다.');
+          setFactoriesData(factories);
+          setConnectionStatus({ success: true, count: 0, message: 'DB에 데이터가 없음' });
+        }
+      } catch (error) {
+        console.error('데이터 로딩 중 오류:', error);
+        console.log('오류로 인해 하드코딩된 데이터를 사용합니다.');
+        setFactoriesData(factories);
+        setConnectionStatus({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadFactories();
   }, []);
 
   // 데모 이미지 배열
@@ -201,7 +232,7 @@ export default function FactoriesPage() {
     ];
     // id가 없으면 idx로 fallback
     return Object.fromEntries(
-      factories.map((f, idx) => {
+      factoriesData.map((f, idx) => {
         // id 또는 idx로 seed 고정
         const seed = String(f.id ?? idx);
         // 간단한 해시로 seed 고정
@@ -218,7 +249,7 @@ export default function FactoriesPage() {
         return [f.id ?? idx, shuffled.slice(0, count)];
       })
     );
-  }, [factories]);
+  }, [factoriesData]);
 
   // FactoryMap 동적 import (SSR 비활성화)
   const FactoryMap = dynamic(() => import("@/components/FactoryMap"), { ssr: false });
@@ -227,7 +258,38 @@ export default function FactoriesPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto py-16 flex flex-col gap-8 px-6">
-      {loading && <div className="text-center py-10 text-lg">공장 정보를 불러오는 중입니다...</div>}
+      {/* 로딩 표시 */}
+      {loading && (
+        <div className="text-center py-10">
+          <div className="text-lg">공장 정보를 불러오는 중입니다...</div>
+        </div>
+      )}
+      
+      {/* 디버그 정보 - 연결 실패 시에만 표시 */}
+      {connectionStatus && !connectionStatus.success && (
+        <div className="mb-4 p-3 rounded-lg text-sm bg-red-100 text-red-800 border border-red-300">
+          <div className="font-medium">
+            ❌ Supabase 연결 실패
+          </div>
+          {connectionStatus.error && <div>오류: {connectionStatus.error}</div>}
+          
+          {/* 환경 변수 설정 안내 */}
+          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+            <div className="font-medium text-blue-800 mb-2">🔧 Supabase 설정이 필요합니다</div>
+            <div className="text-blue-700 text-xs space-y-1">
+              <div>1. 프로젝트 루트에 <code className="bg-blue-100 px-1 rounded">.env.local</code> 파일 생성</div>
+              <div>2. 다음 내용 추가:</div>
+              <div className="bg-blue-100 p-2 rounded font-mono text-xs">
+                NEXT_PUBLIC_SUPABASE_URL=https://your-project-url.supabase.co<br/>
+                NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+              </div>
+              <div>3. Supabase 프로젝트에서 URL과 Anon Key 확인</div>
+              <div>4. 개발 서버 재시작</div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="flex flex-col gap-1">
         <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">봉제공장 찾기</h1>
         <p className="text-lg text-gray-500 mb-8">퀄리티 좋은 의류 제작, 지금 바로 견적을 요청해보세요.</p>
@@ -889,7 +951,16 @@ export default function FactoriesPage() {
                     );
                   })
                 ) : (
-                  <div className="text-center py-20 text-gray-400 text-lg col-span-3">공장 데이터가 없습니다.</div>
+                  <div className="text-center py-20 col-span-3">
+                    {!loading && factoriesData.length === 0 ? (
+                      <div className="text-gray-500">
+                        <div className="text-lg mb-2">등록된 공장이 없습니다</div>
+                        <div className="text-sm">현재 등록된 봉제공장이 없습니다.</div>
+                      </div>
+                    ) : (
+                      <div className="text-gray-400 text-lg">검색 결과가 없습니다.</div>
+                    )}
+                  </div>
                 )}
               </div>
             ) : (

@@ -39,6 +39,11 @@ export interface Factory {
   main_fabrics?: string;
   distribution?: string;
   delivery?: string;
+  company_name?: string;
+  contact_name?: string;
+  email?: string;
+  address?: string;
+  established_year?: number;
   [key: string]: string | number | string[] | undefined;
 }
 
@@ -457,10 +462,70 @@ export const factories: Factory[] = [
 
 // Supabase에서 봉제공장 데이터를 가져오는 함수
 export async function fetchFactoriesFromDB(): Promise<Factory[]> {
-  const { data, error } = await supabase.from("donggori").select("*");
-  if (error) {
-    console.error("Supabase fetch error:", error);
+  try {
+    const { data, error } = await supabase.from("donggori").select("*");
+    
+    if (error) {
+      console.error("Supabase fetch error:", error);
+      return [];
+    }
+
+    if (!data || data.length === 0) {
+      console.log("Supabase에서 데이터를 찾을 수 없습니다.");
+      return [];
+    }
+
+    // Supabase 데이터를 Factory 인터페이스에 맞게 매핑
+    const mappedFactories: Factory[] = data.map((item: any) => ({
+      id: item.id?.toString() || String(Math.random()),
+      name: item.company_name || item.name || "공장명 없음",
+      ownerUserId: item.owner_user_id || item.ownerUserId || "unknown",
+      region: item.admin_district || item.region || "지역 없음",
+      items: [], // items는 별도 필드들로 구성
+      minOrder: item.moq || 0,
+      description: item.intro_text || item.intro || item.description || "설명 없음",
+      image: item.image || "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
+      images: item.images || [],
+      contact: item.phone_num || item.phone_number || item.contact || "연락처 없음",
+      lat: item.lat || 37.5665,
+      lng: item.lng || 126.9780,
+      kakaoUrl: item.kakao_url || item.kakaoUrl || "",
+      processes: item.processes ? (Array.isArray(item.processes) ? item.processes : [item.processes]) : [],
+      // DB 연동용 확장 필드들
+      business_type: item.business_type,
+      equipment: item.equipment,
+      sewing_machines: item.sewing_machines,
+      pattern_machines: item.pattern_machines,
+      special_machines: item.special_machines,
+      top_items_upper: item.top_items_upper,
+      top_items_lower: item.top_items_lower,
+      top_items_outer: item.top_items_outer,
+      top_items_dress_skirt: item.top_items_dress_skirt,
+      top_items_bag: item.top_items_bag,
+      top_items_fashion_accessory: item.top_items_fashion_accessory,
+      top_items_underwear: item.top_items_underwear,
+      top_items_sports_leisure: item.top_items_sports_leisure,
+      top_items_pet: item.top_items_pet,
+      moq: item.moq,
+      monthly_capacity: item.monthly_capacity,
+      admin_district: item.admin_district,
+      intro: item.intro_text || item.intro,
+      phone_number: item.phone_num || item.phone_number,
+      factory_type: item.factory_type,
+      main_fabrics: item.main_fabrics,
+      distribution: item.distribution,
+      delivery: item.delivery,
+      company_name: item.company_name,
+      contact_name: item.contact_name,
+      email: item.email,
+      address: item.address,
+      established_year: item.established_year,
+    }));
+
+    console.log(`Supabase에서 ${mappedFactories.length}개의 공장 데이터를 가져왔습니다.`);
+    return mappedFactories;
+  } catch (error) {
+    console.error("Supabase 데이터 가져오기 중 오류 발생:", error);
     return [];
   }
-  return (data as Factory[]) || [];
 } 

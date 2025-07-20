@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getFactoryDataFromDB, updateFactoryData, getRealFactoryName, getFactoryImages, updateFactoryImages, uploadFactoryImage, deleteFactoryImage } from "@/lib/factoryAuth";
-import { getMatchRequestsByFactoryId, updateMatchRequestStatus, MatchRequest } from "@/lib/matchRequests";
+import { getMatchRequestsByFactoryId, getMatchRequestsByStatus, updateMatchRequestStatus, MatchRequest } from "@/lib/matchRequests";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
@@ -15,6 +15,7 @@ export default function FactoryMyPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [factoryData, setFactoryData] = useState<{ id: string; name: string; company_name?: string; [key: string]: any } | null>(null);
   const [matchRequests, setMatchRequests] = useState<MatchRequest[]>([]);
+  const [allMatchRequests, setAllMatchRequests] = useState<MatchRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -115,8 +116,10 @@ export default function FactoryMyPage() {
         try {
           const requests = await getMatchRequestsByFactoryId(auth.factoryId);
           setMatchRequests(requests);
+          setAllMatchRequests(requests);
         } catch {
           setMatchRequests([]);
+          setAllMatchRequests([]);
         }
         
         // 공장 이미지 가져오기
@@ -811,6 +814,37 @@ export default function FactoryMyPage() {
           {selectedMenu === "의뢰내역" && (
             <div>
               <h2 className="text-2xl font-bold mb-8">의뢰내역</h2>
+              
+              {/* 상태별 필터 */}
+              <div className="mb-6">
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => setMatchRequests(allMatchRequests)}
+                    className="px-4 py-2 text-sm bg-black text-white rounded-full hover:bg-gray-800 transition-colors"
+                  >
+                    전체 ({allMatchRequests.length})
+                  </button>
+                  <button
+                    onClick={() => setMatchRequests(allMatchRequests.filter(r => r.status === 'pending'))}
+                    className="px-4 py-2 text-sm bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors border border-yellow-300"
+                  >
+                    대기중 ({allMatchRequests.filter(r => r.status === 'pending').length})
+                  </button>
+                  <button
+                    onClick={() => setMatchRequests(allMatchRequests.filter(r => r.status === 'accepted'))}
+                    className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors border border-green-300"
+                  >
+                    수락됨 ({allMatchRequests.filter(r => r.status === 'accepted').length})
+                  </button>
+                  <button
+                    onClick={() => setMatchRequests(allMatchRequests.filter(r => r.status === 'rejected'))}
+                    className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-colors border border-red-300"
+                  >
+                    거절됨 ({allMatchRequests.filter(r => r.status === 'rejected').length})
+                  </button>
+                </div>
+              </div>
+              
               {matchRequests.length === 0 ? (
                 <div className="text-center py-20">
                   <div className="text-gray-400 text-lg mb-2">의뢰내역이 없습니다</div>
@@ -839,16 +873,13 @@ export default function FactoryMyPage() {
                              '완료됨'}
                           </span>
                           <span className="text-sm text-gray-500">
-                            {request.created_at ? 
-                              new Date(request.created_at).toLocaleDateString('ko-KR', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              }) : 
-                              request.requestDate || '날짜 없음'
-                            }
+                            {request.created_at ? new Date(request.created_at).toLocaleDateString('ko-KR', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            }) : '날짜 없음'}
                           </span>
                         </div>
                       </div>
@@ -893,7 +924,7 @@ export default function FactoryMyPage() {
                       
                       <div className="mb-4">
                         <p className="text-sm font-medium text-gray-700 mb-2">의뢰 내용</p>
-                        <p className="text-sm text-gray-600">{request.description}</p>
+                        <p className="text-sm text-gray-600 whitespace-pre-line">{request.description}</p>
                       </div>
                       
                       {request.additional_info && (
@@ -946,6 +977,7 @@ export default function FactoryMyPage() {
                                   // 의뢰내역 다시 로드
                                   const updatedRequests = await getMatchRequestsByFactoryId(factoryAuth.factoryId);
                                   setMatchRequests(updatedRequests);
+                                  setAllMatchRequests(updatedRequests);
                                   alert('의뢰를 수락했습니다.');
                                 } else {
                                   alert('수락 처리 중 오류가 발생했습니다.');
@@ -962,6 +994,7 @@ export default function FactoryMyPage() {
                                   // 의뢰내역 다시 로드
                                   const updatedRequests = await getMatchRequestsByFactoryId(factoryAuth.factoryId);
                                   setMatchRequests(updatedRequests);
+                                  setAllMatchRequests(updatedRequests);
                                   alert('의뢰를 거절했습니다.');
                                 } else {
                                   alert('거절 처리 중 오류가 발생했습니다.');
