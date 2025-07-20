@@ -224,7 +224,7 @@ export function getRealFactoryName(factoryId: string): string {
 }
 
 // 공장 정보 업데이트 (DB에)
-export async function updateFactoryData(factoryId: string, updateData: { [key: string]: any }) {
+export async function updateFactoryData(factoryId: string, updateData: { [key: string]: unknown }) {
   try {
     const { data, error } = await supabase
       .from('donggori')
