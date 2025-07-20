@@ -8,7 +8,7 @@ import {
 } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getFactoryNameFromDB, getFactoryProfileImage } from "@/lib/factoryAuth";
+import { getFactoryProfileImage } from "@/lib/factoryAuth";
 
 export default function Header() {
   // 햄버거 메뉴 오픈/닫힘 상태 관리
