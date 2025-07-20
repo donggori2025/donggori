@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSignIn } from "@clerk/nextjs";
 import { Eye, EyeOff, Loader } from "lucide-react";
-import { validateFactoryLogin, getFactoryAuthWithRealName } from "@/lib/factoryAuth";
+import { getFactoryAuthWithRealName } from "@/lib/factoryAuth";
 import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
@@ -15,7 +15,6 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
-  const router = useRouter();
 
   type OAuthStrategy = 'oauth_google' | 'oauth_facebook' | 'oauth_github' | 'oauth_twitter' | 'oauth_gitlab' | 'oauth_bitbucket' | 'oauth_linkedin' | 'oauth_apple' | 'oauth_discord' | 'oauth_twitch' | 'oauth_slack' | 'oauth_tiktok' | 'oauth_kakao' | 'oauth_naver' | 'oauth_line' | 'oauth_yahoo' | 'oauth_wechat' | 'oauth_weibo' | 'oauth_baidu' | 'oauth_gitee' | 'oauth_instagram' | 'oauth_salesforce' | 'oauth_spotify' | 'oauth_wordpress' | 'oauth_yandex' | 'oauth_zoom';
 

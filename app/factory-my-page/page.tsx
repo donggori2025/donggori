@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getFactoryAuthByFactoryId, getFactoryDataFromDB, updateFactoryData, getRealFactoryName, getFactoryImages, updateFactoryImages, uploadFactoryImage, deleteFactoryImage } from "@/lib/factoryAuth";
+import { getFactoryDataFromDB, updateFactoryData, getRealFactoryName, getFactoryImages, updateFactoryImages, uploadFactoryImage, deleteFactoryImage } from "@/lib/factoryAuth";
 import { getMatchRequestsByFactoryId, updateMatchRequestStatus, MatchRequest } from "@/lib/matchRequests";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
@@ -11,15 +11,15 @@ type SidebarMenu = typeof SIDEBAR_MENUS[number];
 export default function FactoryMyPage() {
   const router = useRouter();
   const [selectedMenu, setSelectedMenu] = useState<SidebarMenu>("프로필");
-  const [factoryAuth, setFactoryAuth] = useState<any>(null);
-  const [factoryData, setFactoryData] = useState<any>(null);
+  const [factoryAuth, setFactoryAuth] = useState<{ factoryId: string; factoryName: string } | null>(null);
+  const [factoryData, setFactoryData] = useState<{ id: string; name: string; company_name?: string; [key: string]: any } | null>(null);
   const [matchRequests, setMatchRequests] = useState<MatchRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   // 폼 데이터 상태
-  const [originalData, setOriginalData] = useState<any>({});
-  const [formData, setFormData] = useState<any>({});
+  const [originalData, setOriginalData] = useState<{ [key: string]: any }>({});
+  const [formData, setFormData] = useState<{ [key: string]: any }>({});
   
   // 이미지 관리 상태
   const [factoryImages, setFactoryImages] = useState<string[]>([]);
@@ -112,8 +112,8 @@ export default function FactoryMyPage() {
         try {
           const requests = await getMatchRequestsByFactoryId(auth.factoryId);
           setMatchRequests(requests);
-        } catch (error) {
-          console.error('의뢰내역 조회 중 오류:', error);
+        } catch {
+          console.error('의뢰내역 조회 중 오류');
           setMatchRequests([]);
         }
         
