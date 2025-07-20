@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSignIn } from "@clerk/nextjs";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import { getFactoryAuthWithRealName } from "@/lib/factoryAuth";
-import { useRouter } from "next/navigation";
+
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");

@@ -113,7 +113,6 @@ export default function FactoryMyPage() {
           const requests = await getMatchRequestsByFactoryId(auth.factoryId);
           setMatchRequests(requests);
         } catch {
-          console.error('의뢰내역 조회 중 오류');
           setMatchRequests([]);
         }
         
