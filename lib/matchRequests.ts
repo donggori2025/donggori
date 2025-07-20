@@ -18,6 +18,8 @@ export interface MatchRequest {
   budget?: string;
   additionalInfo?: string;
   additional_info?: string; // Supabase 필드명과 일치
+  created_at?: string; // 생성일시
+  updated_at?: string; // 수정일시
 }
 
 // Supabase에서 공장별 의뢰내역 조회

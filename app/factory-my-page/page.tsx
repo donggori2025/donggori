@@ -838,7 +838,18 @@ export default function FactoryMyPage() {
                              request.status === 'rejected' ? '거절됨' :
                              '완료됨'}
                           </span>
-                          <span className="text-sm text-gray-500">{request.requestDate}</span>
+                          <span className="text-sm text-gray-500">
+                            {request.created_at ? 
+                              new Date(request.created_at).toLocaleDateString('ko-KR', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              }) : 
+                              request.requestDate || '날짜 없음'
+                            }
+                          </span>
                         </div>
                       </div>
                       
