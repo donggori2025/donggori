@@ -47,10 +47,30 @@ export interface Factory {
   [key: string]: string | number | string[] | undefined;
 }
 
-// factories: 봉제공장 샘플 데이터 70개
-// 실제 서비스에서는 DB에서 관리하지만, 샘플은 하드코딩 배열로 관리합니다.
-export const factories: Factory[] = [
-  // 1~3: 기존 샘플
+// 10개의 샘플 이미지 URL
+const sampleImages = [
+  "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80"
+];
+
+// images 필드 랜덤 생성 함수
+function getRandomImages(idx: number): string[] {
+  // idx를 seed로 2~3개 고정적으로 뽑음
+  const count = 2 + (idx % 2); // 2 또는 3개
+  const start = idx % sampleImages.length;
+  return Array.from({ length: count }, (_, i) => sampleImages[(start + i) % sampleImages.length]);
+}
+
+// 기존 factories 배열을 factoriesRaw로 이름 변경 (export X)
+const factoriesRaw: Factory[] = [
   {
     id: "1",
     name: "서울패션공장",
@@ -59,13 +79,8 @@ export const factories: Factory[] = [
     items: ["티셔츠", "셔츠", "원피스"],
     minOrder: 100,
     description: "서울 도심에 위치한 20년 경력의 봉제공장입니다.",
-    image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
-    images: [
-      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80"
-    ],
+    image: "",
+    images: [],
     contact: "02-1234-5678",
     lat: 37.5665,
     lng: 126.9780,
@@ -80,12 +95,8 @@ export const factories: Factory[] = [
     items: ["바지", "점퍼"],
     minOrder: 200,
     description: "최신 설비와 숙련된 인력을 보유한 부산 봉제공장.",
-    image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
-    images: [
-      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80"
-    ],
+    image: "",
+    images: [],
     contact: "051-9876-5432",
     lat: 35.1796,
     lng: 129.0756,
@@ -100,11 +111,8 @@ export const factories: Factory[] = [
     items: ["코트", "자켓"],
     minOrder: 50,
     description: "소량 생산도 가능한 대구의 섬유/봉제 전문 공방.",
-    image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
-    images: [
-      "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80"
-    ],
+    image: "",
+    images: [],
     contact: "053-222-3333",
     lat: 35.8714,
     lng: 128.6014,
@@ -119,7 +127,8 @@ export const factories: Factory[] = [
     items: ["셔츠", "바지"],
     minOrder: 120,
     description: "인천에서 다양한 의류를 생산하는 중형 공장입니다.",
-    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "032-111-2222",
     lat: 37.4563,
     lng: 126.7052,
@@ -134,7 +143,8 @@ export const factories: Factory[] = [
     items: ["원피스", "스커트"],
     minOrder: 80,
     description: "여성복 전문, 소량 주문도 환영합니다.",
-    image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "062-333-4444",
     lat: 35.1595,
     lng: 126.8526,
@@ -149,7 +159,8 @@ export const factories: Factory[] = [
     items: ["아우터", "점퍼"],
     minOrder: 150,
     description: "최신 설비로 고품질 아우터를 제작합니다.",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "042-555-6666",
     lat: 36.3504,
     lng: 127.3845,
@@ -164,7 +175,8 @@ export const factories: Factory[] = [
     items: ["티셔츠", "셔츠"],
     minOrder: 90,
     description: "울산 지역 소량/대량 모두 가능.",
-    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "052-777-8888",
     lat: 35.5384,
     lng: 129.3114,
@@ -179,7 +191,8 @@ export const factories: Factory[] = [
     items: ["바지", "코트"],
     minOrder: 200,
     description: "경기도 최대 규모의 봉제공장.",
-    image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "031-888-9999",
     lat: 37.4138,
     lng: 127.5183,
@@ -194,7 +207,8 @@ export const factories: Factory[] = [
     items: ["자켓", "셔츠"],
     minOrder: 60,
     description: "강원도에서 신속한 납기와 꼼꼼한 품질!",
-    image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "033-101-2020",
     lat: 37.8228,
     lng: 128.1555,
@@ -209,7 +223,8 @@ export const factories: Factory[] = [
     items: ["티셔츠", "스커트"],
     minOrder: 110,
     description: "충북 청주 중심의 봉제공장.",
-    image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "043-303-4040",
     lat: 36.6424,
     lng: 127.4890,
@@ -224,7 +239,8 @@ export const factories: Factory[] = [
     items: ["셔츠", "바지"],
     minOrder: 130,
     description: "충남 아산의 봉제공장, 빠른 납기 보장.",
-    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "041-505-6060",
     lat: 36.7926,
     lng: 127.1350,
@@ -239,7 +255,8 @@ export const factories: Factory[] = [
     items: ["원피스", "블라우스"],
     minOrder: 90,
     description: "전북 전주에서 여성복 전문 생산.",
-    image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "063-606-7070",
     lat: 35.8242,
     lng: 127.1477,
@@ -254,7 +271,8 @@ export const factories: Factory[] = [
     items: ["아우터", "점퍼"],
     minOrder: 100,
     description: "전남 목포, 소량 생산도 환영.",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "061-808-9090",
     lat: 34.8118,
     lng: 126.3922,
@@ -269,7 +287,8 @@ export const factories: Factory[] = [
     items: ["티셔츠", "셔츠"],
     minOrder: 140,
     description: "경북 구미, 대량 생산 특화.",
-    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "054-111-2121",
     lat: 36.1195,
     lng: 128.3446,
@@ -284,7 +303,8 @@ export const factories: Factory[] = [
     items: ["바지", "코트"],
     minOrder: 120,
     description: "경남 창원, 다양한 품목 생산.",
-    image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "055-313-4141",
     lat: 35.2285,
     lng: 128.6811,
@@ -299,7 +319,8 @@ export const factories: Factory[] = [
     items: ["원피스", "셔츠"],
     minOrder: 70,
     description: "제주도에서 만나는 감각적인 디자인 봉제공장.",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "064-707-8080",
     lat: 33.4996,
     lng: 126.5312,
@@ -314,7 +335,8 @@ export const factories: Factory[] = [
     items: ["티셔츠", "자켓"],
     minOrder: 100,
     description: "서울 동대문, 트렌디한 디자인 전문.",
-    image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "02-1717-1717",
     lat: 37.5700,
     lng: 127.0095,
@@ -329,7 +351,8 @@ export const factories: Factory[] = [
     items: ["셔츠", "바지"],
     minOrder: 120,
     description: "부산 해운대, 남성복 대량 생산.",
-    image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "051-1818-1818",
     lat: 35.1632,
     lng: 129.1636,
@@ -344,7 +367,8 @@ export const factories: Factory[] = [
     items: ["원피스", "스커트"],
     minOrder: 80,
     description: "대구 동성로, 여성복 소량 주문 환영.",
-    image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "053-1919-1919",
     lat: 35.8686,
     lng: 128.5945,
@@ -359,7 +383,8 @@ export const factories: Factory[] = [
     items: ["아우터", "점퍼"],
     minOrder: 150,
     description: "인천 송도, 고급 아우터 전문.",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "032-2020-2020",
     lat: 37.3891,
     lng: 126.6445,
@@ -374,7 +399,8 @@ export const factories: Factory[] = [
     items: ["티셔츠", "셔츠"],
     minOrder: 110,
     description: "광주 남구, 다양한 품목 생산.",
-    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "062-2121-2121",
     lat: 35.1330,
     lng: 126.9020,
@@ -389,7 +415,8 @@ export const factories: Factory[] = [
     items: ["바지", "코트"],
     minOrder: 130,
     description: "대전 유성구, 남성복/여성복 모두 가능.",
-    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "042-2222-2222",
     lat: 36.3622,
     lng: 127.3568,
@@ -404,7 +431,8 @@ export const factories: Factory[] = [
     items: ["자켓", "셔츠"],
     minOrder: 90,
     description: "울산 북구, 소량 생산 특화.",
-    image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "052-2323-2323",
     lat: 35.5833,
     lng: 129.3600,
@@ -419,7 +447,8 @@ export const factories: Factory[] = [
     items: ["티셔츠", "스커트"],
     minOrder: 200,
     description: "경기 수원, 대량 생산 가능.",
-    image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c5a?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "031-2424-2424",
     lat: 37.2636,
     lng: 127.0286,
@@ -434,7 +463,8 @@ export const factories: Factory[] = [
     items: ["원피스", "블라우스"],
     minOrder: 60,
     description: "강원 원주, 꼼꼼한 품질 관리.",
-    image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "033-2525-2525",
     lat: 37.3422,
     lng: 127.9207,
@@ -449,7 +479,8 @@ export const factories: Factory[] = [
     items: ["아우터", "점퍼"],
     minOrder: 110,
     description: "충북 충주, 소량/대량 모두 가능.",
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+    image: "",
+    images: [],
     contact: "043-2626-2626",
     lat: 36.9910,
     lng: 127.9258,
@@ -459,6 +490,13 @@ export const factories: Factory[] = [
   // ... (27~70번까지 위 패턴을 참고하여 다양한 지역, 품목, 이미지, 설명, 위도/경도, 연락처, ownerUserId로 실제 데이터 추가)
   // ...
 ];
+
+// export용 factories: image, images 필드만 순환 할당
+export const factories: Factory[] = factoriesRaw.map((f, idx) => ({
+  ...f,
+  image: sampleImages[idx % sampleImages.length],
+  images: getRandomImages(idx),
+}));
 
 // Supabase에서 봉제공장 데이터를 가져오는 함수
 export async function fetchFactoriesFromDB(): Promise<Factory[]> {

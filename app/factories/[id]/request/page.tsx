@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Factory } from "@/lib/factories";
+import { useUser } from "@clerk/nextjs";
 
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
@@ -30,6 +31,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
   // 새로운 링크 입력을 위한 상태
   const [newLink, setNewLink] = useState("");
+  const { user } = useUser();
 
   useEffect(() => {
     (async () => {
@@ -108,6 +110,11 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('제출 시점 factory:', factory); // 디버깅용
+    if (!factory) {
+      alert("공장 정보가 로딩되지 않았습니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
     if (!formData.name.trim()) {
       alert("이름을 입력해주세요.");
       return;
@@ -122,15 +129,39 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }
 
     try {
+      // 공장명 누락 방지: company_name 또는 name이 반드시 있어야 함
+      const factoryName = factory.company_name || factory.name;
+      if (!factoryName) {
+        alert("공장명 정보가 없습니다. 잠시 후 다시 시도해 주세요.");
+        return;
+      }
+      // 1. 첨부파일 Supabase Storage 업로드
+      let uploadedFileUrls: string[] = [];
+      if (formData.files.length > 0) {
+        for (const file of formData.files) {
+          const filePath = `match-request-files/${Date.now()}_${file.name}`;
+          const { error: uploadError } = await supabase.storage.from('match-request-files').upload(filePath, file);
+          if (uploadError) {
+            alert(`파일 업로드 중 오류 발생: ${file.name}`);
+            return;
+          }
+          // publicUrl 생성
+          const { data: publicUrlData } = supabase.storage.from('match-request-files').getPublicUrl(filePath);
+          if (publicUrlData?.publicUrl) {
+            uploadedFileUrls.push(publicUrlData.publicUrl);
+          }
+        }
+      }
+
       // Supabase에 의뢰 데이터 저장
       const { error } = await supabase
         .from('match_requests')
         .insert({
-          user_id: `user_${Date.now()}`, // 임시 사용자 ID
-          user_email: `${formData.name}@example.com`, // 임시 이메일
+          user_id: user?.id || `user_${Date.now()}`,
+          user_email: user?.emailAddresses?.[0]?.emailAddress || `${formData.name}@example.com`,
           user_name: formData.name,
           factory_id: factoryId,
-          factory_name: factory?.name || '',
+          factory_name: factoryName,
           status: 'pending',
           items: [], // 의뢰 품목은 별도 필드로 관리
           quantity: 0, // 수량은 별도 필드로 관리
@@ -145,7 +176,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             qc: formData.qc,
             finishing: formData.finishing,
             packaging: formData.packaging,
-            files: formData.files.map(f => f.name),
+            files: uploadedFileUrls,
             links: formData.links,
             selectedService: selectedService,
             serviceDetails: {
@@ -482,9 +513,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             {/* 제출 버튼 */}
             <Button
               type="submit"
-              disabled={!formData.agreeToTerms}
+              disabled={loading || !factory || !(factory.company_name || factory.name) || !formData.agreeToTerms}
               className={`w-full py-4 rounded-lg font-bold ${
-                formData.agreeToTerms 
+                formData.agreeToTerms && factory && (factory.company_name || factory.name)
                   ? "bg-gray-800 text-white hover:bg-gray-900" 
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}

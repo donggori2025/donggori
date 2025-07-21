@@ -11,7 +11,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export default function FactoriesPage() {
-  const [factoriesData, setFactoriesData] = useState<Factory[]>(factories);
+  const [factoriesData, setFactoriesData] = useState<Factory[]>([]); // 초기값 빈 배열
   const [loading, setLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<{
     success: boolean;
@@ -178,7 +178,7 @@ export default function FactoriesPage() {
         if (!connectionTest.success) {
           console.error('Supabase 연결 실패:', connectionTest.error);
           setConnectionStatus(connectionTest);
-          setFactoriesData(factories);
+          setFactoriesData([]); // 연결 실패 시 빈 배열
           setLoading(false);
           return;
         }
@@ -192,13 +192,13 @@ export default function FactoriesPage() {
           setConnectionStatus({ success: true, count: dbFactories.length });
         } else {
           console.log('Supabase 데이터가 없어 하드코딩된 데이터를 사용합니다.');
-          setFactoriesData(factories);
+          setFactoriesData([]); // 데이터가 없으면 빈 배열
           setConnectionStatus({ success: true, count: 0, message: 'DB에 데이터가 없음' });
         }
       } catch (error) {
         console.error('데이터 로딩 중 오류:', error);
         console.log('오류로 인해 하드코딩된 데이터를 사용합니다.');
-        setFactoriesData(factories);
+        setFactoriesData(factories); // 예외 상황에서만 하드코딩 데이터 사용
         setConnectionStatus({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
       } finally {
         setLoading(false);
@@ -901,7 +901,13 @@ export default function FactoriesPage() {
           <div className="flex-1 min-w-0">
             {view === 'list' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {Array.isArray(filtered) && filtered.length > 0 ? (
+                {loading ? (
+                  <div className="text-center py-10">
+                    <div className="text-lg">공장 정보를 불러오는 중입니다...</div>
+                  </div>
+                ) : factoriesData.length === 0 ? (
+                  <div className="text-center py-10 text-gray-400">공장 데이터가 없습니다.</div>
+                ) : (
                   filtered.map((f: Factory, idx: number) => {
                     const displayName = typeof f.name === 'string' && f.name
                       ? f.name
@@ -955,17 +961,6 @@ export default function FactoriesPage() {
                       </Link>
                     );
                   })
-                ) : (
-                  <div className="text-center py-20 col-span-3">
-                    {!loading && factoriesData.length === 0 ? (
-                      <div className="text-gray-500">
-                        <div className="text-lg mb-2">등록된 공장이 없습니다</div>
-                        <div className="text-sm">현재 등록된 봉제공장이 없습니다.</div>
-                      </div>
-                    ) : (
-                      <div className="text-gray-400 text-lg">검색 결과가 없습니다.</div>
-                    )}
-                  </div>
                 )}
               </div>
             ) : (
