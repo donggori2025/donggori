@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { MatchRequest } from "@/lib/matchRequests";
+import { Factory } from "@/lib/factories";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
@@ -159,7 +160,8 @@ export default function MyPage() {
 
   // 의뢰내역 카드에서 공장 정보 fetch 및 카드 스타일 적용
   function FactoryRequestCard({ req }: { req: any }) {
-    const [factory, setFactory] = useState<any>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [factory, setFactory] = useState<Factory | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -215,8 +217,6 @@ export default function MyPage() {
     const mainItems = [factory.top_items_upper, factory.top_items_lower, factory.top_items_outer, factory.top_items_dress_skirt]
       .filter((v) => typeof v === 'string' && v.length > 0)
       .join(', ') || '-';
-    // 이미지
-    const imageUrl = factory.image || factory.images?.[0] || "/public/logo_donggori.png";
 
     return (
       <div
@@ -240,7 +240,7 @@ export default function MyPage() {
           {statusBadge}
           <button
             className="mt-2 px-4 py-2 bg-gray-800 text-white rounded-lg text-xs hover:bg-gray-900"
-            onClick={e => { e.stopPropagation(); window.location.href = `/my-page/requests/${req.id}`; }}
+            onClick={() => { window.location.href = `/my-page/requests/${req.id}`; }}
           >상세보기</button>
         </div>
       </div>
