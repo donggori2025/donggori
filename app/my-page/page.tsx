@@ -56,7 +56,7 @@ export default function MyPage() {
           } else {
             setMyMatchRequests(data || []);
           }
-        } catch (e) {
+        } catch {
           setRequestError("의뢰내역을 불러오는 중 오류가 발생했습니다.");
           setMyMatchRequests([]);
         } finally {
@@ -159,24 +159,24 @@ export default function MyPage() {
   console.log("Clerk user 객체:", user);
 
   // 의뢰내역 카드에서 공장 정보 fetch 및 카드 스타일 적용
-  function FactoryRequestCard({ req }: { req: any }) {
+  function FactoryRequestCard({ req }: { req: MatchRequest }) {
     const [factory, setFactory] = useState<Factory | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
       async function fetchFactory() {
         setLoading(true);
-        if (!req.factory_id && !req.factoryId) {
+        if (!req.factoryId) {
           setFactory(null);
           setLoading(false);
           return;
         }
-        const { data } = await supabase.from("donggori").select("*").eq("id", req.factory_id || req.factoryId).single();
+        const { data } = await supabase.from("donggori").select("*").eq("id", req.factoryId).single();
         setFactory(data);
         setLoading(false);
       }
       fetchFactory();
-    }, [req.factory_id, req.factoryId]);
+    }, [req.factoryId]);
 
     // 상태 뱃지
     const statusBadge = (
