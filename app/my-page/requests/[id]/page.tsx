@@ -1,30 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getMatchRequestById, updateMatchRequestStatus } from "@/lib/matchRequests";
-import { MatchRequest } from "@/lib/matchRequests";
+import { getMatchRequestById, MatchRequest } from "@/lib/matchRequests";
 
-export default function RequestDetailPage() {
+export default function MyRequestDetailPage() {
   const router = useRouter();
   const params = useParams();
   const requestId = params.id as string;
-  
+
   const [request, setRequest] = useState<MatchRequest | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRequestData = async () => {
-      // 로컬스토리지에서 봉제공장 인증 정보 확인
-      const storedAuth = localStorage.getItem('factoryAuth');
-      const userType = localStorage.getItem('userType');
-      
-      if (!storedAuth || userType !== 'factory') {
-        router.push('/sign-in');
-        return;
-      }
-      
       try {
-        // 의뢰내역 상세 정보 가져오기
         const requestData = await getMatchRequestById(requestId);
         if (requestData) {
           setRequest(requestData);
@@ -35,24 +24,8 @@ export default function RequestDetailPage() {
         setLoading(false);
       }
     };
-    
     fetchRequestData();
-  }, [requestId, router]);
-
-  const handleStatusUpdate = async (newStatus: MatchRequest['status']) => {
-    if (!request) return;
-    
-    try {
-      const success = await updateMatchRequestStatus(request.id, newStatus);
-      if (success) {
-        setRequest({ ...request, status: newStatus });
-        alert(`의뢰가 ${newStatus === 'accepted' ? '수락' : '거절'}되었습니다.`);
-      }
-    } catch (error) {
-      console.error('상태 업데이트 중 오류:', error);
-      alert('상태 업데이트에 실패했습니다.');
-    }
-  };
+  }, [requestId]);
 
   if (loading) {
     return <div className="max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center">로딩 중...</div>;
@@ -94,36 +67,17 @@ export default function RequestDetailPage() {
                request.status === 'rejected' ? '거절됨' :
                '완료됨'}
             </span>
-            {request.status === 'pending' && (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleStatusUpdate('accepted')}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                >
-                  수락
-                </button>
-                <button
-                  onClick={() => handleStatusUpdate('rejected')}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-                >
-                  거절
-                </button>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* 의뢰자 정보 */}
+        {/* 공장 정보 */}
         <div className="bg-gray-50 rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">의뢰자 정보</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">공장 정보</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-700">이름</p>
-              <p className="text-lg text-gray-900">{request.userName}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-700">이메일</p>
-              <p className="text-lg text-gray-900">{request.userEmail}</p>
+              <p className="text-sm font-medium text-gray-700">공장명</p>
+              {/* @ts-ignore */}
+              <p className="text-lg text-gray-900">{request.factoryName || request['factory_name'] || '공장명 없음'}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-700">연락처</p>
@@ -153,13 +107,13 @@ export default function RequestDetailPage() {
         </div>
 
         {/* 추가 요청사항 */}
-        {request.additional_info && (
+        {(request.additional_info || request.additionalInfo) && (
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">상세 요청사항</h2>
             <div className="bg-gray-50 rounded-lg p-6">
               {(() => {
                 try {
-                  const additionalInfo = JSON.parse(request.additional_info);
+                  const additionalInfo = JSON.parse(request.additional_info || request.additionalInfo || '{}');
                   return (
                     <div className="space-y-6">
                       {/* 브랜드 정보 */}
@@ -279,14 +233,6 @@ export default function RequestDetailPage() {
           >
             목록으로
           </button>
-          {request.status === 'pending' && (
-            <button
-              onClick={() => handleStatusUpdate('accepted')}
-              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-            >
-              의뢰 수락
-            </button>
-          )}
         </div>
       </div>
     </div>
