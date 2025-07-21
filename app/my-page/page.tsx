@@ -223,16 +223,16 @@ export default function MyPage() {
         // 카드 전체 클릭 이벤트 제거
       >
         <div className="w-28 h-28 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center">
-          <Image src={factory.image || factory.images?.[0] || "/logo_donggori.png"} alt={factory.company_name || factory.name || '공장 이미지'} width={112} height={112} className="object-cover w-full h-full" />
+          <Image src={factory?.image || factory?.images?.[0] || "/logo_donggori.png"} alt={factory?.company_name || factory?.name || '공장 이미지'} width={112} height={112} className="object-cover w-full h-full" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-lg font-bold text-gray-900 truncate">{factory.company_name || factory.name || '공장명 없음'}</span>
+            <span className="text-lg font-bold text-gray-900 truncate">{factory?.company_name || factory?.name || '공장명 없음'}</span>
           </div>
           <div className="text-xs text-gray-400 mb-1">의뢰번호: {req.id}</div>
-          <div className="text-xs text-gray-500 mb-1">{factory.business_type || '봉제업'}</div>
+          <div className="text-xs text-gray-500 mb-1">{factory?.business_type || '봉제업'}</div>
           <div className="text-sm text-gray-700 mb-1"><b>주요품목</b>: {mainItems}</div>
-          <div className="text-sm text-gray-700 mb-1"><b>MOQ</b>: {factory.moq || factory.minOrder || '-'}</div>
+          <div className="text-sm text-gray-700 mb-1"><b>MOQ</b>: {factory?.moq || factory?.minOrder || '-'}</div>
           <div className="text-xs text-gray-400">문의일 {req.created_at ? new Date(req.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '날짜 없음'}</div>
         </div>
         <div className="flex flex-col items-end gap-2">
