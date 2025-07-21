@@ -136,7 +136,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         return;
       }
       // 1. 첨부파일 Supabase Storage 업로드
-      let uploadedFileUrls: string[] = [];
+      const uploadedFileUrls: string[] = [];
       if (formData.files.length > 0) {
         for (const file of formData.files) {
           const filePath = `match-request-files/${Date.now()}_${file.name}`;
