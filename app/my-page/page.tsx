@@ -160,7 +160,6 @@ export default function MyPage() {
 
   // 의뢰내역 카드에서 공장 정보 fetch 및 카드 스타일 적용
   function FactoryRequestCard({ req }: { req: any }) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [factory, setFactory] = useState<Factory | null>(null);
     const [loading, setLoading] = useState(true);
 
