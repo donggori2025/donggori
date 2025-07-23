@@ -51,6 +51,18 @@ export default function MyPage() {
           console.log("🔍 의뢰내역 로딩 시작...");
           console.log("사용자 ID:", user.id);
           
+          // 환경 변수 확인
+          console.log("환경 변수 확인:");
+          console.log("NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ 설정됨" : "❌ 설정되지 않음");
+          console.log("NEXT_PUBLIC_SUPABASE_ANON_KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ 설정됨" : "❌ 설정되지 않음");
+          
+          if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+            setRequestError("환경 변수가 설정되지 않았습니다. 관리자에게 문의해주세요.");
+            setDebugInfo("환경 변수 오류: Supabase URL 또는 Anon Key가 설정되지 않음");
+            setMyMatchRequests([]);
+            return;
+          }
+          
           // Supabase 연결 테스트
           const connectionTest = await testSupabaseConnection();
           console.log("Supabase 연결 테스트 결과:", connectionTest);
