@@ -144,3 +144,55 @@ export const testSupabaseConnection = async () => {
     };
   }
 }; 
+
+// match_requests 테이블 구조 확인 함수
+export const checkMatchRequestsTable = async () => {
+  try {
+    console.log('🔍 match_requests 테이블 구조 확인 중...');
+    
+    // 테이블 존재 여부 확인
+    const { data, error } = await supabase
+      .from("match_requests")
+      .select("*")
+      .limit(1);
+    
+    console.log('match_requests 테이블 접근 결과:', { 
+      data: data, 
+      error: error,
+      errorMessage: error?.message,
+      errorCode: error?.code,
+      errorDetails: error?.details,
+      errorHint: error?.hint
+    });
+    
+    if (error) {
+      console.error("❌ match_requests 테이블 접근 실패:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      return {
+        success: false,
+        error: error.message || '알 수 없는 오류',
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      };
+    }
+    
+    console.log("✅ match_requests 테이블 접근 성공");
+    return {
+      success: true,
+      data: data,
+      count: data?.length || 0
+    };
+  } catch (error) {
+    console.error("❌ match_requests 테이블 확인 중 예외 발생:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined
+    };
+  }
+}; 
