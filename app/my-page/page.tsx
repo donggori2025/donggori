@@ -209,19 +209,20 @@ export default function MyPage() {
   console.log("Clerk user 객체:", user);
 
   // 의뢰내역 카드에서 공장 정보 fetch 및 카드 스타일 적용
-  function FactoryRequestCard({ req }: { req: any }) {
+  function FactoryRequestCard({ req }: { req: MatchRequest }) {
     const [factory, setFactory] = useState<Factory | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
       async function fetchFactory() {
         setLoading(true);
-        if (!req.factory_id && !req.factoryId) {
+        const factoryId = req.factory_id || req.factoryId;
+        if (!factoryId) {
           setFactory(null);
           setLoading(false);
           return;
         }
-        const { data } = await supabase.from("donggori").select("*").eq("id", req.factory_id || req.factoryId).single();
+        const { data } = await supabase.from("donggori").select("*").eq("id", factoryId).single();
         setFactory(data);
         setLoading(false);
       }

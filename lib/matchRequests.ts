@@ -3,12 +3,17 @@ import { supabase } from "./supabaseClient";
 // 의뢰내역 인터페이스
 export interface MatchRequest {
   id: string;
-  userId: string;
-  userEmail: string;
-  userName: string;
-  factoryId: string;
-  factoryName: string;
-  requestDate: string;
+  userId?: string;
+  user_id?: string; // Supabase 필드명과 일치
+  userEmail?: string;
+  user_email?: string; // Supabase 필드명과 일치
+  userName?: string;
+  user_name?: string; // Supabase 필드명과 일치
+  factoryId?: string;
+  factory_id?: string; // Supabase 필드명과 일치
+  factoryName?: string;
+  factory_name?: string; // Supabase 필드명과 일치
+  requestDate?: string;
   status: 'pending' | 'accepted' | 'rejected' | 'completed';
   items: string[];
   quantity: number;
