@@ -76,8 +76,7 @@ export default function MyRequestDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-sm font-medium text-gray-700">공장명</p>
-              {/* @ts-expect-error: MatchRequest 타입에 factory_name이 없어서 무시 */}
-              <p className="text-lg text-gray-900">{request.factoryName || request['factory_name'] || '공장명 없음'}</p>
+              <p className="text-lg text-gray-900">{request.factoryName || request.factory_name || '공장명 없음'}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-700">연락처</p>
