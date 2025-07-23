@@ -3,7 +3,7 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, testSupabaseConnection, checkMatchRequestsTable } from "@/lib/supabaseClient";
 import { MatchRequest } from "@/lib/matchRequests";
 import { Factory } from "@/lib/factories";
 
@@ -38,26 +38,76 @@ export default function MyPage() {
   const [myMatchRequests, setMyMatchRequests] = useState<MatchRequest[]>([]);
   const [isLoadingRequests, setIsLoadingRequests] = useState(false);
   const [requestError, setRequestError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string>("");
 
   useEffect(() => {
     if (selectedMenu === "의뢰내역" && user) {
       setIsLoadingRequests(true);
       setRequestError(null);
+      setDebugInfo("");
+      
       (async () => {
         try {
-          const { data, error } = await supabase
-            .from("match_requests")
-            .select("*")
-            .eq("user_id", user.id)
-            .order("created_at", { ascending: false });
-          if (error) {
-            setRequestError("의뢰내역을 불러오는 중 오류가 발생했습니다.");
+          console.log("🔍 의뢰내역 로딩 시작...");
+          console.log("사용자 ID:", user.id);
+          
+          // Supabase 연결 테스트
+          const connectionTest = await testSupabaseConnection();
+          console.log("Supabase 연결 테스트 결과:", connectionTest);
+          
+          if (!connectionTest.success) {
+            setRequestError(`Supabase 연결 실패: ${connectionTest.error}`);
+            setDebugInfo(`연결 오류: ${connectionTest.error}`);
+            setMyMatchRequests([]);
+            return;
+          }
+          
+          console.log("✅ Supabase 연결 성공");
+          
+          // match_requests 테이블 확인
+          const tableTest = await checkMatchRequestsTable();
+          console.log("match_requests 테이블 확인 결과:", tableTest);
+          
+          if (!tableTest.success) {
+            setRequestError(`match_requests 테이블 접근 실패: ${tableTest.error}`);
+            setDebugInfo(`테이블 오류: ${tableTest.error}`);
+            setMyMatchRequests([]);
+            return;
+          }
+          
+          console.log("✅ match_requests 테이블 접근 성공, 의뢰내역 조회 시작...");
+          
+          // 직접 fetch를 사용하여 의뢰내역 조회
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/match_requests?user_id=eq.${encodeURIComponent(user.id)}&select=*&order=created_at.desc`,
+            {
+              headers: {
+                'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+                'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          
+          console.log("Fetch 응답 상태:", response.status);
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("의뢰내역 조회 오류:", response.status, errorText);
+            setRequestError(`의뢰내역을 불러오는 중 오류가 발생했습니다: ${response.status} ${response.statusText}`);
+            setDebugInfo(`HTTP 오류: ${response.status} - ${errorText}`);
             setMyMatchRequests([]);
           } else {
+            const data = await response.json();
+            console.log("✅ 의뢰내역 조회 성공:", data?.length || 0, "개");
             setMyMatchRequests(data || []);
+            setDebugInfo(`성공적으로 ${data?.length || 0}개의 의뢰내역을 불러왔습니다.`);
           }
-        } catch {
-          setRequestError("의뢰내역을 불러오는 중 오류가 발생했습니다.");
+        } catch (e) {
+          console.error("의뢰내역 로딩 중 예외 발생:", e);
+          const errorMessage = e instanceof Error ? e.message : "알 수 없는 오류";
+          setRequestError(`의뢰내역을 불러오는 중 오류가 발생했습니다: ${errorMessage}`);
+          setDebugInfo(`예외 발생: ${errorMessage}`);
           setMyMatchRequests([]);
         } finally {
           setIsLoadingRequests(false);
@@ -159,24 +209,24 @@ export default function MyPage() {
   console.log("Clerk user 객체:", user);
 
   // 의뢰내역 카드에서 공장 정보 fetch 및 카드 스타일 적용
-  function FactoryRequestCard({ req }: { req: MatchRequest }) {
+  function FactoryRequestCard({ req }: { req: any }) {
     const [factory, setFactory] = useState<Factory | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
       async function fetchFactory() {
         setLoading(true);
-        if (!req.factoryId) {
+        if (!req.factory_id && !req.factoryId) {
           setFactory(null);
           setLoading(false);
           return;
         }
-        const { data } = await supabase.from("donggori").select("*").eq("id", req.factoryId).single();
+        const { data } = await supabase.from("donggori").select("*").eq("id", req.factory_id || req.factoryId).single();
         setFactory(data);
         setLoading(false);
       }
       fetchFactory();
-    }, [req.factoryId]);
+    }, [req.factory_id, req.factoryId]);
 
     // 상태 뱃지
     const statusBadge = (
@@ -370,7 +420,19 @@ export default function MyPage() {
             {isLoadingRequests ? (
               <div className="text-center py-20 text-gray-400 text-lg">의뢰내역을 불러오는 중...</div>
             ) : requestError ? (
-              <div className="text-center py-20 text-red-500 text-lg">{requestError}</div>
+              <div className="text-center py-20">
+                <div className="text-red-500 text-lg mb-4">{requestError}</div>
+                {debugInfo && (
+                  <div className="text-sm text-gray-600 bg-gray-100 p-4 rounded-lg max-w-2xl mx-auto">
+                    <div className="font-semibold mb-2">디버그 정보:</div>
+                    <div className="text-xs">{debugInfo}</div>
+                  </div>
+                )}
+                <div className="mt-4 text-sm text-gray-500">
+                  <div>• 브라우저 개발자 도구(F12)의 Console 탭에서 더 자세한 오류 정보를 확인할 수 있습니다.</div>
+                  <div>• 환경 변수가 올바르게 설정되어 있는지 확인해주세요.</div>
+                </div>
+              </div>
             ) : myMatchRequests.length === 0 ? (
               <div className="text-center py-20 text-gray-400 text-lg">의뢰내역이 없습니다.</div>
             ) : (
