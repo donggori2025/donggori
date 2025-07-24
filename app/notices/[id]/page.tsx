@@ -5,11 +5,11 @@ export default async function NoticeDetailPage({ params }: { params: Promise<{ i
   const { id } = await params;
   const notice = notices.find(n => n.id === id);
   if (!notice) {
-    return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 공지입니다.</div>;
+    return <div className="max-w-[1400px] mx-auto py-16 px-6 text-center text-gray-500">존재하지 않는 공지입니다.</div>;
   }
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto py-16 px-6">
+      <div className="max-w-[1400px] mx-auto py-16 px-6">
         {/* 상단 섹션 */}
         <div className="mb-12">
           <div className="text-sm text-gray-500 mb-2">업데이트</div>
