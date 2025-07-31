@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { X } from 'lucide-react';
 
 interface FactoryInfoPopupProps {
-  factory: any;
+  factory: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   onClose: () => void;
   onDetailClick: () => void;
 }

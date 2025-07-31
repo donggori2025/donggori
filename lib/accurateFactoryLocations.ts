@@ -61,7 +61,7 @@ export const accurateFactoryLocations = {
 
 // 공장명으로 정확한 위치 찾기
 export function getAccurateFactoryLocation(companyName: string): { lat: number; lng: number; address: string } | null {
-  return (accurateFactoryLocations as any)[companyName] || null;
+  return (accurateFactoryLocations as Record<string, { lat: number; lng: number; address: string }>)[companyName] || null;
 }
 
 // 주소 기반 위치 찾기 (fallback) - 동대문구 실제 좌표 사용

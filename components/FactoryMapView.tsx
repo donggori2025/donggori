@@ -1,11 +1,11 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import KakaoMap from './KakaoMap';
 import FactoryInfoPopup from './FactoryInfoPopup';
 import { FactoryLocation, MapFilters } from '@/lib/types';
 import { getFactoryLocations } from '@/lib/factoryMap';
-import { Map, List, Search, Filter } from 'lucide-react';
+import { Map, List, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface FactoryMapViewProps {
@@ -21,11 +21,7 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFactory, setSelectedFactory] = useState<FactoryLocation | null>(null);
 
-  useEffect(() => {
-    loadFactories();
-  }, [filters]);
-
-  const loadFactories = async () => {
+  const loadFactories = useCallback(async () => {
     setLoading(true);
     try {
       console.log('🔍 팩토리 맵 뷰에서 공장 데이터 로드 시작...');
@@ -37,7 +33,11 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    loadFactories();
+  }, [loadFactories]);
 
   const handleFactoryClick = (factoryId: string) => {
     console.log(`🔗 공장 상세페이지 이동: ${factoryId}`);
@@ -49,7 +49,7 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
     setFilters(prev => ({ ...prev, region: searchTerm }));
   };
 
-  const handleMarkerSelect = (factory: any) => {
+  const handleMarkerSelect = (factory: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     console.log(`ℹ️ 마커 선택: ${factory.company_name}`);
     setSelectedFactory(factory);
   };

@@ -61,7 +61,7 @@ export const factoryLocations = {
 
 // 공장명으로 위치 찾기
 export function getFactoryLocationByName(companyName: string): { lat: number; lng: number; address: string } | null {
-  return (factoryLocations as any)[companyName] || null;
+  return (factoryLocations as Record<string, { lat: number; lng: number; address: string }>)[companyName] || null;
 }
 
 // 주소로 위치 찾기 (기본값) - 동대문구 실제 지리적 범위

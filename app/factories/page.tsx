@@ -6,12 +6,12 @@ import { ArrowPathIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { List, Map as MapIcon } from "lucide-react";
 import { factories, fetchFactoriesFromDB, type Factory } from "@/lib/factories";
 import { testSupabaseConnection } from "@/lib/supabaseClient";
-import dynamic from "next/dynamic";
+// import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import KakaoMap from "@/components/KakaoMap";
-import SimpleKakaoMap from "@/components/SimpleKakaoMap";
-import { getFactoryLocations } from "@/lib/factoryMap";
+// import SimpleKakaoMap from "@/components/SimpleKakaoMap";
+// import { getFactoryLocations } from "@/lib/factoryMap";
 import FactoryInfoPopup from "@/components/FactoryInfoPopup";
 import { getFactoryLocationByName, getDongdaemunCenter } from "@/lib/factoryLocationMapping";
 
@@ -232,22 +232,22 @@ export default function FactoriesPage() {
     loadFactories();
   }, []);
 
-  // 카카오지도용 공장 데이터 로드
-  useEffect(() => {
-    const loadMapFactories = async () => {
-      setMapLoading(true);
-      try {
-        const factoryLocations = await getFactoryLocations();
-        setMapFactories(factoryLocations);
-      } catch (error) {
-        console.error('지도용 공장 데이터 로드 실패:', error);
-      } finally {
-        setMapLoading(false);
-      }
-    };
+  // 카카오지도용 공장 데이터 로드 (사용하지 않음)
+  // useEffect(() => {
+  //   const loadMapFactories = async () => {
+  //     setMapLoading(true);
+  //     try {
+  //       const factoryLocations = await getFactoryLocations();
+  //       setMapFactories(factoryLocations);
+  //     } catch (error) {
+  //       console.error('지도용 공장 데이터 로드 실패:', error);
+  //     } finally {
+  //       setMapLoading(false);
+  //     }
+  //   };
     
-    loadMapFactories();
-  }, []);
+  //   loadMapFactories();
+  // }, []);
 
 
 
@@ -300,14 +300,14 @@ export default function FactoriesPage() {
   }, [factoriesData]);
 
   // FactoryMap 동적 import (SSR 비활성화)
-  const FactoryMap = dynamic(() => import("@/components/FactoryMap"), { ssr: false });
+  // const FactoryMap = dynamic(() => import("@/components/FactoryMap"), { ssr: false });
 
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   
-  // 카카오지도용 상태
-  const [mapFactories, setMapFactories] = useState<any[]>([]);
-  const [mapLoading, setMapLoading] = useState(false);
-  const [selectedFactory, setSelectedFactory] = useState<any>(null);
+  // 카카오지도용 상태 (사용하지 않음)
+  // const [mapFactories, setMapFactories] = useState<any[]>([]);
+  // const [mapLoading, setMapLoading] = useState(false);
+  const [selectedFactory, setSelectedFactory] = useState<Factory | null>(null);
   const [showPopup, setShowPopup] = useState(false);
 
   // 첫 번째 공장 자동 선택 (지도 뷰일 때)
@@ -1024,7 +1024,7 @@ export default function FactoriesPage() {
             ) : (
               <div className="w-full h-[500px] sm:h-[600px] md:h-[700px] lg:h-[800px] bg-gray-100 rounded-xl">
                 {/* 카카오지도 뷰 */}
-                {mapLoading ? (
+                {loading ? (
                   <div className="w-full h-full flex items-center justify-center">
                     <div className="text-gray-500">지도를 불러오는 중...</div>
                   </div>
@@ -1034,7 +1034,7 @@ export default function FactoriesPage() {
                       center={getDongdaemunCenter()}
                       level={4}
                       selectedMarkerId={selectedFactory?.id?.toString()}
-                      markers={filtered.map((factory, index) => {
+                      markers={filtered.map((factory) => {
                         // 공장명으로 정확한 위치 찾기
                         const companyName = factory.company_name || factory.name || '';
                         const factoryLocation = getFactoryLocationByName(companyName);
