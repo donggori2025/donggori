@@ -321,7 +321,7 @@ export default function FactoryMyPage() {
   const hasChanges = JSON.stringify(formData) !== JSON.stringify(originalData);
 
   return (
-    <div className="max-w-[1200px] mx-auto py-16 px-4">
+    <div className="max-w-[1400px] mx-auto py-16 px-4">
       <div className="mb-8">
         <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">마이페이지</h1>
       </div>

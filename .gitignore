@@ -28,3 +28,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+public/동고리_사진데이터/

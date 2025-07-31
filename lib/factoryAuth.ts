@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase, checkSupabaseConfig } from "./supabaseClient";
 
 // 봉제공장 업장별 로그인 정보
 export interface FactoryAuth {
@@ -248,6 +248,14 @@ export async function updateFactoryData(factoryId: string, updateData: { [key: s
 // 공장 이미지 배열 가져오기
 export async function getFactoryImages(factoryId: string): Promise<string[]> {
   try {
+    // Supabase 연결 상태 확인
+    const { isConfigured } = checkSupabaseConfig();
+    if (!isConfigured) {
+      console.error('공장 이미지 조회 중 오류: Supabase 환경 변수가 설정되지 않았습니다.');
+      console.error('NEXT_PUBLIC_SUPABASE_URL과 NEXT_PUBLIC_SUPABASE_ANON_KEY를 .env.local 파일에 설정해주세요.');
+      return [];
+    }
+
     const { data, error } = await supabase
       .from('donggori')
       .select('images')
@@ -255,13 +263,18 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
       .single();
 
     if (error) {
-      console.error('공장 이미지 조회 중 오류:', error);
+      console.error('공장 이미지 조회 중 오류:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
       return [];
     }
 
     return data?.images || [];
   } catch (error) {
-    console.error('공장 이미지 조회 중 오류:', error);
+    console.error('공장 이미지 조회 중 예외 발생:', error);
     return [];
   }
 }
@@ -294,7 +307,7 @@ export async function getFactoryProfileImage(factoryId: string): Promise<string 
     const images = await getFactoryImages(factoryId);
     return images.length > 0 ? images[0] : null;
   } catch (error) {
-    console.error('공장 프로필 이미지 조회 중 오류:', error);
+    console.error('공장 프로필 이미지 조회 중 예외 발생:', error);
     return null;
   }
 }
