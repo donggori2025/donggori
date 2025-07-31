@@ -8,6 +8,7 @@ import { Share, ArrowLeft, ChevronDown, ChevronUp, Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
+import PricingTable from "@/components/PricingTable";
 
 export default function FactoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { user } = useUser();
@@ -173,10 +174,8 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       subtitle: "봉제공정",
       price: "39,000원 (VAT 포함)",
       features: [
-        "텍스트형 시안 1종",
-        "슬로건 제작", 
-        "평생 A/S",
-        "원본, 저작, 재산권 이전"
+        "봉제공장 매칭",
+        "작업지시서 전달"
       ],
       sampleFee: "샘플비 10,000원",
       unitPrice: "장단 단가 16,800원"
@@ -186,12 +185,9 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       subtitle: "패턴/샘플 + 공정",
       price: "89,000원 (VAT 포함)",
       features: [
-        "패턴 제작",
-        "샘플 제작",
-        "봉제 공정",
-        "품질 검수",
-        "배송 서비스",
-        "기술 지원"
+        "샘플/패턴실 매칭",
+        "봉제공장 매칭",
+        "작업지시서 전달"
       ]
     },
     premium: {
@@ -199,13 +195,10 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       subtitle: "올인원(기획/디자인~)",
       price: "159,000원 (VAT 포함)", 
       features: [
-        "기획 및 디자인",
-        "패턴 제작",
-        "샘플 제작", 
-        "봉제 공정",
-        "품질 검수",
-        "배송 서비스",
-        "마케팅 지원"
+        "디자인(도식화, 패턴) 기획 컨설팅",
+        "샘플/패턴실 매칭",
+        "봉제공장 매칭",
+        "작업지시서 전달"
       ]
     }
   };
@@ -216,10 +209,20 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
 
   // 실제 공장 이미지 배열 (DB에서 가져온 이미지들)
   const factoryImages = factory.images && factory.images.length > 0 
-    ? factory.images 
-    : factory.image 
+    ? factory.images.filter(img => 
+        img && 
+        img !== '/logo_donggori.png' && 
+        !img.includes('동고') && 
+        !img.includes('unsplash') &&
+        !img.includes('logo_donggori')
+      )
+    : factory.image && 
+      factory.image !== '/logo_donggori.png' && 
+      !factory.image.includes('동고') && 
+      !factory.image.includes('unsplash') &&
+      !factory.image.includes('logo_donggori')
       ? [factory.image] 
-      : ["/logo_donggori.png"]; // 기본 이미지
+      : []; // 이미지가 없으면 빈 배열
 
   return (
     <div className="min-h-screen bg-white">
@@ -229,7 +232,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           <div className="bg-white rounded-xl p-6 mb-6">
             {/* 이미지 갤러리 */}
             <div className="mb-8">
-              {factoryImages.length > 0 && (
+              {factoryImages.length > 0 ? (
                 <div className="relative">
                   {/* 메인 이미지 */}
                   <div className="relative w-full h-80 sm:h-96 md:h-[500px] overflow-hidden rounded-lg">
@@ -316,6 +319,12 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                       ))}
                     </div>
                   )}
+                </div>
+              ) : (
+                <div className="w-full h-80 sm:h-96 md:h-[500px] bg-gray-100 flex items-center justify-center rounded-lg">
+                  <div className="text-gray-400 text-lg font-medium">
+                    이미지 준비 중
+                  </div>
                 </div>
               )}
             </div>
@@ -458,14 +467,24 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="mb-4">
                   <h4 className="font-semibold mb-2">공통점</h4>
-                  <p className="text-sm text-gray-600">패키지별 가격 정보를 확인해보세요</p>
+                  <p className="text-sm text-gray-600">모든 패키지는 의류 생산을 위한 기본 지원을 제공하며, 작업지시서 전달을 통해 의뢰자가 요청한 사양이 정확히 생산 공장에 전달되도록 보장합니다.</p>
+                  <p className="text-sm text-gray-600 mt-2">또한, 기본적인 생산 A/S를 지원하여 초도 생산 시 발생할 수 있는 문제를 최소화합니다.</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">주요 특징</h4>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600">Standard: 패키지별 가격 정보를 확인해보세요</p>
-                    <p className="text-sm text-gray-600">Deluxe: 패키지별 가격 정보를 확인해보세요</p>
-                    <p className="text-sm text-gray-600">Premium: 패키지별 가격 정보를 확인해보세요</p>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">Standard</p>
+                      <p className="text-sm text-gray-600">봉제공장 매칭을 통해 바로 생산에 착수할 수 있으며, 작업지시서를 기반으로 최소한의 의류 생산 지원을 제공합니다. 단순한 의뢰나 소량 생산에 적합한 패키지입니다.</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">Deluxe</p>
+                      <p className="text-sm text-gray-600">샘플/패턴실 매칭까지 지원하여 사전 검증과 품질 확인이 가능하며, 봉제공장 매칭과 작업지시서 전달까지 일괄 지원합니다. 소량 샘플 제작이나 본생산 이전 검증 단계에 적합합니다.</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">Premium</p>
+                      <p className="text-sm text-gray-600">디자인(도식화·패턴) 기획 단계부터 컨설팅을 지원하며, 샘플/패턴실 매칭과 봉제공장 매칭, 작업지시서 전달까지 풀 패키지를 제공합니다. 브랜드 기획·개발 단계나 정식 런칭 준비에 최적화된 패키지입니다.</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -475,9 +494,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             {/* 공정 단가표 */}
             <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">공정 단가표</h2>
-              <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-500">
-                공정 단가 정보가 없습니다.
-              </div>
+              <PricingTable />
             </div>
             <div className="border-b border-gray-200 mb-8"></div>
 
@@ -572,13 +589,9 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
               {selectedPlan === 'standard' && (
                 <div className="mt-3">
                   <ul className="text-xs lg:text-sm text-gray-600 space-y-1 mb-4">
-                    <li>• 텍스트형 시안 1종</li>
-                    <li>• 슬로건 제작</li>
-                    <li>• 평생 A/S</li>
-                    <li>• 원본, 저작, 재산권 이전</li>
+                    <li>• 봉제공장 매칭</li>
+                    <li>• 작업지시서 전달</li>
                   </ul>
-                  <div className="text-xs lg:text-sm text-gray-600 mb-2">샘플비 10,000원</div>
-                  <div className="text-xs lg:text-sm text-gray-600 mb-4">장단 단가 16,800원</div>
                   <Button className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm">
                     <Link href={`/factories/${factoryId}/request?service=standard`} className="w-full">
                       공정 의뢰하기
@@ -600,12 +613,9 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
               {selectedPlan === 'deluxe' && (
                 <div className="mt-3">
                   <ul className="text-xs lg:text-sm text-gray-600 space-y-1 mb-4">
-                    <li>• 패턴 제작</li>
-                    <li>• 샘플 제작</li>
-                    <li>• 봉제 공정</li>
-                    <li>• 품질 검수</li>
-                    <li>• 배송 서비스</li>
-                    <li>• 기술 지원</li>
+                    <li>• 샘플/패턴실 매칭</li>
+                    <li>• 봉제공장 매칭</li>
+                    <li>• 작업지시서 전달</li>
                   </ul>
                   <Button className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm">
                     <Link href={`/factories/${factoryId}/request?service=deluxe`} className="w-full">
@@ -628,13 +638,10 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
               {selectedPlan === 'premium' && (
                 <div className="mt-3">
                   <ul className="text-xs lg:text-sm text-gray-600 space-y-1 mb-4">
-                    <li>• 기획 및 디자인</li>
-                    <li>• 패턴 제작</li>
-                    <li>• 샘플 제작</li>
-                    <li>• 봉제 공정</li>
-                    <li>• 품질 검수</li>
-                    <li>• 배송 서비스</li>
-                    <li>• 마케팅 지원</li>
+                    <li>• 디자인(도식화, 패턴) 기획 컨설팅</li>
+                    <li>• 샘플/패턴실 매칭</li>
+                    <li>• 봉제공장 매칭</li>
+                    <li>• 작업지시서 전달</li>
                   </ul>
                   <Button className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm">
                     <Link href={`/factories/${factoryId}/request?service=premium`} className="w-full">

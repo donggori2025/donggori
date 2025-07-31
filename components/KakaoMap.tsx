@@ -41,9 +41,17 @@ export default function KakaoMap({
     // 카카오맵 API 로드
     const loadKakaoMap = () => {
       console.log('🗺️ 카카오맵 API 로딩 시작...');
-      console.log('🔑 API Key:', process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY);
-      console.log('🔑 API Key 길이:', process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY?.length);
-      console.log('🔑 API Key 존재 여부:', !!process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY);
+      
+      const apiKey = process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY;
+      console.log('🔑 API Key:', apiKey);
+      console.log('🔑 API Key 길이:', apiKey?.length);
+      console.log('🔑 API Key 존재 여부:', !!apiKey);
+      
+      // API 키가 없으면 에러 처리
+      if (!apiKey) {
+        console.error('❌ 카카오맵 API 키가 설정되지 않았습니다.');
+        return;
+      }
       
       // 이미 로드되어 있는지 확인
       if (window.kakao && window.kakao.maps && window.kakao.maps.LatLng) {
@@ -60,7 +68,7 @@ export default function KakaoMap({
 
       console.log('📥 카카오맵 스크립트 로딩 중...');
       const script = document.createElement('script');
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY}&libraries=services&autoload=false`;
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&libraries=services&autoload=false`;
       script.async = true;
       
       script.onload = () => {
@@ -79,6 +87,11 @@ export default function KakaoMap({
       
       script.onerror = (error) => {
         console.error('❌ 카카오맵 스크립트 로드 실패:', error);
+        console.error('🔍 디버깅 정보:');
+        console.error('- API Key:', apiKey);
+        console.error('- API Key 길이:', apiKey?.length);
+        console.error('- 스크립트 URL:', script.src);
+        console.error('- 네트워크 상태:', navigator.onLine);
       };
       
       document.head.appendChild(script);

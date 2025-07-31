@@ -58,9 +58,12 @@ const InfoSection = () => {
 
   useEffect(() => {
     fetchFactoriesFromDB().then((data) => {
-      // 이미지가 있는 업장들만 필터링
+      // 이미지가 있는 업장들만 필터링 (로고 이미지 제외)
       const factoriesWithImages = data.filter(factory => 
-        factory.images && factory.images.length > 0
+        factory.images && 
+        factory.images.length > 0 && 
+        factory.images[0] !== '/logo_donggori.png' &&
+        !factory.images[0].includes('logo_donggori')
       );
       
       // 이미지가 있는 업장이 CARD_COUNT보다 적으면 모든 업장 사용
@@ -146,21 +149,28 @@ const InfoSection = () => {
                   .join(', ') || '-';
                 const randomFabrics = cardFabricsById[f.id ?? idx] || [];
                 return (
-                  <Link href={`/factories/${f.id}`} key={`${f.id ?? 'noid'}-${idx}`} className="rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer hover:shadow-lg transition-shadow w-[calc(50%-4px)] sm:w-[calc(33.333%-8px)] md:w-[calc(25%-12px)] flex-shrink-0">
+                  <Link href={`/factories/${f.id}`} key={`${f.id ?? 'noid'}-${idx}`} className="rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer w-[calc(50%-4px)] sm:w-[calc(33.333%-8px)] md:w-[calc(25%-12px)] flex-shrink-0">
                     {/* 이미지 영역 */}
-                    <div className="w-full h-32 sm:h-40 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-xl">
-                      <Image
-                        src={f.images && f.images.length > 0 ? f.images[0] : (f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length])}
-                        alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
-                        className="object-cover w-full h-full rounded-t-xl"
-                        width={400}
-                        height={192}
-                        priority={idx < 4}
-                        unoptimized
-                      />
+                    <div className="w-full h-32 sm:h-40 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-xl group">
+                      {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('동고')) || 
+                       (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('동고') && !f.image.includes('unsplash')) ? (
+                        <Image
+                          src={f.images && f.images.length > 0 ? f.images[0] : f.image}
+                          alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
+                          className="object-cover w-full h-full rounded-t-xl group-hover:scale-110 transition-transform duration-300"
+                          width={400}
+                          height={192}
+                          priority={idx < 4}
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="text-gray-400 text-xs sm:text-sm font-medium">
+                          이미지 준비 중
+                        </div>
+                      )}
                     </div>
                     {/* 정보 영역 */}
-                    <div className="flex-1 flex flex-col p-3 sm:p-4 text-left">
+                    <div className="flex-1 flex flex-col px-0 py-3 sm:py-4 text-left">
                       {/* 주요 원단 칩 */}
                       <div className="flex flex-wrap gap-1 mb-2">
                         {randomFabrics.map((chip) => (
