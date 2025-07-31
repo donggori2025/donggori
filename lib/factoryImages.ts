@@ -127,8 +127,43 @@ const factoryImageFiles: Record<string, string[]> = {
     'KakaoTalk_20250716_103440984_03.jpg',
     'KakaoTalk_20250716_103440984_04.jpg'
   ],
-  // 재민상사는 실제 이미지 파일이 없으므로 기본 이미지 사용
-  '재민상사': ['/logo_donggori.png'],
+  // 누락된 업장들 추가
+  '재민상사': [
+    '20250714_120323.jpg',
+    '20250714_120423.jpg',
+    '20250714_120430.jpg',
+    '20250714_120452.jpg',
+    'KakaoTalk_20250715_163600624.jpg'
+  ],
+  '아트패션': [
+    '20250709_112748.jpg',
+    '20250709_112919.jpg',
+    '20250709_112925.jpg',
+    '20250709_112951.jpg',
+    '20250709_113042.jpg'
+  ],
+  // 기본 이미지 사용할 업장들 (업로드되지 않은 경우)
+  '라이브 어패럴': ['/logo_donggori.png'],
+  '라인스': ['/logo_donggori.png'],
+  '백산실업': ['/logo_donggori.png'],
+  '부연사': ['/logo_donggori.png'],
+  '새가온': ['/logo_donggori.png'],
+  '선화사': ['/logo_donggori.png'],
+  '스마일': ['/logo_donggori.png'],
+  '시즌': ['/logo_donggori.png'],
+  '실루엣컴퍼니': ['/logo_donggori.png'],
+  '에이스': ['/logo_donggori.png'],
+  '오르다': ['/logo_donggori.png'],
+  '오성섬유': ['/logo_donggori.png'],
+  '오스카 디자인': ['/logo_donggori.png'],
+  '우정샘플': ['/logo_donggori.png'],
+  '유화 섬유': ['/logo_donggori.png'],
+  '좋은사람': ['/logo_donggori.png'],
+  '하늘패션': ['/logo_donggori.png'],
+  '혜민사': ['/logo_donggori.png'],
+  '화신사': ['/logo_donggori.png'],
+  '희란패션': ['/logo_donggori.png'],
+  '희망사': ['/logo_donggori.png'],
 };
 
 // 업장 이름으로 이미지 폴더 찾기
@@ -164,7 +199,7 @@ export function getFactoryImages(factoryName: string): string[] {
     return ['/logo_donggori.png'];
   }
 
-  // 첫 번째 파일이 기본 이미지 경로인 경우 (재민상사 등)
+  // 첫 번째 파일이 기본 이미지 경로인 경우 (업로드되지 않은 업장들)
   if (imageFiles[0].startsWith('/')) {
     return imageFiles;
   }
