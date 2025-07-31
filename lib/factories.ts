@@ -571,7 +571,18 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
     });
 
     console.log(`Supabase에서 ${mappedFactories.length}개의 공장 데이터를 가져왔습니다.`);
-    return mappedFactories;
+    
+    // 이미지가 있는 업장들을 맨 상단으로 정렬
+    const sortedFactories = mappedFactories.sort((a, b) => {
+      const aHasImages = a.images && a.images.length > 0 && a.images[0] !== '/logo_donggori.png';
+      const bHasImages = b.images && b.images.length > 0 && b.images[0] !== '/logo_donggori.png';
+      
+      if (aHasImages && !bHasImages) return -1;
+      if (!aHasImages && bHasImages) return 1;
+      return 0;
+    });
+    
+    return sortedFactories;
   } catch (error) {
     console.error("Supabase 데이터 가져오기 중 오류 발생:", error);
     return [];

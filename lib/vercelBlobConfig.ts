@@ -5,7 +5,9 @@ export const BLOB_READ_WRITE_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || '';
 
 // Vercel Blob 이미지 URL 생성 함수
 export function getVercelBlobImageUrl(folderName: string, fileName: string): string {
-  return `https://m7fjtbfe2aen7kcw.public.blob.vercel-storage.com/${folderName}/${fileName}`;
+  const encodedFolderName = encodeURIComponent(folderName);
+  const encodedFileName = encodeURIComponent(fileName);
+  return `https://m7fjtbfe2aen7kcw.public.blob.vercel-storage.com/${encodedFolderName}/${encodedFileName}`;
 }
 
 // Vercel Blob 썸네일 이미지 URL 생성

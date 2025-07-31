@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import type { Factory } from "@/lib/factories";
+import { getFactoryImages } from "@/lib/factoryImages";
 
 // factories 데이터에서 옵션 추출 유틸(공장 찾기에서 복사)
 const moqRanges = [
@@ -99,6 +100,7 @@ type ScoredFactory = Factory & { score: number };
   ], [QUESTIONS]);
   const [introStep, setIntroStep] = useState(0); // 0: 타이핑, 1: ... 표시, 2: 다음 메시지
   const typingTimer = useRef<NodeJS.Timeout | null>(null);
+  const [introRestartKey, setIntroRestartKey] = useState(0); // 인트로 재시작을 위한 키
 
   useEffect(() => {
     // 인트로 타이핑 효과
@@ -139,7 +141,7 @@ type ScoredFactory = Factory & { score: number };
       timers.forEach(clearTimeout);
       if (typingTimer.current) clearTimeout(typingTimer.current);
     };
-  }, [introMessages]);
+  }, [introMessages, introRestartKey]);
   // 현재 질문 인덱스
   const [step, setStep] = useState(0);
   // 사용자가 선택한 답변들
@@ -305,18 +307,31 @@ type ScoredFactory = Factory & { score: number };
               .filter((v) => typeof v === 'string' && v.length > 0)
               .join(', ') || '-';
             const randomFabrics = cardFabricsById[f.id ?? idx] || [];
+            
+            // 공장 이름으로 실제 blob 이미지 가져오기
+            const companyName = String(f.company_name || f.name || "공장명 없음");
+            const factoryImages = getFactoryImages(companyName);
+            const factoryImage = factoryImages && factoryImages.length > 0 ? factoryImages[0] : f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length];
+            
             return (
               <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden flex flex-col border border-gray-200">
                 {/* 이미지 영역 */}
-                <div className="w-full h-40 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl">
-                  <Image
-                    src={f.images && f.images.length > 0 ? f.images[0] : (f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length])}
-                    alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
-                    className="object-cover w-full h-full rounded-xl"
-                    width={400}
-                    height={160}
-                    priority={idx < 3}
-                  />
+                <div className="w-full h-40 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl group">
+                  {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('동고')) || 
+                   (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('동고') && !f.image.includes('unsplash')) ? (
+                    <Image
+                      src={f.images && f.images.length > 0 ? f.images[0] : f.image}
+                      alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
+                      className="object-cover w-full h-full rounded-xl group-hover:scale-110 transition-transform duration-300"
+                      width={400}
+                      height={160}
+                      priority={idx < 3}
+                    />
+                  ) : (
+                    <div className="text-gray-400 text-sm font-medium">
+                      이미지 준비 중
+                    </div>
+                  )}
                 </div>
                 {/* 이미지와 텍스트 사이 gap */}
                 <div className="mt-4" />
@@ -375,6 +390,7 @@ type ScoredFactory = Factory & { score: number };
 
   // 추천 결과(매칭 완료) 시 왼쪽 하단에 '직접 찾기'와 '다시하기' 버튼을 추가합니다. '직접 찾기'는 /factories로 이동, '다시하기'는 매칭 상태(answers, step, chat 등) 초기화. 버튼은 Figma 예시처럼 스타일링(직접 찾기: 흰색, 다시하기: 검정 배경, 아이콘 포함)합니다.
   const handleRestart = () => {
+    // 모든 상태 초기화
     setLoading(false);
     setStep(0);
     setAnswers([]);
@@ -382,6 +398,20 @@ type ScoredFactory = Factory & { score: number };
     setChat([]);
     setIntroDone(false);
     setRecommended([]); // 결과 초기화
+    setResultLoading(false);
+    setShowResultMsg1(false);
+    setShowResultMsg2(false);
+    setTypingText("");
+    setIntroStep(0);
+    
+    // 타이핑 타이머 초기화
+    if (typingTimer.current) {
+      clearTimeout(typingTimer.current);
+      typingTimer.current = null;
+    }
+    
+    // 인트로 재시작을 위한 키 변경
+    setIntroRestartKey(prev => prev + 1);
   };
 
   // 답변이 모두 끝나면 분석 로딩 후 결과 노출

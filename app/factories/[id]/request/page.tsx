@@ -182,18 +182,15 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             serviceDetails: {
               standard: {
                 title: "Standard",
-                subtitle: "봉제공정",
-                price: "39,000원 (VAT 포함)"
+                subtitle: "봉제공정"
               },
               deluxe: {
                 title: "Deluxe", 
-                subtitle: "패턴/샘플 + 공장",
-                price: "89,000원 (VAT 포함)"
+                subtitle: "패턴/샘플 + 공장"
               },
               premium: {
                 title: "Premium",
-                subtitle: "올인원(기획/디자인~)",
-                price: "159,000원 (VAT 포함)"
+                subtitle: "올인원(기획/디자인~)"
               }
             }
           }),
@@ -267,41 +264,30 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     standard: {
       title: "Standard",
       subtitle: "봉제공정",
-      price: "39,000원 (VAT 포함)",
       features: [
-        "텍스트형 시안 1종",
-        "슬로건 제작", 
-        "평생 A/S",
-        "원본, 저작, 재산권 이전",
-        "샘플비 10,000원",
-        "장단 단가 16,800원"
-      ]
+        "봉제공장 매칭",
+        "작업지시서 전달"
+      ],
+      sampleFee: "샘플비 10,000원",
+      unitPrice: "장단 단가 16,800원"
     },
     deluxe: {
-      title: "Deluxe",
-      subtitle: "패턴/샘플 + 공장",
-      price: "89,000원 (VAT 포함)",
+      title: "Deluxe", 
+      subtitle: "패턴/샘플 + 공정",
       features: [
-        "패턴 제작",
-        "샘플 제작",
-        "봉제 공정",
-        "품질 검수",
-        "배송 서비스",
-        "기술 지원"
+        "샘플/패턴실 매칭",
+        "봉제공장 매칭",
+        "작업지시서 전달"
       ]
     },
     premium: {
-      title: "Premium", 
+      title: "Premium",
       subtitle: "올인원(기획/디자인~)",
-      price: "159,000원 (VAT 포함)",
       features: [
-        "기획 및 디자인",
-        "패턴 제작",
-        "샘플 제작", 
-        "봉제 공정",
-        "품질 검수",
-        "배송 서비스",
-        "마케팅 지원"
+        "디자인(도식화, 패턴) 기획 컨설팅",
+        "샘플/패턴실 매칭",
+        "봉제공장 매칭",
+        "작업지시서 전달"
       ]
     }
   };
@@ -533,18 +519,21 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             
             {/* 선택된 서비스 표시 */}
             <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <div className="font-semibold">{currentService.title}</div>
-                  <div className="text-xs text-gray-500">{currentService.subtitle}</div>
-                </div>
-                <div className="text-sm font-semibold text-black">{currentService.price}</div>
+              <div className="mb-2">
+                <div className="font-semibold">{currentService.title}</div>
+                <div className="text-xs text-gray-500">{currentService.subtitle}</div>
               </div>
               <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
                 {currentService.features.map((feature, index) => (
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
+              {selectedService === 'standard' && 'sampleFee' in currentService && 'unitPrice' in currentService && (
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <div className="text-xs text-gray-600">{currentService.sampleFee}</div>
+                  <div className="text-xs text-gray-600">{currentService.unitPrice}</div>
+                </div>
+              )}
             </div>
 
             <Button className="w-full bg-black text-white rounded-full font-bold py-4 hover:bg-gray-800">

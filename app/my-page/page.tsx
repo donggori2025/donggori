@@ -282,11 +282,24 @@ export default function MyPage() {
 
     return (
       <div
-        className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow flex gap-6 items-center"
+        className="border border-gray-200 rounded-lg p-6 flex gap-6 items-center"
         // 카드 전체 클릭 이벤트 제거
       >
-        <div className="w-28 h-28 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center">
-          <Image src={factory?.images && factory.images.length > 0 ? factory.images[0] : (factory?.image || "/logo_donggori.png")} alt={factory?.company_name || factory?.name || '공장 이미지'} width={112} height={112} className="object-cover w-full h-full" />
+        <div className="w-28 h-28 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center group">
+          {(factory?.images && factory.images.length > 0 && factory.images[0] && factory.images[0] !== '/logo_donggori.png' && !factory.images[0].includes('동고')) || 
+           (factory?.image && factory.image !== '/logo_donggori.png' && !factory.image.includes('동고') && !factory.image.includes('unsplash')) ? (
+            <Image 
+              src={factory.images && factory.images.length > 0 ? factory.images[0] : factory.image} 
+              alt={factory?.company_name || factory?.name || '공장 이미지'} 
+              width={112} 
+              height={112} 
+              className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300" 
+            />
+          ) : (
+            <div className="text-gray-400 text-xs font-medium text-center">
+              이미지<br />준비 중
+            </div>
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">

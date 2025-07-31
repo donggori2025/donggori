@@ -853,7 +853,7 @@ export default function FactoryMyPage() {
               ) : (
                 <div className="space-y-4">
                   {matchRequests.map((request) => (
-                    <div key={request.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div key={request.id} className="border border-gray-200 rounded-lg p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900">{request.userName}</h3>
