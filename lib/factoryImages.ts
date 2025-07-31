@@ -1,5 +1,5 @@
 // Vercel Blob Storage 사용
-import { getVercelBlobImageUrl, getVercelBlobThumbnailUrl } from './vercelBlobConfig';
+import { getVercelBlobImageUrl } from './vercelBlobConfig';
 
 // 업장 이름과 이미지 폴더 매칭
 const factoryImageMapping: Record<string, string> = {

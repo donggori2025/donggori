@@ -311,7 +311,6 @@ type ScoredFactory = Factory & { score: number };
             // 공장 이름으로 실제 blob 이미지 가져오기
             const companyName = String(f.company_name || f.name || "공장명 없음");
             const factoryImages = getFactoryImages(companyName);
-            const factoryImage = factoryImages && factoryImages.length > 0 ? factoryImages[0] : f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length];
             
             return (
               <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden flex flex-col border border-gray-200">
