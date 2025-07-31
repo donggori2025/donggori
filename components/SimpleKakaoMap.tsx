@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 declare global {
   interface Window {
-    kakao: any;
+    kakao: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 }
 
@@ -77,6 +77,7 @@ export default function SimpleKakaoMap({ className = "w-full h-96" }: SimpleKaka
         level: 3
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const map = new window.kakao.maps.Map(container, options);
       console.log('✅ 지도 생성 완료');
     } catch (error) {
@@ -100,6 +101,7 @@ export default function SimpleKakaoMap({ className = "w-full h-96" }: SimpleKaka
               level: 3
             };
 
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const map = new window.kakao.maps.Map(container, options);
             console.log('✅ 지도 재초기화 완료');
           } catch (error) {
@@ -108,7 +110,7 @@ export default function SimpleKakaoMap({ className = "w-full h-96" }: SimpleKaka
         }
       }, 100);
     }
-  }, [isLoaded, mapRef.current]);
+  }, [isLoaded]);
 
   if (error) {
     return (

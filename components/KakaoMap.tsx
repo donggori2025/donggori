@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 
 declare global {
   interface Window {
-    kakao: any;
+    kakao: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 }
 
@@ -14,12 +14,12 @@ interface KakaoMapProps {
     id: string;
     position: { lat: number; lng: number };
     title: string;
-    factory?: any; // 공장 정보 추가
+    factory?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     onClick?: () => void;
   }>;
   selectedMarkerId?: string; // 선택된 마커 ID 추가
-  onMapLoad?: (map: any) => void;
-  onMarkerSelect?: (factory: any) => void; // 마커 선택 콜백 추가
+  onMapLoad?: (map: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onMarkerSelect?: (factory: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   className?: string;
 }
 
@@ -33,7 +33,7 @@ export default function KakaoMap({
   className = "w-full h-96"
 }: KakaoMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<any>(null);
+  const [map, setMap] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -122,7 +122,7 @@ export default function KakaoMap({
     } catch (error) {
       console.error('❌ 카카오지도 생성 실패:', error);
     }
-  }, [isLoaded, center.lat, center.lng, level, onMapLoad, isInitialized]);
+  }, [isLoaded, center, level, onMapLoad, isInitialized]);
 
   // DOM 요소가 준비되었는지 확인하는 추가 useEffect
   useEffect(() => {
@@ -153,7 +153,7 @@ export default function KakaoMap({
         }
       }, 100);
     }
-  }, [isLoaded, mapRef.current, isInitialized, center.lat, center.lng, level, onMapLoad]);
+  }, [isLoaded, isInitialized, center, level, onMapLoad]);
 
   // 마커 업데이트
   useEffect(() => {

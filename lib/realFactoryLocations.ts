@@ -56,7 +56,7 @@ export const realFactoryLocations = {
 
 // 공장명으로 정확한 위치 찾기
 export function getRealFactoryLocation(companyName: string): { lat: number; lng: number; address: string } | null {
-  return (realFactoryLocations as any)[companyName] || null;
+  return (realFactoryLocations as Record<string, { lat: number; lng: number; address: string }>)[companyName] || null;
 }
 
 // 주소로 위치 찾기 (동대문구 실제 지리적 범위)
