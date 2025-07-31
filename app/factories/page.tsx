@@ -988,6 +988,7 @@ export default function FactoriesPage() {
                             width={400}
                             height={224}
                             priority={idx < 6}
+                            unoptimized
                           />
                         </div>
                         {/* 이미지와 텍스트 사이 gap 줄임 */}

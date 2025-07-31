@@ -238,6 +238,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                       alt={`${factory.company_name} 이미지 ${currentImageIndex + 1}`}
                       fill
                       className="object-cover"
+                      unoptimized
                     />
                   </div>
                   
@@ -292,6 +293,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                             alt={`${factory.company_name} 썸네일 ${index + 1}`}
                             fill
                             className="object-cover"
+                            unoptimized
                           />
                         </button>
                       ))}
