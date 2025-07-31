@@ -5,12 +5,12 @@ export const BLOB_READ_WRITE_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || '';
 
 // Vercel Blob 이미지 URL 생성 함수
 export function getVercelBlobImageUrl(folderName: string, fileName: string): string {
-  return `https://donggori-images.vercel-storage.com/${folderName}/${fileName}`;
+  return `https://m7fjtbfe2aen7kcw.public.blob.vercel-storage.com/${folderName}/${fileName}`;
 }
 
 // Vercel Blob 썸네일 이미지 URL 생성
 export function getVercelBlobThumbnailUrl(factoryName: string): string {
-  return `https://donggori-images.vercel-storage.com/thumbnails/${factoryName}.jpg`;
+  return `https://m7fjtbfe2aen7kcw.public.blob.vercel-storage.com/thumbnails/${factoryName}.jpg`;
 }
 
 // 이미지 업로드 함수
