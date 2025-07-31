@@ -156,6 +156,7 @@ const InfoSection = () => {
                         width={400}
                         height={192}
                         priority={idx < 4}
+                        unoptimized
                       />
                     </div>
                     {/* 정보 영역 */}
