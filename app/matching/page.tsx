@@ -157,14 +157,7 @@ type ScoredFactory = Factory & { score: number };
   // 채팅 스크롤 ref
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
-  // 데모 이미지 배열(공장 찾기와 동일)
-  const DEMO_IMAGES = [
-    "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80",
-  ];
+
   // 카드별 칩(공장 id 기준) - 공장 찾기와 동일하게 고정
   const cardFabricsById = useMemo(() => {
     const fabricChips = [
@@ -310,7 +303,6 @@ type ScoredFactory = Factory & { score: number };
             
             // 공장 이름으로 실제 blob 이미지 가져오기
             const companyName = String(f.company_name || f.name || "공장명 없음");
-            const factoryImages = getFactoryImages(companyName);
             
             return (
               <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden flex flex-col border border-gray-200">
