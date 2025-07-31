@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Factory } from "@/lib/factories";
 import { Share, ArrowLeft, ChevronDown, ChevronUp, Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
 
 export default function FactoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { user } = useUser();
@@ -15,6 +16,8 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const [factoryId, setFactoryId] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string | null>('standard');
   const [shareCopied, setShareCopied] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const thumbnailRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     (async () => {
@@ -28,11 +31,94 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     async function fetchFactory() {
       setLoading(true);
       const { data } = await supabase.from("donggori").select("*").eq("id", factoryId).single();
-      setFactory(data);
+      
+      if (data) {
+        // 이미지 매핑 적용
+        const companyName = String(data.company_name || data.name || "공장명 없음");
+        const mappedFactory: Factory = {
+          ...data,
+          id: String(data.id || Math.random()),
+          name: companyName,
+          ownerUserId: String(data.owner_user_id || data.ownerUserId || "unknown"),
+          region: String(data.admin_district || data.region || "지역 없음"),
+          items: [], // items는 별도 필드들로 구성
+          minOrder: Number(data.moq) || 0,
+          description: String(data.intro_text || data.intro || data.description || "설명 없음"),
+          image: getFactoryMainImage(companyName), // 업장 이름으로 이미지 매칭
+          images: getFactoryImages(companyName), // 업장 이름으로 모든 이미지 가져오기
+          contact: String(data.phone_num || data.phone_number || data.contact || "연락처 없음"),
+          lat: Number(data.lat) || 37.5665,
+          lng: Number(data.lng) || 126.9780,
+          kakaoUrl: String(data.kakao_url || data.kakaoUrl || ""),
+          processes: data.processes ? (Array.isArray(data.processes) ? data.processes as string[] : [String(data.processes)]) : [],
+          // DB 연동용 확장 필드들
+          business_type: data.business_type as string | undefined,
+          equipment: data.equipment as string | undefined,
+          sewing_machines: data.sewing_machines as string | undefined,
+          pattern_machines: data.pattern_machines as string | undefined,
+          special_machines: data.special_machines as string | undefined,
+          top_items_upper: data.top_items_upper as string | undefined,
+          top_items_lower: data.top_items_lower as string | undefined,
+          top_items_outer: data.top_items_outer as string | undefined,
+          top_items_dress_skirt: data.top_items_dress_skirt as string | undefined,
+          top_items_bag: data.top_items_bag as string | undefined,
+          top_items_fashion_accessory: data.top_items_fashion_accessory as string | undefined,
+          top_items_underwear: data.top_items_underwear as string | undefined,
+          top_items_sports_leisure: data.top_items_sports_leisure as string | undefined,
+          top_items_pet: data.top_items_pet as string | undefined,
+          moq: Number(data.moq) || undefined,
+          monthly_capacity: Number(data.monthly_capacity) || undefined,
+          admin_district: data.admin_district as string | undefined,
+          intro: (data.intro_text || data.intro) as string | undefined,
+          phone_number: (data.phone_num || data.phone_number) as string | undefined,
+          factory_type: data.factory_type as string | undefined,
+          main_fabrics: data.main_fabrics as string | undefined,
+          distribution: data.distribution as string | undefined,
+          delivery: data.delivery as string | undefined,
+          company_name: data.company_name as string | undefined,
+          contact_name: data.contact_name as string | undefined,
+          email: data.email as string | undefined,
+          address: data.address as string | undefined,
+          established_year: Number(data.established_year) || undefined,
+        };
+        
+        // 디버깅을 위한 로그 추가
+        console.log("Fetched factory data:", data);
+        console.log("Mapped factory:", mappedFactory);
+        console.log("Factory images:", mappedFactory.images);
+        console.log("Factory image:", mappedFactory.image);
+        
+        setFactory(mappedFactory);
+      }
+      
       setLoading(false);
     }
     fetchFactory();
   }, [factoryId]);
+
+  // 현재 이미지가 변경될 때 썸네일 영역을 자동으로 스크롤
+  useEffect(() => {
+    if (thumbnailRef.current && factory && factory.images && factory.images.length > 0) {
+      // 화면 크기에 따른 썸네일 크기 계산
+      const isMobile = window.innerWidth < 640; // sm breakpoint
+      const isTablet = window.innerWidth < 768; // md breakpoint
+      
+      let thumbnailWidth = 64; // w-16 (mobile)
+      if (!isMobile && isTablet) {
+        thumbnailWidth = 80; // w-20 (tablet)
+      } else if (!isTablet) {
+        thumbnailWidth = 96; // w-24 (desktop)
+      }
+      
+      const gap = 8; // gap-2
+      const scrollPosition = currentImageIndex * (thumbnailWidth + gap);
+      
+      thumbnailRef.current.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+      });
+    }
+  }, [currentImageIndex, factory]);
 
   if (loading) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">로딩 중...</div>;
   if (!factory) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 공장입니다.</div>;
@@ -128,13 +214,12 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     setSelectedPlan(selectedPlan === planKey ? null : planKey);
   };
 
-  // 샘플 이미지 배열
-  const sampleImages = [
-    "/bozhin-karaivanov-p1jldJ9tZ6c-unsplash (1).jpg",
-    "/logo_donggori.png",
-    "/logo_donggori.svg",
-    "/next.svg"
-  ];
+  // 실제 공장 이미지 배열 (DB에서 가져온 이미지들)
+  const factoryImages = factory.images && factory.images.length > 0 
+    ? factory.images 
+    : factory.image 
+      ? [factory.image] 
+      : ["/logo_donggori.png"]; // 기본 이미지
 
   return (
     <div className="min-h-screen bg-white">
@@ -143,23 +228,98 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex-1 min-w-0 p-4 lg:p-6 order-2 lg:order-1">
           <div className="bg-white rounded-xl p-6 mb-6">
             {/* 이미지 갤러리 */}
-            <div className="mb-6">
-              <div className="flex gap-2 overflow-x-auto">
-                {sampleImages.map((image, index) => (
-                  <div key={index} className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 flex-shrink-0 overflow-hidden rounded-lg">
+            <div className="mb-8">
+              {factoryImages.length > 0 && (
+                <div className="relative">
+                  {/* 메인 이미지 */}
+                  <div className="relative w-full h-80 sm:h-96 md:h-[500px] overflow-hidden rounded-lg">
                     <Image
-                      src={image}
-                      alt={`업장 이미지 ${index + 1}`}
+                      src={factoryImages[currentImageIndex]}
+                      alt={`${factory.company_name} 이미지 ${currentImageIndex + 1}`}
                       fill
-                      className="object-cover hover:scale-105 transition-transform duration-300"
+                      className="object-cover"
                     />
                   </div>
-                ))}
-              </div>
+                  
+                  {/* 화살표 버튼들 */}
+                  {factoryImages.length > 1 && (
+                    <>
+                      {/* 왼쪽 화살표 */}
+                      <button
+                        onClick={() => setCurrentImageIndex(prev => 
+                          prev === 0 ? factoryImages.length - 1 : prev - 1
+                        )}
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                      >
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      
+                      {/* 오른쪽 화살표 */}
+                      <button
+                        onClick={() => setCurrentImageIndex(prev => 
+                          prev === factoryImages.length - 1 ? 0 : prev + 1
+                        )}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                      >
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </>
+                  )}
+                  
+                  {/* 썸네일 이미지들 */}
+                  {factoryImages.length > 1 && (
+                    <div 
+                      ref={thumbnailRef}
+                      className="flex gap-2 mt-4 overflow-x-auto scrollbar-hide"
+                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    >
+                      {factoryImages.map((image: string, index: number) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
+                            index === currentImageIndex 
+                              ? 'border-blue-500 scale-105' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <Image
+                            src={image}
+                            alt={`${factory.company_name} 썸네일 ${index + 1}`}
+                            fill
+                            className="object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* 이미지 인디케이터 */}
+                  {factoryImages.length > 1 && (
+                    <div className="flex justify-center gap-2 mt-4">
+                      {factoryImages.map((_: string, index: number) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            index === currentImageIndex 
+                              ? 'bg-blue-500' 
+                              : 'bg-gray-300 hover:bg-gray-400'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* 상단 헤더 */}
-            <div className="bg-gray-50 rounded-lg p-4 lg:p-6 mb-6">
+            <div className="bg-gray-50 rounded-lg p-4 lg:p-6 mb-8">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
@@ -184,16 +344,16 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* 위치 */}
-            <div className="mb-6">
+            <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">위치</h2>
               <p className="text-gray-700">
                 (02522) 서울특별시 동대문구 장한로34길 23-2 (장안동) 지층
               </p>
             </div>
-            <div className="border-b border-gray-200 mb-6"></div>
+            <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 주요 정보 */}
-            <div className="mb-6">
+            <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">주요 정보</h2>
               <div className="space-y-4">
                 <div>
@@ -214,10 +374,10 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
             </div>
-            <div className="border-b border-gray-200 mb-6"></div>
+            <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 보유 장비 */}
-            <div className="mb-6">
+            <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">보유 장비</h2>
               <div className="flex flex-wrap gap-2">
                 {splitChips(factory.sewing_machines).length > 0 ? (
@@ -234,10 +394,10 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 )}
               </div>
             </div>
-            <div className="border-b border-gray-200 mb-6"></div>
+            <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 패턴 장비 */}
-            <div className="mb-6">
+            <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">패턴 장비</h2>
               <div className="flex flex-wrap gap-2">
                 {splitChips(factory.pattern_machines).length > 0 ? (
@@ -252,10 +412,10 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 )}
               </div>
             </div>
-            <div className="border-b border-gray-200 mb-6"></div>
+            <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 특수 장비 */}
-            <div className="mb-6">
+            <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">특수 장비</h2>
               <div className="flex flex-wrap gap-2">
                 {splitChips(factory.special_machines).length > 0 ? (
@@ -270,10 +430,10 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 )}
               </div>
             </div>
-            <div className="border-b border-gray-200 mb-6"></div>
+            <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 플랜 */}
-            <div className="mb-6">
+            <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">플랜</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Object.entries(servicePlans).map(([key, plan]) => (
@@ -288,10 +448,10 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 ))}
               </div>
             </div>
-            <div className="border-b border-gray-200 mb-6"></div>
+            <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 플랜 정보 */}
-            <div className="mb-6">
+            <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">플랜 정보</h2>
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="mb-4">
@@ -308,19 +468,19 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
             </div>
-            <div className="border-b border-gray-200 mb-6"></div>
+            <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 공정 단가표 */}
-            <div className="mb-6">
+            <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">공정 단가표</h2>
               <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-500">
                 공정 단가 정보가 없습니다.
               </div>
             </div>
-            <div className="border-b border-gray-200 mb-6"></div>
+            <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 전문가 정보 */}
-            <div className="mb-6">
+            <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">전문가 정보</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div className="bg-gray-50 rounded-lg px-4 py-4 text-center">
@@ -336,16 +496,16 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                   <div className="text-base">{factory.delivery || "업체 배달 서비스"}</div>
                 </div>
               </div>
-              <div className="mt-4">
-                <h4 className="font-semibold mb-2">소개</h4>
-                <p className="text-base text-gray-600 mb-4">
+              <div className="mt-6">
+                <h4 className="font-semibold mb-3">소개</h4>
+                <p className="text-base text-gray-600 mb-6">
                   {factory.intro || "동대문구장한로34길23~2 지층에 위치하고있읍니다"}
                 </p>
-                <h4 className="font-semibold mb-2">특수 보유 기술</h4>
-                <p className="text-base text-gray-600 mb-4">
+                <h4 className="font-semibold mb-3">특수 보유 기술</h4>
+                <p className="text-base text-gray-600 mb-6">
                   {factory.special_tech || "주로 다이마루티의류제조업이면서 바지및 반직기도 가능한업체이며 되도록이면 꼼꼼하게 작업해서업체만족도가 높습니다"}
                 </p>
-                <h4 className="font-semibold mb-2">주요 거래처</h4>
+                <h4 className="font-semibold mb-3">주요 거래처</h4>
                 <p className="text-base text-gray-600">
                   길트프리, 브랜다브랜든, 헬더
                 </p>
@@ -353,9 +513,14 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* 하단 네비게이션 */}
-            <div className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer">
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm">목록으로 돌아가기</span>
+            <div className="mt-12 mb-8">
+              <Link 
+                href="/factories" 
+                className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer bg-gray-50 hover:bg-gray-100 px-4 py-3 rounded-lg"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="text-sm font-medium">목록으로 돌아가기</span>
+              </Link>
             </div>
           </div>
         </div>

@@ -21,6 +21,10 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project-url.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
+**⚠️ 중요: Supabase 환경 변수가 설정되지 않으면 "공장 이미지 조회 중 오류"가 발생할 수 있습니다.**
+
+환경 변수 설정 후에는 개발 서버를 재시작해야 합니다.
+
 ### 2. Supabase 프로젝트 설정
 
 1. [Supabase](https://supabase.com)에서 새 프로젝트 생성

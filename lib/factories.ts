@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import { getFactoryMainImage, getFactoryImages } from "./factoryImages";
 
 export interface Factory {
   id: string;
@@ -514,51 +515,60 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
     }
 
     // Supabase 데이터를 Factory 인터페이스에 맞게 매핑
-    const mappedFactories: Factory[] = data.map((item: Record<string, unknown>) => ({
-      id: String(item.id || Math.random()),
-      name: String(item.company_name || item.name || "공장명 없음"),
-      ownerUserId: String(item.owner_user_id || item.ownerUserId || "unknown"),
-      region: String(item.admin_district || item.region || "지역 없음"),
-      items: [], // items는 별도 필드들로 구성
-      minOrder: Number(item.moq) || 0,
-      description: String(item.intro_text || item.intro || item.description || "설명 없음"),
-      image: String(item.image || "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80"),
-      images: Array.isArray(item.images) ? item.images as string[] : [],
-      contact: String(item.phone_num || item.phone_number || item.contact || "연락처 없음"),
-      lat: Number(item.lat) || 37.5665,
-      lng: Number(item.lng) || 126.9780,
-      kakaoUrl: String(item.kakao_url || item.kakaoUrl || ""),
-      processes: item.processes ? (Array.isArray(item.processes) ? item.processes as string[] : [String(item.processes)]) : [],
-      // DB 연동용 확장 필드들
-      business_type: item.business_type as string | undefined,
-      equipment: item.equipment as string | undefined,
-      sewing_machines: item.sewing_machines as string | undefined,
-      pattern_machines: item.pattern_machines as string | undefined,
-      special_machines: item.special_machines as string | undefined,
-      top_items_upper: item.top_items_upper as string | undefined,
-      top_items_lower: item.top_items_lower as string | undefined,
-      top_items_outer: item.top_items_outer as string | undefined,
-      top_items_dress_skirt: item.top_items_dress_skirt as string | undefined,
-      top_items_bag: item.top_items_bag as string | undefined,
-      top_items_fashion_accessory: item.top_items_fashion_accessory as string | undefined,
-      top_items_underwear: item.top_items_underwear as string | undefined,
-      top_items_sports_leisure: item.top_items_sports_leisure as string | undefined,
-      top_items_pet: item.top_items_pet as string | undefined,
-      moq: Number(item.moq) || undefined,
-      monthly_capacity: Number(item.monthly_capacity) || undefined,
-      admin_district: item.admin_district as string | undefined,
-      intro: (item.intro_text || item.intro) as string | undefined,
-      phone_number: (item.phone_num || item.phone_number) as string | undefined,
-      factory_type: item.factory_type as string | undefined,
-      main_fabrics: item.main_fabrics as string | undefined,
-      distribution: item.distribution as string | undefined,
-      delivery: item.delivery as string | undefined,
-      company_name: item.company_name as string | undefined,
-      contact_name: item.contact_name as string | undefined,
-      email: item.email as string | undefined,
-      address: item.address as string | undefined,
-      established_year: Number(item.established_year) || undefined,
-    }));
+    const mappedFactories: Factory[] = data.map((item: Record<string, unknown>) => {
+      const companyName = String(item.company_name || item.name || "공장명 없음");
+      
+      // 디버깅을 위한 로그 추가
+      console.log("Mapping factory:", companyName);
+      console.log("Main image:", getFactoryMainImage(companyName));
+      console.log("All images:", getFactoryImages(companyName));
+      
+      return {
+        id: String(item.id || Math.random()),
+        name: companyName,
+        ownerUserId: String(item.owner_user_id || item.ownerUserId || "unknown"),
+        region: String(item.admin_district || item.region || "지역 없음"),
+        items: [], // items는 별도 필드들로 구성
+        minOrder: Number(item.moq) || 0,
+        description: String(item.intro_text || item.intro || item.description || "설명 없음"),
+        image: getFactoryMainImage(companyName), // 업장 이름으로 이미지 매칭
+        images: getFactoryImages(companyName), // 업장 이름으로 모든 이미지 가져오기
+        contact: String(item.phone_num || item.phone_number || item.contact || "연락처 없음"),
+        lat: Number(item.lat) || 37.5665,
+        lng: Number(item.lng) || 126.9780,
+        kakaoUrl: String(item.kakao_url || item.kakaoUrl || ""),
+        processes: item.processes ? (Array.isArray(item.processes) ? item.processes as string[] : [String(item.processes)]) : [],
+        // DB 연동용 확장 필드들
+        business_type: item.business_type as string | undefined,
+        equipment: item.equipment as string | undefined,
+        sewing_machines: item.sewing_machines as string | undefined,
+        pattern_machines: item.pattern_machines as string | undefined,
+        special_machines: item.special_machines as string | undefined,
+        top_items_upper: item.top_items_upper as string | undefined,
+        top_items_lower: item.top_items_lower as string | undefined,
+        top_items_outer: item.top_items_outer as string | undefined,
+        top_items_dress_skirt: item.top_items_dress_skirt as string | undefined,
+        top_items_bag: item.top_items_bag as string | undefined,
+        top_items_fashion_accessory: item.top_items_fashion_accessory as string | undefined,
+        top_items_underwear: item.top_items_underwear as string | undefined,
+        top_items_sports_leisure: item.top_items_sports_leisure as string | undefined,
+        top_items_pet: item.top_items_pet as string | undefined,
+        moq: Number(item.moq) || undefined,
+        monthly_capacity: Number(item.monthly_capacity) || undefined,
+        admin_district: item.admin_district as string | undefined,
+        intro: (item.intro_text || item.intro) as string | undefined,
+        phone_number: (item.phone_num || item.phone_number) as string | undefined,
+        factory_type: item.factory_type as string | undefined,
+        main_fabrics: item.main_fabrics as string | undefined,
+        distribution: item.distribution as string | undefined,
+        delivery: item.delivery as string | undefined,
+        company_name: item.company_name as string | undefined,
+        contact_name: item.contact_name as string | undefined,
+        email: item.email as string | undefined,
+        address: item.address as string | undefined,
+        established_year: Number(item.established_year) || undefined,
+      };
+    });
 
     console.log(`Supabase에서 ${mappedFactories.length}개의 공장 데이터를 가져왔습니다.`);
     return mappedFactories;

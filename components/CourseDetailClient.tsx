@@ -23,7 +23,7 @@ export default function CourseDetailClient({ course }: { course: Course }) {
         <CourseImage
           src={course.image || ''}
           alt={course.title}
-          className="w-full h-60 object-cover rounded mb-4"
+          className="w-full h-60 object-cover rounded-t mb-4"
         />
         <p className="text-base text-gray-700 mb-4">{course.description}</p>
         <div className="flex items-center justify-between mt-4">

@@ -286,7 +286,7 @@ export default function MyPage() {
         // 카드 전체 클릭 이벤트 제거
       >
         <div className="w-28 h-28 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center">
-          <Image src={factory?.image || factory?.images?.[0] || "/logo_donggori.png"} alt={factory?.company_name || factory?.name || '공장 이미지'} width={112} height={112} className="object-cover w-full h-full" />
+          <Image src={factory?.images && factory.images.length > 0 ? factory.images[0] : (factory?.image || "/logo_donggori.png")} alt={factory?.company_name || factory?.name || '공장 이미지'} width={112} height={112} className="object-cover w-full h-full" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
@@ -310,7 +310,7 @@ export default function MyPage() {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto py-16 px-4 h-full flex flex-row gap-8 min-h-[500px]">
+    <div className="max-w-[1400px] mx-auto py-16 px-4 h-full flex flex-row gap-8 min-h-[500px]">
       {/* 왼쪽 사이드바: 메뉴만 */}
       <aside className="w-1/4 min-w-[220px] bg-white rounded-xl shadow p-6 flex flex-col self-stretch h-full min-h-0">
         <nav className="w-full flex flex-col gap-2 mb-6">

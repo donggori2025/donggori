@@ -22,25 +22,25 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-[#fafafa] border-t border-gray-200 py-12 px-6 mt-16">
-      <div className="max-w-[1400px] mx-auto flex flex-col items-center gap-4 px-10">
+    <footer className="w-full bg-[#fafafa] border-t border-gray-200 py-8 sm:py-12 px-4 sm:px-6 mt-8 sm:mt-16">
+      <div className="max-w-[1400px] mx-auto flex flex-col items-center gap-3 sm:gap-4 px-4 sm:px-10">
         {/* nav: md 이상에서만 flex, md 미만에서는 hidden */}
-        <nav className="hidden md:flex w-full justify-between items-center mb-4 text-sm text-gray-700">
+        <nav className="hidden md:flex w-full justify-between items-center mb-3 sm:mb-4 text-sm text-gray-700">
           {/* 왼쪽 메뉴 그룹 */}
-          <div className="flex gap-8">
+          <div className="flex gap-6 lg:gap-8">
             {leftMenu.map((item) => (
               <a key={item.label} href={item.href} className="hover:underline">{item.label}</a>
             ))}
           </div>
           {/* 오른쪽 메뉴 그룹 */}
-          <div className="flex gap-8">
+          <div className="flex gap-6 lg:gap-8">
             {rightMenu.map((item) => (
               <a key={item.label} href={item.href} className="hover:underline">{item.label}</a>
             ))}
           </div>
         </nav>
         {/* 협회 정보 */}
-        <div className="text-xs text-gray-500 mb-1 text-center">
+        <div className="text-xs text-gray-500 mb-1 text-center px-4">
           (사)DDM패션봉제산업연합회  |  (사)동대문패션봉제발전산업협의회  |  (사)동대문구의류봉제산업연합회
         </div>
         {/* 저작권 문구 */}

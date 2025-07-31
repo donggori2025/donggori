@@ -310,7 +310,7 @@ type ScoredFactory = Factory & { score: number };
                 {/* 이미지 영역 */}
                 <div className="w-full h-40 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl">
                   <Image
-                    src={f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length]}
+                    src={f.images && f.images.length > 0 ? f.images[0] : (f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length])}
                     alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
                     className="object-cover w-full h-full rounded-xl"
                     width={400}

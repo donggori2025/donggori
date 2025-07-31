@@ -49,8 +49,8 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full bg-white border-b px-6 sticky top-0 z-[9999]">
-      <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-4 justify-between">
+    <header className="w-full bg-white border-b px-4 sm:px-6 sticky top-0 z-[9999]">
+      <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-3 sm:py-4 justify-between">
         {/* 로고 */}
         <Link href="/" className="select-none" aria-label="동고리 홈">
           <Image
@@ -59,12 +59,12 @@ export default function Header() {
             width={113}
             height={47}
             priority
-            style={{ width: 113, height: 47 }}
+            className="w-20 sm:w-24 md:w-[113px] h-auto"
           />
         </Link>
         {/* 데스크탑 메뉴: md 이상에서만 보임 */}
-        <div className="hidden md:flex items-center gap-8">
-          <nav className="flex gap-6 text-base font-medium text-[#222222]">
+        <div className="hidden md:flex items-center gap-6 lg:gap-8">
+          <nav className="flex gap-4 lg:gap-6 text-sm lg:text-base font-medium text-[#222222]">
             {navMenu.map((item) => (
               <Link key={item.href} href={item.href} className={`hover:text-[#222222] hover:font-bold transition-colors ${item.label === "AI 매칭" ? "ai-matching-glow" : ""}`}>
                 {item.label}
@@ -76,7 +76,7 @@ export default function Header() {
             <SignedOut>
               {userType !== 'factory' && (
                 <button
-                  className="text-base font-medium text-white bg-[#222222] px-3 py-1 rounded hover:bg-[#444] transition-colors"
+                  className="text-sm lg:text-base font-medium text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors"
                   onClick={() => router.push("/sign-in")}
                 >
                   로그인/회원가입
@@ -92,7 +92,7 @@ export default function Header() {
                     alt="프로필 이미지"
                     width={40}
                     height={40}
-                    className="w-9 h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
+                    className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
                   />
                 </Link>
               )}
@@ -105,7 +105,7 @@ export default function Header() {
                   alt="공장 프로필 이미지"
                   width={40}
                   height={40}
-                  className="w-9 h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
+                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
                 />
               </Link>
             )}

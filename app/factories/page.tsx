@@ -9,6 +9,11 @@ import { testSupabaseConnection } from "@/lib/supabaseClient";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
+import KakaoMap from "@/components/KakaoMap";
+import SimpleKakaoMap from "@/components/SimpleKakaoMap";
+import { getFactoryLocations } from "@/lib/factoryMap";
+import FactoryInfoPopup from "@/components/FactoryInfoPopup";
+import { getFactoryLocationByName, getDongdaemunCenter } from "@/lib/factoryLocationMapping";
 
 export default function FactoriesPage() {
   const [factoriesData, setFactoriesData] = useState<Factory[]>([]); // 초기값 빈 배열
@@ -153,6 +158,25 @@ export default function FactoriesPage() {
     );
   });
 
+  // 필터가 걸려있지 않을 때 이미지가 있는 업장들을 상단에 배치
+  const sortedFiltered = useMemo(() => {
+    // 필터가 걸려있지 않은 경우에만 정렬 적용
+    const hasActiveFilters = Object.values(selected).some(arr => arr.length > 0) || search;
+    
+    if (!hasActiveFilters) {
+      return [...filtered].sort((a, b) => {
+        const aHasImages = a.images && a.images.length > 0;
+        const bHasImages = b.images && b.images.length > 0;
+        
+        if (aHasImages && !bHasImages) return -1; // a가 이미지 있음, b가 없음
+        if (!aHasImages && bHasImages) return 1;  // a가 이미지 없음, b가 있음
+        return 0; // 둘 다 이미지 있거나 둘 다 없음
+      });
+    }
+    
+    return filtered;
+  }, [filtered, selected, search]);
+
   // 필터 뱃지
   const badges = Object.entries(selected).flatMap(([key, arr]) =>
     arr.map(val => ({ key, val }))
@@ -208,6 +232,25 @@ export default function FactoriesPage() {
     loadFactories();
   }, []);
 
+  // 카카오지도용 공장 데이터 로드
+  useEffect(() => {
+    const loadMapFactories = async () => {
+      setMapLoading(true);
+      try {
+        const factoryLocations = await getFactoryLocations();
+        setMapFactories(factoryLocations);
+      } catch (error) {
+        console.error('지도용 공장 데이터 로드 실패:', error);
+      } finally {
+        setMapLoading(false);
+      }
+    };
+    
+    loadMapFactories();
+  }, []);
+
+
+
   // 데모 이미지 배열
   const DEMO_IMAGES = [
     "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
@@ -260,13 +303,28 @@ export default function FactoriesPage() {
   const FactoryMap = dynamic(() => import("@/components/FactoryMap"), { ssr: false });
 
   const [showMobileFilter, setShowMobileFilter] = useState(false);
+  
+  // 카카오지도용 상태
+  const [mapFactories, setMapFactories] = useState<any[]>([]);
+  const [mapLoading, setMapLoading] = useState(false);
+  const [selectedFactory, setSelectedFactory] = useState<any>(null);
+  const [showPopup, setShowPopup] = useState(false);
+
+  // 첫 번째 공장 자동 선택 (지도 뷰일 때)
+  useEffect(() => {
+    if (view === 'map' && filtered.length > 0 && !selectedFactory) {
+      const firstFactory = filtered[0];
+      setSelectedFactory(firstFactory);
+      setShowPopup(true);
+    }
+  }, [view, filtered, selectedFactory]);
 
   return (
-    <div className="max-w-[1400px] mx-auto py-16 flex flex-col gap-8 px-6">
+    <div className="max-w-[1400px] mx-auto py-8 sm:py-12 md:py-16 flex flex-col gap-6 sm:gap-8 px-4 sm:px-6">
       {/* 로딩 표시 */}
       {loading && (
-        <div className="text-center py-10">
-          <div className="text-lg">공장 정보를 불러오는 중입니다...</div>
+        <div className="text-center py-8 sm:py-10">
+          <div className="text-base sm:text-lg">공장 정보를 불러오는 중입니다...</div>
         </div>
       )}
       
@@ -296,8 +354,8 @@ export default function FactoriesPage() {
       )}
       
       <div className="flex flex-col gap-1">
-        <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">봉제공장 찾기</h1>
-        <p className="text-lg text-gray-500 mb-8">퀄리티 좋은 의류 제작, 지금 바로 견적을 요청해보세요.</p>
+        <h1 className="text-2xl sm:text-3xl md:text-[40px] font-extrabold text-gray-900 mb-2">봉제공장 찾기</h1>
+        <p className="text-base sm:text-lg text-gray-500 mb-6 sm:mb-8">퀄리티 좋은 의류 제작, 지금 바로 견적을 요청해보세요.</p>
       </div>
       {/* 모바일 필터 버튼 */}
       <div className="lg:hidden flex mb-4">
@@ -879,7 +937,7 @@ export default function FactoriesPage() {
             </div>
           </div>
           {/* 공장 개수 표시 */}
-          <div className="mb-2 text-sm text-gray-500">{filtered.length}개</div>
+          <div className="mb-2 text-sm text-gray-500">{sortedFiltered.length}개</div>
           {/* 선택된 필터 뱃지 (오른쪽 컨테이너 내) */}
           {badges.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
@@ -900,15 +958,15 @@ export default function FactoriesPage() {
           {/* 카드 리스트/지도 뷰 */}
           <div className="flex-1 min-w-0">
             {view === 'list' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {loading ? (
-                  <div className="text-center py-10">
-                    <div className="text-lg">공장 정보를 불러오는 중입니다...</div>
+                  <div className="text-center py-8 sm:py-10">
+                    <div className="text-base sm:text-lg">공장 정보를 불러오는 중입니다...</div>
                   </div>
                 ) : factoriesData.length === 0 ? (
-                  <div className="text-center py-10 text-gray-400">공장 데이터가 없습니다.</div>
+                  <div className="text-center py-8 sm:py-10 text-gray-400">공장 데이터가 없습니다.</div>
                 ) : (
-                  filtered.map((f: Factory, idx: number) => {
+                  sortedFiltered.map((f: Factory, idx: number) => {
                     const displayName = typeof f.name === 'string' && f.name
                       ? f.name
                       : typeof f.company_name === 'string' && f.company_name
@@ -922,39 +980,39 @@ export default function FactoriesPage() {
                     return (
                       <Link href={`/factories/${f.id}`} key={f.id ?? idx} className="rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer hover:shadow-lg transition-shadow">
                         {/* 이미지 영역 */}
-                        <div className="w-full h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl">
+                        <div className="w-full h-40 sm:h-48 md:h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-xl">
                           <Image
-                            src={f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length]}
+                            src={f.images && f.images.length > 0 ? f.images[0] : (f.image || DEMO_IMAGES[idx % DEMO_IMAGES.length])}
                             alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
-                            className="object-cover w-full h-full rounded-xl"
+                            className="object-cover w-full h-full rounded-t-xl"
                             width={400}
                             height={224}
                             priority={idx < 6}
                           />
                         </div>
-                        {/* 이미지와 텍스트 사이 gap */}
-                        <div className="mt-4" />
+                        {/* 이미지와 텍스트 사이 gap 줄임 */}
+                        <div className="mt-2" />
                         {/* 정보 영역 */}
-                        <div className="flex-1 flex flex-col p-4">
+                        <div className="flex-1 flex flex-col p-3 sm:p-4">
                           {/* 주요 원단 칩 */}
-                          <div className="flex flex-wrap gap-2 mb-2">
+                          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
                             {randomFabrics.map((chip) => (
-                              <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-3 py-1 text-xs font-semibold">
+                              <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-xs font-semibold">
                                 {chip.label}
                               </span>
                             ))}
                           </div>
-                          <div className="font-bold text-base mb-1">{displayName}</div>
+                          <div className="font-bold text-sm sm:text-base mb-1">{displayName}</div>
                           {/* 주요 품목 */}
-                          <div className="text-sm font-bold mt-2 mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
+                          <div className="text-xs sm:text-sm font-bold mt-2 mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
                             <span className="shrink-0">주요품목</span>
                             <span className="font-normal ml-2 flex-1 truncate">{mainItems}</span>
                           </div>
-                          <div className="text-sm font-bold mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
+                          <div className="text-xs sm:text-sm font-bold mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
                             <span className="shrink-0">주요원단</span>
                             <span className="font-normal ml-2 flex-1 truncate">{mainFabrics}</span>
                           </div>
-                          <div className="text-sm font-bold" style={{ color: '#333333', opacity: 0.6 }}>
+                          <div className="text-xs sm:text-sm font-bold" style={{ color: '#333333', opacity: 0.6 }}>
                             MOQ(최소 주문 수량) <span className="font-normal">{typeof f.moq === 'number' ? f.moq : (typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? f.moq : (typeof f.minOrder === 'number' ? f.minOrder : '-'))}</span>
                           </div>
                         </div>
@@ -964,14 +1022,71 @@ export default function FactoriesPage() {
                 )}
               </div>
             ) : (
-              <div className="w-full h-[600px] bg-gray-100 rounded-xl flex items-center justify-center">
-                {/* 구글 지도 뷰 */}
-                <FactoryMap
-                  factories={filtered}
-                  selectedFactoryId={filtered[0]?.id || ""}
-                  onSelectFactory={() => {}}
-                  height="600px"
-                />
+              <div className="w-full h-[500px] sm:h-[600px] md:h-[700px] lg:h-[800px] bg-gray-100 rounded-xl">
+                {/* 카카오지도 뷰 */}
+                {mapLoading ? (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="text-gray-500">지도를 불러오는 중...</div>
+                  </div>
+                ) : (
+                                    <div className="relative w-full h-full">
+                    <KakaoMap
+                      center={getDongdaemunCenter()}
+                      level={4}
+                      selectedMarkerId={selectedFactory?.id?.toString()}
+                      markers={filtered.map((factory, index) => {
+                        // 공장명으로 정확한 위치 찾기
+                        const companyName = factory.company_name || factory.name || '';
+                        const factoryLocation = getFactoryLocationByName(companyName);
+                        
+                        let position;
+                        if (factoryLocation) {
+                          // 정확한 위치 정보가 있으면 사용
+                          position = factoryLocation;
+                          console.log(`📍 ${companyName}: 정확한 위치 사용 (${position.lat}, ${position.lng})`);
+                        } else {
+                          // 없으면 기본 동대문구 중심
+                          position = getDongdaemunCenter();
+                          console.log(`📍 ${companyName}: 기본 위치 사용 (${position.lat}, ${position.lng})`);
+                        }
+                        
+                        return {
+                          id: factory.id?.toString() || '0',
+                          position: position,
+                          title: factory.company_name || factory.name || '공장',
+                          factory: factory,
+                          onClick: () => {
+                            if (factory.id) {
+                              window.location.href = `/factories/${factory.id}`;
+                            }
+                          }
+                        };
+                      })}
+                      onMarkerSelect={(factory) => {
+                        // 새로운 공장을 선택하면 이전 선택을 해제하고 새로운 공장을 선택
+                        setSelectedFactory(factory);
+                        setShowPopup(true);
+                      }}
+                      className="w-full h-full rounded-xl"
+                    />
+                    
+                    {/* 팝업 정보창 */}
+                    {showPopup && selectedFactory && (
+                      <FactoryInfoPopup
+                        factory={selectedFactory}
+                        onClose={() => {
+                          setShowPopup(false);
+                          setSelectedFactory(null);
+                        }}
+                        onDetailClick={() => {
+                          if (selectedFactory.id) {
+                            window.location.href = `/factories/${selectedFactory.id}`;
+                          }
+                        }}
+                      />
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

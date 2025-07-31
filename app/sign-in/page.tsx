@@ -138,18 +138,27 @@ export default function SignInPage() {
           <div className="flex-1 h-px bg-gray-200" />
         </div>
         {/* 소셜 로그인 버튼 */}
-        <div className="flex justify-center gap-6 mt-2">
-          <button type="button" onClick={() => handleSocial("oauth_google")}
-            className="w-12 h-12 rounded-full border flex items-center justify-center bg-white shadow hover:shadow-md">
-            <Image src="/google.svg" alt="구글" width={28} height={28} />
+        <div className="flex justify-center gap-6 mt-4">
+          <button 
+            type="button" 
+            onClick={() => handleSocial("oauth_google")}
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-sm hover:shadow-md transition-shadow"
+          >
+            <Image src="/google.svg" alt="구글" width={32} height={32} />
           </button>
-          <button type="button" onClick={() => handleSocial("oauth_kakao")}
-            className="w-12 h-12 rounded-full border flex items-center justify-center bg-yellow-300 shadow hover:shadow-md">
-            <Image src="/kakao.svg" alt="카카오" width={28} height={28} />
+          <button 
+            type="button" 
+            onClick={() => handleSocial("oauth_kakao")}
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-[#FEE500] shadow-sm hover:shadow-md transition-shadow"
+          >
+            <Image src="/kakao_lastlast.svg" alt="카카오" width={32} height={32} />
           </button>
-          <button type="button" onClick={() => handleSocial("oauth_naver")}
-            className="w-12 h-12 rounded-full border flex items-center justify-center bg-green-400 shadow hover:shadow-md">
-            <Image src="/naver.svg" alt="네이버" width={28} height={28} />
+          <button 
+            type="button" 
+            onClick={() => handleSocial("oauth_naver")}
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-[#03C75A] shadow-sm hover:shadow-md transition-shadow"
+          >
+            <Image src="/naver_lastlast.svg" alt="네이버" width={32} height={32} />
           </button>
         </div>
       </form>
