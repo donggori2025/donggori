@@ -107,6 +107,10 @@ export function getFactoryThumbnailImage(factoryName: string): string {
     return '/logo_donggori.png';
   }
 
+  // 압축된 이미지가 있는지 먼저 확인
+  const compressedImagePath = `/compressed_images/${folderName}.jpg`;
+  
+  // 압축된 이미지가 있으면 사용, 없으면 기존 방식 사용
   const firstImage = firstImages[folderName];
   if (firstImage) {
     return `/동고리_사진데이터/${folderName}/${firstImage}`;
