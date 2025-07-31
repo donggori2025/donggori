@@ -28,4 +28,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# 동고리_사진데이터 폴더 제외 해제
 public/동고리_사진데이터/
