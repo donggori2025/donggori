@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import type { Factory } from "@/lib/factories";
-import { getFactoryImages } from "@/lib/factoryImages";
+
 
 // factories 데이터에서 옵션 추출 유틸(공장 찾기에서 복사)
 const moqRanges = [
@@ -301,8 +301,7 @@ type ScoredFactory = Factory & { score: number };
               .join(', ') || '-';
             const randomFabrics = cardFabricsById[f.id ?? idx] || [];
             
-            // 공장 이름으로 실제 blob 이미지 가져오기
-            const companyName = String(f.company_name || f.name || "공장명 없음");
+
             
             return (
               <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden flex flex-col border border-gray-200">
