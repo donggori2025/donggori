@@ -62,20 +62,20 @@ export default function KakaoMap({
       }
 
       const script = document.createElement('script');
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&libraries=services&autoload=false`;
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&libraries=services`;
       script.async = true;
       
       script.onload = () => {
-        // autoload=false로 설정했으므로 수동으로 초기화
-        if (window.kakao && window.kakao.maps) {
-          window.kakao.maps.load(() => {
+        // 스크립트 로드 완료 후 약간의 지연을 두고 확인
+        setTimeout(() => {
+          if (window.kakao && window.kakao.maps) {
             setIsLoaded(true);
-          });
-        } else {
-          if (process.env.NODE_ENV === 'development') {
-            console.error('❌ 카카오맵 객체를 찾을 수 없음');
+          } else {
+            if (process.env.NODE_ENV === 'development') {
+              console.error('❌ 카카오맵 객체를 찾을 수 없음');
+            }
           }
-        }
+        }, 200);
       };
       
       script.onerror = (error) => {
