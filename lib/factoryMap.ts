@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { FactoryLocation, MapFilters } from './types';
+import { getFactoryLocationByName } from './factoryLocations';
 
 // 기본 공장 위치 데이터 (임시)
 const defaultFactoryLocations: FactoryLocation[] = [
@@ -31,8 +32,6 @@ const defaultFactoryLocations: FactoryLocation[] = [
 
 export async function getFactoryLocations(filters?: MapFilters): Promise<FactoryLocation[]> {
   try {
-    console.log('🔍 공장 위치 데이터 가져오기 시작...');
-    
     // Supabase에서 공장 데이터 가져오기 (주소 기반)
     let query = supabase
       .from('donggori')
@@ -50,25 +49,34 @@ export async function getFactoryLocations(filters?: MapFilters): Promise<Factory
     const { data, error } = await query;
 
     if (error) {
-      console.error('❌ 공장 위치 데이터 가져오기 실패:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('❌ 공장 위치 데이터 가져오기 실패:', error);
+      }
       return defaultFactoryLocations;
     }
-
-    console.log(`📊 DB에서 가져온 공장 수: ${data?.length || 0}`);
 
     // 주소 기반으로 좌표 매핑
     const factoriesWithLocation = data
       .filter(factory => {
         const hasAddress = factory.address;
-        if (!hasAddress) {
+        if (!hasAddress && process.env.NODE_ENV === 'development') {
           console.log(`⚠️ 주소 없음: ${factory.company_name} (ID: ${factory.id})`);
         }
         return hasAddress;
       })
       .map(factory => {
-        // 주소 기반으로 좌표 계산
-        const position = getPositionFromAddress(factory.address);
-        console.log(`📍 ${factory.company_name}: ${position.lat}, ${position.lng} (주소: ${factory.address})`);
+        // 공장명으로 정확한 위치 정보 먼저 확인
+        const exactLocation = getFactoryLocationByName(factory.company_name);
+        
+        let position;
+        if (exactLocation) {
+          // 정확한 위치 정보가 있으면 사용
+          position = { lat: exactLocation.lat, lng: exactLocation.lng };
+        } else {
+          // 없으면 주소 기반으로 좌표 계산 (우편번호 제거)
+          const cleanAddress = removePostalCode(factory.address);
+          position = getPositionFromAddress(cleanAddress);
+        }
         
         return {
           id: factory.id,
@@ -81,18 +89,26 @@ export async function getFactoryLocations(filters?: MapFilters): Promise<Factory
       })
       .filter(factory => factory.position.lat !== 0 && factory.position.lng !== 0);
 
-    console.log(`✅ 지도에 표시될 공장 수: ${factoriesWithLocation.length}`);
-    
     if (factoriesWithLocation.length === 0) {
-      console.log('⚠️ 유효한 주소가 없어 기본 데이터 사용');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('⚠️ 유효한 주소가 없어 기본 데이터 사용');
+      }
       return defaultFactoryLocations;
     }
     
     return factoriesWithLocation;
   } catch (error) {
-    console.error('❌ 공장 위치 데이터 가져오기 오류:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('❌ 공장 위치 데이터 가져오기 오류:', error);
+    }
     return defaultFactoryLocations;
   }
+}
+
+// 우편번호를 제거하는 함수
+function removePostalCode(address: string): string {
+  // 우편번호 패턴 제거 (02로 시작하는 5자리 숫자)
+  return address.replace(/02\d{3}\s*/, '').trim();
 }
 
 // 주소를 좌표로 변환하는 함수 (실제 위치 기반)
@@ -143,13 +159,17 @@ function getPositionFromAddress(address: string): { lat: number; lng: number } {
   // 가장 구체적인 매칭부터 시도
   for (const [key, position] of Object.entries(locationMap)) {
     if (addressLower.includes(key.toLowerCase())) {
-      console.log(`📍 주소 매핑: "${address}" -> "${key}" (${position.lat}, ${position.lng})`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`📍 주소 매핑: "${address}" -> "${key}" (${position.lat}, ${position.lng})`);
+      }
       return position;
     }
   }
   
   // 기본값 (동대문구 중심)
-  console.log(`⚠️ 주소 매핑 실패: "${address}" -> 기본값 사용`);
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`⚠️ 주소 매핑 실패: "${address}" -> 기본값 사용`);
+  }
   return { lat: 37.5665, lng: 126.9780 };
 }
 
@@ -163,14 +183,26 @@ export async function getFactoryLocation(factoryId: string): Promise<FactoryLoca
       .single();
 
     if (error || !data) {
-      console.log(`❌ 공장 정보 없음: ID ${factoryId}`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`❌ 공장 정보 없음: ID ${factoryId}`);
+      }
       return null;
     }
 
     // 주소가 있는 경우 주소 기반으로 좌표 계산
     if (data.address) {
-      const position = getPositionFromAddress(data.address);
-      console.log(`📍 공장 위치: ${data.company_name} - ${position.lat}, ${position.lng} (주소: ${data.address})`);
+      // 공장명으로 정확한 위치 정보 먼저 확인
+      const exactLocation = getFactoryLocationByName(data.company_name);
+      
+              let position;
+        if (exactLocation) {
+          // 정확한 위치 정보가 있으면 사용
+          position = { lat: exactLocation.lat, lng: exactLocation.lng };
+        } else {
+          // 없으면 주소 기반으로 좌표 계산 (우편번호 제거)
+          const cleanAddress = removePostalCode(data.address);
+          position = getPositionFromAddress(cleanAddress);
+        }
       
       return {
         id: data.id,
@@ -182,10 +214,14 @@ export async function getFactoryLocation(factoryId: string): Promise<FactoryLoca
       };
     }
 
-    console.log(`⚠️ 주소 없음: ${data.company_name} (ID: ${factoryId})`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`⚠️ 주소 없음: ${data.company_name} (ID: ${factoryId})`);
+    }
     return null;
   } catch (error) {
-    console.error('❌ 공장 위치 정보 가져오기 오류:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('❌ 공장 위치 정보 가져오기 오류:', error);
+    }
     return null;
   }
 } 

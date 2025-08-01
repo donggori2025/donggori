@@ -64,8 +64,16 @@ export function getFactoryLocationByName(companyName: string): { lat: number; ln
   return (factoryLocations as Record<string, { lat: number; lng: number; address: string }>)[companyName] || null;
 }
 
+// 우편번호를 제거하는 함수
+function removePostalCode(address: string): string {
+  // 우편번호 패턴 제거 (02로 시작하는 5자리 숫자)
+  return address.replace(/02\d{3}\s*/, '').trim();
+}
+
 // 주소로 위치 찾기 (기본값) - 동대문구 실제 지리적 범위
 export function getLocationByAddress(address: string): { lat: number; lng: number } {
+  // 우편번호 제거
+  const cleanAddress = removePostalCode(address);
   const locationMap: { [key: string]: { lat: number; lng: number } } = {
     // 동대문구 실제 동별 위치
     '장안동': { lat: 37.5665, lng: 126.9780 },
@@ -82,7 +90,7 @@ export function getLocationByAddress(address: string): { lat: number; lng: numbe
     '동대문구': { lat: 37.5670, lng: 126.9785 }, // 동대문구 중심점
   };
 
-  const addressLower = address.toLowerCase();
+  const addressLower = cleanAddress.toLowerCase();
   for (const [key, position] of Object.entries(locationMap)) {
     if (addressLower.includes(key.toLowerCase())) {
       return position;

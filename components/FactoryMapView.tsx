@@ -24,12 +24,12 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
   const loadFactories = useCallback(async () => {
     setLoading(true);
     try {
-      console.log('🔍 팩토리 맵 뷰에서 공장 데이터 로드 시작...');
       const factoryData = await getFactoryLocations(filters);
-      console.log(`✅ 팩토리 맵 뷰에서 ${factoryData.length}개 공장 로드 완료`);
       setFactories(factoryData);
     } catch (error) {
-      console.error('❌ 공장 데이터 로드 실패:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('❌ 공장 데이터 로드 실패:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,6 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
   }, [loadFactories]);
 
   const handleFactoryClick = (factoryId: string) => {
-    console.log(`🔗 공장 상세페이지 이동: ${factoryId}`);
     router.push(`/factories/${factoryId}`);
   };
 
@@ -50,18 +49,15 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
   };
 
   const handleMarkerSelect = (factory: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-    console.log(`ℹ️ 마커 선택: ${factory.company_name}`);
     setSelectedFactory(factory);
   };
 
   const handlePopupClose = () => {
-    console.log('❌ 팝업 닫기');
     setSelectedFactory(null);
   };
 
   const handlePopupDetailClick = () => {
     if (selectedFactory) {
-      console.log(`🔗 팝업에서 상세페이지 이동: ${selectedFactory.id}`);
       handleFactoryClick(selectedFactory.id);
     }
   };
