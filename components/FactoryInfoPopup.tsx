@@ -2,9 +2,11 @@ import Image from 'next/image';
 
 interface FactoryInfoPopupProps {
   factory: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onClose?: () => void;
+  onDetailClick?: () => void;
 }
 
-export default function FactoryInfoPopup({ factory }: FactoryInfoPopupProps) {
+export default function FactoryInfoPopup({ factory, onClose, onDetailClick }: FactoryInfoPopupProps) {
   if (!factory) return null;
 
   // 주요 품목 정보 구성

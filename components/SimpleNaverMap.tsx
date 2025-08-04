@@ -1,11 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 
-declare global {
-  interface Window {
-    naver: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  }
-}
+// Window 인터페이스는 NaverMap.tsx에서 이미 정의되어 있으므로 여기서는 제거
 
 interface SimpleNaverMapProps {
   center?: { lat: number; lng: number };
