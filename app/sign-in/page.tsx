@@ -26,8 +26,8 @@ export default function SignInPage() {
     try {
       await signIn.authenticateWithRedirect({
         strategy: provider as unknown as Parameters<typeof signIn.authenticateWithRedirect>[0]['strategy'],
-        redirectUrl: typeof window !== 'undefined' ? window.location.origin + '/sso-callback' : '/sso-callback',
-        redirectUrlComplete: typeof window !== 'undefined' ? window.location.origin : '/',
+        redirectUrl: '/v1/oauth_callback',
+        redirectUrlComplete: '/',
       });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "소셜 로그인 중 오류가 발생했습니다.");

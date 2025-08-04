@@ -1,7 +1,6 @@
-// Clerk 미들웨어 임시 비활성화 - 타입 에러 해결 후 재활성화 예정
-export function middleware() {
-  // 임시로 빈 미들웨어
-}
+import { clerkMiddleware } from '@clerk/nextjs/server';
+
+export default clerkMiddleware();
 
 export const config = {
   matcher: [
