@@ -1,9 +1,10 @@
 "use client";
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import type { Factory } from "@/lib/factories";
 
 
@@ -43,6 +44,7 @@ function ChatBubble({ text, type, isTyping, showCursor, onEdit }: { text: string
 }
 
 export default function MatchingPage() {
+  const { user } = useUser();
   // 공장 데이터 state
   const [factories, setFactories] = useState<Factory[]>([]);
 
@@ -301,14 +303,22 @@ type ScoredFactory = Factory & { score: number };
               .join(', ') || '-';
             const randomFabrics = cardFabricsById[f.id ?? idx] || [];
             
+            // 디버깅: 이미지 정보 출력
+            console.log(`공장 ${displayName}:`, {
+              images: f.images,
+              image: f.image,
+              hasImages: f.images && f.images.length > 0 && f.images[0],
+              hasImage: f.image,
+              imageUrl: f.images && f.images.length > 0 ? f.images[0] : f.image
+            });
+            
 
             
             return (
               <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden flex flex-col border border-gray-200">
                 {/* 이미지 영역 */}
                 <div className="w-full h-40 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl group">
-                  {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('동고')) || 
-                   (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('동고') && !f.image.includes('unsplash')) ? (
+                  {(f.images && f.images.length > 0 && f.images[0]) || f.image ? (
                     <Image
                       src={f.images && f.images.length > 0 ? f.images[0] : f.image}
                       alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
@@ -316,6 +326,7 @@ type ScoredFactory = Factory & { score: number };
                       width={400}
                       height={160}
                       priority={idx < 3}
+                      unoptimized
                     />
                   ) : (
                     <div className="text-gray-400 text-sm font-medium">
@@ -346,7 +357,13 @@ type ScoredFactory = Factory & { score: number };
                   </div>
                   <button
                     className="w-full mt-4 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition"
-                    onClick={() => router.push(`/factories/${f.id}`)}
+                    onClick={() => {
+                      if (!user) {
+                        alert('로그인 후 이용 가능합니다.');
+                        return;
+                      }
+                      router.push(`/factories/${f.id}`);
+                    }}
                   >
                     의뢰하기
                   </button>

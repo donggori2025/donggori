@@ -16,6 +16,16 @@ export default function FactoryMap({ factories, selectedFactoryId, onSelectFacto
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "", // 반드시 환경변수 필요
   });
 
+  const handleMapLoad = (map: google.maps.Map) => {
+    // 지도 클릭 시 줌 레벨 8로 설정 (마커가 아닌 지도 영역 클릭 시에만)
+    map.addListener('click', (e: google.maps.MapMouseEvent) => {
+      // 마커를 클릭한 것이 아닌 지도 영역을 클릭한 경우에만 줌 레벨 변경
+      if (!e.placeId) {
+        map.setZoom(8);
+      }
+    });
+  };
+
   if (!isLoaded) return <div className="flex items-center justify-center h-[200px]">지도를 불러오는 중...</div>;
 
   const selected = factories.find(f => f.id === selectedFactoryId) || factories[0];
@@ -30,6 +40,7 @@ export default function FactoryMap({ factories, selectedFactoryId, onSelectFacto
         disableDefaultUI: true,
         clickableIcons: false,
       }}
+      onLoad={handleMapLoad}
     >
       {factories.map(f => (
         <Marker

@@ -1,11 +1,40 @@
-// import { clerkMiddleware } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-// export default clerkMiddleware();
+// 보호된 라우트 정의
+const protectedRoutes = createRouteMatcher([
+  '/my-page(.*)',
+  '/factory-my-page(.*)',
+  '/payment(.*)',
+]);
 
-// 임시로 Clerk 미들웨어 비활성화
-export default function middleware() {
-  // Clerk 미들웨어 비활성화
-}
+// 공개 라우트 정의
+const publicRoutes = createRouteMatcher([
+  '/',
+  '/factories(.*)',
+  '/matching',
+  '/notices(.*)',
+  '/sign-in',
+  '/sign-up',
+  '/terms(.*)',
+  '/api(.*)',
+]);
+
+export default clerkMiddleware((auth, req) => {
+  // API 라우트는 Clerk 미들웨어를 건너뜀
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    return;
+  }
+
+  // 공개 라우트는 인증 없이 접근 가능
+  if (publicRoutes(req)) {
+    return;
+  }
+
+  // 보호된 라우트는 인증 필요
+  if (protectedRoutes(req)) {
+    return auth().protect();
+  }
+});
 
 export const config = {
   matcher: [

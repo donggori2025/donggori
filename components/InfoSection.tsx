@@ -115,14 +115,19 @@ const InfoSection = () => {
             <p className="text-base sm:text-lg text-gray-500 mb-4 sm:mb-6 px-4 sm:px-0">
               동고리는 70개 이상의 봉제공장 있으며 3곳의 패션봉제협회의 품질인증을 받은 고퀄리티의 봉제를 약속드립니다.
             </p>
-            <Link href="/matching" className="inline-flex items-center bg-neutral-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-[1000px] font-bold text-base sm:text-lg hover:bg-neutral-500 transition shadow-none gap-2 mx-auto w-fit relative overflow-hidden group animate-glow-pulse">
+            <Link href="/matching" className="inline-flex items-center bg-neutral-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-[1000px] font-bold text-base sm:text-lg hover:bg-neutral-500 transition-all duration-300 shadow-none gap-2 mx-auto w-fit relative overflow-hidden group hover:scale-105">
               <span className="relative z-10">봉제공장 매칭받기</span>
               <span className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full bg-white relative z-10">
                 <span className="text-sm sm:text-base text-black">→</span>
               </span>
-              {/* Glow 효과 */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-[1000px] glow-animate blur-sm"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 rounded-[1000px] glow-animate blur-md scale-110"></div>
+              {/* 강화된 Glow 효과 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-[1000px] animate-enhanced-glow blur-sm opacity-70"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 rounded-[1000px] animate-enhanced-glow blur-md scale-110 opacity-50"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 rounded-[1000px] animate-enhanced-glow blur-lg scale-125 opacity-30"></div>
+              {/* 호버 시 추가 효과 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-[1000px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+              {/* 레인보우 glow 효과 */}
+              <div className="absolute inset-0 animate-rainbow-glow rounded-[1000px] blur-xl scale-150 opacity-20"></div>
             </Link>
           </div>
 

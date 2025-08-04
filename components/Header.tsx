@@ -6,51 +6,63 @@ import {
   SignedOut,
   useUser,
 } from "@clerk/nextjs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getFactoryProfileImage } from "@/lib/factoryAuth";
+import { storage } from "@/lib/utils";
+import type { FactoryAuth } from "@/lib/types";
 
 export default function Header() {
-  // 햄버거 메뉴 오픈/닫힘 상태 관리
   const [menuOpen, setMenuOpen] = useState(false);
-  // Clerk에서 현재 로그인한 사용자 정보 가져오기
   const { user } = useUser();
   const router = useRouter();
   const [userType, setUserType] = useState<string | null>(null);
-  const [factoryAuth, setFactoryAuth] = useState<{ factoryId: string; factoryName: string } | null>(null);
-
+  const [factoryAuth, setFactoryAuth] = useState<FactoryAuth | null>(null);
   const [factoryProfileImage, setFactoryProfileImage] = useState<string | null>(null);
 
+  // 네비게이션 메뉴 항목을 메모이제이션
+  const navMenu = useMemo(() => [
+    { href: "/factories", label: "봉제공장 찾기" },
+    { href: "/matching", label: "AI 매칭" },
+    { href: "/notices", label: "공지사항" },
+  ], []);
+
+  // 사용자 타입과 공장 인증 정보 로드
   useEffect(() => {
-    const storedUserType = localStorage.getItem('userType');
-    const storedFactoryAuth = localStorage.getItem('factoryAuth');
+    const storedUserType = storage.get<string>('userType');
+    const storedFactoryAuth = storage.get<FactoryAuth>('factoryAuth');
     
     setUserType(storedUserType);
     if (storedFactoryAuth) {
-      const auth = JSON.parse(storedFactoryAuth);
-      setFactoryAuth(auth);
+      setFactoryAuth(storedFactoryAuth);
       
-      // 실제 공장명과 프로필 이미지 가져오기
-      if (auth && auth.factoryId) {
-
-        
-        getFactoryProfileImage(auth.factoryId).then(image => {
-          setFactoryProfileImage(image);
-        });
+      // 공장 프로필 이미지 로드
+      if (storedFactoryAuth.factoryId) {
+        getFactoryProfileImage(storedFactoryAuth.factoryId)
+          .then(image => setFactoryProfileImage(image))
+          .catch(() => setFactoryProfileImage(null));
       }
     }
   }, []);
 
-  // 네비게이션 메뉴 항목
-  const navMenu = [
-    { href: "/factories", label: "봉제공장 찾기" },
-    { href: "/matching", label: "AI 매칭" },
-    { href: "/notices", label: "공지사항" },
-  ];
+  // 로그인 버튼 클릭 핸들러
+  const handleSignInClick = useCallback(() => {
+    router.push("/sign-in");
+  }, [router]);
+
+  // 메뉴 토글 핸들러
+  const toggleMenu = useCallback(() => {
+    setMenuOpen(prev => !prev);
+  }, []);
+
+  // 메뉴 닫기 핸들러
+  const closeMenu = useCallback(() => {
+    setMenuOpen(false);
+  }, []);
 
   return (
     <header className="w-full bg-white border-b px-4 sm:px-6 sticky top-0 z-[9999]">
-      <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-3 sm:py-4 justify-between">
+      <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-3 sm:py-4">
         {/* 로고 */}
         <Link href="/" className="select-none" aria-label="동고리 홈">
           <Image
@@ -62,28 +74,37 @@ export default function Header() {
             className="w-20 sm:w-24 md:w-[113px] h-auto"
           />
         </Link>
-        {/* 데스크탑 메뉴: md 이상에서만 보임 */}
+
+        {/* 데스크탑 메뉴 */}
         <div className="hidden md:flex items-center gap-6 lg:gap-8">
           <nav className="flex gap-4 lg:gap-6 text-sm lg:text-base font-medium text-[#222222]">
             {navMenu.map((item) => (
-              <Link key={item.href} href={item.href} className={`hover:text-[#222222] hover:font-bold transition-colors ${item.label === "AI 매칭" ? "ai-matching-glow" : ""}`}>
+              <Link 
+                key={item.href} 
+                href={item.href} 
+                className={`hover:text-[#222222] hover:font-bold transition-colors ${
+                  item.label === "AI 매칭" ? "ai-matching-glow" : ""
+                }`}
+              >
                 {item.label}
               </Link>
             ))}
           </nav>
+
           <div className="flex items-center gap-2">
-            {/* 로그인 전: 로그인/회원가입 버튼 노출 (봉제공장 로그인이 아닐 때만) */}
+            {/* 로그인 전: 로그인/회원가입 버튼 */}
             <SignedOut>
               {userType !== 'factory' && (
                 <button
                   className="text-sm lg:text-base font-medium text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors"
-                  onClick={() => router.push("/sign-in")}
+                  onClick={handleSignInClick}
                 >
                   로그인/회원가입
                 </button>
               )}
             </SignedOut>
-            {/* 로그인 후: 프로필 이미지(아바타) 클릭 시 마이페이지로 이동 */}
+
+            {/* 로그인 후: 프로필 이미지 */}
             <SignedIn>
               {user && (
                 <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
@@ -97,7 +118,8 @@ export default function Header() {
                 </Link>
               )}
             </SignedIn>
-            {/* 봉제공장 로그인 후: 프로필 이미지 클릭 시 공장 마이페이지로 이동 */}
+
+            {/* 봉제공장 로그인 후: 공장 프로필 이미지 */}
             {userType === 'factory' && factoryAuth && (
               <Link href="/factory-my-page" className="flex items-center" aria-label="공장 마이페이지로 이동">
                 <Image
@@ -111,40 +133,43 @@ export default function Header() {
             )}
           </div>
         </div>
-        {/* 모바일: md 미만에서만 햄버거 버튼 보임 */}
+
+        {/* 모바일 햄버거 버튼 */}
         <div className="md:hidden flex items-center">
           <button
             aria-label="메뉴 열기"
             className="p-2 rounded hover:bg-gray-100 focus:outline-none"
-            onClick={() => setMenuOpen(true)}
+            onClick={toggleMenu}
           >
-            {/* 햄버거 아이콘 (SVG) */}
             <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </div>
-        {/* 드로어 메뉴: 햄버거 버튼 클릭 시 노출, md 이상에서는 숨김 */}
+
+        {/* 모바일 드로어 메뉴 */}
         {menuOpen && (
           <div className="fixed inset-0 z-50 flex items-start justify-end md:hidden">
             {/* 오버레이 */}
             <div
               className="absolute inset-0 bg-black/10"
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
               aria-label="오버레이 클릭 시 메뉴 닫기"
             />
+            
             {/* 사이드 드로어 메뉴 */}
             <div className="relative w-64 bg-white h-full shadow-lg p-6 animate-slide-in-right flex flex-col gap-6">
               {/* 닫기 버튼 */}
               <button
                 className="absolute top-4 right-4 p-2 rounded hover:bg-gray-100"
                 aria-label="메뉴 닫기"
-                onClick={() => setMenuOpen(false)}
+                onClick={closeMenu}
               >
                 <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
+
               {/* 메뉴 그룹 */}
               <div className="flex flex-col gap-4 mt-8">
                 {navMenu.map((item) => (
@@ -152,24 +177,26 @@ export default function Header() {
                     key={item.href}
                     href={item.href}
                     className="py-2 px-2 rounded hover:bg-gray-100 text-gray-800"
-                    onClick={() => setMenuOpen(false)}
+                    onClick={closeMenu}
                   >
                     {item.label}
                   </Link>
                 ))}
               </div>
+
               {/* 로그인/회원가입 또는 프로필 이미지 */}
               <div className="flex gap-2 mt-4">
                 <SignedOut>
                   {userType !== 'factory' && (
                     <button
                       className="flex-1 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
-                      onClick={() => router.push("/sign-in")}
+                      onClick={handleSignInClick}
                     >
                       로그인/회원가입
                     </button>
                   )}
                 </SignedOut>
+
                 <SignedIn>
                   {user && (
                     <Link href="/my-page" className="flex-1 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 text-gray-800 py-2">
@@ -184,6 +211,7 @@ export default function Header() {
                     </Link>
                   )}
                 </SignedIn>
+
                 {/* 봉제공장 로그인 후 모바일 메뉴 */}
                 {userType === 'factory' && factoryAuth && (
                   <Link href="/factory-my-page" className="flex-1 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 text-gray-800 py-2">
@@ -202,7 +230,8 @@ export default function Header() {
           </div>
         )}
       </div>
-      {/* 사이드 드로어 애니메이션 (Tailwind에 없으므로 직접 정의 필요) */}
+
+      {/* 사이드 드로어 애니메이션 */}
       <style>{`
         @keyframes slide-in-right {
           from { transform: translateX(100%); }

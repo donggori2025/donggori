@@ -333,8 +333,40 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             <div className="bg-gray-50 rounded-lg p-4 lg:p-6 mb-8">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">재</span>
+                  {/* 업장 이미지 - 첫 번째 사진 사용 */}
+                  <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center">
+                    {factory && factory.images && factory.images.length > 0 && 
+                     factory.images[0] && 
+                     factory.images[0] !== '/logo_donggori.png' && 
+                     !factory.images[0].includes('동고') && 
+                     !factory.images[0].includes('unsplash') ? (
+                      <Image
+                        src={factory.images[0]}
+                        alt={factory.company_name || "공장 이미지"}
+                        width={48}
+                        height={48}
+                        className="object-cover w-full h-full"
+                        unoptimized
+                      />
+                    ) : factory && factory.image && 
+                      factory.image !== '/logo_donggori.png' && 
+                      !factory.image.includes('동고') && 
+                      !factory.image.includes('unsplash') ? (
+                      <Image
+                        src={factory.image}
+                        alt={factory.company_name || "공장 이미지"}
+                        width={48}
+                        height={48}
+                        className="object-cover w-full h-full"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-orange-500 flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">
+                          {factory && factory.company_name ? factory.company_name.charAt(0) : "재"}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h1 className="text-xl lg:text-2xl font-bold">{factory.company_name || "재민상사"}</h1>
@@ -445,14 +477,20 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
 
             {/* 플랜 */}
             <div className="mb-8">
-              <h2 className="text-lg font-bold mb-3">플랜</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <h2 className="text-lg font-bold mb-6">플랜</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {Object.entries(servicePlans).map(([key, plan]) => (
-                  <div key={key} className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="font-bold text-lg mb-2">{plan.title}</h3>
-                    <ul className="text-sm text-gray-600 space-y-1">
+                  <div key={key} className="bg-white p-6">
+                    <div className="text-center mb-4 bg-gray-50 rounded-lg p-4">
+                      <h3 className="font-bold text-xl mb-2">{plan.title}</h3>
+                      <p className="text-sm text-gray-600">{plan.subtitle}</p>
+                    </div>
+                    <ul className="text-sm text-gray-700 space-y-2">
                       {plan.features.map((feature, i) => (
-                        <li key={i}>{feature}</li>
+                        <li key={i} className="flex items-start">
+                          <span className="text-gray-400 mr-2">•</span>
+                          <span>{feature}</span>
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -463,27 +501,36 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
 
             {/* 플랜 정보 */}
             <div className="mb-8">
-              <h2 className="text-lg font-bold mb-3">플랜 정보</h2>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="mb-4">
-                  <h4 className="font-semibold mb-2">공통점</h4>
-                  <p className="text-sm text-gray-600">모든 패키지는 의류 생산을 위한 기본 지원을 제공하며, 작업지시서 전달을 통해 의뢰자가 요청한 사양이 정확히 생산 공장에 전달되도록 보장합니다.</p>
-                  <p className="text-sm text-gray-600 mt-2">또한, 기본적인 생산 A/S를 지원하여 초도 생산 시 발생할 수 있는 문제를 최소화합니다.</p>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">👏</span>
                 </div>
+                <h2 className="text-lg font-bold">패키지별 정보를 확인해보세요</h2>
+              </div>
+              
+              <div className="space-y-6">
+                {/* 공통점 */}
                 <div>
-                  <h4 className="font-semibold mb-2">주요 특징</h4>
-                  <div className="space-y-3">
+                  <h4 className="font-semibold text-gray-800 mb-3">공통점</h4>
+                  <p className="text-base text-gray-600">모든 패키지는 의류 생산을 위한 기본 지원을 제공하며, 작업지시서 전달을 통해 의뢰자가 요청한 사양이 정확히 생산 공장에 전달되도록 보장합니다.</p>
+                  <p className="text-base text-gray-600 mt-2">또한, 기본적인 생산 A/S를 지원하여 초도 생산 시 발생할 수 있는 문제를 최소화합니다.</p>
+                </div>
+                
+                {/* 주요 특징 */}
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-3">주요 특징</h4>
+                  <div className="space-y-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-800">Standard</p>
-                      <p className="text-sm text-gray-600">봉제공장 매칭을 통해 바로 생산에 착수할 수 있으며, 작업지시서를 기반으로 최소한의 의류 생산 지원을 제공합니다. 단순한 의뢰나 소량 생산에 적합한 패키지입니다.</p>
+                      <p className="text-sm font-medium text-gray-800">• Standard :</p>
+                      <p className="text-base text-gray-600">봉제공장 매칭을 통해 바로 생산에 착수할 수 있으며, 작업지시서를 기반으로 최소한의 의류 생산 지원을 제공합니다. 단순한 의뢰나 소량 생산에 적합한 패키지입니다.</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800">Deluxe</p>
-                      <p className="text-sm text-gray-600">샘플/패턴실 매칭까지 지원하여 사전 검증과 품질 확인이 가능하며, 봉제공장 매칭과 작업지시서 전달까지 일괄 지원합니다. 소량 샘플 제작이나 본생산 이전 검증 단계에 적합합니다.</p>
+                      <p className="text-sm font-medium text-gray-800">• Deluxe :</p>
+                      <p className="text-base text-gray-600">샘플/패턴실 매칭까지 지원하여 사전 검증과 품질 확인이 가능하며, 봉제공장 매칭과 작업지시서 전달까지 일괄 지원합니다. 소량 샘플 제작이나 본생산 이전 검증 단계에 적합합니다.</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800">Premium</p>
-                      <p className="text-sm text-gray-600">디자인(도식화·패턴) 기획 단계부터 컨설팅을 지원하며, 샘플/패턴실 매칭과 봉제공장 매칭, 작업지시서 전달까지 풀 패키지를 제공합니다. 브랜드 기획·개발 단계나 정식 런칭 준비에 최적화된 패키지입니다.</p>
+                      <p className="text-sm font-medium text-gray-800">• Premium :</p>
+                      <p className="text-base text-gray-600">디자인(도식화·패턴) 기획 단계부터 컨설팅을 지원하며, 샘플/패턴실 매칭과 봉제공장 매칭, 작업지시서 전달까지 풀 패키지를 제공합니다. 브랜드 기획·개발 단계나 정식 런칭 준비에 최적화된 패키지입니다.</p>
                     </div>
                   </div>
                 </div>
@@ -549,9 +596,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           {/* 상단 헤더 */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">재</span>
-              </div>
               <div>
                 <h3 className="font-bold text-sm lg:text-base">{factory.company_name || "재민상사"}</h3>
                 <p className="text-xs text-gray-500">봉제공장</p>
@@ -592,10 +636,18 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                     <li>• 봉제공장 매칭</li>
                     <li>• 작업지시서 전달</li>
                   </ul>
-                  <Button className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm">
-                    <Link href={`/factories/${factoryId}/request?service=standard`} className="w-full">
-                      공정 의뢰하기
-                    </Link>
+                  <Button 
+                    className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
+                    onClick={() => {
+                      if (!user) {
+                        alert('로그인 후 이용 가능합니다.');
+                        return;
+                      }
+                      const userName = user.firstName || '';
+                      window.location.href = `/factories/${factoryId}/request?service=standard&name=${encodeURIComponent(userName)}`;
+                    }}
+                  >
+                    공정 의뢰하기
                   </Button>
                 </div>
               )}
@@ -617,10 +669,18 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                     <li>• 봉제공장 매칭</li>
                     <li>• 작업지시서 전달</li>
                   </ul>
-                  <Button className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm">
-                    <Link href={`/factories/${factoryId}/request?service=deluxe`} className="w-full">
-                      패턴/샘플 의뢰하기
-                    </Link>
+                  <Button 
+                    className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
+                    onClick={() => {
+                      if (!user) {
+                        alert('로그인 후 이용 가능합니다.');
+                        return;
+                      }
+                      const userName = user.firstName || '';
+                      window.location.href = `/factories/${factoryId}/request?service=deluxe&name=${encodeURIComponent(userName)}`;
+                    }}
+                  >
+                    패턴/샘플 의뢰하기
                   </Button>
                 </div>
               )}
@@ -643,10 +703,18 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                     <li>• 봉제공장 매칭</li>
                     <li>• 작업지시서 전달</li>
                   </ul>
-                  <Button className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm">
-                    <Link href={`/factories/${factoryId}/request?service=premium`} className="w-full">
-                      올인원 의뢰하기
-                    </Link>
+                  <Button 
+                    className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
+                    onClick={() => {
+                      if (!user) {
+                        alert('로그인 후 이용 가능합니다.');
+                        return;
+                      }
+                      const userName = user.firstName || '';
+                      window.location.href = `/factories/${factoryId}/request?service=premium&name=${encodeURIComponent(userName)}`;
+                    }}
+                  >
+                    올인원 의뢰하기
                   </Button>
                 </div>
               )}
