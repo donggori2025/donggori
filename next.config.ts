@@ -17,12 +17,14 @@ const nextConfig: NextConfig = {
   // 실험적 기능 활성화
   experimental: {
     optimizePackageImports: ['@clerk/nextjs', '@heroicons/react', 'lucide-react'],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+
+  // Turbopack 설정
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },

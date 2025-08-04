@@ -13,7 +13,15 @@ export const storage = {
     if (typeof window === 'undefined') return null;
     try {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : null;
+      if (!item) return null;
+      
+      // JSON.parse 시도
+      try {
+        return JSON.parse(item);
+      } catch {
+        // JSON 파싱 실패 시 원본 문자열 반환 (문자열 타입인 경우)
+        return item as T;
+      }
     } catch (error) {
       console.error('Error reading from localStorage:', error);
       return null;

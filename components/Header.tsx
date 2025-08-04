@@ -29,7 +29,8 @@ export default function Header() {
 
   // 사용자 타입과 공장 인증 정보 로드
   useEffect(() => {
-    const storedUserType = storage.get<string>('userType');
+    // userType은 단순 문자열이므로 직접 localStorage에서 가져옴
+    const storedUserType = typeof window !== 'undefined' ? localStorage.getItem('userType') : null;
     const storedFactoryAuth = storage.get<FactoryAuth>('factoryAuth');
     
     setUserType(storedUserType);

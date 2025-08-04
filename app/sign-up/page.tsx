@@ -153,9 +153,22 @@ export default function SignUpPage() {
     }
   };
 
-  // 소셜 로그인 핸들러 (추후 Clerk 연동)
-  const handleSocial = (provider: string) => {
-    alert(`${provider} 소셜 로그인 연동 예정`);
+  // 소셜 로그인 핸들러
+  const handleSocial = async (provider: 'oauth_google' | 'oauth_kakao' | 'oauth_naver') => {
+    setError("");
+    if (!signUp) return;
+    setLoading(true);
+    try {
+      await signUp.authenticateWithRedirect({
+        strategy: provider as any,
+        redirectUrl: '/v1/oauth_callback',
+        redirectUrlComplete: '/',
+      });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "소셜 로그인 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 타이머를 mm:ss 형식으로 변환
@@ -324,24 +337,27 @@ export default function SignUpPage() {
         <div className="flex justify-center gap-6 mt-4">
           <button 
             type="button" 
-            onClick={() => handleSocial("google")}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-sm hover:shadow-md transition-shadow"
+            onClick={() => handleSocial("oauth_google")}
+            disabled={loading}
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-sm hover:shadow-md transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Image src="/google.svg" alt="구글" width={32} height={32} />
+            {loading ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/google.svg" alt="구글" width={32} height={32} />}
           </button>
           <button 
             type="button" 
-            onClick={() => handleSocial("kakao")}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-[#FEE500] shadow-sm hover:shadow-md transition-shadow"
+            onClick={() => handleSocial("oauth_kakao")}
+            disabled={loading}
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-[#FEE500] shadow-sm hover:shadow-md transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Image src="/kakao_lastlast.svg" alt="카카오" width={32} height={32} />
+            {loading ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/kakao_lastlast.svg" alt="카카오" width={32} height={32} />}
           </button>
           <button 
             type="button" 
-            onClick={() => handleSocial("naver")}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-[#03C75A] shadow-sm hover:shadow-md transition-shadow"
+            onClick={() => handleSocial("oauth_naver")}
+            disabled={loading}
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-[#03C75A] shadow-sm hover:shadow-md transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Image src="/naver_lastlast.svg" alt="네이버" width={32} height={32} />
+            {loading ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/naver_lastlast.svg" alt="네이버" width={32} height={32} />}
           </button>
         </div>
       </form>
