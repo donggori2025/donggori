@@ -1,9 +1,10 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { Loader } from "lucide-react";
 
 export default function SignUpPage() {
   // 입력값 상태
@@ -22,7 +23,8 @@ export default function SignUpPage() {
   const [verificationCode, setVerificationCode] = useState("");
   const [timer, setTimer] = useState(0); // 남은 시간(초)
   const [canResend, setCanResend] = useState(false); // 재요청 가능 여부
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  // NodeJS 타입 경고 제거 (타입 명시)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { signUp, setActive } = useSignUp();
   const router = useRouter();
 

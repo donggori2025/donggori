@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useState } from 'react';
 import NaverMap from '@/components/NaverMap';
 import SimpleNaverMap from '@/components/SimpleNaverMap';
