@@ -108,6 +108,17 @@ export default function FactoryInfoPopup({ factory, onClose, onDetailClick }: Fa
           </div>
         </div>
       </div>
+      {/* 상세보기 버튼 */}
+      {onDetailClick && (
+        <div className="px-4 pb-4">
+          <button
+            onClick={onDetailClick}
+            className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-900 transition"
+          >
+            상세페이지 보기
+          </button>
+        </div>
+      )}
     </div>
   );
 } 
