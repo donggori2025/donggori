@@ -14,6 +14,7 @@ import SimpleNaverMap from "@/components/SimpleNaverMap";
 // import { getFactoryLocations } from "@/lib/factoryMap";
 import FactoryInfoPopup from "@/components/FactoryInfoPopup";
 import { getFactoryLocationByName, getDongdaemunCenter } from "@/lib/factoryLocationMapping";
+import { useRouter } from "next/navigation";
 
 export default function FactoriesPage() {
   const [factoriesData, setFactoriesData] = useState<Factory[]>([]); // 초기값 빈 배열
@@ -309,6 +310,7 @@ export default function FactoriesPage() {
   // const [mapLoading, setMapLoading] = useState(false);
   const [selectedFactory, setSelectedFactory] = useState<Factory | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const router = useRouter();
 
   // 첫 번째 공장 자동 선택 (지도 뷰일 때)
   useEffect(() => {
@@ -1075,6 +1077,11 @@ export default function FactoriesPage() {
                     {showPopup && selectedFactory && (
                       <FactoryInfoPopup
                         factory={selectedFactory}
+                        onDetailClick={() => {
+                          if (selectedFactory) {
+                            router.push(`/factories/${selectedFactory.id}`);
+                          }
+                        }}
                       />
                     )}
                   </div>
