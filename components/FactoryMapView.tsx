@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import KakaoMap from './KakaoMap';
+import NaverMap from './NaverMap';
 import FactoryInfoPopup from './FactoryInfoPopup';
 import { FactoryLocation, MapFilters } from '@/lib/types';
 import { getFactoryLocations } from '@/lib/factoryMap';
@@ -138,7 +138,7 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
         {viewMode === 'map' ? (
           /* 지도 뷰 */
           <div className="h-[calc(100vh-200px)] relative">
-            <KakaoMap
+            <NaverMap
               center={{ lat: 37.5665, lng: 126.9780 }}
               level={8}
               markers={mapMarkers}

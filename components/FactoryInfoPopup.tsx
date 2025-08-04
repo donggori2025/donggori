@@ -1,13 +1,10 @@
 import Image from 'next/image';
-import { X } from 'lucide-react';
 
 interface FactoryInfoPopupProps {
   factory: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  onClose: () => void;
-  onDetailClick: () => void;
 }
 
-export default function FactoryInfoPopup({ factory, onClose, onDetailClick }: FactoryInfoPopupProps) {
+export default function FactoryInfoPopup({ factory }: FactoryInfoPopupProps) {
   if (!factory) return null;
 
   // 주요 품목 정보 구성
@@ -46,36 +43,32 @@ export default function FactoryInfoPopup({ factory, onClose, onDetailClick }: Fa
   const count = (Math.abs(hash) % 2) + 1;
   const selectedTags = shuffled.slice(0, count);
 
-  return (
-    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between p-3 border-b border-gray-200">
-        <h3 className="font-bold text-lg text-gray-900 truncate flex-1">
-          {factory.company_name || factory.name || '공장'}
-        </h3>
-        <button
-          onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 transition-colors ml-2 flex-shrink-0"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
+  const factoryName = factory.company_name || factory.name || '공장명 없음';
 
-      {/* 내용 - 가로 레이아웃 */}
-      <div className="p-3">
+  return (
+    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-96 bg-white rounded-xl shadow-xl border border-gray-200 z-10">
+      <div className="p-4">
         <div className="flex items-start gap-4">
           {/* 이미지 */}
-          <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-            <Image
-              src={factory.images && factory.images.length > 0 ? factory.images[0] : (factory.image || '/logo_donggori.png')}
-              alt={factory.company_name || '공장 이미지'}
-              width={80}
-              height={80}
-              className="object-cover w-full h-full"
-            />
+          <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+            {(factory.images && factory.images.length > 0 && factory.images[0] && factory.images[0] !== '/logo_donggori.png') || 
+             (factory.image && factory.image !== '/logo_donggori.png') ? (
+              <Image
+                src={factory.images && factory.images.length > 0 ? factory.images[0] : factory.image}
+                alt={factoryName}
+                width={96}
+                height={96}
+                className="object-cover w-full h-full"
+                unoptimized
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                이미지 없음
+              </div>
+            )}
           </div>
 
-          {/* 정보 */}
+          {/* 기본 정보 */}
           <div className="flex-1 min-w-0">
             {/* 태그 */}
             <div className="flex flex-wrap gap-1 mb-2">
@@ -83,37 +76,34 @@ export default function FactoryInfoPopup({ factory, onClose, onDetailClick }: Fa
                 <span
                   key={tag.label}
                   style={{ color: tag.color, background: tag.bg }}
-                  className="rounded-full px-2 py-1 text-xs font-semibold"
+                  className="rounded-full px-2 py-0.5 text-xs font-semibold"
                 >
                   {tag.label}
                 </span>
               ))}
             </div>
 
-            {/* 정보 - 텍스트 오버플로우 방지 */}
-            <div className="space-y-1 text-sm">
-              <div className="flex items-start">
-                <span className="font-semibold text-gray-600 flex-shrink-0">주요품목:</span>
-                <span className="text-gray-900 ml-1 truncate block">{mainItems}</span>
+            {/* 공장명 */}
+            <h3 className="font-bold text-base text-gray-900 mb-2">
+              {factoryName}
+            </h3>
+
+            {/* 주요 정보 */}
+            <div className="space-y-1 text-xs text-gray-600">
+              <div className="flex items-center">
+                <span className="font-semibold w-16 flex-shrink-0">주요품목:</span>
+                <span className="truncate flex-1">{mainItems}</span>
               </div>
-              <div className="flex items-start">
-                <span className="font-semibold text-gray-600 flex-shrink-0">주요원단:</span>
-                <span className="text-gray-900 ml-1 truncate block">{mainFabrics}</span>
+              <div className="flex items-center">
+                <span className="font-semibold w-16 flex-shrink-0">주요원단:</span>
+                <span className="truncate flex-1">{mainFabrics}</span>
               </div>
-              <div className="flex items-start">
-                <span className="font-semibold text-gray-600 flex-shrink-0">MOQ:</span>
-                <span className="text-gray-900 ml-1">{moq}</span>
+              <div className="flex items-center">
+                <span className="font-semibold w-16 flex-shrink-0">MOQ:</span>
+                <span className="truncate flex-1">{moq}</span>
               </div>
             </div>
           </div>
-
-          {/* 상세보기 버튼 */}
-          <button
-            onClick={onDetailClick}
-            className="bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap flex-shrink-0"
-          >
-            상세보기
-          </button>
         </div>
       </div>
     </div>

@@ -9,8 +9,8 @@ import { testSupabaseConnection } from "@/lib/supabaseClient";
 // import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import KakaoMap from "@/components/KakaoMap";
-// import SimpleKakaoMap from "@/components/SimpleKakaoMap";
+import NaverMap from "@/components/NaverMap";
+import SimpleNaverMap from "@/components/SimpleNaverMap";
 // import { getFactoryLocations } from "@/lib/factoryMap";
 import FactoryInfoPopup from "@/components/FactoryInfoPopup";
 import { getFactoryLocationByName, getDongdaemunCenter } from "@/lib/factoryLocationMapping";
@@ -61,6 +61,13 @@ export default function FactoriesPage() {
 
   // 목록/지도 뷰 상태
   const [view, setView] = useState<'list' | 'map'>('list');
+  const [mapLoadError, setMapLoadError] = useState(false);
+
+  // 지도 로딩 실패 시 목록 뷰로 전환
+  const handleMapLoadError = () => {
+    setMapLoadError(true);
+    setView('list');
+  };
 
   // 옵션 동적 추출 함수 (중복 없는 값, 분리 처리)
   function getOptions(key: string): string[] {
@@ -363,13 +370,13 @@ export default function FactoriesPage() {
         {/* 필터 패널 (좌측) - 데스크탑 */}
         <aside className="w-72 shrink-0 hidden lg:block">
           <div className="bg-white rounded-xl mb-6 flex flex-col gap-2">
-            <div className="font-bold mb-2 flex items-center justify-between text-lg pt-4 pb-2">
-              <span>필터</span>
+            <div className="font-bold mb-2 flex items-center justify-between text-lg pt-4 pb-2 h-8">
+              <span className="text-gray-900">필터</span>
               <button
                 onClick={() => setSelected({
                   admin_district: [], moq: [], monthly_capacity: [], business_type: [], distribution: [], delivery: [], items: [], equipment: [], sewing_machines: [], pattern_machines: [], special_machines: [], factory_type: [], main_fabrics: [], processes: []
                 })}
-                className="flex items-center gap-1 text-xs text-gray-500 hover:text-black px-2 py-1 rounded transition"
+                className="text-gray-500 hover:text-black text-lg font-bold flex items-center justify-center w-6 h-6"
                 title="필터 초기화"
               >
                 <ArrowPathIcon className="w-5 h-5" />
@@ -636,29 +643,21 @@ export default function FactoriesPage() {
         </aside>
         {/* 모바일 필터 오버레이 */}
         {showMobileFilter && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-xl w-[90vw] max-w-md p-6 flex flex-col gap-2 relative border border-gray-200 shadow-lg">
-              <button
-                className="absolute top-2 right-2 text-gray-500 hover:text-black text-2xl"
-                onClick={() => setShowMobileFilter(false)}
-                aria-label="필터 닫기"
-              >
-                ×
-              </button>
-              {/* 필터 내용 복붙 (aside 내부와 동일) */}
-              <div className="font-bold mb-2 flex items-center justify-between text-lg pt-4 pb-2">
-                <span>필터</span>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-[90vw] max-w-md max-h-[80vh] flex flex-col relative border border-gray-200 shadow-lg">
+              {/* 헤더 - 고정 */}
+              <div className="p-6 pb-4 border-b border-gray-200 flex-shrink-0 flex items-center justify-end h-12">
                 <button
-                  onClick={() => setSelected({
-                    admin_district: [], moq: [], monthly_capacity: [], business_type: [], distribution: [], delivery: [], items: [], equipment: [], sewing_machines: [], pattern_machines: [], special_machines: [], factory_type: [], main_fabrics: [], processes: []
-                  })}
-                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-black px-2 py-1 rounded transition"
-                  title="필터 초기화"
+                  className="text-gray-500 hover:text-black text-2xl flex items-center justify-center w-8 h-8"
+                  onClick={() => setShowMobileFilter(false)}
+                  aria-label="필터 닫기"
                 >
-                  <ArrowPathIcon className="w-5 h-5" />
+                  ×
                 </button>
               </div>
-              <hr className="my-2 border-gray-200" />
+              
+              {/* 스크롤 가능한 필터 내용 */}
+              <div className="flex-1 overflow-y-auto p-6 pt-4">
               {/* 이하 필터 항목들(공정, 지역, MOQ 등) - aside 내부와 동일하게 복사 */}
               {/* 공정 */}
               <div>
@@ -903,6 +902,7 @@ export default function FactoriesPage() {
               </div>
             </div>
           </div>
+        </div>
         )}
         {/* 오른쪽: 검색+카드/지도 컨테이너 */}
         <div className="flex-1 min-w-0 flex flex-col items-stretch">
@@ -974,7 +974,7 @@ export default function FactoriesPage() {
                       <Link href={`/factories/${f.id}`} key={f.id ?? idx} className="rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer">
                         {/* 이미지 영역 */}
                         <div className="w-full h-40 sm:h-48 md:h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-xl group">
-                          {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('동고')) || 
+                          {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('logo_donggori')) || 
                            (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('동고') && !f.image.includes('unsplash')) ? (
                             <Image
                               src={f.images && f.images.length > 0 ? f.images[0] : f.image}
@@ -1024,66 +1024,57 @@ export default function FactoriesPage() {
               </div>
             ) : (
               <div className="w-full h-[500px] sm:h-[600px] md:h-[700px] lg:h-[800px] bg-gray-100 rounded-xl">
-                {/* 카카오지도 뷰 */}
+                {/* 네이버지도 뷰 */}
                 {loading ? (
                   <div className="w-full h-full flex items-center justify-center">
                     <div className="text-gray-500">지도를 불러오는 중...</div>
                   </div>
+                ) : mapLoadError ? (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="text-center text-gray-500 p-6">
+                      <div className="mb-4">
+                        <svg className="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2">지도를 불러올 수 없습니다</h3>
+                      <p className="text-sm mb-4">
+                        네이버맵 API 키가 설정되지 않았습니다.
+                      </p>
+                      <div className="text-xs text-gray-400">
+                        <p>• .env.local 파일에 NEXT_PUBLIC_NAVER_MAP_CLIENT_ID를 설정해주세요</p>
+                        <p>• 네이버 클라우드 플랫폼에서 Maps API Client ID를 발급받으세요</p>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
-                                    <div className="relative w-full h-full">
-                    <KakaoMap
+                  <div className="relative w-full h-full">
+                    <NaverMap
                       center={getDongdaemunCenter()}
-                      level={4}
-                      selectedMarkerId={selectedFactory?.id?.toString()}
-                      markers={filtered.map((factory) => {
-                        // 공장명으로 정확한 위치 찾기
-                        const companyName = factory.company_name || factory.name || '';
-                        const factoryLocation = getFactoryLocationByName(companyName);
-                        
-                        let position;
-                        if (factoryLocation) {
-                          // 정확한 위치 정보가 있으면 사용
-                          position = factoryLocation;
-                          console.log(`📍 ${companyName}: 정확한 위치 사용 (${position.lat}, ${position.lng})`);
-                        } else {
-                          // 없으면 기본 동대문구 중심
-                          position = getDongdaemunCenter();
-                          console.log(`📍 ${companyName}: 기본 위치 사용 (${position.lat}, ${position.lng})`);
+                      level={14}
+                      markers={sortedFiltered.map((factory) => ({
+                        id: factory.id,
+                        position: { lat: factory.lat, lng: factory.lng },
+                        title: factory.name || factory.company_name || '공장명 없음',
+                        factory: factory,
+                        onClick: () => {
+                          setSelectedFactory(factory);
+                          setShowPopup(true);
                         }
-                        
-                        return {
-                          id: factory.id?.toString() || '0',
-                          position: position,
-                          title: factory.company_name || factory.name || '공장',
-                          factory: factory,
-                          onClick: () => {
-                            if (factory.id) {
-                              window.location.href = `/factories/${factory.id}`;
-                            }
-                          }
-                        };
-                      })}
+                      }))}
                       onMarkerSelect={(factory) => {
-                        // 새로운 공장을 선택하면 이전 선택을 해제하고 새로운 공장을 선택
                         setSelectedFactory(factory);
                         setShowPopup(true);
                       }}
+                      onLoadError={handleMapLoadError}
                       className="w-full h-full rounded-xl"
+                      isPopupOpen={showPopup}
                     />
                     
-                    {/* 팝업 정보창 */}
+                    {/* 팝업 */}
                     {showPopup && selectedFactory && (
                       <FactoryInfoPopup
                         factory={selectedFactory}
-                        onClose={() => {
-                          setShowPopup(false);
-                          setSelectedFactory(null);
-                        }}
-                        onDetailClick={() => {
-                          if (selectedFactory.id) {
-                            window.location.href = `/factories/${selectedFactory.id}`;
-                          }
-                        }}
                       />
                     )}
                   </div>

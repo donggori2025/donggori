@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -57,6 +57,24 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       setSelectedService(service);
     }
   }, [searchParams]);
+
+  // 로그인한 유저의 이름을 자동으로 입력
+  useEffect(() => {
+    // URL 파라미터에서 이름을 먼저 확인
+    const nameFromUrl = searchParams.get("name");
+    if (nameFromUrl) {
+      setFormData(prev => ({
+        ...prev,
+        name: decodeURIComponent(nameFromUrl)
+      }));
+    } else if (user && user.firstName) {
+      // URL에 이름이 없으면 Clerk 유저 정보에서 가져오기
+      setFormData(prev => ({
+        ...prev,
+        name: user.firstName || ''
+      }));
+    }
+  }, [user, searchParams]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
@@ -528,12 +546,6 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
-              {selectedService === 'standard' && 'sampleFee' in currentService && 'unitPrice' in currentService && (
-                <div className="mt-3 pt-3 border-t border-gray-200">
-                  <div className="text-xs text-gray-600">{currentService.sampleFee}</div>
-                  <div className="text-xs text-gray-600">{currentService.unitPrice}</div>
-                </div>
-              )}
             </div>
 
             <Button className="w-full bg-black text-white rounded-full font-bold py-4 hover:bg-gray-800">

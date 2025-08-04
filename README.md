@@ -1,134 +1,157 @@
-# 동고리 (Donggori) - 봉제공장 매칭 플랫폼
+# 동고리 (Donggori) - 의류 디자이너-봉제공장 매칭 플랫폼
 
-봉제공장과 의류 제작 의뢰자를 연결하는 플랫폼입니다.
+의류 디자이너와 봉제공장을 연결하는 AI 기반 매칭 플랫폼입니다.
 
-## 주요 기능
+## 🚀 주요 기능
 
-- 🏭 봉제공장 검색 및 필터링
-- 📋 공정 의뢰 시스템
-- 👤 봉제공장 마이페이지
-- 💬 실시간 의뢰 관리
+- **AI 매칭**: 디자이너의 요구사항에 맞는 최적의 봉제공장 추천
+- **공장 검색**: 지역별, 업태별 봉제공장 검색 및 지도 시각화
+- **의뢰 관리**: 디자이너의 의뢰 내역 및 공장의 의뢰 접수 관리
+- **실시간 알림**: 매칭 상태 및 의뢰 진행 상황 실시간 알림
+- **결제 시스템**: 안전한 결제 처리 (Toss Payments 연동)
 
-## 시작하기
+## 🛠️ 기술 스택
 
-### 1. 환경 변수 설정
+### Frontend
+- **Next.js 15** - React 기반 풀스택 프레임워크
+- **TypeScript** - 타입 안전성 보장
+- **Tailwind CSS** - 유틸리티 퍼스트 CSS 프레임워크
+- **Framer Motion** - 애니메이션 라이브러리
 
-프로젝트 루트에 `.env.local` 파일을 생성하고 Supabase 설정을 추가하세요:
+### Backend & Database
+- **Supabase** - PostgreSQL 기반 백엔드 서비스
+- **Clerk** - 사용자 인증 및 권한 관리
+- **Vercel Blob Storage** - 이미지 저장소
 
+### External Services
+- **Naver Maps API** - 지도 서비스
+- **Toss Payments** - 결제 시스템
+
+## 📦 설치 및 실행
+
+### 1. 저장소 클론
 ```bash
-# .env.local
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-url.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+git clone https://github.com/your-username/donggori.git
+cd donggori
 ```
 
-**⚠️ 중요: Supabase 환경 변수가 설정되지 않으면 "공장 이미지 조회 중 오류"가 발생할 수 있습니다.**
-
-환경 변수 설정 후에는 개발 서버를 재시작해야 합니다.
-
-### 2. Supabase 프로젝트 설정
-
-1. [Supabase](https://supabase.com)에서 새 프로젝트 생성
-2. `donggori` 테이블 생성 (봉제공장 정보)
-3. `match_requests` 테이블 생성 (의뢰 내역)
-4. `factory_auth` 테이블 생성 (공장 인증)
-
-### 3. 개발 서버 실행
-
+### 2. 의존성 설치
 ```bash
-# Bun 사용 (권장)
+bun install
+```
+
+### 3. 환경 변수 설정
+```bash
+cp env.example .env.local
+```
+
+`.env.local` 파일을 편집하여 필요한 환경 변수를 설정하세요:
+
+```env
+# Supabase 설정
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+# Clerk 인증 설정
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
+CLERK_SECRET_KEY=your-clerk-secret-key
+
+# Naver Maps 설정
+NEXT_PUBLIC_NAVER_CLIENT_ID=your-naver-client-id
+NAVER_CLIENT_SECRET=your-naver-client-secret
+
+# Vercel Blob Storage 설정
+BLOB_READ_WRITE_TOKEN=your-vercel-blob-token
+```
+
+### 4. 개발 서버 실행
+```bash
 bun dev
-
-# 또는 다른 패키지 매니저
-npm run dev
-# yarn dev
-# pnpm dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인하세요.
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
 
-## 데이터베이스 스키마
+## 🏗️ 프로젝트 구조
 
-### donggori 테이블 (봉제공장 정보)
-```sql
-CREATE TABLE donggori (
-  id SERIAL PRIMARY KEY,
-  company_name TEXT,
-  admin_district TEXT,
-  phone_number TEXT,
-  business_type TEXT,
-  factory_type TEXT,
-  moq INTEGER,
-  monthly_capacity INTEGER,
-  top_items_upper TEXT,
-  top_items_lower TEXT,
-  top_items_outer TEXT,
-  top_items_dress_skirt TEXT,
-  top_items_bag TEXT,
-  top_items_fashion_accessory TEXT,
-  top_items_underwear TEXT,
-  top_items_sports_leisure TEXT,
-  top_items_pet TEXT,
-  sewing_machines TEXT,
-  pattern_machines TEXT,
-  special_machines TEXT,
-  main_fabrics TEXT,
-  processes TEXT,
-  delivery TEXT,
-  distribution TEXT,
-  intro TEXT,
-  description TEXT,
-  kakao_url TEXT,
-  lat DECIMAL,
-  lng DECIMAL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
+```
+donggori/
+├── app/                    # Next.js App Router
+│   ├── factories/         # 공장 관련 페이지
+│   ├── matching/          # AI 매칭 페이지
+│   ├── my-page/          # 사용자 마이페이지
+│   ├── factory-my-page/  # 공장 마이페이지
+│   └── ...
+├── components/            # 재사용 가능한 컴포넌트
+│   ├── ui/               # 기본 UI 컴포넌트
+│   └── ...
+├── lib/                  # 유틸리티 및 설정
+│   ├── hooks/            # 커스텀 훅
+│   ├── types.ts          # TypeScript 타입 정의
+│   ├── utils.ts          # 유틸리티 함수
+│   └── ...
+└── public/               # 정적 파일
 ```
 
-### match_requests 테이블 (의뢰 내역)
-```sql
-CREATE TABLE match_requests (
-  id SERIAL PRIMARY KEY,
-  user_id TEXT,
-  user_email TEXT,
-  user_name TEXT,
-  factory_id TEXT,
-  factory_name TEXT,
-  status TEXT DEFAULT 'pending',
-  items TEXT[],
-  quantity INTEGER,
-  description TEXT,
-  contact TEXT,
-  deadline TEXT,
-  budget TEXT,
-  additional_info JSONB,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
+## 🔧 개발 가이드
+
+### 코드 스타일
+- **ESLint**: 코드 품질 및 일관성 유지
+- **Prettier**: 코드 포맷팅
+- **TypeScript**: 타입 안전성 보장
+
+### 커밋 컨벤션
+```
+feat: 새로운 기능 추가
+fix: 버그 수정
+docs: 문서 수정
+style: 코드 포맷팅
+refactor: 코드 리팩토링
+test: 테스트 추가
+chore: 빌드 프로세스 또는 보조 도구 변경
 ```
 
-## 기술 스택
+### 성능 최적화
+- **이미지 최적화**: Next.js Image 컴포넌트 사용
+- **코드 분할**: 동적 임포트로 번들 크기 최적화
+- **캐싱**: 적절한 캐싱 전략 적용
+- **SEO**: 메타데이터 및 구조화된 데이터 최적화
 
-- **Frontend**: Next.js 14, React, TypeScript
-- **Styling**: Tailwind CSS
-- **Database**: Supabase (PostgreSQL)
-- **Package Manager**: Bun
-- **Deployment**: Vercel
+## 🚀 배포
 
-## 개발 가이드
+### Vercel 배포 (권장)
+1. Vercel 계정 생성
+2. GitHub 저장소 연결
+3. 환경 변수 설정
+4. 자동 배포 활성화
 
-### Supabase 연결 문제 해결
+### 수동 배포
+```bash
+bun build
+bun start
+```
 
-1. 환경 변수가 올바르게 설정되었는지 확인
-2. Supabase 프로젝트 URL과 Anon Key 확인
-3. 데이터베이스 테이블이 생성되었는지 확인
-4. RLS (Row Level Security) 설정 확인
+## 📊 모니터링 및 분석
 
-### 데이터 로딩
+- **Vercel Analytics**: 웹사이트 성능 모니터링
+- **Sentry**: 에러 추적 및 성능 모니터링
+- **Google Analytics**: 사용자 행동 분석
 
-- Supabase 연결이 실패하면 하드코딩된 샘플 데이터를 사용
-- 연결 상태는 페이지 상단에 표시됩니다
+## 🤝 기여하기
 
-## 라이센스
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-MIT License
+## 📄 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
+
+## 📞 문의
+
+프로젝트에 대한 문의사항이 있으시면 이슈를 생성해 주세요.
+
+---
+
+**동고리** - 의류 디자이너와 봉제공장을 연결하는 플랫폼
