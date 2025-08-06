@@ -208,7 +208,7 @@ export default function FactoriesPage() {
         console.log('Supabase 연결 테스트 결과:', connectionTest);
         
         if (!connectionTest.success) {
-          console.error('Supabase 연결 실패:', connectionTest.error);
+          console.error('Supabase 연결에 실패했습니다:', connectionTest.error);
           setConnectionStatus(connectionTest);
           setFactoriesData([]); // 연결 실패 시 빈 배열
           setLoading(false);
@@ -228,7 +228,7 @@ export default function FactoriesPage() {
           setConnectionStatus({ success: true, count: 0, message: 'DB에 데이터가 없음' });
         }
       } catch (error) {
-        console.error('데이터 로딩 중 오류:', error);
+        console.error('데이터 로딩 중 오류가 발생했습니다:', error);
         console.log('오류로 인해 하드코딩된 데이터를 사용합니다.');
         setFactoriesData(factories); // 예외 상황에서만 하드코딩 데이터 사용
         setConnectionStatus({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });

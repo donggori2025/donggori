@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSignIn } from "@clerk/nextjs";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import { getFactoryAuthWithRealName } from "@/lib/factoryAuth";
+import { clerkConfig } from "@/lib/clerkConfig";
 
 
 export default function SignInPage() {
@@ -40,6 +41,16 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+    
+    // 도메인 제한 확인 (임시로 비활성화)
+    // if (email.includes('@')) {
+    //   const domainError = clerkConfig.getDomainError(email);
+    //   if (domainError) {
+    //     setError(domainError);
+    //     return;
+    //   }
+    // }
+    
     setLoading(true);
     
     try {
@@ -66,6 +77,7 @@ export default function SignInPage() {
         setError("추가 인증이 필요합니다.");
       }
     } catch (err: unknown) {
+      console.error('Clerk 오류:', err);
       setError(err instanceof Error ? err.message : "이메일 또는 비밀번호가 올바르지 않습니다.");
     } finally {
       setLoading(false);

@@ -50,7 +50,7 @@ export async function getFactoryLocations(filters?: MapFilters): Promise<Factory
 
     if (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('❌ 공장 위치 데이터 가져오기 실패:', error);
+        console.error('❌ 공장 위치 데이터 가져오기에 실패했습니다:', error);
       }
       return defaultFactoryLocations;
     }
@@ -99,7 +99,7 @@ export async function getFactoryLocations(filters?: MapFilters): Promise<Factory
     return factoriesWithLocation;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.error('❌ 공장 위치 데이터 가져오기 오류:', error);
+      console.error('❌ 공장 위치 데이터 가져오기 중 오류가 발생했습니다:', error);
     }
     return defaultFactoryLocations;
   }
@@ -220,7 +220,7 @@ export async function getFactoryLocation(factoryId: string): Promise<FactoryLoca
     return null;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.error('❌ 공장 위치 정보 가져오기 오류:', error);
+      console.error('❌ 공장 위치 정보 가져오기 중 오류가 발생했습니다:', error);
     }
     return null;
   }

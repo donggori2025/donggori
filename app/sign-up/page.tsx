@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
+import { clerkConfig } from "@/lib/clerkConfig";
 
 export default function SignUpPage() {
   // 입력값 상태
@@ -76,6 +77,14 @@ export default function SignUpPage() {
       setError("이메일을 입력해주세요.");
       return;
     }
+    
+    // 도메인 제한 확인 (임시로 비활성화)
+    // const domainError = clerkConfig.getDomainError(email);
+    // if (domainError) {
+    //   setError(domainError);
+    //   return;
+    // }
+    
     setLoading(true);
     try {
       await signUp?.create({ emailAddress: email, password: password || "TempPassword!1" });
@@ -84,6 +93,7 @@ export default function SignUpPage() {
       setVerificationCode("");
       startTimer();
     } catch (err: unknown) {
+      console.error('Clerk 오류:', err);
       setError(err instanceof Error ? err.message : "이메일 인증 요청 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
@@ -130,6 +140,14 @@ export default function SignUpPage() {
     e.preventDefault();
     setError("");
     if (!email) return setError("이메일을 입력해주세요.");
+    
+    // 도메인 제한 확인 (임시로 비활성화)
+    // const domainError = clerkConfig.getDomainError(email);
+    // if (domainError) {
+    //   setError(domainError);
+    //   return;
+    // }
+    
     if (!emailVerified) return setError("이메일 인증을 완료해주세요.");
     if (!password) return setError("비밀번호를 입력해주세요.");
     if (password.length < 6) return setError("비밀번호는 6자 이상이어야 합니다.");
@@ -146,6 +164,7 @@ export default function SignUpPage() {
       await setActive({ session: signUp.createdSessionId });
       router.push("/");
     } catch (err: unknown) {
+      console.error('Clerk 오류:', err);
       setError(
         err instanceof Error ? err.message :
         "예상치 못한 오류가 발생했습니다. 새로고침 후 다시 시도해주세요."

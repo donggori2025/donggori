@@ -296,7 +296,7 @@ export default function NaverMap({
       } catch (error) {
         // 개발 환경에서만 에러 로그 출력
         if (process.env.NODE_ENV === 'development') {
-          console.error('마커 생성 실패:', error);
+          console.error('마커 생성에 실패했습니다:', error);
         }
       }
     });
