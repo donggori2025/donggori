@@ -28,7 +28,7 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
       setFactories(factoryData);
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('❌ 공장 데이터 로드 실패:', error);
+        console.error('❌ 공장 데이터 로드에 실패했습니다:', error);
       }
     } finally {
       setLoading(false);
@@ -63,7 +63,7 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
       console.log('상세페이지로 이동:', `/factories/${selectedFactory.id}`);
       handleFactoryClick(selectedFactory.id);
     } else {
-      console.error('selectedFactory가 없습니다!');
+      console.error('selectedFactory가 없습니다');
     }
   };
 

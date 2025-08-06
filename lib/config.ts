@@ -56,11 +56,11 @@ if (process.env.NODE_ENV === 'development') {
   const validation = validateConfig();
   
   if (validation.errors.length > 0) {
-    console.error('❌ 필수 환경 변수 누락:', validation.errors);
+    console.error('❌ 필수 환경 변수가 누락되었습니다:', validation.errors);
   }
   
   if (validation.warnings.length > 0) {
-    console.warn('⚠️ 선택적 환경 변수 누락:', validation.warnings);
+    console.warn('⚠️ 선택적 환경 변수가 누락되었습니다:', validation.warnings);
   }
   
   if (validation.isValid) {

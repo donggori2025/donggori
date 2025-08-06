@@ -14,7 +14,7 @@ const RecommendSection = () => {
           setFactoryCount(factories.length);
         }
       } catch (error) {
-        console.error('공장 수 로딩 중 오류:', error);
+        console.error('공장 수 로딩 중 오류가 발생했습니다:', error);
       }
     };
     

@@ -118,7 +118,7 @@ export default function FactoryInfoPopup({ factory, onClose, onDetailClick }: Fa
             if (onDetailClick) {
               onDetailClick();
             } else {
-              console.error('onDetailClick 함수가 없습니다!');
+              console.error('onDetailClick 함수가 없습니다');
             }
           }}
           className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-900 transition text-sm"

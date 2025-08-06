@@ -23,7 +23,7 @@ export async function uploadImageToBlob(file: File, folderName: string, fileName
     });
     return url;
   } catch (error) {
-    console.error('이미지 업로드 실패:', error);
+    console.error('이미지 업로드에 실패했습니다:', error);
     throw error;
   }
 }
@@ -34,7 +34,7 @@ export async function deleteImageFromBlob(url: string) {
     await del(url);
     console.log('이미지 삭제 완료:', url);
   } catch (error) {
-    console.error('이미지 삭제 실패:', error);
+    console.error('이미지 삭제에 실패했습니다:', error);
     throw error;
   }
 }
@@ -45,7 +45,7 @@ export async function listImagesInFolder(folderName: string) {
     const { blobs } = await list({ prefix: `${folderName}/` });
     return blobs;
   } catch (error) {
-    console.error('이미지 목록 조회 실패:', error);
+    console.error('이미지 목록 조회에 실패했습니다:', error);
     return [];
   }
 } 
