@@ -57,13 +57,8 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
   };
 
   const handlePopupDetailClick = () => {
-    console.log('handlePopupDetailClick 호출됨!');
-    console.log('selectedFactory:', selectedFactory);
     if (selectedFactory) {
-      console.log('상세페이지로 이동:', `/factories/${selectedFactory.id}`);
       handleFactoryClick(selectedFactory.id);
-    } else {
-      console.error('selectedFactory가 없습니다');
     }
   };
 

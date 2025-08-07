@@ -6,6 +6,7 @@ import { useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
 import { clerkConfig } from "@/lib/clerkConfig";
+import { handleClerkError } from "@/lib/clerkErrorTranslator";
 
 export default function SignUpPage() {
   // 입력값 상태
@@ -94,7 +95,7 @@ export default function SignUpPage() {
       startTimer();
     } catch (err: unknown) {
       console.error('Clerk 오류:', err);
-      setError(err instanceof Error ? err.message : "이메일 인증 요청 중 오류가 발생했습니다.");
+      setError(handleClerkError(err));
     } finally {
       setLoading(false);
     }
@@ -109,7 +110,7 @@ export default function SignUpPage() {
       setVerificationCode("");
       startTimer();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "인증번호 재요청 중 오류가 발생했습니다.");
+      setError(handleClerkError(err));
     } finally {
       setLoading(false);
     }
@@ -129,7 +130,7 @@ export default function SignUpPage() {
         setError("인증 코드가 올바르지 않습니다.");
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "이메일 인증 중 오류가 발생했습니다.");
+      setError(handleClerkError(err));
     } finally {
       setLoading(false);
     }
@@ -165,10 +166,7 @@ export default function SignUpPage() {
       router.push("/");
     } catch (err: unknown) {
       console.error('Clerk 오류:', err);
-      setError(
-        err instanceof Error ? err.message :
-        "예상치 못한 오류가 발생했습니다. 새로고침 후 다시 시도해주세요."
-      );
+      setError(handleClerkError(err));
     } finally {
       setLoading(false);
     }
@@ -186,7 +184,7 @@ export default function SignUpPage() {
         redirectUrlComplete: '/',
       });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "소셜 로그인 중 오류가 발생했습니다.");
+      setError(handleClerkError(err));
     } finally {
       setLoading(false);
     }
