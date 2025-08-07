@@ -133,7 +133,7 @@ type ScoredFactory = Factory & { score: number };
     QUESTIONS[0]?.question || "어떤 공정을 원하시나요?",
   ], [QUESTIONS]);
   const [introStep, setIntroStep] = useState(0); // 0: 타이핑, 1: ... 표시, 2: 다음 메시지
-  const typingTimer = useRef<NodeJS.Timeout | null>(null);
+  const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [introRestartKey, setIntroRestartKey] = useState(0); // 인트로 재시작을 위한 키
 
   useEffect(() => {
@@ -142,7 +142,7 @@ type ScoredFactory = Factory & { score: number };
     setIntroDone(false);
     setTypingText("");
     setIntroStep(0);
-    const timers: NodeJS.Timeout[] = [];
+    const timers: ReturnType<typeof setTimeout>[] = [];
     let currentMsgIdx = 0;
     let currentCharIdx = 0;
     function typeNextChar() {

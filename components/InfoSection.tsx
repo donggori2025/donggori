@@ -34,7 +34,7 @@ const InfoSection = () => {
   const [factories, setFactories] = useState<Factory[]>([]);
   const [slideIdx, setSlideIdx] = useState(VISIBLE_COUNT); // 시작은 복제 앞쪽 끝
   const [isTransitioning, setIsTransitioning] = useState(true);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 무한루프용: 앞뒤로 복제
   const getLoopedFactories = () => {
