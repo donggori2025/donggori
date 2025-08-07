@@ -193,8 +193,9 @@ export default function FactoriesPage() {
   // 아코디언 열림/닫힘 상태 관리
   const [openFilter, setOpenFilter] = useState<{ [key: string]: boolean }>({
     process: true,
+    main_fabrics: true,
     region: true,
-    items: true,
+    items: false,
     moq: false,
     equipment: false,
   });
@@ -270,6 +271,69 @@ export default function FactoriesPage() {
   const itemOptionsAll = Array.isArray(getOptions('items')) ? getOptions('items') : [];
   const mainFabricsOptions = Array.isArray(getOptions('main_fabrics')) ? getOptions('main_fabrics') : [];
 
+  // 지역 옵션을 동별로 그룹화하는 함수
+  const getGroupedRegionOptions = () => {
+    const allRegions = regionOptions;
+    const districtGroups: { [key: string]: string[] } = {
+      '장안동': [],
+      '답십리동': [],
+      '용신동': [],
+      '제기동': [],
+      '청량리동': [],
+      '회기동': [],
+      '전농동': [],
+      '이문동': [],
+      '기타': []
+    };
+
+    allRegions.forEach(region => {
+      let assigned = false;
+      for (const [district, _] of Object.entries(districtGroups)) {
+        if (region.includes(district)) {
+          districtGroups[district].push(region);
+          assigned = true;
+          break;
+        }
+      }
+      if (!assigned) {
+        districtGroups['기타'].push(region);
+      }
+    });
+
+    // 각 동 내에서 세부 지역 순서 조정
+    const sortedDistrictGroups = Object.entries(districtGroups)
+      .filter(([_, regions]) => regions.length > 0)
+      .map(([district, regions]) => {
+        let sortedRegions = [...regions];
+        
+        // 장안동: 1동을 2동 앞으로
+        if (district === '장안동') {
+          sortedRegions.sort((a, b) => {
+            const aIs1Dong = a.includes('1동');
+            const bIs1Dong = b.includes('1동');
+            if (aIs1Dong && !bIs1Dong) return -1;
+            if (!aIs1Dong && bIs1Dong) return 1;
+            return a.localeCompare(b);
+          });
+        }
+        
+        // 답십리동: 제1동을 제2동 앞으로
+        if (district === '답십리동') {
+          sortedRegions.sort((a, b) => {
+            const aIs1Dong = a.includes('제1동');
+            const bIs1Dong = b.includes('제1동');
+            if (aIs1Dong && !bIs1Dong) return -1;
+            if (!aIs1Dong && bIs1Dong) return 1;
+            return a.localeCompare(b);
+          });
+        }
+        
+        return { district, regions: sortedRegions };
+      });
+
+    return sortedDistrictGroups;
+  };
+
   // 카드별 칩을 공장 id 기준으로 고정
   const cardFabricsById = useMemo(() => {
     const fabricChips = [
@@ -322,11 +386,11 @@ export default function FactoriesPage() {
   }, [view, filtered, selectedFactory]);
 
   return (
-    <div className="max-w-[1400px] mx-auto py-8 sm:py-12 md:py-16 flex flex-col gap-6 sm:gap-8 px-4 sm:px-6">
+    <div className="max-w-[1400px] mx-auto py-6 sm:py-8 md:py-12 lg:py-16 flex flex-col gap-4 sm:gap-6 md:gap-8 px-2 sm:px-4 md:px-6">
       {/* 로딩 표시 */}
       {loading && (
-        <div className="text-center py-8 sm:py-10">
-          <div className="text-base sm:text-lg">공장 정보를 불러오는 중입니다...</div>
+        <div className="text-center py-6 sm:py-8 md:py-10">
+          <div className="text-sm sm:text-base md:text-lg">공장 정보를 불러오는 중입니다...</div>
         </div>
       )}
       
@@ -356,13 +420,13 @@ export default function FactoriesPage() {
       )}
       
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl sm:text-3xl md:text-[40px] font-extrabold text-gray-900 mb-2">봉제공장 찾기</h1>
-        <p className="text-base sm:text-lg text-gray-500 mb-6 sm:mb-8">퀄리티 좋은 의류 제작, 지금 바로 견적을 요청해보세요.</p>
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[40px] font-extrabold text-gray-900 mb-1 sm:mb-2">봉제공장 찾기</h1>
+        <p className="text-sm sm:text-base md:text-lg text-gray-500 mb-4 sm:mb-6 md:mb-8">퀄리티 좋은 의류 제작, 지금 바로 견적을 요청해보세요.</p>
       </div>
       {/* 모바일 필터 버튼 */}
-      <div className="lg:hidden flex mb-4">
+      <div className="lg:hidden flex mb-3 sm:mb-4">
         <button
-          className="flex items-center gap-2 px-4 py-2 bg-[#333] text-white rounded-lg font-semibold shadow"
+          className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#333] text-white rounded-lg font-semibold shadow text-sm sm:text-base"
           onClick={() => setShowMobileFilter(true)}
         >
           <span>🔍</span> 필터
@@ -417,6 +481,38 @@ export default function FactoriesPage() {
                 </div>
               )}
             </div>
+            {/* 주요 원단 */}
+            <div>
+              <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, main_fabrics: !f.main_fabrics }))}>
+                <span className="font-bold text-[16px] flex items-center gap-3">
+                  주요 원단
+                  {selected.main_fabrics.length > 0 && (
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.main_fabrics.length}</span>
+                  )}
+                </span>
+                <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`} />
+              </button>
+              {openFilter.main_fabrics && (
+                <div className="flex flex-wrap gap-2 pb-2 mt-3">
+                  {mainFabricsOptions.map((opt: string) => (
+                    <Button
+                      key={opt}
+                      size="sm"
+                      variant={selected.main_fabrics.includes(opt) ? "default" : "outline"}
+                      className="rounded-full border px-4"
+                      onClick={() => setSelected(sel => ({
+                        ...sel,
+                        main_fabrics: sel.main_fabrics.includes(opt)
+                          ? sel.main_fabrics.filter((v: string) => v !== opt)
+                          : [...sel.main_fabrics, opt]
+                      }))}
+                    >
+                      {opt}
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
             {/* 지역 */}
             <div>
               <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, region: !f.region }))}>
@@ -430,22 +526,24 @@ export default function FactoriesPage() {
               </button>
               {openFilter.region && (
                 <div className="flex flex-wrap gap-2 pb-2 mt-3">
-                  {regionOptions.map((opt: string) => (
-                    <Button
-                      key={opt}
-                      size="sm"
-                      variant={selected.admin_district.includes(opt) ? "default" : "outline"}
-                      className="rounded-full border px-4"
-                      onClick={() => setSelected(sel => ({
-                        ...sel,
-                        admin_district: sel.admin_district.includes(opt)
-                          ? sel.admin_district.filter((v: string) => v !== opt)
-                          : [...sel.admin_district, opt]
-                      }))}
-                    >
-                      {opt}
-                    </Button>
-                  ))}
+                  {getGroupedRegionOptions().flatMap(({ regions }) => 
+                    regions.map((opt: string) => (
+                      <Button
+                        key={opt}
+                        size="sm"
+                        variant={selected.admin_district.includes(opt) ? "default" : "outline"}
+                        className="rounded-full border px-4"
+                        onClick={() => setSelected(sel => ({
+                          ...sel,
+                          admin_district: sel.admin_district.includes(opt)
+                            ? sel.admin_district.filter((v: string) => v !== opt)
+                            : [...sel.admin_district, opt]
+                        }))}
+                      >
+                        {opt}
+                      </Button>
+                    ))
+                  )}
                 </div>
               )}
             </div>
@@ -609,48 +707,17 @@ export default function FactoriesPage() {
                 </div>
               )}
             </div>
-            {/* 주요 품목 */}
-            <div>
-              <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, main_fabrics: !f.main_fabrics }))}>
-                <span className="font-bold text-[16px] flex items-center gap-3">
-                  주요 원단
-                  {selected.main_fabrics.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.main_fabrics.length}</span>
-                  )}
-                </span>
-                <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`} />
-              </button>
-              {openFilter.main_fabrics && (
-                <div className="flex flex-wrap gap-2 pb-2 mt-3">
-                  {mainFabricsOptions.map((opt: string) => (
-                    <Button
-                      key={opt}
-                      size="sm"
-                      variant={selected.main_fabrics.includes(opt) ? "default" : "outline"}
-                      className="rounded-full border px-4"
-                      onClick={() => setSelected(sel => ({
-                        ...sel,
-                        main_fabrics: sel.main_fabrics.includes(opt)
-                          ? sel.main_fabrics.filter((v: string) => v !== opt)
-                          : [...sel.main_fabrics, opt]
-                      }))}
-                    >
-                      {opt}
-                    </Button>
-                  ))}
-                </div>
-              )}
-            </div>
+
           </div>
         </aside>
         {/* 모바일 필터 오버레이 */}
         {showMobileFilter && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-[90vw] max-w-md max-h-[80vh] flex flex-col relative border border-gray-200 shadow-lg">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+            <div className="bg-white rounded-lg sm:rounded-xl w-[95vw] sm:w-[90vw] max-w-md max-h-[85vh] sm:max-h-[80vh] flex flex-col relative border border-gray-200 shadow-lg">
               {/* 헤더 - 고정 */}
-              <div className="p-6 pb-4 border-b border-gray-200 flex-shrink-0 flex items-center justify-end h-12">
+              <div className="p-4 sm:p-6 pb-3 sm:pb-4 border-b border-gray-200 flex-shrink-0 flex items-center justify-end h-10 sm:h-12">
                 <button
-                  className="text-gray-500 hover:text-black text-2xl flex items-center justify-center w-8 h-8"
+                  className="text-gray-500 hover:text-black text-xl sm:text-2xl flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8"
                   onClick={() => setShowMobileFilter(false)}
                   aria-label="필터 닫기"
                 >
@@ -659,27 +726,27 @@ export default function FactoriesPage() {
               </div>
               
               {/* 스크롤 가능한 필터 내용 */}
-              <div className="flex-1 overflow-y-auto p-6 pt-4">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 pt-3 sm:pt-4">
               {/* 이하 필터 항목들(공정, 지역, MOQ 등) - aside 내부와 동일하게 복사 */}
               {/* 공정 */}
               <div>
                 <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, process: !f.process }))}>
-                  <span className="font-bold text-[16px] flex items-center gap-3">
+                  <span className="font-bold text-sm sm:text-[16px] flex items-center gap-2 sm:gap-3">
                     공정
                     {selected.processes.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.processes.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.processes.length}</span>
                     )}
                   </span>
-                  <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.process ? '' : 'rotate-180'}`} />
+                  <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.process ? '' : 'rotate-180'}`} />
                 </button>
                 {openFilter.process && (
-                  <div className="flex flex-wrap gap-2 pb-2 mt-3">
+                  <div className="flex flex-wrap gap-1 sm:gap-2 pb-2 mt-2 sm:mt-3">
                     {processesOptions.map((opt: string) => (
                       <Button
                         key={opt}
                         size="sm"
                         variant={selected.processes?.includes?.(opt) ? "default" : "outline"}
-                        className="rounded-full border px-4"
+                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           processes: sel.processes?.includes?.(opt)
@@ -693,30 +760,30 @@ export default function FactoriesPage() {
                   </div>
                 )}
               </div>
-              {/* 지역 */}
+              {/* 주요 원단 */}
               <div>
-                <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, region: !f.region }))}>
-                  <span className="font-bold text-[16px] flex items-center gap-1">
-                    지역
-                    {selected.admin_district.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.admin_district.length}</span>
+                <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, main_fabrics: !f.main_fabrics }))}>
+                  <span className="font-bold text-sm sm:text-[16px] flex items-center gap-2 sm:gap-3">
+                    주요 원단
+                    {selected.main_fabrics.length > 0 && (
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.main_fabrics.length}</span>
                     )}
                   </span>
-                  <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.region ? '' : 'rotate-180'}`} />
+                  <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`} />
                 </button>
-                {openFilter.region && (
-                  <div className="flex flex-wrap gap-2 pb-2">
-                    {regionOptions.map((opt: string) => (
+                {openFilter.main_fabrics && (
+                  <div className="flex flex-wrap gap-1 sm:gap-2 pb-2 mt-2 sm:mt-3">
+                    {mainFabricsOptions.map((opt: string) => (
                       <Button
                         key={opt}
                         size="sm"
-                        variant={selected.admin_district.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-4"
+                        variant={selected.main_fabrics.includes(opt) ? "default" : "outline"}
+                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
                         onClick={() => setSelected(sel => ({
                           ...sel,
-                          admin_district: sel.admin_district.includes(opt)
-                            ? sel.admin_district.filter((v: string) => v !== opt)
-                            : [...sel.admin_district, opt]
+                          main_fabrics: sel.main_fabrics.includes(opt)
+                            ? sel.main_fabrics.filter((v: string) => v !== opt)
+                            : [...sel.main_fabrics, opt]
                         }))}
                       >
                         {opt}
@@ -725,25 +792,59 @@ export default function FactoriesPage() {
                   </div>
                 )}
               </div>
+              {/* 지역 */}
+              <div>
+                <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, region: !f.region }))}>
+                  <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
+                    지역
+                    {selected.admin_district.length > 0 && (
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.admin_district.length}</span>
+                    )}
+                  </span>
+                  <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.region ? '' : 'rotate-180'}`} />
+                </button>
+                {openFilter.region && (
+                  <div className="flex flex-wrap gap-1 sm:gap-2 pb-2 mt-2 sm:mt-3">
+                    {getGroupedRegionOptions().flatMap(({ regions }) => 
+                      regions.map((opt: string) => (
+                        <Button
+                          key={opt}
+                          size="sm"
+                          variant={selected.admin_district.includes(opt) ? "default" : "outline"}
+                          className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
+                          onClick={() => setSelected(sel => ({
+                            ...sel,
+                            admin_district: sel.admin_district.includes(opt)
+                              ? sel.admin_district.filter((v: string) => v !== opt)
+                              : [...sel.admin_district, opt]
+                          }))}
+                        >
+                          {opt}
+                        </Button>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
               {/* MOQ(최소수량) */}
               <div>
                 <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, moq: !f.moq }))}>
-                  <span className="font-bold text-[16px] flex items-center gap-1">
+                  <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     MOQ(최소수량)
                     {selected.moq.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.moq.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.moq.length}</span>
                     )}
                   </span>
-                  <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.moq ? '' : 'rotate-180'}`} />
+                  <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.moq ? '' : 'rotate-180'}`} />
                 </button>
                 {openFilter.moq && (
-                  <div className="flex flex-wrap gap-2 pb-2">
+                  <div className="flex flex-wrap gap-1 sm:gap-2 pb-2 mt-2 sm:mt-3">
                     {moqRanges.map(opt => (
                       <Button
                         key={opt.label}
                         size="sm"
                         variant={selected.moq.includes(opt.label) ? "default" : "outline"}
-                        className="rounded-full border px-4"
+                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           moq: sel.moq.includes(opt.label)
@@ -760,22 +861,22 @@ export default function FactoriesPage() {
               {/* 재봉기 */}
               <div>
                 <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, sewing_machines: !f.sewing_machines }))}>
-                  <span className="font-bold text-[16px] flex items-center gap-1">
+                  <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     재봉기
                     {selected.sewing_machines.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.sewing_machines.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.sewing_machines.length}</span>
                     )}
                   </span>
-                  <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.sewing_machines ? '' : 'rotate-180'}`} />
+                  <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.sewing_machines ? '' : 'rotate-180'}`} />
                 </button>
                 {openFilter.sewing_machines && (
-                  <div className="flex flex-wrap gap-2 pb-2">
+                  <div className="flex flex-wrap gap-1 sm:gap-2 pb-2 mt-2 sm:mt-3">
                     {sewingMachineOptions.map((opt: string) => (
                       <Button
                         key={opt}
                         size="sm"
                         variant={selected.sewing_machines.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-4"
+                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           sewing_machines: sel.sewing_machines.includes(opt)
@@ -792,22 +893,22 @@ export default function FactoriesPage() {
               {/* 패턴기 */}
               <div>
                 <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, pattern_machines: !f.pattern_machines }))}>
-                  <span className="font-bold text-[16px] flex items-center gap-1">
+                  <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     패턴기
                     {selected.pattern_machines.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.pattern_machines.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.pattern_machines.length}</span>
                     )}
                   </span>
-                  <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.pattern_machines ? '' : 'rotate-180'}`} />
+                  <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.pattern_machines ? '' : 'rotate-180'}`} />
                 </button>
                 {openFilter.pattern_machines && (
-                  <div className="flex flex-wrap gap-2 pb-2">
+                  <div className="flex flex-wrap gap-1 sm:gap-2 pb-2 mt-2 sm:mt-3">
                     {patternMachineOptions.map((opt: string) => (
                       <Button
                         key={opt}
                         size="sm"
                         variant={selected.pattern_machines.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-4"
+                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           pattern_machines: sel.pattern_machines.includes(opt)
@@ -824,22 +925,22 @@ export default function FactoriesPage() {
               {/* 특수기 */}
               <div>
                 <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, special_machines: !f.special_machines }))}>
-                  <span className="font-bold text-[16px] flex items-center gap-1">
+                  <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     특수기
                     {selected.special_machines.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.special_machines.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.special_machines.length}</span>
                     )}
                   </span>
-                  <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.special_machines ? '' : 'rotate-180'}`} />
+                  <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.special_machines ? '' : 'rotate-180'}`} />
                 </button>
                 {openFilter.special_machines && (
-                  <div className="flex flex-wrap gap-2 pb-2">
+                  <div className="flex flex-wrap gap-1 sm:gap-2 pb-2 mt-2 sm:mt-3">
                     {specialMachineOptions.map((opt: string) => (
                       <Button
                         key={opt}
                         size="sm"
                         variant={selected.special_machines.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-4"
+                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           special_machines: sel.special_machines.includes(opt)
@@ -856,22 +957,22 @@ export default function FactoriesPage() {
               {/* 품목 */}
               <div>
                 <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, items: !f.items }))}>
-                  <span className="font-bold text-[16px] flex items-center gap-1">
+                  <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     품목
                     {selected.items.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.items.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.items.length}</span>
                     )}
                   </span>
-                  <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.items ? '' : 'rotate-180'}`} />
+                  <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.items ? '' : 'rotate-180'}`} />
                 </button>
                 {openFilter.items && (
-                  <div className="flex flex-wrap gap-2 pb-2">
+                  <div className="flex flex-wrap gap-1 sm:gap-2 pb-2 mt-2 sm:mt-3">
                     {itemOptionsAll.map((opt: string) => (
                       <Button
                         key={opt}
                         size="sm"
                         variant={selected.items.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-4"
+                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           items: sel.items.includes(opt)
@@ -885,59 +986,43 @@ export default function FactoriesPage() {
                   </div>
                 )}
               </div>
-              {/* 주요 품목 */}
-              <div>
-                <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, main_fabrics: !f.main_fabrics }))}>
-                  <span className="font-bold text-[16px] flex items-center gap-1">
-                    주요 원단
-                    {selected.main_fabrics.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.main_fabrics.length}</span>
-                    )}
-                  </span>
-                  <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`} />
-                </button>
-                {openFilter.main_fabrics && (
-                  <div className="flex flex-wrap gap-2 pb-2">
-                    {/* 데이터가 없으므로 버튼 없음 */}
-                  </div>
-                )}
-              </div>
+
+                          </div>
             </div>
           </div>
-        </div>
         )}
         {/* 오른쪽: 검색+카드/지도 컨테이너 */}
         <div className="flex-1 min-w-0 flex flex-col items-stretch">
           {/* 검색 인풋 + 목록/지도 버튼 */}
-          <div className="flex gap-2 mb-4 items-center self-start w-full">
+          <div className="flex flex-col sm:flex-row gap-2 mb-3 sm:mb-4 items-start sm:items-center self-start w-full">
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="공장명, 키워드로 검색하세요."
-              className="flex-1 w-full border rounded-[0.625rem] px-4 py-2 focus:border-black focus:outline-none"
+              className="flex-1 w-full border rounded-[0.625rem] px-3 sm:px-4 py-2 focus:border-black focus:outline-none text-sm sm:text-base"
             />
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex bg-gray-100 rounded-lg p-1 w-full sm:w-auto">
               <button
-                className={`px-4 py-1 rounded-lg transition flex items-center gap-2 ${view === 'list' ? 'bg-white text-[#333] font-semibold shadow' : 'bg-transparent text-[#555] font-normal'}`}
+                className={`flex-1 sm:flex-none px-3 sm:px-4 py-1 rounded-lg transition flex items-center justify-center gap-1 sm:gap-2 text-sm sm:text-base ${view === 'list' ? 'bg-white text-[#333] font-semibold shadow' : 'bg-transparent text-[#555] font-normal'}`}
                 onClick={() => setView('list')}
               >
-                <List className="w-4 h-4" /> 목록
+                <List className="w-3 h-3 sm:w-4 sm:h-4" /> 목록
               </button>
               <button
-                className={`px-4 py-1 rounded-lg transition flex items-center gap-2 ${view === 'map' ? 'bg-white text-[#333] font-semibold shadow' : 'bg-transparent text-[#555] font-normal'}`}
+                className={`flex-1 sm:flex-none px-3 sm:px-4 py-1 rounded-lg transition flex items-center justify-center gap-1 sm:gap-2 text-sm sm:text-base ${view === 'map' ? 'bg-white text-[#333] font-semibold shadow' : 'bg-transparent text-[#555] font-normal'}`}
                 onClick={() => setView('map')}
               >
-                <MapIcon className="w-4 h-4" /> 지도
+                <MapIcon className="w-3 h-3 sm:w-4 sm:h-4" /> 지도
               </button>
             </div>
           </div>
           {/* 공장 개수 표시 */}
-          <div className="mb-2 text-sm text-gray-500">{sortedFiltered.length}개</div>
+          <div className="mb-2 text-xs sm:text-sm text-gray-500">{sortedFiltered.length}개</div>
           {/* 선택된 필터 뱃지 (오른쪽 컨테이너 내) */}
           {badges.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
               {badges.map((b) => (
-                <span key={b.key + b.val} className="bg-[#333333] text-white rounded-full px-3 py-1 text-[14px] font-semibold flex items-center gap-1">
+                <span key={b.key + b.val} className="bg-[#333333] text-white rounded-full px-2 sm:px-3 py-1 text-xs sm:text-[14px] font-semibold flex items-center gap-1">
                   {b.val}
                   <button onClick={() => setSelected(sel => ({
                     ...sel,
@@ -953,13 +1038,13 @@ export default function FactoriesPage() {
           {/* 카드 리스트/지도 뷰 */}
           <div className="flex-1 min-w-0">
             {view === 'list' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 {loading ? (
-                  <div className="text-center py-8 sm:py-10">
-                    <div className="text-base sm:text-lg">공장 정보를 불러오는 중입니다...</div>
+                  <div className="text-center py-6 sm:py-8 md:py-10">
+                    <div className="text-sm sm:text-base md:text-lg">공장 정보를 불러오는 중입니다...</div>
                   </div>
                 ) : factoriesData.length === 0 ? (
-                  <div className="text-center py-8 sm:py-10 text-gray-400">공장 데이터가 없습니다.</div>
+                  <div className="text-center py-6 sm:py-8 md:py-10 text-gray-400">공장 데이터가 없습니다.</div>
                 ) : (
                   sortedFiltered.map((f: Factory, idx: number) => {
                     const displayName = typeof f.name === 'string' && f.name
@@ -973,47 +1058,47 @@ export default function FactoriesPage() {
                     const mainFabrics: string = typeof f.main_fabrics === 'string' && f.main_fabrics.length > 0 ? f.main_fabrics : '-';
                     const randomFabrics = cardFabricsById[f.id ?? idx] || [];
                     return (
-                      <Link href={`/factories/${f.id}`} key={f.id ?? idx} className="rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer">
+                      <Link href={`/factories/${f.id}`} key={f.id ?? idx} className="rounded-lg sm:rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer">
                         {/* 이미지 영역 */}
-                        <div className="w-full h-40 sm:h-48 md:h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-xl group">
+                        <div className="w-full h-32 sm:h-40 md:h-48 lg:h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
                           {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('logo_donggori')) || 
                            (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('동고') && !f.image.includes('unsplash')) ? (
                             <Image
                               src={f.images && f.images.length > 0 ? f.images[0] : f.image}
                               alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
-                              className="object-cover w-full h-full rounded-t-xl group-hover:scale-110 transition-transform duration-300"
+                              className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
                               width={400}
                               height={224}
                               priority={idx < 6}
                               unoptimized
                             />
                           ) : (
-                            <div className="text-gray-400 text-sm font-medium">
+                            <div className="text-gray-400 text-xs sm:text-sm font-medium">
                               이미지 준비 중
                             </div>
                           )}
                         </div>
                         {/* 이미지와 텍스트 사이 gap 줄임 */}
-                        <div className="mt-2" />
+                        <div className="mt-1 sm:mt-2" />
                         {/* 정보 영역 */}
-                        <div className="flex-1 flex flex-col pt-2">
+                        <div className="flex-1 flex flex-col pt-1 sm:pt-2 px-2 sm:px-3">
                           {/* 주요 원단 칩 */}
-                          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
+                          <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 mb-1 sm:mb-2">
                             {randomFabrics.map((chip) => (
-                              <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-xs font-semibold">
+                              <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 text-xs font-semibold">
                                 {chip.label}
                               </span>
                             ))}
                           </div>
-                          <div className="font-bold text-sm sm:text-base mb-1">{displayName}</div>
+                          <div className="font-bold text-xs sm:text-sm md:text-base mb-1">{displayName}</div>
                           {/* 주요 품목 */}
-                          <div className="text-xs sm:text-sm font-bold mt-2 mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
+                          <div className="text-xs sm:text-sm font-bold mt-1 sm:mt-2 mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
                             <span className="shrink-0">주요품목</span>
-                            <span className="font-normal ml-2 flex-1 truncate">{mainItems}</span>
+                            <span className="font-normal ml-1 sm:ml-2 flex-1 truncate">{mainItems}</span>
                           </div>
                           <div className="text-xs sm:text-sm font-bold mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
                             <span className="shrink-0">주요원단</span>
-                            <span className="font-normal ml-2 flex-1 truncate">{mainFabrics}</span>
+                            <span className="font-normal ml-1 sm:ml-2 flex-1 truncate">{mainFabrics}</span>
                           </div>
                           <div className="text-xs sm:text-sm font-bold" style={{ color: '#333333', opacity: 0.6 }}>
                             MOQ(최소 주문 수량) <span className="font-normal">{typeof f.moq === 'number' ? f.moq : (typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? f.moq : (typeof f.minOrder === 'number' ? f.minOrder : '-'))}</span>
@@ -1025,22 +1110,22 @@ export default function FactoriesPage() {
                 )}
               </div>
             ) : (
-              <div className="w-full h-[500px] sm:h-[600px] md:h-[700px] lg:h-[800px] bg-gray-100 rounded-xl">
+              <div className="w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-gray-100 rounded-lg sm:rounded-xl">
                 {/* 네이버지도 뷰 */}
                 {loading ? (
                   <div className="w-full h-full flex items-center justify-center">
-                    <div className="text-gray-500">지도를 불러오는 중...</div>
+                    <div className="text-gray-500 text-sm sm:text-base">지도를 불러오는 중...</div>
                   </div>
                 ) : mapLoadError ? (
                   <div className="w-full h-full flex items-center justify-center">
-                    <div className="text-center text-gray-500 p-6">
-                      <div className="mb-4">
-                        <svg className="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="text-center text-gray-500 p-4 sm:p-6">
+                      <div className="mb-3 sm:mb-4">
+                        <svg className="w-8 h-8 sm:w-12 sm:h-12 mx-auto text-gray-400 mb-3 sm:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
                         </svg>
                       </div>
-                      <h3 className="text-lg font-semibold mb-2">지도를 불러올 수 없습니다</h3>
-                      <p className="text-sm mb-4">
+                      <h3 className="text-base sm:text-lg font-semibold mb-2">지도를 불러올 수 없습니다</h3>
+                      <p className="text-xs sm:text-sm mb-3 sm:mb-4">
                         네이버맵 API 키가 설정되지 않았습니다.
                       </p>
                       <div className="text-xs text-gray-400">
@@ -1069,7 +1154,7 @@ export default function FactoriesPage() {
                         setShowPopup(true);
                       }}
                       onLoadError={handleMapLoadError}
-                      className="w-full h-full rounded-xl"
+                      className="w-full h-full rounded-lg sm:rounded-xl"
                       isPopupOpen={showPopup}
                     />
                     

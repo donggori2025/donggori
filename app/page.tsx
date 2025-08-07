@@ -9,7 +9,7 @@ import NoticesSection from "@/components/NoticesSection";
 // 메인 페이지 컴포넌트
 export default function HomePage() {
   return (
-    <main className="px-4 sm:px-6">
+    <main className="px-2 sm:px-4 md:px-6">
       <HeroSection />
       <InfoSection />
       <StepSection />

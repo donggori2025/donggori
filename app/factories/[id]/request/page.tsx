@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Factory } from "@/lib/factories";
 import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
 
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
@@ -85,6 +86,26 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
+    
+    // 파일 크기 및 형식 검증
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const allowedTypes = ['.pdf', '.ppt', '.pptx', '.png', '.jpg', '.jpeg'];
+    
+    for (const file of files) {
+      // 파일 크기 검증
+      if (file.size > maxSize) {
+        alert(`${file.name} 파일이 10MB를 초과합니다.`);
+        return;
+      }
+      
+      // 파일 형식 검증
+      const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+      if (!allowedTypes.includes(fileExtension)) {
+        alert(`${file.name} 파일 형식이 지원되지 않습니다. (지원 형식: PDF, PPT, PNG, JPG)`);
+        return;
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
       files: [...prev.files, ...files]
@@ -153,74 +174,88 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         alert("공장명 정보가 없습니다. 잠시 후 다시 시도해 주세요.");
         return;
       }
+      
       // 1. 첨부파일 Supabase Storage 업로드
       const uploadedFileUrls: string[] = [];
       if (formData.files.length > 0) {
-        for (const file of formData.files) {
-          const filePath = `match-request-files/${Date.now()}_${file.name}`;
-          const { error: uploadError } = await supabase.storage.from('match-request-files').upload(filePath, file);
-          if (uploadError) {
-            alert(`파일 업로드 중 오류 발생: ${file.name}`);
-            return;
+        try {
+          for (const file of formData.files) {
+            const filePath = `match-request-files/${Date.now()}_${file.name}`;
+            const { error: uploadError } = await supabase.storage.from('match-request-files').upload(filePath, file);
+            if (uploadError) {
+              console.error('파일 업로드 오류:', uploadError);
+              alert(`파일 업로드 중 오류가 발생했습니다: ${file.name}\n오류: ${uploadError.message}`);
+              return;
+            }
+            // publicUrl 생성
+            const { data: publicUrlData } = supabase.storage.from('match-request-files').getPublicUrl(filePath);
+            if (publicUrlData?.publicUrl) {
+              uploadedFileUrls.push(publicUrlData.publicUrl);
+            }
           }
-          // publicUrl 생성
-          const { data: publicUrlData } = supabase.storage.from('match-request-files').getPublicUrl(filePath);
-          if (publicUrlData?.publicUrl) {
-            uploadedFileUrls.push(publicUrlData.publicUrl);
-          }
+        } catch (fileError) {
+          console.error('파일 업로드 중 예외 발생:', fileError);
+          alert('파일 업로드 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+          return;
         }
       }
 
       // Supabase에 의뢰 데이터 저장
-      const { error } = await supabase
-        .from('match_requests')
-        .insert({
-          user_id: user?.id || `user_${Date.now()}`,
-          user_email: user?.emailAddresses?.[0]?.emailAddress || `${formData.name}@example.com`,
-          user_name: formData.name,
-          factory_id: factoryId,
-          factory_name: factoryName,
-          status: 'pending',
-          items: [], // 의뢰 품목은 별도 필드로 관리
-          quantity: 0, // 수량은 별도 필드로 관리
-          description: `브랜드: ${formData.brandName || '미입력'}\n연락처: ${formData.contact}`,
-          contact: formData.contact,
-          deadline: '', // 납기일은 별도 필드로 관리
-          budget: '', // 예산은 별도 필드로 관리
-          additional_info: JSON.stringify({
-            brandName: formData.brandName,
-            sample: formData.sample,
-            pattern: formData.pattern,
-            qc: formData.qc,
-            finishing: formData.finishing,
-            packaging: formData.packaging,
-            files: uploadedFileUrls,
-            links: formData.links,
-            selectedService: selectedService,
-            serviceDetails: {
-              standard: {
-                title: "Standard",
-                subtitle: "봉제공정"
-              },
-              deluxe: {
-                title: "Deluxe", 
-                subtitle: "패턴/샘플 + 공장"
-              },
-              premium: {
-                title: "Premium",
-                subtitle: "올인원(기획/디자인~)"
+      try {
+        const { error } = await supabase
+          .from('match_requests')
+          .insert({
+            user_id: user?.id || `user_${Date.now()}`,
+            user_email: user?.emailAddresses?.[0]?.emailAddress || `${formData.name}@example.com`,
+            user_name: formData.name,
+            factory_id: factoryId,
+            factory_name: factoryName,
+            status: 'pending',
+            items: [], // 의뢰 품목은 별도 필드로 관리
+            quantity: 0, // 수량은 별도 필드로 관리
+            description: `브랜드: ${formData.brandName || '미입력'}\n연락처: ${formData.contact}`,
+            contact: formData.contact,
+            deadline: '', // 납기일은 별도 필드로 관리
+            budget: '', // 예산은 별도 필드로 관리
+            additional_info: JSON.stringify({
+              brandName: formData.brandName,
+              sample: formData.sample,
+              pattern: formData.pattern,
+              qc: formData.qc,
+              finishing: formData.finishing,
+              packaging: formData.packaging,
+              files: uploadedFileUrls,
+              links: formData.links,
+              selectedService: selectedService,
+              serviceDetails: {
+                standard: {
+                  title: "Standard",
+                  subtitle: "봉제공정"
+                },
+                deluxe: {
+                  title: "Deluxe", 
+                  subtitle: "패턴/샘플 + 공장"
+                },
+                premium: {
+                  title: "Premium",
+                  subtitle: "올인원(기획/디자인~)"
+                }
               }
-            }
-          }),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .select()
-        .single();
+            }),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
 
-      if (error) {
-        console.error('의뢰 제출 중 오류:', error);
-        alert('의뢰 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
+        if (error) {
+          console.error('의뢰 제출 중 오류:', error);
+          alert(`의뢰 제출 중 오류가 발생했습니다.\n오류: ${error.message}`);
+          return;
+        }
+      } catch (dbError) {
+        console.error('데이터베이스 저장 중 예외 발생:', dbError);
+        alert('데이터베이스 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
         return;
       }
 
@@ -419,6 +454,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                   <input
                     type="file"
                     multiple
+                    accept=".pdf,.ppt,.pptx,.png,.jpg,.jpeg"
                     onChange={handleFileUpload}
                     className="hidden"
                     id="file-upload"
@@ -426,6 +462,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                   <label htmlFor="file-upload" className="inline-block px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-black focus:border-black">
                     + 파일 업로드
                   </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    지원 형식: PDF, PPT, PNG, JPG (최대 10MB)
+                  </p>
                   {formData.files.length > 0 && (
                     <div className="mt-2 space-y-2">
                       {formData.files.map((file, index) => (
@@ -548,7 +587,14 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
               </ul>
             </div>
 
-            <Button className="w-full bg-black text-white rounded-full font-bold py-4 hover:bg-gray-800">
+            <Button className="w-full bg-gray-100 text-black rounded-lg py-3 font-bold hover:bg-gray-200 text-sm lg:text-base flex items-center justify-center gap-2">
+              <Image 
+                src="/kakao_lastlast.svg" 
+                alt="카카오톡" 
+                width={20} 
+                height={20}
+                className="w-5 h-5"
+              />
               문의하기
             </Button>
           </div>

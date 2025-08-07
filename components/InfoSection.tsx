@@ -27,8 +27,6 @@ function getCardFabricsById(factories: Factory[]) {
   );
 }
 
-
-
 const CARD_COUNT = 10;
 const VISIBLE_COUNT = 4;
 
@@ -106,19 +104,19 @@ const InfoSection = () => {
   };
 
   return (
-    <section className="w-full bg-white py-8 sm:py-12 md:py-16 min-h-[400px] sm:min-h-[500px] md:min-h-[600px] flex items-center">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+    <section className="w-full bg-white py-6 sm:py-8 md:py-12 lg:py-16 min-h-[300px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[600px] flex items-center">
+      <div className="max-w-[1400px] mx-auto px-2 sm:px-4 md:px-6">
         <div className="flex flex-col items-center text-center">
           {/* 상단: 정보 섹션 */}
-          <div className="mb-6 sm:mb-8">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">70+ 개의 인증된 고퀄리티 봉제공장</h2>
-            <p className="text-base sm:text-lg text-gray-500 mb-4 sm:mb-6 px-4 sm:px-0">
+          <div className="mb-4 sm:mb-6 md:mb-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 md:mb-4 px-2 sm:px-0">70+ 개의 인증된 고퀄리티 봉제공장</h2>
+            <p className="text-sm sm:text-base md:text-lg text-gray-500 mb-3 sm:mb-4 md:mb-6 px-4 sm:px-0">
               동고리는 70개 이상의 봉제공장 있으며 3곳의 패션봉제협회의 품질인증을 받은 고퀄리티의 봉제를 약속드립니다.
             </p>
-            <Link href="/matching" className="inline-flex items-center bg-neutral-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-[1000px] font-bold text-base sm:text-lg hover:bg-neutral-500 transition-all duration-300 shadow-none gap-2 mx-auto w-fit relative overflow-hidden group hover:scale-105">
+            <Link href="/matching" className="inline-flex items-center bg-neutral-600 text-white px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-[1000px] font-bold text-sm sm:text-base md:text-lg hover:bg-neutral-500 transition-all duration-300 shadow-none gap-2 mx-auto w-fit relative overflow-hidden group hover:scale-105">
               <span className="relative z-10">봉제공장 매칭받기</span>
-              <span className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full bg-white relative z-10">
-                <span className="text-sm sm:text-base text-black">→</span>
+              <span className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex items-center justify-center rounded-full bg-white relative z-10">
+                <span className="text-xs sm:text-sm md:text-base text-black">→</span>
               </span>
               {/* 강화된 Glow 효과 */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-[1000px] animate-enhanced-glow blur-sm opacity-70"></div>
@@ -131,10 +129,10 @@ const InfoSection = () => {
             </Link>
           </div>
 
-          {/* 하단: 공장 카드 슬라이드 */}
-          <div className="w-full overflow-hidden py-2 sm:py-4">
+          {/* 하단: 공장 카드 슬라이드 - 데스크톱에서만 표시 */}
+          <div className="w-full overflow-hidden py-1 sm:py-2 md:py-4 hidden lg:block">
             <div
-              className={`flex gap-2 sm:gap-4 ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''}`}
+              className={`flex gap-1 sm:gap-2 md:gap-4 ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''}`}
               style={{ transform: `translateX(${getTranslateX()})` }}
             >
               {loopedFactories.map((f, idx) => {
@@ -148,37 +146,37 @@ const InfoSection = () => {
                   .join(', ') || '-';
                 const randomFabrics = cardFabricsById[f.id ?? idx] || [];
                 return (
-                  <Link href={`/factories/${f.id}`} key={`${f.id ?? 'noid'}-${idx}`} className="rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer w-[calc(50%-4px)] sm:w-[calc(33.333%-8px)] md:w-[calc(25%-12px)] flex-shrink-0">
+                  <Link href={`/factories/${f.id}`} key={`${f.id ?? 'noid'}-${idx}`} className="rounded-lg sm:rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer w-[calc(25%-12px)] flex-shrink-0">
                     {/* 이미지 영역 */}
-                    <div className="w-full h-32 sm:h-40 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-xl group">
+                    <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
                       {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('동고')) || 
                        (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('동고') && !f.image.includes('unsplash')) ? (
                         <Image
                           src={f.images && f.images.length > 0 ? f.images[0] : f.image}
                           alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
-                          className="object-cover w-full h-full rounded-t-xl group-hover:scale-110 transition-transform duration-300"
+                          className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
                           width={400}
                           height={192}
                           priority={idx < 4}
                           unoptimized
                         />
                       ) : (
-                        <div className="text-gray-400 text-xs sm:text-sm font-medium">
+                        <div className="text-gray-400 text-sm font-medium">
                           이미지 준비 중
                         </div>
                       )}
                     </div>
                     {/* 정보 영역 */}
-                    <div className="flex-1 flex flex-col px-0 py-3 sm:py-4 text-left">
+                    <div className="flex-1 flex flex-col px-0 py-4 text-left">
                       {/* 주요 원단 칩 */}
                       <div className="flex flex-wrap gap-1 mb-2">
                         {randomFabrics.map((chip) => (
-                          <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-semibold">
+                          <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-2 py-1 text-xs font-semibold">
                             {chip.label}
                           </span>
                         ))}
                       </div>
-                      <div className="font-bold text-xs sm:text-sm mb-1 text-left">{displayName}</div>
+                      <div className="font-bold text-sm mb-1 text-left">{displayName}</div>
                       {/* 주요 품목 */}
                       <div className="text-xs font-bold mb-1 flex items-start" style={{ color: '#333333', opacity: 0.6 }}>
                         <span className="shrink-0 mr-1">주요품목</span>

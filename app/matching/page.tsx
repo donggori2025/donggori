@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import type { Factory } from "@/lib/factories";
+import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
 
 
 // factories 데이터에서 옵션 추출 유틸(공장 찾기에서 복사)
@@ -51,7 +52,38 @@ export default function MatchingPage() {
   useEffect(() => {
     async function fetchFactories() {
       const { data } = await supabase.from("donggori").select("*");
-      setFactories(data ?? []);
+      
+      // 이미지 정보를 추가로 처리
+      const factoriesWithImages = (data ?? []).map((factory: any) => {
+        const companyName = factory.company_name || factory.name || '';
+        
+        // 이미지 정보 로깅
+        console.log(`공장 ${companyName} 원본 데이터:`, {
+          id: factory.id,
+          company_name: factory.company_name,
+          name: factory.name,
+          images: factory.images,
+          image: factory.image
+        });
+        
+        // 실제 이미지 정보 가져오기
+        const factoryWithImages = {
+          ...factory,
+          // 공장 이름으로 실제 이미지 가져오기
+          image: getFactoryMainImage(companyName),
+          images: getFactoryImages(companyName)
+        };
+        
+        console.log(`공장 ${companyName} 처리된 이미지 데이터:`, {
+          image: factoryWithImages.image,
+          images: factoryWithImages.images,
+          companyName: companyName
+        });
+        
+        return factoryWithImages;
+      });
+      
+      setFactories(factoriesWithImages);
     }
     fetchFactories();
   }, []);
@@ -275,7 +307,15 @@ type ScoredFactory = Factory & { score: number };
       return false;
     });
     // 3개 미만이면 랜덤으로 채움
-    const result = matched.slice(0, 3).map(f => ({ ...f, score: 1 }));
+    const result = matched.slice(0, 3).map(f => {
+      // 이미지 정보 로깅
+      console.log(`추천 공장 ${f.company_name || f.name} 이미지 정보:`, {
+        images: f.images,
+        image: f.image,
+        companyName: f.company_name || f.name
+      });
+      return { ...f, score: 1 };
+    });
     if (result.length < 3) {
       const others = factories.filter(f => !matched.includes(f));
       while (result.length < 3 && others.length > 0) {
@@ -289,9 +329,9 @@ type ScoredFactory = Factory & { score: number };
   // 추천 결과 카드 UI (공장 정보 상세)
   function renderResultCards() {
     return (
-      <div className="w-full flex flex-col items-center justify-center min-h-[500px] animate-fade-in">
-        <div className="text-[40px] font-extrabold text-gray-900 mb-2">가장 적합한 봉제공장 3곳을 추천드려요!</div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full max-w-3xl">
+      <div className="w-full flex flex-col items-center justify-center min-h-[500px] animate-fade-in h-full">
+        <div className="text-2xl md:text-[40px] font-extrabold text-gray-900 mb-8 text-center px-4">가장 적합한 봉제공장 3곳을 추천드려요!</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 w-full max-w-3xl px-4 overflow-y-auto flex-1">
           {recommended.map((f, idx) => {
             const displayName = typeof f.name === 'string' && f.name
               ? f.name
@@ -316,47 +356,86 @@ type ScoredFactory = Factory & { score: number };
             
             return (
               <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden flex flex-col border border-gray-200">
-                {/* 이미지 영역 */}
-                <div className="w-full h-40 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl group">
-                  {(f.images && f.images.length > 0 && f.images[0]) || f.image ? (
-                    <Image
-                      src={f.images && f.images.length > 0 ? f.images[0] : f.image}
-                      alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
-                      className="object-cover w-full h-full rounded-xl group-hover:scale-110 transition-transform duration-300"
-                      width={400}
-                      height={160}
-                      priority={idx < 3}
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="text-gray-400 text-sm font-medium">
-                      이미지 준비 중
+                {/* 이미지 영역 - 데스크톱에서만 표시 */}
+                <div className="hidden md:block w-full h-32 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl group">
+                  {(() => {
+                    // 이미지 URL 우선순위: images[0] > image > 기본 이미지
+                    let imageUrl = '';
+                    if (f.images && f.images.length > 0 && f.images[0]) {
+                      imageUrl = f.images[0];
+                    } else if (f.image && f.image.trim() !== '') {
+                      imageUrl = f.image;
+                    }
+                    
+                    console.log(`공장 ${displayName} 이미지 정보:`, {
+                      images: f.images,
+                      image: f.image,
+                      selectedUrl: imageUrl,
+                      companyName: f.company_name || f.name
+                    });
+                    
+                    if (imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== '' && imageUrl !== '/logo_donggori.png') {
+                      return (
+                        <Image
+                          src={imageUrl}
+                          alt={typeof f.company_name === 'string' ? f.company_name : (typeof f.name === 'string' ? f.name : '공장 이미지')}
+                          className="object-cover w-full h-full rounded-xl group-hover:scale-110 transition-transform duration-300"
+                          width={400}
+                          height={160}
+                          priority={idx < 3}
+                          unoptimized
+                          onError={(e) => {
+                            console.warn(`이미지 로드 실패: ${imageUrl}`);
+                            // 이미지 로드 실패 시 대체 UI 표시
+                            const imgElement = e.currentTarget;
+                            imgElement.style.display = 'none';
+                            const fallbackElement = imgElement.nextElementSibling;
+                            if (fallbackElement) {
+                              fallbackElement.classList.remove('hidden');
+                            }
+                          }}
+                        />
+                      );
+                    } else {
+                      return (
+                        <div className="text-gray-400 text-sm font-medium flex items-center justify-center h-full">
+                          <div className="text-center">
+                            <div>이미지 준비 중</div>
+                          </div>
+                        </div>
+                      );
+                    }
+                  })()}
+                  {/* 이미지 로드 실패 시 표시할 대체 텍스트 */}
+                  <div className="text-gray-400 text-sm font-medium hidden flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <div>이미지 준비 중</div>
                     </div>
-                  )}
+                  </div>
                 </div>
-                {/* 이미지와 텍스트 사이 gap */}
-                <div className="mt-4" />
+                {/* 이미지와 텍스트 사이 gap - 데스크톱에서만 */}
+                <div className="hidden md:block mt-4" />
                 {/* 정보 영역 (패딩 적용) */}
-                <div className="flex-1 flex flex-col p-6">
+                <div className="flex-1 flex flex-col p-4 md:p-6">
                   {/* 주요 원단 칩 */}
                   <div className="flex flex-wrap gap-2 mb-2">
                     {randomFabrics.map((chip) => (
-                      <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-3 py-1 text-xs font-semibold">
+                      <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-2 md:px-3 py-1 text-xs font-semibold">
                         {chip.label}
                       </span>
                     ))}
                   </div>
-                  <div className="font-bold text-base mb-1">{displayName}</div>
+                  <div className="font-bold text-sm md:text-base mb-1">{displayName}</div>
                   {/* 주요 품목 */}
-                  <div className="text-sm font-bold mt-2 mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
+                  <div className="text-xs md:text-sm font-bold mt-2 mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
                     <span className="shrink-0">주요품목</span>
                     <span className="font-normal ml-2 flex-1 truncate">{mainItems}</span>
                   </div>
-                  <div className="text-sm font-bold" style={{ color: '#333333', opacity: 0.6 }}>
+                  <div className="text-xs md:text-sm font-bold" style={{ color: '#333333', opacity: 0.6 }}>
                     MOQ(최소 주문 수량) <span className="font-normal">{typeof f.moq === 'number' ? f.moq : (typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? Number(f.moq) : (typeof f.minOrder === 'number' ? f.minOrder : '-'))}</span>
                   </div>
                   <button
-                    className="w-full mt-4 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition"
+                    className="w-full mt-4 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition text-sm md:text-base"
                     onClick={() => {
                       if (!user) {
                         alert('로그인 후 이용 가능합니다.');
@@ -477,10 +556,10 @@ type ScoredFactory = Factory & { score: number };
 
   // 왼쪽: 질문/선택지 or 결과 카드 or 로딩
   return (
-    <div className="w-full min-h-screen bg-[#F4F5F7] flex flex-col items-center justify-start overflow-x-hidden py-16 px-6">
-      <div className="w-full max-w-[1400px] mx-auto flex flex-row gap-4 items-start justify-center flex-1 transition-opacity duration-700 px-1 overflow-hidden bg-[#F4F5F7] pb-0 mb-0" style={{ minHeight: '84vh' }}>
+    <div className="w-full min-h-screen bg-[#F4F5F7] flex flex-col items-center justify-start overflow-x-hidden py-8 md:py-16 px-4 md:px-6">
+      <div className="w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-4 items-start justify-center flex-1 transition-opacity duration-700 px-1 overflow-hidden bg-[#F4F5F7] pb-0 mb-0" style={{ minHeight: '84vh' }}>
         {/* 왼쪽: 질문/선택지 or 결과 카드 or 로딩 */}
-        <div className="flex-[2] bg-white rounded-2xl shadow border p-6 flex flex-col h-[100vh] max-h-[80vh]">
+        <div className="w-full lg:flex-[2] bg-white rounded-2xl shadow border p-4 md:p-6 flex flex-col h-[70vh] lg:h-[100vh] max-h-[70vh] lg:max-h-[80vh]">
           {answers.length === QUESTIONS.length ? (
             resultLoading ? (
               <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] animate-fade-in">
@@ -488,20 +567,20 @@ type ScoredFactory = Factory & { score: number };
                 <div className="text-lg font-semibold">추천 결과를 분석 중입니다...</div>
               </div>
             ) : (
-              <div className="flex flex-col flex-1 justify-between h-full">
-                <div className="flex-1 flex flex-col items-center justify-center">
+              <div className="flex flex-col flex-1 justify-between h-full overflow-hidden">
+                <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto">
                   {renderResultCards()}
                 </div>
                 {/* 하단 버튼 영역 */}
-                <div className="flex w-full gap-4 pt-4">
+                <div className="flex w-full gap-4 pt-4 shrink-0">
                   <button
-                    className="flex-1 flex items-center justify-center border border-gray-300 rounded-lg py-3 text-base font-semibold bg-white hover:bg-gray-50 transition"
+                    className="flex-1 flex items-center justify-center border border-gray-300 rounded-lg py-3 text-sm md:text-base font-semibold bg-white hover:bg-gray-50 transition"
                     onClick={() => router.push('/factories')}
                   >
                     <span className="mr-2">🔍</span>직접 찾기
                   </button>
                   <button
-                    className="flex-1 flex items-center justify-center rounded-lg py-3 text-base font-semibold bg-[#222] text-white hover:bg-[#111] transition"
+                    className="flex-1 flex items-center justify-center rounded-lg py-3 text-sm md:text-base font-semibold bg-[#222] text-white hover:bg-[#111] transition"
                     onClick={handleRestart}
                   >
                     <span className="mr-2">↻</span>다시하기
@@ -517,26 +596,26 @@ type ScoredFactory = Factory & { score: number };
             <>
               {/* 상단~선택지 영역 */}
               <div className="flex-1 min-h-0 flex flex-col gap-4">
-                <div className="text-base text-gray-500 mb-4">
+                <div className="text-sm md:text-base text-gray-500 mb-4">
                   몇 가지 정보를 알려주시면,<br />
                   <span className="font-bold">가장 적합한 3개의 봉제공장을 추천</span>해드립니다.
                 </div>
                 <hr className="my-4 border-gray-200" />
                 <div className="flex gap-2 mb-6">
                   {QUESTIONS.map((_, idx) => (
-                    <div key={idx} className={`h-1 w-12 rounded-full ${idx <= step ? "bg-[#333333]" : "bg-gray-200"}`}></div>
+                    <div key={idx} className={`h-1 w-8 md:w-12 rounded-full ${idx <= step ? "bg-[#333333]" : "bg-gray-200"}`}></div>
                   ))}
                 </div>
-                <div className="text-sm text-gray-400 mb-2">{step + 1} of {QUESTIONS.length}</div>
-                <div className="text-xl font-bold mb-6">{QUESTIONS[step].question}</div>
+                <div className="text-xs md:text-sm text-gray-400 mb-2">{step + 1} of {QUESTIONS.length}</div>
+                <div className="text-lg md:text-xl font-bold mb-6">{QUESTIONS[step].question}</div>
                 {/* 선택지 영역 */}
-                <div className={QUESTIONS[step].key === 'items' ? 'bg-gray-50 rounded-xl p-6 grid grid-cols-3 gap-6 overflow-y-auto flex-1' : 'bg-gray-50 rounded-xl p-6 grid grid-cols-3 gap-6 overflow-y-auto flex-1'}
+                <div className={QUESTIONS[step].key === 'items' ? 'bg-gray-50 rounded-xl p-4 md:p-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 overflow-y-auto flex-1' : 'bg-gray-50 rounded-xl p-4 md:p-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 overflow-y-auto flex-1'}
                   style={QUESTIONS[step].key === 'items' ? { maxHeight: 'unset' } : {}}>
                   {QUESTIONS[step].options.map(option => (
                     <button
                       key={option}
                       type="button"
-                      className={`rounded-xl bg-white shadow text-[15px] font-medium py-8 transition border border-gray-200 flex items-center justify-center
+                      className={`rounded-xl bg-white shadow text-xs md:text-[15px] font-medium py-4 md:py-8 transition border border-gray-200 flex items-center justify-center
                         ${selectedOptions.includes(option)
                           ? "border-[#333333] ring-2 ring-[#333333]"
                           : "hover:border-[#333333]"}
@@ -551,11 +630,11 @@ type ScoredFactory = Factory & { score: number };
               </div>
               {/* 하단 버튼 영역 */}
               <div className="pt-4 pb-6 border-t border-gray-200 flex justify-between items-center gap-4 shrink-0 bg-white">
-                <button className="text-base text-gray-500 underline" onClick={() => router.push("/")}>나가기</button>
+                <button className="text-sm md:text-base text-gray-500 underline" onClick={() => router.push("/")}>나가기</button>
                 <div className="flex gap-2">
-                  <Button variant="ghost" className="text-[#333333] text-base px-6 py-3" onClick={handleSkip}>건너뛰기</Button>
+                  <Button variant="ghost" className="text-[#333333] text-sm md:text-base px-4 md:px-6 py-2 md:py-3" onClick={handleSkip}>건너뛰기</Button>
                   <Button
-                    className="bg-[#333333] text-white rounded-lg px-8 py-3 font-bold text-base"
+                    className="bg-[#333333] text-white rounded-lg px-6 md:px-8 py-2 md:py-3 font-bold text-sm md:text-base"
                     onClick={handleConfirm}
                     disabled={selectedOptions.length === 0}
                   >
@@ -568,8 +647,8 @@ type ScoredFactory = Factory & { score: number };
         </div>
         {/* 오른쪽: 기존 채팅 UI + 결과 안내 메시지(답변 말풍선) */}
         <div
-          className="flex-[1] bg-[#F7F8FA] rounded-xl shadow-md p-4 min-h-[500px] flex flex-col gap-6"
-          style={{ height: '80vh', maxHeight: '80vh', overflowY: 'auto' }}
+          className="w-full lg:flex-[1] bg-[#F7F8FA] rounded-xl shadow-md p-4 min-h-[300px] lg:min-h-[500px] flex flex-col gap-6"
+          style={{ height: '40vh', maxHeight: '40vh', overflowY: 'auto' }}
           ref={chatScrollRef}
         >
           {/* 기존 채팅/인트로 UI */}
