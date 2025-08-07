@@ -304,7 +304,7 @@ export default function FactoriesPage() {
     const sortedDistrictGroups = Object.entries(districtGroups)
       .filter(([_, regions]) => regions.length > 0)
       .map(([district, regions]) => {
-        let sortedRegions = [...regions];
+        const sortedRegions = [...regions];
         
         // 장안동: 1동을 2동 앞으로
         if (district === '장안동') {
