@@ -501,10 +501,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
 
             {/* 플랜 정보 */}
             <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">👏</span>
-                </div>
+              <div className="mb-4">
                 <h2 className="text-lg font-bold">패키지별 정보를 확인해보세요</h2>
               </div>
               
@@ -725,9 +722,16 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           <div className="mt-6">
             <Button 
               onClick={handleKakaoInquiry}
-              className="w-full bg-yellow-400 text-black rounded-lg py-3 font-bold hover:bg-yellow-500 text-sm lg:text-base"
+              className="w-full bg-gray-100 text-black rounded-lg py-3 font-bold hover:bg-gray-200 text-sm lg:text-base flex items-center justify-center gap-2"
             >
-              💬 문의하기
+              <Image 
+                src="/kakao_lastlast.svg" 
+                alt="카카오톡" 
+                width={20} 
+                height={20}
+                className="w-5 h-5"
+              />
+              문의하기
             </Button>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase, testSupabaseConnection, checkMatchRequestsTable } from "@/lib/supabaseClient";
 import { MatchRequest } from "@/lib/matchRequests";
 import { Factory } from "@/lib/factories";
+import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
@@ -235,7 +236,60 @@ export default function MyPage() {
           return;
         }
         const { data } = await supabase.from("donggori").select("*").eq("id", factoryId).single();
-        setFactory(data);
+        
+        if (data) {
+          // 이미지 매핑 적용
+          const companyName = String(data.company_name || data.name || "공장명 없음");
+          const mappedFactory: Factory = {
+            ...data,
+            id: String(data.id || Math.random()),
+            name: companyName,
+            ownerUserId: String(data.owner_user_id || data.ownerUserId || "unknown"),
+            region: String(data.admin_district || data.region || "지역 없음"),
+            items: [], // items는 별도 필드들로 구성
+            minOrder: Number(data.moq) || 0,
+            description: String(data.intro_text || data.intro || data.description || "설명 없음"),
+            image: getFactoryMainImage(companyName), // 업장 이름으로 이미지 매칭
+            images: getFactoryImages(companyName), // 업장 이름으로 모든 이미지 가져오기
+            contact: String(data.phone_num || data.phone_number || data.contact || "연락처 없음"),
+            lat: Number(data.lat) || 37.5665,
+            lng: Number(data.lng) || 126.9780,
+            kakaoUrl: String(data.kakao_url || data.kakaoUrl || ""),
+            processes: data.processes ? (Array.isArray(data.processes) ? data.processes as string[] : [String(data.processes)]) : [],
+            // DB 연동용 확장 필드들
+            business_type: data.business_type as string | undefined,
+            equipment: data.equipment as string | undefined,
+            sewing_machines: data.sewing_machines as string | undefined,
+            pattern_machines: data.pattern_machines as string | undefined,
+            special_machines: data.special_machines as string | undefined,
+            top_items_upper: data.top_items_upper as string | undefined,
+            top_items_lower: data.top_items_lower as string | undefined,
+            top_items_outer: data.top_items_outer as string | undefined,
+            top_items_dress_skirt: data.top_items_dress_skirt as string | undefined,
+            top_items_bag: data.top_items_bag as string | undefined,
+            top_items_fashion_accessory: data.top_items_fashion_accessory as string | undefined,
+            top_items_underwear: data.top_items_underwear as string | undefined,
+            top_items_sports_leisure: data.top_items_sports_leisure as string | undefined,
+            top_items_pet: data.top_items_pet as string | undefined,
+            moq: Number(data.moq) || undefined,
+            monthly_capacity: Number(data.monthly_capacity) || undefined,
+            admin_district: data.admin_district as string | undefined,
+            intro: (data.intro_text || data.intro) as string | undefined,
+            phone_number: (data.phone_num || data.phone_number) as string | undefined,
+            factory_type: data.factory_type as string | undefined,
+            main_fabrics: data.main_fabrics as string | undefined,
+            distribution: data.distribution as string | undefined,
+            delivery: data.delivery as string | undefined,
+            company_name: data.company_name as string | undefined,
+            contact_name: data.contact_name as string | undefined,
+            email: data.email as string | undefined,
+            address: data.address as string | undefined,
+            established_year: Number(data.established_year) || undefined,
+          };
+          setFactory(mappedFactory);
+        } else {
+          setFactory(null);
+        }
         setLoading(false);
       }
       fetchFactory();
@@ -286,14 +340,15 @@ export default function MyPage() {
         // 카드 전체 클릭 이벤트 제거
       >
         <div className="w-28 h-28 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center group">
-          {(factory?.images && factory.images.length > 0 && factory.images[0] && factory.images[0] !== '/logo_donggori.png' && !factory.images[0].includes('동고')) || 
-           (factory?.image && factory.image !== '/logo_donggori.png' && !factory.image.includes('동고') && !factory.image.includes('unsplash')) ? (
+          {(factory?.images && factory.images.length > 0 && factory.images[0] && factory.images[0] !== '/logo_donggori.png' && !factory.images[0].includes('logo_donggori')) || 
+           (factory?.image && factory.image !== '/logo_donggori.png' && !factory.image.includes('logo_donggori') && !factory.image.includes('unsplash')) ? (
             <Image 
               src={factory.images && factory.images.length > 0 ? factory.images[0] : factory.image} 
               alt={factory?.company_name || factory?.name || '공장 이미지'} 
               width={112} 
               height={112} 
               className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300" 
+              unoptimized
             />
           ) : (
             <div className="text-gray-400 text-xs font-medium text-center">
@@ -323,42 +378,194 @@ export default function MyPage() {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto py-16 px-4 h-full flex flex-row gap-8 min-h-[500px]">
-      {/* 왼쪽 사이드바: 메뉴만 */}
-      <aside className="w-1/4 min-w-[220px] bg-white rounded-xl shadow p-6 flex flex-col self-stretch h-full min-h-0">
-        <nav className="w-full flex flex-col gap-2 mb-6">
+    <div className="max-w-[1400px] mx-auto py-16 px-4 h-full min-h-[500px]">
+      {/* 모바일 탭 메뉴 */}
+      <div className="md:hidden mb-6">
+        <div className="flex bg-gray-100 rounded-lg p-1">
           {SIDEBAR_MENUS.map((menu) => (
             <button
               key={menu}
-              className={`w-full text-left px-4 py-2 rounded transition-colors
-                ${selectedMenu === menu
-                  ? "bg-gray-100 text-black font-bold"
-                  : "text-gray-700 hover:bg-gray-100"}
-              `}
+              className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                selectedMenu === menu
+                  ? "bg-white text-black shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
               onClick={() => setSelectedMenu(menu)}
             >
               {menu}
             </button>
           ))}
-        </nav>
-        {/* 로그아웃 버튼을 맨 아래에 추가 */}
-        <div className="mt-auto pt-4 border-t border-gray-200">
+        </div>
+        {/* 모바일 로그아웃 버튼 */}
+        <div className="mt-4 text-center">
           <button
             onClick={handleLogout}
-            className="w-full text-left px-4 py-2 rounded text-gray-600 hover:bg-gray-100 transition-colors"
+            className="text-gray-600 hover:text-gray-800 text-sm transition-colors"
           >
             로그아웃
           </button>
         </div>
-      </aside>
-      {/* 오른쪽 메인 컨텐츠 - border 제거 */}
-      <section className="flex-1 bg-white rounded-xl p-8 min-h-0">
+      </div>
+
+      {/* 데스크톱 레이아웃 */}
+      <div className="hidden md:flex flex-row gap-8 h-full min-h-0">
+        {/* 왼쪽 사이드바: 메뉴만 */}
+        <aside className="w-1/4 min-w-[220px] bg-white rounded-xl shadow p-6 flex flex-col self-stretch h-full min-h-0">
+          <nav className="w-full flex flex-col gap-2 mb-6">
+            {SIDEBAR_MENUS.map((menu) => (
+              <button
+                key={menu}
+                className={`w-full text-left px-4 py-2 rounded transition-colors
+                  ${selectedMenu === menu
+                    ? "bg-gray-100 text-black font-bold"
+                    : "text-gray-700 hover:bg-gray-100"}
+                `}
+                onClick={() => setSelectedMenu(menu)}
+              >
+                {menu}
+              </button>
+            ))}
+          </nav>
+          {/* 로그아웃 버튼을 맨 아래에 추가 */}
+          <div className="mt-auto pt-4 border-t border-gray-200">
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-2 rounded text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              로그아웃
+            </button>
+          </div>
+        </aside>
+        {/* 오른쪽 메인 컨텐츠 - border 제거 */}
+        <section className="flex-1 bg-white rounded-xl p-8 min-h-0">
+          {selectedMenu === "프로필" && (
+            <div>
+              <h2 className="text-2xl font-bold mb-8">프로필</h2>
+              
+              {/* 프로필 사진과 이름 */}
+              <div className="flex items-center gap-4 mb-8">
+                <div className="relative">
+                  <Image
+                    src={user.imageUrl}
+                    alt="프로필 이미지"
+                    width={80}
+                    height={80}
+                    className="w-20 h-20 rounded-full object-cover border"
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="text-xl font-semibold mb-2">{originalName}</div>
+                  <div className="flex gap-4 text-sm">
+                    <button className="text-blue-600 hover:underline">사진 삭제</button>
+                    <label className="text-blue-600 hover:underline cursor-pointer">
+                      사진 업로드
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* 이름 입력 필드 */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">이름</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                />
+              </div>
+
+              {/* 이메일 입력 필드 */}
+              <div className="mb-8">
+                <label className="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none text-gray-500"
+                  disabled
+                />
+              </div>
+
+              {/* 하단 버튼들 */}
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={handleWithdraw}
+                  className="text-red-600 hover:text-red-800 transition-colors"
+                >
+                  탈퇴하기
+                </button>
+                <button
+                  onClick={handleSaveChanges}
+                  disabled={!hasChanges}
+                  className={`px-6 py-2 rounded-lg transition-colors ${
+                    hasChanges 
+                      ? "bg-black hover:bg-gray-800 text-white" 
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  변경사항 저장
+                </button>
+              </div>
+            </div>
+          )}
+
+          {selectedMenu === "문의내역" && (
+            <div>
+              <h2 className="text-2xl font-bold mb-8">문의내역</h2>
+              <div className="text-center py-20 text-gray-400 text-lg">
+                문의내역이 없습니다.
+              </div>
+            </div>
+          )}
+
+          {selectedMenu === "의뢰내역" && (
+            <div>
+              <h2 className="text-2xl font-bold mb-8">의뢰내역</h2>
+              {isLoadingRequests ? (
+                <div className="text-center py-20 text-gray-400 text-lg">의뢰내역을 불러오는 중...</div>
+              ) : requestError ? (
+                <div className="text-center py-20">
+                  <div className="text-red-500 text-lg mb-4">{requestError}</div>
+                  {debugInfo && (
+                    <div className="text-sm text-gray-600 bg-gray-100 p-4 rounded-lg max-w-2xl mx-auto">
+                      <div className="font-semibold mb-2">디버그 정보:</div>
+                      <div className="text-xs">{debugInfo}</div>
+                    </div>
+                  )}
+                  <div className="mt-4 text-sm text-gray-500">
+                    <div>• 브라우저 개발자 도구(F12)의 Console 탭에서 더 자세한 오류 정보를 확인할 수 있습니다.</div>
+                    <div>• 환경 변수가 올바르게 설정되어 있는지 확인해주세요.</div>
+                  </div>
+                </div>
+              ) : myMatchRequests.length === 0 ? (
+                <div className="text-center py-20 text-gray-400 text-lg">의뢰내역이 없습니다.</div>
+              ) : (
+                <div className="space-y-4">
+                  {myMatchRequests.map((req) => (
+                    <FactoryRequestCard key={req.id} req={req} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      </div>
+
+      {/* 모바일 메인 컨텐츠 */}
+      <div className="md:hidden bg-white rounded-xl p-6">
         {selectedMenu === "프로필" && (
           <div>
-            <h2 className="text-2xl font-bold mb-8">프로필</h2>
+            <h2 className="text-xl font-bold mb-6">프로필</h2>
             
             {/* 프로필 사진과 이름 */}
-            <div className="flex items-center gap-4 mb-8">
+            <div className="flex items-center gap-4 mb-6">
               <div className="relative">
                 <Image
                   src={user.imageUrl}
@@ -369,7 +576,7 @@ export default function MyPage() {
                 />
               </div>
               <div className="flex-1">
-                <div className="text-xl font-semibold mb-2">{originalName}</div>
+                <div className="text-lg font-semibold mb-2">{originalName}</div>
                 <div className="flex gap-4 text-sm">
                   <button className="text-blue-600 hover:underline">사진 삭제</button>
                   <label className="text-blue-600 hover:underline cursor-pointer">
@@ -397,7 +604,7 @@ export default function MyPage() {
             </div>
 
             {/* 이메일 입력 필드 */}
-            <div className="mb-8">
+            <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">이메일</label>
               <input
                 type="email"
@@ -412,14 +619,14 @@ export default function MyPage() {
             <div className="flex justify-between items-center">
               <button
                 onClick={handleWithdraw}
-                className="text-red-600 hover:text-red-800 transition-colors"
+                className="text-red-600 hover:text-red-800 transition-colors text-sm"
               >
                 탈퇴하기
               </button>
               <button
                 onClick={handleSaveChanges}
                 disabled={!hasChanges}
-                className={`px-6 py-2 rounded-lg transition-colors ${
+                className={`px-4 py-2 rounded-lg transition-colors text-sm ${
                   hasChanges 
                     ? "bg-black hover:bg-gray-800 text-white" 
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -433,8 +640,8 @@ export default function MyPage() {
 
         {selectedMenu === "문의내역" && (
           <div>
-            <h2 className="text-2xl font-bold mb-8">문의내역</h2>
-            <div className="text-center py-20 text-gray-400 text-lg">
+            <h2 className="text-xl font-bold mb-6">문의내역</h2>
+            <div className="text-center py-16 text-gray-400 text-lg">
               문의내역이 없습니다.
             </div>
           </div>
@@ -442,14 +649,14 @@ export default function MyPage() {
 
         {selectedMenu === "의뢰내역" && (
           <div>
-            <h2 className="text-2xl font-bold mb-8">의뢰내역</h2>
+            <h2 className="text-xl font-bold mb-6">의뢰내역</h2>
             {isLoadingRequests ? (
-              <div className="text-center py-20 text-gray-400 text-lg">의뢰내역을 불러오는 중...</div>
+              <div className="text-center py-16 text-gray-400 text-lg">의뢰내역을 불러오는 중...</div>
             ) : requestError ? (
-              <div className="text-center py-20">
+              <div className="text-center py-16">
                 <div className="text-red-500 text-lg mb-4">{requestError}</div>
                 {debugInfo && (
-                  <div className="text-sm text-gray-600 bg-gray-100 p-4 rounded-lg max-w-2xl mx-auto">
+                  <div className="text-sm text-gray-600 bg-gray-100 p-4 rounded-lg">
                     <div className="font-semibold mb-2">디버그 정보:</div>
                     <div className="text-xs">{debugInfo}</div>
                   </div>
@@ -460,7 +667,7 @@ export default function MyPage() {
                 </div>
               </div>
             ) : myMatchRequests.length === 0 ? (
-              <div className="text-center py-20 text-gray-400 text-lg">의뢰내역이 없습니다.</div>
+              <div className="text-center py-16 text-gray-400 text-lg">의뢰내역이 없습니다.</div>
             ) : (
               <div className="space-y-4">
                 {myMatchRequests.map((req) => (
@@ -470,7 +677,7 @@ export default function MyPage() {
             )}
           </div>
         )}
-      </section>
+      </div>
     </div>
   );
 } 
