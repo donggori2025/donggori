@@ -6,6 +6,7 @@ import { useSignIn } from "@clerk/nextjs";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import { getFactoryAuthWithRealName } from "@/lib/factoryAuth";
 import { clerkConfig } from "@/lib/clerkConfig";
+import { handleClerkError } from "@/lib/clerkErrorTranslator";
 
 
 export default function SignInPage() {
@@ -31,7 +32,7 @@ export default function SignInPage() {
         redirectUrlComplete: '/',
       });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "소셜 로그인 중 오류가 발생했습니다.");
+      setError(handleClerkError(err));
     } finally {
       setLoading(false);
     }
@@ -78,7 +79,7 @@ export default function SignInPage() {
       }
     } catch (err: unknown) {
       console.error('Clerk 오류:', err);
-      setError(err instanceof Error ? err.message : "이메일 또는 비밀번호가 올바르지 않습니다.");
+      setError(handleClerkError(err));
     } finally {
       setLoading(false);
     }

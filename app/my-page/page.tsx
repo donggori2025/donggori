@@ -68,7 +68,7 @@ export default function MyPage() {
           console.log("Supabase 연결 테스트 결과:", connectionTest);
           
           if (!connectionTest.success) {
-            setRequestError(`Supabase 연결 실패: ${connectionTest.error}`);
+            setRequestError(`Supabase 연결에 실패했습니다: ${connectionTest.error}`);
             setDebugInfo(`연결 오류: ${connectionTest.error}`);
             setMyMatchRequests([]);
             return;
@@ -81,7 +81,7 @@ export default function MyPage() {
           console.log("match_requests 테이블 확인 결과:", tableTest);
           
           if (!tableTest.success) {
-            setRequestError(`match_requests 테이블 접근 실패: ${tableTest.error}`);
+            setRequestError(`match_requests 테이블 접근에 실패했습니다: ${tableTest.error}`);
             setDebugInfo(`테이블 오류: ${tableTest.error}`);
             setMyMatchRequests([]);
             return;
@@ -117,7 +117,7 @@ export default function MyPage() {
           }
         } catch (e) {
           console.error("의뢰내역 로딩 중 예외 발생:", e);
-          const errorMessage = e instanceof Error ? e.message : "알 수 없는 오류";
+          const errorMessage = e instanceof Error ? e.message : "알 수 없는 오류가 발생했습니다";
           setRequestError(`의뢰내역을 불러오는 중 오류가 발생했습니다: ${errorMessage}`);
           setDebugInfo(`예외 발생: ${errorMessage}`);
           setMyMatchRequests([]);

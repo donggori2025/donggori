@@ -2,7 +2,7 @@
 export const clerkConfig = {
   // 허용된 이메일 도메인 목록
   allowedEmailDomains: process.env.CLERK_ALLOWED_EMAIL_DOMAINS 
-    ? process.env.CLERK_ALLOWED_EMAIL_DOMAINS.split(',').map(domain => domain.trim())
+    ? process.env.CLERK_ALLOWED_EMAIL_DOMAINS.split(',').map((domain: string) => domain.trim())
     : [], // 빈 배열이면 모든 도메인 허용
   
   // 특정 도메인 제한이 있는지 확인
@@ -17,7 +17,7 @@ export const clerkConfig = {
     const domain = email.split('@')[1]?.toLowerCase();
     if (!domain) return false;
     
-    return clerkConfig.allowedEmailDomains.some(allowedDomain => 
+    return clerkConfig.allowedEmailDomains.some((allowedDomain: string) => 
       domain === allowedDomain.toLowerCase()
     );
   },
