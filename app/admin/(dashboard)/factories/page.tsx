@@ -251,7 +251,7 @@ export default function AdminFactoriesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {columns.map((c:any) => {
                 // 이미지 필드는 별도 컴포넌트로 처리
-                if (c.column_name === 'images') {
+                if (c.column_name === 'images' || c.column_name === 'image') {
                   return (
                     <div key={c.column_name} className="md:col-span-2 lg:col-span-3">
                       <ImageUpload
@@ -359,26 +359,41 @@ export default function AdminFactoriesPage() {
                     {item.moq && <div className="text-sm text-gray-600">MOQ: {item.moq}</div>}
                   </div>
 
-                  {item.images && item.images.length > 0 && (
-                    <div>
-                      <div className="text-sm text-gray-600 mb-1">이미지 ({item.images.length}개):</div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {item.images.slice(0, 4).map((imageUrl: string, index: number) => (
-                          <img
-                            key={index}
-                            src={imageUrl}
-                            alt={`업장 이미지 ${index + 1}`}
-                            className="w-full h-16 object-cover rounded border"
-                          />
-                        ))}
-                        {item.images.length > 4 && (
-                          <div className="w-full h-16 bg-gray-100 rounded border flex items-center justify-center text-xs text-gray-500">
-                            +{item.images.length - 4}개 더
-                          </div>
-                        )}
+                  {(() => {
+                    const images = item.images || [];
+                    const hasImage = item.image;
+                    const totalImages = images.length + (hasImage && !images.includes(item.image) ? 1 : 0);
+                    
+                    if (totalImages === 0) return null;
+                    
+                    const displayImages = [...images];
+                    if (hasImage && !displayImages.includes(item.image)) {
+                      displayImages.unshift(item.image);
+                    }
+                    
+                    return (
+                      <div>
+                        <div className="text-sm text-gray-600 mb-1">
+                          이미지 ({totalImages}개):
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {displayImages.slice(0, 4).map((imageUrl: string, index: number) => (
+                            <img
+                              key={index}
+                              src={imageUrl}
+                              alt={`업장 이미지 ${index + 1}`}
+                              className="w-full h-16 object-cover rounded border"
+                            />
+                          ))}
+                          {totalImages > 4 && (
+                            <div className="w-full h-16 bg-gray-100 rounded border flex items-center justify-center text-xs text-gray-500">
+                              +{totalImages - 4}개 더
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   <div className="flex gap-2 pt-2">
                     <button 
@@ -446,18 +461,31 @@ export default function AdminFactoriesPage() {
                           />
                         </div>
                         
-                        {selected.images && selected.images.length > 0 && (
-                          <div className="border-t pt-4">
-                            <FactoryImageManager
-                              factoryId={selected.id}
-                              images={selected.images}
-                              onImagesChange={(updatedImages) => {
-                                handleFieldChange('images', updatedImages);
-                              }}
-                              isEditing={true}
-                            />
-                          </div>
-                        )}
+                        {(() => {
+                          const images = selected.images || [];
+                          const hasImage = selected.image;
+                          const totalImages = images.length + (hasImage && !images.includes(selected.image) ? 1 : 0);
+                          
+                          if (totalImages === 0) return null;
+                          
+                          const displayImages = [...images];
+                          if (hasImage && !displayImages.includes(selected.image)) {
+                            displayImages.unshift(selected.image);
+                          }
+                          
+                          return (
+                            <div className="border-t pt-4">
+                              <FactoryImageManager
+                                factoryId={selected.id}
+                                images={displayImages}
+                                onImagesChange={(updatedImages) => {
+                                  handleFieldChange('images', updatedImages);
+                                }}
+                                isEditing={true}
+                              />
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   );
