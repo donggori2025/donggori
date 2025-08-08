@@ -265,6 +265,14 @@ export default function AdminFactoriesPage() {
                 if (c.column_name === 'image') {
                   return (
                     <div key={c.column_name} className="md:col-span-2 lg:col-span-3">
+                      <div className="mb-2">
+                        <label className="text-sm font-medium text-gray-700">
+                          업장 이미지 업로드
+                        </label>
+                        <p className="text-xs text-gray-500 mt-1">
+                          업장 이미지를 업로드하세요. (선택사항)
+                        </p>
+                      </div>
                       <ImageUpload
                         onImagesChange={handleImageChange}
                         currentImages={form.image ? [form.image] : []}
@@ -372,7 +380,20 @@ export default function AdminFactoriesPage() {
 
                   {item.image && (
                     <div>
-                      <div className="text-sm text-gray-600 mb-1">이미지:</div>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-sm text-gray-600">이미지:</div>
+                        <button
+                          onClick={() => {
+                            if (confirm('이미지를 삭제하시겠습니까?')) {
+                              update(item.id, { ...item, image: "" });
+                            }
+                          }}
+                          className="text-xs text-red-600 hover:text-red-800 underline"
+                          title="이미지 삭제"
+                        >
+                          삭제
+                        </button>
+                      </div>
                       <img
                         src={item.image}
                         alt="업장 이미지"
@@ -431,6 +452,14 @@ export default function AdminFactoriesPage() {
                 if (c.column_name === 'image') {
                   return (
                     <div key={c.column_name} className="md:col-span-2">
+                      <div className="mb-2">
+                        <label className="text-sm font-medium text-gray-700">
+                          업장 이미지 관리
+                        </label>
+                        <p className="text-xs text-gray-500 mt-1">
+                          이미지를 업로드하거나 기존 이미지를 삭제할 수 있습니다.
+                        </p>
+                      </div>
                       <ImageUpload
                         onImagesChange={handleSelectedImageChange}
                         currentImages={selected.image ? [selected.image] : []}
