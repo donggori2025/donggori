@@ -3,7 +3,8 @@ import { cookies } from "next/headers";
 import { getServiceSupabase } from "@/lib/supabaseService";
 
 export async function GET() {
-  const session = cookies().get("admin_session");
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
   if (!session) return NextResponse.json({ success: false, error: "관리자 인증 필요" }, { status: 401 });
 
   const supabase = getServiceSupabase();

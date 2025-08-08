@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { put } from "@vercel/blob";
 
-function requireAdmin() {
-  const session = cookies().get("admin_session");
+async function requireAdmin() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
   if (!session) {
     return NextResponse.json({ success: false, error: "관리자 인증 필요" }, { status: 401 });
   }
@@ -11,7 +12,7 @@ function requireAdmin() {
 }
 
 export async function POST(req: Request) {
-  const auth = requireAdmin();
+  const auth = await requireAdmin();
   if (auth) return auth;
 
   try {
