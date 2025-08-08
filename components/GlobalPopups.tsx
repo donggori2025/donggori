@@ -93,7 +93,7 @@ export default function GlobalPopups() {
         
         {current.image_url && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={current.image_url} alt={current.title || ''} className="w-full h-80 object-cover" />
+          <img src={current.image_url} alt={current.title || ''} className="w-full h-80 object-contain" />
         )}
         <div className="p-6 space-y-3">
           {current.title && <div className="text-xl font-bold text-gray-900">{current.title}</div>}
