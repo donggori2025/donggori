@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import ImageUpload from "@/components/ImageUpload";
+import FactoryImageManager from "@/components/FactoryImageManager";
 
 type FactoryForm = Record<string, any>;
 
@@ -185,19 +186,7 @@ export default function AdminFactoriesPage() {
 
   // 이미지 필드 처리 함수
   const handleImageChange = (images: string[]) => {
-    // 단일 이미지만 사용
-    setForm((prev: FactoryForm) => ({ ...prev, image: images[0] || "" }));
-  };
-
-  const handleSelectedImageChange = (images: string[]) => {
-    // 단일 이미지만 사용
-    const newImage = images[0] || "";
-    setSelected((prev: any) => ({ ...prev, image: newImage }));
-    
-    // 변경사항 체크
-    if (originalSelected && originalSelected.image !== newImage) {
-      setHasChanges(true);
-    }
+    setForm((prev: FactoryForm) => ({ ...prev, images: images }));
   };
 
   // 선택된 업장 수정 시 원본 데이터 저장
@@ -262,21 +251,13 @@ export default function AdminFactoriesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {columns.map((c:any) => {
                 // 이미지 필드는 별도 컴포넌트로 처리
-                if (c.column_name === 'image') {
+                if (c.column_name === 'images') {
                   return (
                     <div key={c.column_name} className="md:col-span-2 lg:col-span-3">
-                      <div className="mb-2">
-                        <label className="text-sm font-medium text-gray-700">
-                          업장 이미지 업로드
-                        </label>
-                        <p className="text-xs text-gray-500 mt-1">
-                          업장 이미지를 업로드하세요. (선택사항)
-                        </p>
-                      </div>
                       <ImageUpload
                         onImagesChange={handleImageChange}
-                        currentImages={form.image ? [form.image] : []}
-                        multiple={false}
+                        currentImages={form.images || []}
+                        multiple={true}
                       />
                     </div>
                   );
@@ -378,27 +359,24 @@ export default function AdminFactoriesPage() {
                     {item.moq && <div className="text-sm text-gray-600">MOQ: {item.moq}</div>}
                   </div>
 
-                  {item.image && (
+                  {item.images && item.images.length > 0 && (
                     <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="text-sm text-gray-600">이미지:</div>
-                        <button
-                          onClick={() => {
-                            if (confirm('이미지를 삭제하시겠습니까?')) {
-                              update(item.id, { ...item, image: "" });
-                            }
-                          }}
-                          className="text-xs text-red-600 hover:text-red-800 underline"
-                          title="이미지 삭제"
-                        >
-                          삭제
-                        </button>
+                      <div className="text-sm text-gray-600 mb-1">이미지 ({item.images.length}개):</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {item.images.slice(0, 4).map((imageUrl: string, index: number) => (
+                          <img
+                            key={index}
+                            src={imageUrl}
+                            alt={`업장 이미지 ${index + 1}`}
+                            className="w-full h-16 object-cover rounded border"
+                          />
+                        ))}
+                        {item.images.length > 4 && (
+                          <div className="w-full h-16 bg-gray-100 rounded border flex items-center justify-center text-xs text-gray-500">
+                            +{item.images.length - 4}개 더
+                          </div>
+                        )}
                       </div>
-                      <img
-                        src={item.image}
-                        alt="업장 이미지"
-                        className="w-full h-32 object-cover rounded border"
-                      />
                     </div>
                   )}
 
@@ -449,22 +427,38 @@ export default function AdminFactoriesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {columns.map((c:any) => {
                 // 이미지 필드는 별도 컴포넌트로 처리
-                if (c.column_name === 'image') {
+                if (c.column_name === 'images') {
                   return (
                     <div key={c.column_name} className="md:col-span-2">
-                      <div className="mb-2">
-                        <label className="text-sm font-medium text-gray-700">
-                          업장 이미지 관리
-                        </label>
-                        <p className="text-xs text-gray-500 mt-1">
-                          이미지를 업로드하거나 기존 이미지를 삭제할 수 있습니다.
-                        </p>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-sm font-medium text-gray-700 mb-2 block">
+                            새 이미지 업로드
+                          </label>
+                          <ImageUpload
+                            onImagesChange={(newImages) => {
+                              const currentImages = selected.images || [];
+                              const updatedImages = [...currentImages, ...newImages];
+                              handleFieldChange('images', updatedImages);
+                            }}
+                            currentImages={[]}
+                            multiple={true}
+                          />
+                        </div>
+                        
+                        {selected.images && selected.images.length > 0 && (
+                          <div className="border-t pt-4">
+                            <FactoryImageManager
+                              factoryId={selected.id}
+                              images={selected.images}
+                              onImagesChange={(updatedImages) => {
+                                handleFieldChange('images', updatedImages);
+                              }}
+                              isEditing={true}
+                            />
+                          </div>
+                        )}
                       </div>
-                      <ImageUpload
-                        onImagesChange={handleSelectedImageChange}
-                        currentImages={selected.image ? [selected.image] : []}
-                        multiple={false}
-                      />
                     </div>
                   );
                 }
