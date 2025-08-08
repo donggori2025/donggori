@@ -77,8 +77,8 @@ export default function GlobalPopups() {
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40" onClick={(e) => e.stopPropagation()}>
-      {/* 컨테이너 최대 너비 확대, 내부 스크롤 방지 */}
-      <div className="w-[96vw] max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
+      {/* 가로를 이미지에 맞추기: inline-block + w-auto, 상한은 90vw */}
+      <div className="inline-block w-auto max-w-[90vw] max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden relative align-middle" onClick={(e) => e.stopPropagation()}>
         {/* X 닫기 버튼 */}
         <button 
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-black/20 hover:bg-black/30 text-white rounded-full transition-colors z-10"
@@ -92,20 +92,25 @@ export default function GlobalPopups() {
           </svg>
         </button>
         
+        {/* 이미지 영역: 남는 공간을 모두 사용하도록 */}
         {current.image_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img 
-            src={current.image_url} 
-            alt={current.title || ''} 
-            className="w-full max-h-[75vh] object-contain"
-          />
+          <div className="grid place-items-center bg-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src={current.image_url} 
+              alt={current.title || ''} 
+              className="w-auto h-auto max-w-[90vw] max-h-[75vh] object-contain"
+            />
+          </div>
         )}
-        <div className="p-6 space-y-3 max-h-[22vh] overflow-y-auto">
+
+        {/* 내용/네비게이션 영역 */}
+        <div className="p-6 space-y-3 border-t border-gray-100 max-h-[35vh] overflow-y-auto">
           {current.title && <div className="text-xl font-bold text-gray-900">{current.title}</div>}
           {current.content && <div className="text-base text-gray-700 whitespace-pre-wrap leading-relaxed">{current.content}</div>}
           
           {/* 하단 컨트롤 영역 */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div className="flex items-center justify-between pt-2">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <input id="remember-today" type="checkbox" className="h-4 w-4 rounded" onChange={()=>{}} />
               <label htmlFor="remember-today">오늘 하루 보지 않기</label>
