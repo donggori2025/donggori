@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getServiceSupabase } from "@/lib/supabaseService";
 
-function requireAdmin() {
-  const session = cookies().get("admin_session");
+async function requireAdmin() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
   if (!session) {
     return NextResponse.json({ success: false, error: "관리자 인증 필요" }, { status: 401 });
   }
@@ -11,7 +12,7 @@ function requireAdmin() {
 }
 
 export async function GET() {
-  const auth = requireAdmin();
+  const auth = await requireAdmin();
   if (auth) return auth;
   const supabase = getServiceSupabase();
   const { data, error } = await supabase.from("donggori").select("*").order("id", { ascending: false });
@@ -20,7 +21,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const auth = requireAdmin();
+  const auth = await requireAdmin();
   if (auth) return auth;
   const body = await req.json();
   const supabase = getServiceSupabase();
