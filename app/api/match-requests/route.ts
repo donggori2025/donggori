@@ -137,7 +137,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const queries: Promise<{ data: any[] | null; error: any }>[] = [];
+    const queries: any[] = [];
     if (userId) queries.push(supabase.from('match_requests').select('*').eq('user_id', userId));
     if (userEmail) queries.push(supabase.from('match_requests').select('*').eq('user_email', userEmail));
     if (factoryId) queries.push(supabase.from('match_requests').select('*').eq('factory_id', factoryId));
