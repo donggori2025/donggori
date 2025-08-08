@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import GlobalPopups from "@/components/GlobalPopups";
 import { ClerkProvider } from "@clerk/nextjs";
 
 const geistSans = Geist({
@@ -31,6 +32,7 @@ export default function RootLayout({
       <html lang="ko">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-toss-gray min-h-screen flex flex-col`}>
           <Header />
+          <GlobalPopups />
           <main className="w-full flex-1">
             {children}
           </main>

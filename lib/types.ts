@@ -125,3 +125,29 @@ export interface PaginatedResponse<T> {
   data: T[];
   pagination: PaginationParams;
 } 
+
+// 관리자: 팝업/공지 타입
+export interface PopupItem {
+  id: string;
+  title?: string;
+  content?: string;
+  image_url?: string;
+  start_at?: string; // ISO string
+  end_at?: string;   // ISO string
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type NoticeCategory = "공지" | "일반" | "채용공고";
+
+export interface NoticeItem {
+  id: string;
+  title: string;
+  content: string;
+  category: NoticeCategory;
+  image_urls?: string[];
+  start_at?: string; // 노출 시작
+  end_at?: string;   // 노출 종료
+  created_at?: string;
+  updated_at?: string;
+}

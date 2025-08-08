@@ -66,9 +66,14 @@ export default function SignInPage() {
       return;
       }
       
-      // 봉제공장 로그인이 실패하면 일반 사용자 로그인 시도
+      // 봉제공장 로그인이 실패하면 일반 사용자(Clerk) 로그인 시도
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError("Clerk 로그인은 이메일 형식만 지원합니다. 관리자 로그인은 /admin/login 을 이용하세요.");
+        return;
+      }
       if (!isLoaded) return;
-      
+
       const res = await signIn.create({ identifier: email, password });
       if (res.status === "complete") {
         localStorage.setItem('userType', 'user');
@@ -100,7 +105,7 @@ export default function SignInPage() {
         <label className="text-sm font-semibold">이메일</label>
         <input
           type="text"
-          placeholder="이메일 또는 봉제공장 아이디를 입력해주세요."
+          placeholder="이메일(사용자) 또는 봉제공장 아이디 입력"
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           required

@@ -37,20 +37,24 @@ export default function Header() {
   useEffect(() => {
     if (!mounted) return;
     
-    // userType은 단순 문자열이므로 직접 localStorage에서 가져옴
-    const storedUserType = localStorage.getItem('userType');
-    const storedFactoryAuth = storage.get<FactoryAuth>('factoryAuth');
-    
-    setUserType(storedUserType);
-    if (storedFactoryAuth) {
-      setFactoryAuth(storedFactoryAuth);
+    try {
+      // userType은 단순 문자열이므로 직접 localStorage에서 가져옴
+      const storedUserType = localStorage.getItem('userType');
+      const storedFactoryAuth = storage.get<FactoryAuth>('factoryAuth');
       
-      // 공장 프로필 이미지 로드
-      if (storedFactoryAuth.factoryId) {
-        getFactoryProfileImage(storedFactoryAuth.factoryId)
-          .then(image => setFactoryProfileImage(image))
-          .catch(() => setFactoryProfileImage(null));
+      setUserType(storedUserType);
+      if (storedFactoryAuth) {
+        setFactoryAuth(storedFactoryAuth);
+        
+        // 공장 프로필 이미지 로드
+        if (storedFactoryAuth.factoryId) {
+          getFactoryProfileImage(storedFactoryAuth.factoryId)
+            .then(image => setFactoryProfileImage(image))
+            .catch(() => setFactoryProfileImage(null));
+        }
       }
+    } catch (error) {
+      console.error('Header initialization error:', error);
     }
   }, [mounted]);
 
@@ -83,6 +87,7 @@ export default function Header() {
               height={47}
               priority
               className="w-20 sm:w-24 md:w-[113px] h-auto"
+              style={{ height: 'auto' }}
             />
           </Link>
 
@@ -131,6 +136,7 @@ export default function Header() {
             height={47}
             priority
             className="w-20 sm:w-24 md:w-[113px] h-auto"
+            style={{ height: 'auto' }}
           />
         </Link>
 

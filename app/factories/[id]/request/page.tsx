@@ -154,6 +154,11 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       alert("공장 정보가 로딩되지 않았습니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
+    if (!factoryId) {
+      console.error('의뢰 제출 중 오류: factoryId 누락');
+      alert('공장 정보(ID)가 확인되지 않았습니다. 잠시 후 다시 시도해 주세요.');
+      return;
+    }
     if (!formData.name.trim()) {
       alert("이름을 입력해주세요.");
       return;
@@ -200,61 +205,58 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         }
       }
 
-      // Supabase에 의뢰 데이터 저장
+      // 서버 API 경유로 의뢰 데이터 저장 (RLS 회피 및 상세 오류 전달)
       try {
-        const { error } = await supabase
-          .from('match_requests')
-          .insert({
-            user_id: user?.id || `user_${Date.now()}`,
-            user_email: user?.emailAddresses?.[0]?.emailAddress || `${formData.name}@example.com`,
-            user_name: formData.name,
-            factory_id: factoryId,
-            factory_name: factoryName,
-            status: 'pending',
-            items: [], // 의뢰 품목은 별도 필드로 관리
-            quantity: 0, // 수량은 별도 필드로 관리
-            description: `브랜드: ${formData.brandName || '미입력'}\n연락처: ${formData.contact}`,
-            contact: formData.contact,
-            deadline: '', // 납기일은 별도 필드로 관리
-            budget: '', // 예산은 별도 필드로 관리
-            additional_info: JSON.stringify({
-              brandName: formData.brandName,
-              sample: formData.sample,
-              pattern: formData.pattern,
-              qc: formData.qc,
-              finishing: formData.finishing,
-              packaging: formData.packaging,
-              files: uploadedFileUrls,
-              links: formData.links,
-              selectedService: selectedService,
-              serviceDetails: {
-                standard: {
-                  title: "Standard",
-                  subtitle: "봉제공정"
-                },
-                deluxe: {
-                  title: "Deluxe", 
-                  subtitle: "패턴/샘플 + 공장"
-                },
-                premium: {
-                  title: "Premium",
-                  subtitle: "올인원(기획/디자인~)"
-                }
-              }
-            }),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-          .select()
-          .single();
+        const payload = {
+          user_id: user?.id || `user_${Date.now()}`,
+          user_email: user?.emailAddresses?.[0]?.emailAddress || `${formData.name}@example.com`,
+          user_name: formData.name,
+          factory_id: factoryId,
+          factory_name: factoryName,
+          status: 'pending',
+          items: [],
+          quantity: 0,
+          description: `브랜드: ${formData.brandName || '미입력'}\n연락처: ${formData.contact}`,
+          contact: formData.contact,
+          deadline: '',
+          budget: '',
+          additional_info: JSON.stringify({
+            brandName: formData.brandName,
+            sample: formData.sample,
+            pattern: formData.pattern,
+            qc: formData.qc,
+            finishing: formData.finishing,
+            packaging: formData.packaging,
+            files: uploadedFileUrls,
+            links: formData.links,
+            selectedService: selectedService,
+            serviceDetails: {
+              standard: { title: 'Standard', subtitle: '봉제공정' },
+              deluxe: { title: 'Deluxe', subtitle: '패턴/샘플 + 공장' },
+              premium: { title: 'Premium', subtitle: '올인원(기획/디자인~)' }
+            }
+          }),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        } as const;
 
-        if (error) {
-          console.error('의뢰 제출 중 오류:', error);
-          alert(`의뢰 제출 중 오류가 발생했습니다.\n오류: ${error.message}`);
+        const res = await fetch('/api/match-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          console.error('의뢰 제출 중 오류(서버):', err);
+          alert(`의뢰 제출 중 오류가 발생했습니다.\n${err?.error || res.statusText}`);
           return;
         }
-      } catch (dbError) {
-        console.error('데이터베이스 저장 중 예외 발생:', dbError);
+      } catch (dbError: any) {
+        console.error('데이터베이스 저장 중 예외 발생:', dbError, {
+          message: dbError?.message,
+          stack: dbError?.stack,
+        });
         alert('데이터베이스 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
         return;
       }
@@ -275,8 +277,11 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         agreeToTerms: false
       });
       
-    } catch (error) {
-      console.error('의뢰 제출 중 오류:', error);
+    } catch (error: any) {
+      console.error('의뢰 제출 중 오류:', error, {
+        message: error?.message,
+        stack: error?.stack,
+      });
       alert('의뢰 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
