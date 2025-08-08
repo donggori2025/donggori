@@ -52,67 +52,18 @@ export default function MyPage() {
           console.log("🔍 의뢰내역 로딩 시작...");
           console.log("사용자 ID:", user.id);
           
-          // 환경 변수 확인
-          console.log("환경 변수 확인:");
-          console.log("NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ 설정됨" : "❌ 설정되지 않음");
-          console.log("NEXT_PUBLIC_SUPABASE_ANON_KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ 설정됨" : "❌ 설정되지 않음");
-          
-          if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-            setRequestError("환경 변수가 설정되지 않았습니다. 관리자에게 문의해주세요.");
-            setDebugInfo("환경 변수 오류: Supabase URL 또는 Anon Key가 설정되지 않음");
-            setMyMatchRequests([]);
-            return;
-          }
-          
-          // Supabase 연결 테스트
-          const connectionTest = await testSupabaseConnection();
-          console.log("Supabase 연결 테스트 결과:", connectionTest);
-          
-          if (!connectionTest.success) {
-            setRequestError(`Supabase 연결에 실패했습니다: ${connectionTest.error}`);
-            setDebugInfo(`연결 오류: ${connectionTest.error}`);
-            setMyMatchRequests([]);
-            return;
-          }
-          
-          console.log("✅ Supabase 연결 성공");
-          
-          // match_requests 테이블 확인
-          const tableTest = await checkMatchRequestsTable();
-          console.log("match_requests 테이블 확인 결과:", tableTest);
-          
-          if (!tableTest.success) {
-            setRequestError(`match_requests 테이블 접근에 실패했습니다: ${tableTest.error}`);
-            setDebugInfo(`테이블 오류: ${tableTest.error}`);
-            setMyMatchRequests([]);
-            return;
-          }
-          
-          console.log("✅ match_requests 테이블 접근 성공, 의뢰내역 조회 시작...");
-          
-          // 직접 fetch를 사용하여 의뢰내역 조회
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/match_requests?user_id=eq.${encodeURIComponent(user.id)}&select=*&order=created_at.desc`,
-            {
-              headers: {
-                'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-                'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-          
-          console.log("Fetch 응답 상태:", response.status);
-          
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error("의뢰내역 조회 오류:", response.status, errorText);
-            setRequestError(`의뢰내역을 불러오는 중 오류가 발생했습니다: ${response.status} ${response.statusText}`);
-            setDebugInfo(`HTTP 오류: ${response.status} - ${errorText}`);
+          // 내부 API를 통해 조회 (서비스 키 사용, RLS 영향 없음)
+          const res = await fetch(`/api/match-requests?userId=${encodeURIComponent(user.id)}`);
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            console.error("의뢰내역 조회 오류(API):", err);
+            setRequestError(`의뢰내역을 불러오는 중 오류가 발생했습니다: ${res.status} ${res.statusText}`);
+            setDebugInfo(err?.error || JSON.stringify(err));
             setMyMatchRequests([]);
           } else {
-            const data = await response.json();
-            console.log("✅ 의뢰내역 조회 성공:", data?.length || 0, "개");
+            const json = await res.json();
+            const data = json?.data || [];
+            console.log("✅ 의뢰내역 조회 성공(API):", data?.length || 0, "개");
             setMyMatchRequests(data || []);
             setDebugInfo(`성공적으로 ${data?.length || 0}개의 의뢰내역을 불러왔습니다.`);
           }

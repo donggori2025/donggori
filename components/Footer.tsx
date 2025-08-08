@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 
 // Footer 컴포넌트: 사이트 하단에 고정적으로 표시되는 정보 영역입니다.
@@ -22,7 +20,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-[#fafafa] border-t border-gray-200 py-8 sm:py-12 px-4 sm:px-6 mt-8 sm:mt-16">
+    <footer className="w-full bg-[#fafafa] border-t border-gray-200 py-8 sm:py-12 px-4 sm:px-6 mt-8 sm:mt-16 relative z-50">
       <div className="max-w-[1400px] mx-auto flex flex-col items-center gap-3 sm:gap-4 px-4 sm:px-10">
         {/* nav: md 이상에서만 flex, md 미만에서는 hidden */}
         <nav className="hidden md:flex w-full justify-between items-center mb-3 sm:mb-4 text-sm text-gray-700">

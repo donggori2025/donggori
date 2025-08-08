@@ -1,6 +1,5 @@
 "use client";
-import React, { useState } from "react";
-import { notices } from "@/lib/notices";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 const TABS = [
@@ -12,9 +11,28 @@ const TABS = [
 
 export default function NoticesPage() {
   const [tab, setTab] = useState("전체");
-  // 최신순, 번호 역순
-  const filtered = tab === "전체" ? notices : notices.filter(n => n.type === tab);
-  const sorted = [...filtered].sort((a, b) => Number(b.id) - Number(a.id));
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/notices');
+        const json = await res.json();
+        if (res.ok && json.success) setItems(json.data || []);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (tab === '전체') return items;
+    return items.filter((n:any) => n.category === tab);
+  }, [items, tab]);
+  const sorted = useMemo(() => [...filtered].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()), [filtered]);
 
   return (
     <section className="w-full bg-white py-16 min-h-[600px]">
@@ -42,22 +60,24 @@ export default function NoticesPage() {
         </div>
         {/* 리스트 */}
         <ul>
-          {sorted.length === 0 ? (
+          {loading ? (
+            <li className="py-16 text-center text-gray-400 text-lg">로딩 중...</li>
+          ) : sorted.length === 0 ? (
             <li className="py-16 text-center text-gray-400 text-lg">등록된 공지사항이 없습니다.</li>
           ) : (
-            sorted.map((notice) => (
+            sorted.map((notice: any, index: number) => (
               <li key={notice.id} className="grid grid-cols-12 items-center py-4 border-b border-gray-100 hover:bg-gray-50 transition group">
-                <div className="col-span-1 text-center text-gray-400">{notice.id}</div>
+                <div className="col-span-1 text-center text-gray-400">{index + 1}</div>
                 <div className="col-span-2 text-center">
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${notice.type === '공지' ? 'bg-red-100 text-red-700' : notice.type === '채용공고' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}>{notice.type}</span>
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${notice.category === '공지' ? 'bg-red-100 text-red-700' : notice.category === '채용공고' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}>{notice.category}</span>
                 </div>
                 <div className="col-span-7">
                   <Link href={`/notices/${notice.id}`} className="font-medium text-gray-900 group-hover:underline block mb-1">
                     {notice.title}
                   </Link>
-                  <span className="text-gray-400 text-sm truncate block">{notice.content.slice(0, 50)}{notice.content.length > 50 ? '...' : ''}</span>
+                  <span className="text-gray-400 text-sm truncate block">{(notice.content || '').slice(0, 50)}{(notice.content || '').length > 50 ? '...' : ''}</span>
                 </div>
-                <div className="col-span-2 text-center text-gray-400">{notice.createdAt}</div>
+                <div className="col-span-2 text-center text-gray-400">{(notice.created_at || '').slice(0,10)}</div>
               </li>
             ))
           )}

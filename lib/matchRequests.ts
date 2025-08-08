@@ -30,18 +30,14 @@ export interface MatchRequest {
 // Supabase에서 공장별 의뢰내역 조회
 export async function getMatchRequestsByFactoryId(factoryId: string): Promise<MatchRequest[]> {
   try {
-    const { data, error } = await supabase
-      .from('match_requests')
-      .select('*')
-      .eq('factory_id', factoryId)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('의뢰내역 조회 중 오류:', error);
+    const res = await fetch(`/api/match-requests?factoryId=${encodeURIComponent(factoryId)}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error('의뢰내역 조회 중 오류(API):', err);
       return [];
     }
-
-    return data || [];
+    const json = await res.json();
+    return json?.data || [];
   } catch (error) {
     console.error('의뢰내역 조회 중 오류:', error);
     return [];
@@ -51,19 +47,15 @@ export async function getMatchRequestsByFactoryId(factoryId: string): Promise<Ma
 // Supabase에서 의뢰내역 상태별 조회
 export async function getMatchRequestsByStatus(factoryId: string, status: MatchRequest['status']): Promise<MatchRequest[]> {
   try {
-    const { data, error } = await supabase
-      .from('match_requests')
-      .select('*')
-      .eq('factory_id', factoryId)
-      .eq('status', status)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('의뢰내역 상태별 조회 중 오류:', error);
+    const res = await fetch(`/api/match-requests?factoryId=${encodeURIComponent(factoryId)}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error('의뢰내역 상태별 조회 중 오류(API):', err);
       return [];
     }
-
-    return data || [];
+    const json = await res.json();
+    const all = (json?.data || []) as MatchRequest[];
+    return all.filter((r) => r.status === status);
   } catch (error) {
     console.error('의뢰내역 상태별 조회 중 오류:', error);
     return [];
@@ -73,18 +65,15 @@ export async function getMatchRequestsByStatus(factoryId: string, status: MatchR
 // Supabase에서 의뢰내역 상세 조회
 export async function getMatchRequestById(requestId: string): Promise<MatchRequest | null> {
   try {
-    const { data, error } = await supabase
-      .from('match_requests')
-      .select('*')
-      .eq('id', requestId)
-      .single();
-
-    if (error) {
-      console.error('의뢰내역 상세 조회 중 오류:', error);
+    const res = await fetch(`/api/match-requests?id=${encodeURIComponent(requestId)}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error('의뢰내역 상세 조회 중 오류(API):', err);
       return null;
     }
-
-    return data;
+    const json = await res.json();
+    const data = json?.data || [];
+    return Array.isArray(data) ? (data[0] || null) : data || null;
   } catch (error) {
     console.error('의뢰내역 상세 조회 중 오류:', error);
     return null;
@@ -94,19 +83,19 @@ export async function getMatchRequestById(requestId: string): Promise<MatchReque
 // Supabase에서 의뢰내역 상태 업데이트
 export async function updateMatchRequestStatus(requestId: string, status: MatchRequest['status']): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from('match_requests')
-      .update({ status, updated_at: new Date().toISOString() })
-      .eq('id', requestId);
-
-    if (error) {
-      console.error('의뢰내역 상태 업데이트 중 오류:', error);
+    const res = await fetch('/api/match-requests', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: requestId, status }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error('의뢰내역 상태 업데이트 중 오류(API):', err);
       return false;
     }
-
     return true;
   } catch (error) {
     console.error('의뢰내역 상태 업데이트 중 오류:', error);
     return false;
   }
-} 
+}
