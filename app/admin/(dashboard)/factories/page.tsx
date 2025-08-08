@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import ImageUpload from "@/components/ImageUpload";
 import FactoryImageManager from "@/components/FactoryImageManager";
+import FactoryBlobImageManager from "@/components/FactoryBlobImageManager";
 
 type FactoryForm = Record<string, any>;
 
@@ -442,13 +443,13 @@ export default function AdminFactoriesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {columns.map((c:any) => {
                 // 이미지 필드는 별도 컴포넌트로 처리
-                if (c.column_name === 'images') {
+                if (c.column_name === 'images' || c.column_name === 'image') {
                   return (
                     <div key={c.column_name} className="md:col-span-2">
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         <div>
                           <label className="text-sm font-medium text-gray-700 mb-2 block">
-                            새 이미지 업로드
+                            새 이미지 업로드 (DB images)
                           </label>
                           <ImageUpload
                             onImagesChange={(newImages) => {
@@ -460,7 +461,14 @@ export default function AdminFactoriesPage() {
                             multiple={true}
                           />
                         </div>
-                        
+
+                        <div className="border-t pt-4">
+                          <label className="text-sm font-medium text-gray-700 mb-2 block">
+                            Blob 이미지 관리 (폴더: 업장명 기반)
+                          </label>
+                          <FactoryBlobImageManager folder={selected.company_name || ''} />
+                        </div>
+
                         {(() => {
                           const images = selected.images || [];
                           const hasImage = selected.image;
