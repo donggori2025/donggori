@@ -38,6 +38,9 @@ export interface Factory {
     lat: number;
     lng: number;
   };
+  contact_name?: string;
+  phone_number?: string;
+  [key: string]: unknown; // 인덱스 시그니처 추가
 }
 
 export interface FactoryAuth {
@@ -77,7 +80,7 @@ export interface UserProfile {
 }
 
 // API 응답 타입
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -150,4 +153,60 @@ export interface NoticeItem {
   end_at?: string;   // 노출 종료
   created_at?: string;
   updated_at?: string;
+}
+
+// 네이버맵 관련 타입
+export interface NaverMapConfig {
+  clientId: string;
+  clientSecret?: string;
+}
+
+export interface MapMarker {
+  id: string;
+  position: { lat: number; lng: number };
+  title?: string;
+  factory?: Factory;
+}
+
+export interface MapEvent {
+  target: unknown;
+  coord: { lat: number; lng: number };
+}
+
+// 관리자 대시보드 타입
+export interface AdminUser {
+  id: string;
+  email: string;
+  role: 'admin' | 'user';
+  createdAt: string;
+}
+
+export interface AdminSession {
+  user: AdminUser;
+  isAuthenticated: boolean;
+}
+
+// 스키마 타입
+export interface DatabaseSchema {
+  tables: Record<string, TableSchema>;
+}
+
+export interface TableSchema {
+  name: string;
+  columns: ColumnSchema[];
+}
+
+export interface ColumnSchema {
+  name: string;
+  column_name: string; // 실제 컬럼명
+  data_type: string; // 데이터 타입
+  is_nullable: boolean; // null 허용 여부
+  type: string;
+  nullable: boolean;
+  default?: string;
+}
+
+// 관리자 폼 타입
+export interface FactoryForm {
+  [key: string]: string | number | boolean | string[] | undefined;
 }

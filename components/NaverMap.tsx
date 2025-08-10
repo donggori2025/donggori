@@ -1,23 +1,24 @@
 "use client";
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { config } from '@/lib/config';
+import { Factory, MapEvent } from '@/lib/types';
 
 // 네이버 맵 타입 정의
 interface NaverMaps {
-  Map: any;
-  LatLng: any;
-  Marker: any;
-  Size: any;
-  Point: any;
-  Event: any;
-  Position: any;
-  MapTypeControlStyle: any;
-  ZoomControlStyle: any;
+  Map: unknown;
+  LatLng: unknown;
+  Marker: unknown;
+  Size: unknown;
+  Point: unknown;
+  Event: unknown;
+  Position: unknown;
+  MapTypeControlStyle: unknown;
+  ZoomControlStyle: unknown;
 }
 
 interface NaverMapInstance {
   setZoom: (level: number) => void;
-  getCenter: () => any;
+  getCenter: () => unknown;
   getZoom: () => number;
 }
 
@@ -33,7 +34,7 @@ interface MarkerData {
   id: string;
   position: { lat: number; lng: number };
   title: string;
-  factory?: any;
+  factory?: Factory;
   onClick?: () => void;
 }
 
@@ -43,7 +44,7 @@ interface NaverMapProps {
   markers?: MarkerData[];
   selectedMarkerId?: string;
   onMapLoad?: (map: NaverMapInstance) => void;
-  onMarkerSelect?: (factory: any) => void;
+  onMarkerSelect?: (factory: Factory) => void;
   onLoadError?: () => void;
   className?: string;
   isPopupOpen?: boolean;
@@ -67,7 +68,7 @@ export default function NaverMap({
   const [isInitialized, setIsInitialized] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorDetails, setErrorDetails] = useState<string>('');
-  const [markerElements, setMarkerElements] = useState<any[]>([]);
+  const [markerElements, setMarkerElements] = useState<unknown[]>([]);
 
   // 환경 변수 검증
   const clientId = useMemo(() => {
@@ -85,7 +86,6 @@ export default function NaverMap({
   const loadNaverMap = useCallback(() => {
     // API 키가 없으면 에러 처리
     if (!clientId) {
-      const errorMsg = '네이버맵 Client ID가 설정되지 않았습니다.';
       setErrorDetails('환경 변수 NEXT_PUBLIC_NAVER_CLIENT_ID가 설정되지 않았습니다.');
       setHasError(true);
       return;
@@ -166,7 +166,7 @@ export default function NaverMap({
       setHasError(false);
 
       // 지도 클릭 이벤트
-      window.naver.maps.Event.addListener(naverMap, 'click', (e: { overlay?: any }) => {
+      window.naver.maps.Event.addListener(naverMap, 'click', (e: { overlay?: unknown }) => {
         // 마커를 클릭한 것이 아닌 지도 영역을 클릭한 경우에만 줌 레벨 변경
         if (!e.overlay && !isPopupOpen) {
           naverMap.setZoom(8);
@@ -193,7 +193,7 @@ export default function NaverMap({
       }
     });
 
-    const newMarkers: any[] = [];
+    const newMarkers: unknown[] = [];
 
     markers.forEach(markerData => {
       try {

@@ -3,11 +3,23 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // 이미지 최적화 설정
   images: {
-    domains: [
-      "images.unsplash.com", 
-      "img.clerk.com", 
-      "ulrlltcrqvyutfmhcqyj.supabase.co",
-      "m7fjtbfe2aen7kcw.public.blob.vercel-storage.com"
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.clerk.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ulrlltcrqvyutfmhcqyj.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'm7fjtbfe2aen7kcw.public.blob.vercel-storage.com',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],

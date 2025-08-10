@@ -3,21 +3,19 @@ import { useEffect, useState } from "react";
 import ImageUpload from "@/components/ImageUpload";
 import FactoryImageManager from "@/components/FactoryImageManager";
 import FactoryBlobImageManager from "@/components/FactoryBlobImageManager";
-
-type FactoryForm = Record<string, any>;
+import { Factory, ColumnSchema, FactoryForm } from "@/lib/types";
 
 export default function AdminFactoriesPage() {
-  const [items, setItems] = useState<any[]>([]);
-  const [filteredItems, setFilteredItems] = useState<any[]>([]);
+  const [items, setItems] = useState<Factory[]>([]);
+  const [filteredItems, setFilteredItems] = useState<Factory[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<FactoryForm>({});
-  const [columns, setColumns] = useState<any[]>([]);
-  const [selected, setSelected] = useState<any | null>(null);
-  const [schemaLoading, setSchemaLoading] = useState(false);
+  const [columns, setColumns] = useState<ColumnSchema[]>([]);
+  const [selected, setSelected] = useState<Factory | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
-  const [originalSelected, setOriginalSelected] = useState<any | null>(null);
+  const [originalSelected, setOriginalSelected] = useState<Factory | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -40,8 +38,9 @@ export default function AdminFactoriesPage() {
       setItems(listJson.data || []);
       setFilteredItems(listJson.data || []);
       setColumns(schemaJson.data || []);
-    } catch (e: any) {
-      setError(e?.message || "불러오기 실패");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "불러오기 실패";
+      setError(errorMessage);
       console.error("데이터 로딩 오류:", e);
     } finally {
       setLoading(false);
@@ -63,8 +62,8 @@ export default function AdminFactoriesPage() {
         (item.company_name && item.company_name.toLowerCase().includes(searchLower)) ||
         (item.address && item.address.toLowerCase().includes(searchLower)) ||
         (item.business_type && item.business_type.toLowerCase().includes(searchLower)) ||
-        (item.contact_name && item.contact_name.toLowerCase().includes(searchLower)) ||
-        (item.phone_number && item.phone_number.toString().includes(searchLower))
+        (item.contact_name && item.contact_name?.toLowerCase().includes(searchLower)) ||
+        (item.phone_number && item.phone_number?.toString().includes(searchLower))
       );
     });
 
@@ -91,8 +90,9 @@ export default function AdminFactoriesPage() {
       if (!res.ok || !json.success) throw new Error(json.error || "등록 실패");
       setForm({});
       await load();
-    } catch (e: any) {
-      setError(e?.message || "등록 실패");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "등록 실패";
+      setError(errorMessage);
       console.error("등록 오류:", e);
     } finally {
       setLoading(false);
@@ -114,8 +114,9 @@ export default function AdminFactoriesPage() {
       setSelected(null);
       setOriginalSelected(null);
       setHasChanges(false);
-    } catch (e: any) {
-      setError(e?.message || "수정 실패");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "수정 실패";
+      setError(errorMessage);
       console.error("수정 오류:", e);
     } finally {
       setLoading(false);
@@ -132,8 +133,9 @@ export default function AdminFactoriesPage() {
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "삭제 실패");
       await load();
-    } catch (e: any) {
-      setError(e?.message || "삭제 실패");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "삭제 실패";
+      setError(errorMessage);
       console.error("삭제 오류:", e);
     } finally {
       setLoading(false);
@@ -191,15 +193,15 @@ export default function AdminFactoriesPage() {
   };
 
   // 선택된 업장 수정 시 원본 데이터 저장
-  const handleSelectItem = (item: any) => {
+  const handleSelectItem = (item: Factory) => {
     setSelected(item);
     setOriginalSelected(JSON.parse(JSON.stringify(item))); // 깊은 복사
     setHasChanges(false);
   };
 
   // 필드 변경 시 변경사항 체크
-  const handleFieldChange = (field: string, value: any) => {
-    setSelected((prev: any) => ({ ...prev, [field]: value }));
+  const handleFieldChange = (field: string, value: unknown) => {
+    setSelected((prev) => prev ? { ...prev, [field]: value } : null);
     
     // 변경사항 체크
     if (originalSelected && originalSelected[field] !== value) {
@@ -210,7 +212,10 @@ export default function AdminFactoriesPage() {
   // 변경사항 저장
   const handleSaveChanges = () => {
     if (selected) {
-      update(selected.id, selected);
+      const formData = Object.fromEntries(
+        Object.entries(selected).filter(([k]) => !k.startsWith("__"))
+      );
+      update(selected.id, formData);
     }
   };
 
@@ -250,7 +255,7 @@ export default function AdminFactoriesPage() {
           <div>
             <h3 className="text-lg font-medium text-gray-800 mb-3">정보 입력</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {columns.map((c:any) => {
+              {columns.map((c:ColumnSchema) => {
                 // 이미지 필드는 별도 컴포넌트로 처리
                 if (c.column_name === 'images' || c.column_name === 'image') {
                   return (
@@ -441,7 +446,7 @@ export default function AdminFactoriesPage() {
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {columns.map((c:any) => {
+              {columns.map((c:ColumnSchema) => {
                 // 이미지 필드는 별도 컴포넌트로 처리
                 if (c.column_name === 'images' || c.column_name === 'image') {
                   return (
@@ -514,7 +519,7 @@ export default function AdminFactoriesPage() {
                     ) : (
                       <input 
                         className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                        value={(selected as any)[c.column_name] ?? ""} 
+                        value={(selected as Factory)[c.column_name] ?? ""} 
                         onChange={(e)=>handleFieldChange(c.column_name, e.target.value)} 
                       />
                     )}

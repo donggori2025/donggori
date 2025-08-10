@@ -86,6 +86,13 @@ export default function GlobalPopups() {
             const cb = (document.getElementById('remember-today') as HTMLInputElement | null)?.checked;
             closeForToday(Boolean(cb));
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              const cb = (document.getElementById('remember-today') as HTMLInputElement | null)?.checked;
+              closeForToday(Boolean(cb));
+            }
+          }}
+          aria-label="팝업 닫기"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -122,6 +129,12 @@ export default function GlobalPopups() {
                   className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
                   disabled={index === 0} 
                   onClick={()=>setIndex(i=>Math.max(0, i-1))}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      setIndex(i=>Math.max(0, i-1));
+                    }
+                  }}
+                  aria-label="이전 팝업"
                 >
                   이전
                 </button>
@@ -137,6 +150,12 @@ export default function GlobalPopups() {
                   className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
                   disabled={index >= items.length - 1} 
                   onClick={()=>setIndex(i=>Math.min(items.length-1, i+1))}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      setIndex(i=>Math.min(items.length-1, i+1));
+                    }
+                  }}
+                  aria-label="다음 팝업"
                 >
                   다음
                 </button>

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import NaverMap from './NaverMap';
 import FactoryInfoPopup from './FactoryInfoPopup';
-import { FactoryLocation, MapFilters } from '@/lib/types';
+import { FactoryLocation, MapFilters, Factory } from '@/lib/types';
 import { getFactoryLocations } from '@/lib/factoryMap';
 import { Map, List, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -48,7 +48,7 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
     setFilters(prev => ({ ...prev, region: searchTerm }));
   };
 
-  const handleMarkerSelect = (factory: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const handleMarkerSelect = (factory: FactoryLocation) => {
     setSelectedFactory(factory);
   };
 
@@ -71,7 +71,7 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
     id: factory.id,
     position: factory.position,
     title: factory.company_name,
-    factory: factory,
+    factory,
     onClick: () => handleFactoryClick(factory.id)
   }));
 

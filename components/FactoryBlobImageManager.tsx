@@ -84,7 +84,7 @@ export default function FactoryBlobImageManager({ folder }: FactoryBlobImageMana
       if (json.success) {
         setImages(prev => prev.filter(img => img.url !== url));
       } else {
-        alert("삭제 실패: " + (json.error || "알 수 없는 오류"));
+        alert(`삭제 실패: ${json.error || "알 수 없는 오류"}`);
       }
     } catch (e) {
       console.error("삭제 오류", e);

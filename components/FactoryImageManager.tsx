@@ -119,7 +119,7 @@ export default function FactoryImageManager({
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {images.map((imageUrl, index) => (
-          <div key={index} className="relative group">
+          <div key={`factory-image-${index}-${imageUrl}`} className="relative group">
             <img
               src={imageUrl}
               alt={`업장 이미지 ${index + 1}`}

@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+
 
 // 의뢰내역 인터페이스
 export interface MatchRequest {

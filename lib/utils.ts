@@ -14,7 +14,7 @@ export const storage = {
     try {
       const item = localStorage.getItem(key);
       if (!item) return null;
-      
+
       // JSON.parse 시도
       try {
         return JSON.parse(item);
@@ -27,7 +27,7 @@ export const storage = {
       return null;
     }
   },
-  
+
   set: <T>(key: string, value: T): void => {
     if (typeof window === 'undefined') return;
     try {
@@ -36,7 +36,7 @@ export const storage = {
       console.error('Error writing to localStorage:', error);
     }
   },
-  
+
   remove: (key: string): void => {
     if (typeof window === 'undefined') return;
     try {
@@ -45,7 +45,7 @@ export const storage = {
       console.error('Error removing from localStorage:', error);
     }
   },
-  
+
   clear: (): void => {
     if (typeof window === 'undefined') return;
     try {
@@ -61,13 +61,13 @@ export const storage = {
  */
 export function validateNaverMapConfig() {
   const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
-  
+
   const validation = {
     hasClientId: false,
     isValidClientId: false,
     errorMessage: '',
     debugInfo: {
-      clientId: clientId ? '***' + clientId.slice(-4) : '없음',
+      clientId: clientId ? `***${clientId.slice(-4)}` : '없음',
       clientIdLength: clientId?.length || 0,
       isDevelopment: process.env.NODE_ENV === 'development',
       isProduction: process.env.NODE_ENV === 'production'
@@ -97,17 +97,17 @@ export function validateNaverMapConfig() {
  */
 export function logNaverMapConfig() {
   const validation = validateNaverMapConfig();
-  
+
   console.group('🗺️ 네이버맵 설정 상태');
   console.log('✅ Client ID 설정:', validation.hasClientId ? '설정됨' : '설정되지 않음');
   console.log('✅ Client ID 유효성:', validation.isValidClientId ? '유효함' : '유효하지 않음');
   console.log('🔍 디버그 정보:', validation.debugInfo);
-  
+
   if (validation.errorMessage) {
     console.error('❌ 오류:', validation.errorMessage);
   }
-  
+
   console.groupEnd();
-  
+
   return validation;
 }
