@@ -170,8 +170,8 @@ const InfoSection = () => {
                     <div className="flex-1 flex flex-col px-0 py-4 text-left">
                       {/* 주요 원단 칩 */}
                       <div className="flex flex-wrap gap-1 mb-2">
-                        {randomFabrics.map((chip) => (
-                          <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-2 py-1 text-xs font-semibold">
+                        {randomFabrics.map((chip, chipIndex) => (
+                          <span key={`fabric-${chipIndex}-${chip.label}`} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-2 py-1 text-xs font-semibold">
                             {chip.label}
                           </span>
                         ))}

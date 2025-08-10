@@ -219,6 +219,13 @@ export default function Header() {
             <div
               className="absolute inset-0 bg-black/20"
               onClick={closeMenu}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  closeMenu();
+                }
+              }}
+              role="button"
+              tabIndex={0}
               aria-label="오버레이 클릭 시 메뉴 닫기"
             />
             
@@ -229,6 +236,11 @@ export default function Header() {
                 className="absolute top-4 right-4 p-2 rounded hover:bg-gray-100"
                 aria-label="메뉴 닫기"
                 onClick={closeMenu}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    closeMenu();
+                  }
+                }}
               >
                 <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

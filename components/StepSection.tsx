@@ -51,7 +51,7 @@ const StepSection = () => (
       {/* 하단 카드 섹션 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         {matchingSteps.map((step, idx) => (
-          <div key={idx} className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-shadow duration-300">
+          <div key={`step-${idx}-${step.title}`} className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-shadow duration-300">
             {/* 단계 이미지/아이콘 */}
             <div className="w-full h-48 sm:h-64 md:h-80 lg:h-96 bg-white rounded-lg mb-3 sm:mb-4 flex items-center justify-center overflow-hidden relative">
               {/* 실제 이미지 표시 */}
@@ -81,7 +81,7 @@ const StepSection = () => (
             {/* 주요 기능 */}
             <div className="space-y-1">
               {step.features.map((feature, featureIdx) => (
-                <div key={featureIdx} className="flex items-center text-xs sm:text-sm text-gray-500">
+                <div key={`feature-${featureIdx}-${feature}`} className="flex items-center text-xs sm:text-sm text-gray-500">
                   <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-blue-400 rounded-full mr-2"></div>
                   {feature}
                 </div>

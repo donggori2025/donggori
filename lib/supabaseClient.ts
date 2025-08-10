@@ -49,7 +49,7 @@ export const testSupabaseConnection = async () => {
     
     return {
       success: true,
-      data: data,
+      data,
       count: data?.length || 0
     };
   } catch (error) {
@@ -81,7 +81,7 @@ export const checkMatchRequestsTable = async () => {
     
     return {
       success: true,
-      data: data,
+      data,
       count: data?.length || 0
     };
   } catch (error) {

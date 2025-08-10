@@ -53,8 +53,9 @@ export default function ImageUpload({ onImagesChange, currentImages = [], multip
 
       onImagesChange(newImages);
       
-    } catch (err: any) {
-      setError(err.message || "이미지 업로드에 실패했습니다.");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "이미지 업로드에 실패했습니다.";
+      setError(errorMessage);
     } finally {
       setUploading(false);
       // 파일 입력 초기화
@@ -117,7 +118,7 @@ export default function ImageUpload({ onImagesChange, currentImages = [], multip
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {currentImages.map((imageUrl, index) => (
-              <div key={index} className="relative group">
+              <div key={`image-${index}-${imageUrl}`} className="relative group">
                 <img
                   src={imageUrl}
                   alt={`이미지 ${index + 1}`}

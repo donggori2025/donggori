@@ -81,7 +81,7 @@ export async function getFactoryLocations(filters?: MapFilters): Promise<Factory
         return {
           id: factory.id,
           company_name: factory.company_name,
-          position: position,
+          position,
           address: factory.address,
           business_type: factory.business_type,
           image: factory.image
@@ -207,7 +207,7 @@ export async function getFactoryLocation(factoryId: string): Promise<FactoryLoca
       return {
         id: data.id,
         company_name: data.company_name,
-        position: position,
+        position,
         address: data.address,
         business_type: data.business_type,
         image: data.image
