@@ -248,26 +248,38 @@ export async function updateFactoryData(factoryId: string, updateData: { [key: s
 // 공장 이미지 배열 가져오기
 export async function getFactoryImages(factoryId: string): Promise<string[]> {
   try {
+    console.log('공장 이미지 조회 시작:', { factoryId });
 
     const { data, error } = await supabase
       .from('donggori')
-      .select('images')
+      .select('image')
       .eq('id', factoryId)
       .single();
 
     if (error) {
       console.error('공장 이미지 조회 중 오류:', {
+        factoryId,
         message: error.message,
         code: error.code,
         details: error.details,
-        hint: error.hint
+        hint: error.hint,
+        fullError: error
       });
       return [];
     }
 
-    return data?.images || [];
+    // image 컬럼은 단일 문자열이므로 배열로 변환
+    const imageUrl = data?.image;
+    const images = imageUrl ? [imageUrl] : [];
+    
+    console.log('공장 이미지 조회 성공:', { factoryId, imageUrl, images });
+    return images;
   } catch (error) {
-    console.error('공장 이미지 조회 중 예외 발생:', error);
+    console.error('공장 이미지 조회 중 예외 발생:', {
+      factoryId,
+      error: error instanceof Error ? error.message : String(error),
+      fullError: error
+    });
     return [];
   }
 }
@@ -275,9 +287,12 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
 // 공장 이미지 업데이트
 export async function updateFactoryImages(factoryId: string, images: string[]) {
   try {
+    // images 배열의 첫 번째 이미지를 image 컬럼에 저장
+    const imageUrl = images.length > 0 ? images[0] : null;
+    
     const { data, error } = await supabase
       .from('donggori')
-      .update({ images })
+      .update({ image: imageUrl })
       .eq('id', factoryId)
       .select()
       .single();
@@ -297,10 +312,19 @@ export async function updateFactoryImages(factoryId: string, images: string[]) {
 // 공장 첫 번째 이미지 가져오기 (헤더 프로필 이미지용)
 export async function getFactoryProfileImage(factoryId: string): Promise<string | null> {
   try {
+    console.log('공장 프로필 이미지 조회 시작:', { factoryId });
+    
     const images = await getFactoryImages(factoryId);
-    return images.length > 0 ? images[0] : null;
+    const profileImage = images.length > 0 ? images[0] : null;
+    
+    console.log('공장 프로필 이미지 조회 완료:', { factoryId, profileImage });
+    return profileImage;
   } catch (error) {
-    console.error('공장 프로필 이미지 조회 중 예외 발생:', error);
+    console.error('공장 프로필 이미지 조회 중 예외 발생:', {
+      factoryId,
+      error: error instanceof Error ? error.message : String(error),
+      fullError: error
+    });
     return null;
   }
 }

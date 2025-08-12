@@ -101,3 +101,4 @@ INSERT INTO public.notices (id, title, content, category, start_at, end_at, crea
     '2024-12-01T00:00:00Z'
 )
 ON CONFLICT DO NOTHING;
+

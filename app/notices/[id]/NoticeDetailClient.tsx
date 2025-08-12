@@ -93,3 +93,4 @@ export default function NoticeDetailClient({ notice }: NoticeDetailClientProps) 
     </div>
   );
 }
+
