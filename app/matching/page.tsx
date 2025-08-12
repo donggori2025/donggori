@@ -329,9 +329,9 @@ type ScoredFactory = Factory & { score: number };
   // 추천 결과 카드 UI (공장 정보 상세)
   function renderResultCards() {
     return (
-      <div className="w-full flex flex-col items-center justify-center min-h-[500px] animate-fade-in h-full">
+      <div className="w-full flex flex-col items-center justify-center animate-fade-in">
         <div className="text-2xl md:text-[40px] font-extrabold text-gray-900 mb-8 text-center px-4">가장 적합한 봉제공장 3곳을 추천드려요!</div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 w-full max-w-3xl px-4 overflow-y-auto flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 w-full max-w-3xl px-4">
           {recommended.map((f, idx) => {
             const displayName = typeof f.name === 'string' && f.name
               ? f.name
@@ -355,7 +355,7 @@ type ScoredFactory = Factory & { score: number };
 
             
             return (
-              <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden flex flex-col border border-gray-200">
+              <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden border border-gray-200">
                 {/* 이미지 영역 - 데스크톱에서만 표시 */}
                 <div className="hidden md:block w-full h-32 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl group">
                   {(() => {
@@ -414,9 +414,9 @@ type ScoredFactory = Factory & { score: number };
                   </div>
                 </div>
                 {/* 이미지와 텍스트 사이 gap - 데스크톱에서만 */}
-                <div className="hidden md:block mt-4" />
+                <div className="hidden md:block mt-2" />
                 {/* 정보 영역 (패딩 적용) */}
-                <div className="flex-1 flex flex-col p-4 md:p-6">
+                <div className="p-3 md:p-4">
                   {/* 주요 원단 칩 */}
                   <div className="flex flex-wrap gap-2 mb-2">
                     {randomFabrics.map((chip) => (
@@ -435,7 +435,7 @@ type ScoredFactory = Factory & { score: number };
                     MOQ(최소 주문 수량) <span className="font-normal">{typeof f.moq === 'number' ? f.moq : (typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? Number(f.moq) : (typeof f.minOrder === 'number' ? f.minOrder : '-'))}</span>
                   </div>
                   <button
-                    className="w-full mt-4 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition text-sm md:text-base"
+                    className="w-full mt-3 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition text-sm md:text-base"
                     onClick={() => {
                       if (!user) {
                         alert('로그인 후 이용 가능합니다.');
@@ -567,8 +567,8 @@ type ScoredFactory = Factory & { score: number };
                 <div className="text-lg font-semibold">추천 결과를 분석 중입니다...</div>
               </div>
             ) : (
-              <div className="flex flex-col flex-1 justify-between h-full overflow-hidden">
-                <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto">
+              <div className="flex flex-col h-full">
+                <div className="flex-1 flex flex-col items-center justify-center py-6">
                   {renderResultCards()}
                 </div>
                 {/* 하단 버튼 영역 */}
