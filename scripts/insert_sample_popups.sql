@@ -51,3 +51,4 @@ INSERT INTO public.popups (id, title, content, image_url, start_at, end_at, crea
     '2024-12-01T00:00:00Z'
 )
 ON CONFLICT DO NOTHING;
+

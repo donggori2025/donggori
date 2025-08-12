@@ -48,9 +48,21 @@ export default function Header() {
         
         // 공장 프로필 이미지 로드
         if (storedFactoryAuth.factoryId) {
+          console.log('공장 프로필 이미지 로드 시작:', { factoryId: storedFactoryAuth.factoryId });
+          
           getFactoryProfileImage(storedFactoryAuth.factoryId)
-            .then(image => setFactoryProfileImage(image))
-            .catch(() => setFactoryProfileImage(null));
+            .then(image => {
+              console.log('공장 프로필 이미지 로드 성공:', { factoryId: storedFactoryAuth.factoryId, image });
+              setFactoryProfileImage(image);
+            })
+            .catch((error) => {
+              console.error('공장 프로필 이미지 로드 실패:', {
+                factoryId: storedFactoryAuth.factoryId,
+                error: error instanceof Error ? error.message : String(error),
+                fullError: error
+              });
+              setFactoryProfileImage(null);
+            });
         }
       }
     } catch (error) {
