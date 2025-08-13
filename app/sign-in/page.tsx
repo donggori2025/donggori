@@ -26,12 +26,14 @@ export default function SignInPage() {
     if (!isLoaded) return;
     setLoading(true);
     try {
+      console.log('OAuth 로그인 시작:', provider);
       await signIn.authenticateWithRedirect({
         strategy: provider as unknown as Parameters<typeof signIn.authenticateWithRedirect>[0]['strategy'],
         redirectUrl: '/v1/oauth_callback',
         redirectUrlComplete: '/',
       });
     } catch (err: unknown) {
+      console.error('OAuth 로그인 오류:', err);
       setError(handleClerkError(err));
     } finally {
       setLoading(false);
