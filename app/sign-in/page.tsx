@@ -69,7 +69,8 @@ export default function SignInPage() {
       // 봉제공장 로그인이 실패하면 일반 사용자(Clerk) 로그인 시도
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        setError("Clerk 로그인은 이메일 형식만 지원합니다. 관리자 로그인은 /admin/login 을 이용하세요.");
+        // 이메일 형식이 아니면 Clerk 경로로 진행하지 않고 자격 증명 오류를 안내
+        setError("아이디 또는 비밀번호가 올바르지 않습니다. 관리자라면 /admin/login 을 이용하세요.");
         return;
       }
       if (!isLoaded) return;
