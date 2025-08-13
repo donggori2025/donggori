@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import HeroSection from "@/components/HeroSection";
@@ -9,8 +9,8 @@ import RecommendSection from "@/components/RecommendSection";
 import NoticesSection from "@/components/NoticesSection";
 import GlobalPopups from "@/components/GlobalPopups";
 
-// 메인 페이지 컴포넌트
-export default function HomePage() {
+// OAuth 콜백 처리 컴포넌트
+function OAuthCallbackHandler() {
   const { user, isSignedIn, isLoaded } = useUser();
   const searchParams = useSearchParams();
 
@@ -44,8 +44,16 @@ export default function HomePage() {
     }
   }, [searchParams, isLoaded, isSignedIn, user]);
 
+  return null; // 이 컴포넌트는 UI를 렌더링하지 않음
+}
+
+// 메인 페이지 컴포넌트
+export default function HomePage() {
   return (
     <main className="px-2 sm:px-4 md:px-6">
+      <Suspense fallback={null}>
+        <OAuthCallbackHandler />
+      </Suspense>
       <GlobalPopups />
       <HeroSection />
       <InfoSection />
