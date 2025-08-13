@@ -344,7 +344,17 @@ export default function SignUpPage() {
             </div>
           </div>
         </div>
-        {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+        {error && (
+          <div className="text-red-500 text-sm text-center">
+            {error}
+            {error.includes("이미 가입된 이메일 주소입니다") && (
+              <>
+                {" "}
+                <Link href="/sign-in" className="underline text-blue-600">로그인 하러가기</Link>
+              </>
+            )}
+          </div>
+        )}
         <button
           type="submit"
           className="w-full bg-black text-white py-3 rounded font-bold text-lg mt-2 hover:bg-gray-900 transition disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
