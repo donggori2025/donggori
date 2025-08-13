@@ -78,6 +78,15 @@ export default function SignUpPage() {
       setError("이메일을 입력해주세요.");
       return;
     }
+    const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+    const cleanEmail = normalizeInvisible(email).toLowerCase();
+    const cleanPassword = normalizeInvisible(password || "TempPassword!1");
+    // 기본 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      setError("올바른 이메일 형식이 아닙니다.");
+      return;
+    }
     
     // 도메인 제한 확인 (임시로 비활성화)
     // const domainError = clerkConfig.getDomainError(email);
@@ -88,7 +97,7 @@ export default function SignUpPage() {
     
     setLoading(true);
     try {
-      await signUp?.create({ emailAddress: email, password: password || "TempPassword!1" });
+      await signUp?.create({ emailAddress: cleanEmail, password: cleanPassword });
       await signUp?.prepareEmailAddressVerification({ strategy: "email_code" });
       setVerificationSent(true);
       setVerificationCode("");
@@ -121,7 +130,9 @@ export default function SignUpPage() {
     setError("");
     setLoading(true);
     try {
-      const res = await signUp?.attemptEmailAddressVerification({ code: verificationCode });
+      const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+      const cleanCode = normalizeInvisible(verificationCode);
+      const res = await signUp?.attemptEmailAddressVerification({ code: cleanCode });
       if (res?.status === "complete") {
         setEmailVerified(true);
         setError("");
@@ -141,6 +152,10 @@ export default function SignUpPage() {
     e.preventDefault();
     setError("");
     if (!email) return setError("이메일을 입력해주세요.");
+    const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+    const cleanEmail = normalizeInvisible(email).toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) return setError("올바른 이메일 형식이 아닙니다.");
     
     // 도메인 제한 확인 (임시로 비활성화)
     // const domainError = clerkConfig.getDomainError(email);
