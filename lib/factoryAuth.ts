@@ -26,8 +26,27 @@ for (let i = 1; i <= 70; i++) {
 
 // 봉제공장 로그인 검증 함수
 export function validateFactoryLogin(username: string, password: string): FactoryAuth | null {
+  const input = username.trim().toLowerCase();
+
+  // 입력값 정규화: 숫자만 입력 → factoryNN, factoryN → factoryNN
+  let normalizedUsername = input;
+
+  // 숫자만 들어온 경우: 공장 ID로 간주
+  if (/^\d{1,2}$/.test(input)) {
+    const padded = input.padStart(2, '0');
+    normalizedUsername = `factory${padded}`;
+  }
+
+  // factory + 1~2자리 숫자 (선행 0 없는 형태) → 선행 0 패딩
+  const factoryMatch = input.match(/^factory(\d{1,2})$/);
+  if (factoryMatch) {
+    const num = factoryMatch[1];
+    const padded = num.padStart(2, '0');
+    normalizedUsername = `factory${padded}`;
+  }
+
   const factory = factoryAuthData.find(
-    auth => auth.username === username && auth.password === password
+    auth => auth.username.toLowerCase() === normalizedUsername && auth.password === password
   );
   return factory || null;
 }
