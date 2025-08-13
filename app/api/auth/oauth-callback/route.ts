@@ -11,10 +11,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 여기서 OAuth 제공자(예: Google, Naver, Kakao 등)의 토큰 엔드포인트로 요청
-    // 실제 구현에서는 환경 변수에서 클라이언트 ID와 시크릿을 가져와야 합니다
-    
-    // 예시: Google OAuth
+    // Google OAuth 환경 변수 검증
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/v1/oauth_callback';
+
+    if (!googleClientId || !googleClientSecret) {
+      console.error('Google OAuth 설정이 누락되었습니다:', {
+        hasClientId: !!googleClientId,
+        hasClientSecret: !!googleClientSecret,
+      });
+      return NextResponse.json(
+        { error: 'OAuth 설정이 완료되지 않았습니다. 관리자에게 문의하세요.' },
+        { status: 500 }
+      );
+    }
+
+    // Google OAuth 토큰 교환
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
@@ -22,9 +35,9 @@ export async function POST(request: NextRequest) {
       },
       body: new URLSearchParams({
         code,
-        client_id: process.env.GOOGLE_CLIENT_ID || '',
-        client_secret: process.env.GOOGLE_CLIENT_SECRET || '',
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/v1/oauth_callback',
+        client_id: googleClientId,
+        client_secret: googleClientSecret,
+        redirect_uri: googleRedirectUri,
         grant_type: 'authorization_code',
       }),
     });
@@ -32,8 +45,29 @@ export async function POST(request: NextRequest) {
     if (!tokenResponse.ok) {
       const errorData = await tokenResponse.text();
       console.error('OAuth token exchange failed:', errorData);
+      
+      // Google OAuth 오류 응답 파싱
+      let errorMessage = 'OAuth 토큰 교환에 실패했습니다.';
+      try {
+        const errorJson = JSON.parse(errorData);
+        if (errorJson.error === 'redirect_uri_mismatch') {
+          errorMessage = '리디렉션 URI가 일치하지 않습니다. Google Cloud Console에서 설정을 확인해주세요.';
+          console.error('Redirect URI mismatch. Expected:', googleRedirectUri);
+        } else if (errorJson.error === 'invalid_request') {
+          errorMessage = '잘못된 요청입니다. OAuth 설정을 확인해주세요.';
+        } else if (errorJson.error) {
+          errorMessage = `OAuth 오류: ${errorJson.error}`;
+        }
+      } catch (e) {
+        console.error('Error parsing OAuth error response:', e);
+      }
+      
       return NextResponse.json(
-        { error: 'OAuth 토큰 교환에 실패했습니다.' },
+        { 
+          error: errorMessage,
+          details: errorData,
+          redirectUri: googleRedirectUri
+        },
         { status: 400 }
       );
     }
