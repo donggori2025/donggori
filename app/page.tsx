@@ -5,11 +5,13 @@ import InfoSection from "@/components/InfoSection";
 import StepSection from "@/components/StepSection";
 import RecommendSection from "@/components/RecommendSection";
 import NoticesSection from "@/components/NoticesSection";
+import GlobalPopups from "@/components/GlobalPopups";
 
 // 메인 페이지 컴포넌트
 export default function HomePage() {
   return (
     <main className="px-2 sm:px-4 md:px-6">
+      <GlobalPopups />
       <HeroSection />
       <InfoSection />
       <StepSection />
