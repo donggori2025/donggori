@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function OAuthCallbackPage() {
+function OAuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -73,34 +73,52 @@ export default function OAuthCallbackPage() {
   }, [router, searchParams]);
 
   return (
+    <div className="text-center">
+      {status === 'loading' && (
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+      )}
+      {status === 'success' && (
+        <div className="text-green-500 text-4xl mb-4">✓</div>
+      )}
+      {status === 'error' && (
+        <div className="text-red-500 text-4xl mb-4">✗</div>
+      )}
+      
+      <h2 className="text-xl font-semibold mb-2">
+        {status === 'loading' && '로그인 처리 중...'}
+        {status === 'success' && '로그인 완료!'}
+        {status === 'error' && '오류 발생'}
+      </h2>
+      <p className="text-gray-600">{message}</p>
+      
+      {status === 'error' && (
+        <button
+          onClick={() => router.push('/sign-in')}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          로그인 페이지로 돌아가기
+        </button>
+      )}
+    </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+      <h2 className="text-xl font-semibold mb-2">로딩 중...</h2>
+      <p className="text-gray-600">페이지를 불러오는 중입니다.</p>
+    </div>
+  );
+}
+
+export default function OAuthCallbackPage() {
+  return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white">
-      <div className="text-center">
-        {status === 'loading' && (
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-        )}
-        {status === 'success' && (
-          <div className="text-green-500 text-4xl mb-4">✓</div>
-        )}
-        {status === 'error' && (
-          <div className="text-red-500 text-4xl mb-4">✗</div>
-        )}
-        
-        <h2 className="text-xl font-semibold mb-2">
-          {status === 'loading' && '로그인 처리 중...'}
-          {status === 'success' && '로그인 완료!'}
-          {status === 'error' && '오류 발생'}
-        </h2>
-        <p className="text-gray-600">{message}</p>
-        
-        {status === 'error' && (
-          <button
-            onClick={() => router.push('/sign-in')}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            로그인 페이지로 돌아가기
-          </button>
-        )}
-      </div>
+      <Suspense fallback={<LoadingFallback />}>
+        <OAuthCallbackContent />
+      </Suspense>
     </div>
   );
 } 
