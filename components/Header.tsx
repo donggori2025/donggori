@@ -183,19 +183,17 @@ export default function Header() {
             )}
 
             {/* 로그인 후: 프로필 이미지 */}
-            <SignedIn>
-              {user && (
-                <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
-                  <Image
-                    src={user.imageUrl}
-                    alt="프로필 이미지"
-                    width={40}
-                    height={40}
-                    className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
-                  />
-                </Link>
-              )}
-            </SignedIn>
+            {isSignedIn && user && (
+              <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
+                <Image
+                  src={user.imageUrl}
+                  alt="프로필 이미지"
+                  width={40}
+                  height={40}
+                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
+                />
+              </Link>
+            )}
 
             {/* 봉제공장 로그인 후: 공장 프로필 이미지 */}
             {userType === 'factory' && factoryAuth && (
@@ -274,28 +272,19 @@ export default function Header() {
                 ))}
               </div>
 
-              {/* 로그인/회원가입 또는 프로필 이미지 */}
-              <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-gray-200">
-                {(!isLoaded || (!isSignedIn && !factoryAuth)) && (
-                  <button
-                    className="w-full py-3 px-4 rounded-lg bg-[#222222] hover:bg-[#444] text-white font-medium transition-colors"
-                    onClick={handleSignInClick}
-                  >
-                    로그인/회원가입
-                  </button>
-                )}
-                {/* SSR 대비 폴백 버튼 - 하이드레이션 이전에만 의미 있음 */}
-                {!user && (
-                  <button
-                    className="w-full py-3 px-4 rounded-lg bg-[#222222] hover:bg-[#444] text-white font-medium transition-colors md:hidden"
-                    onClick={handleSignInClick}
-                  >
-                    로그인/회원가입
-                  </button>
-                )}
+                              {/* 로그인/회원가입 또는 프로필 이미지 */}
+                <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-gray-200">
+                  {(!isLoaded || (!isSignedIn && !factoryAuth)) && (
+                    <button
+                      className="w-full py-3 px-4 rounded-lg bg-[#222222] hover:bg-[#444] text-white font-medium transition-colors"
+                      onClick={handleSignInClick}
+                    >
+                      로그인/회원가입
+                    </button>
+                  )}
 
-                <SignedIn>
-                  {user && (
+                  {/* 로그인 후: 프로필 이미지 */}
+                  {isSignedIn && user && (
                     <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
                       <Image
                         src={user.imageUrl}
@@ -307,22 +296,21 @@ export default function Header() {
                       <span className="font-medium">마이페이지</span>
                     </Link>
                   )}
-                </SignedIn>
 
-                {/* 봉제공장 로그인 후 모바일 메뉴 */}
-                {userType === 'factory' && factoryAuth && (
-                  <Link href="/factory-my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
-                    <Image
-                      src={factoryProfileImage || "/logo_donggori.png"}
-                      alt="공장 프로필 이미지"
-                      width={40}
-                      height={40}
-                      className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                    />
-                    <span className="font-medium">공장 마이페이지</span>
-                  </Link>
-                )}
-              </div>
+                  {/* 봉제공장 로그인 후 모바일 메뉴 */}
+                  {userType === 'factory' && factoryAuth && (
+                    <Link href="/factory-my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
+                      <Image
+                        src={factoryProfileImage || "/logo_donggori.png"}
+                        alt="공장 프로필 이미지"
+                        width={40}
+                        height={40}
+                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                      />
+                      <span className="font-medium">공장 마이페이지</span>
+                    </Link>
+                  )}
+                </div>
             </div>
           </div>
         )}
