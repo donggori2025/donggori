@@ -32,6 +32,8 @@ export function validateFactoryLogin(username: string, password: string): Factor
   const rawUser = stripInvisibles(username).trim();
   const rawPass = stripInvisibles(password).trim();
 
+  console.log('validateFactoryLogin 입력:', { username, password, rawUser, rawPass });
+
   const input = rawUser.toLowerCase();
 
   // 입력값 정규화: 숫자만 입력 → factoryNN, factoryN → factoryNN
@@ -41,6 +43,7 @@ export function validateFactoryLogin(username: string, password: string): Factor
   if (/^\d{1,2}$/.test(input)) {
     const padded = input.padStart(2, '0');
     normalizedUsername = `factory${padded}`;
+    console.log('숫자만 입력됨, 정규화:', { input, normalizedUsername });
   }
 
   // factory + 1~2자리 숫자 (선행 0 없는 형태) → 선행 0 패딩
@@ -49,20 +52,35 @@ export function validateFactoryLogin(username: string, password: string): Factor
     const num = factoryMatch[1];
     const padded = num.padStart(2, '0');
     normalizedUsername = `factory${padded}`;
+    console.log('factory + 숫자 입력됨, 정규화:', { input, normalizedUsername });
   }
+
+  console.log('정규화된 사용자명:', normalizedUsername);
 
   const factory = factoryAuthData.find(
     auth => auth.username.toLowerCase() === normalizedUsername && auth.password === rawPass
   );
+  
+  console.log('검색 결과:', factory ? '찾음' : '못찾음', factory);
+  
   return factory || null;
 }
 
 // 공장 로그인 시 실제 DB 공장명으로 업데이트
 export async function getFactoryAuthWithRealName(username: string, password: string): Promise<FactoryAuth | null> {
+  console.log('getFactoryAuthWithRealName 시작:', { username, password: password.substring(0, 3) + '***' });
+  
   const factory = validateFactoryLogin(username, password);
-  if (!factory) return null;
+  console.log('validateFactoryLogin 결과:', factory);
+  
+  if (!factory) {
+    console.log('공장 인증 실패');
+    return null;
+  }
 
   try {
+    console.log('DB에서 공장명 조회 시작, factoryId:', factory.factoryId);
+    
     // DB에서 실제 공장명 가져오기
     const { data, error } = await supabase
       .from('donggori')
@@ -70,17 +88,28 @@ export async function getFactoryAuthWithRealName(username: string, password: str
       .eq('id', factory.factoryId)
       .single();
 
+    console.log('DB 조회 결과:', { data, error });
+
     if (error) {
       console.error('공장명 조회 중 오류:', error);
       // DB 오류 시 실제 공장명 매핑 사용
+      const fallbackName = getRealFactoryName(factory.factoryId);
+      console.log('DB 오류로 인한 fallback 공장명 사용:', fallbackName);
       return {
         ...factory,
-        factoryName: getRealFactoryName(factory.factoryId)
+        factoryName: fallbackName
       };
     }
 
     // 실제 공장명으로 업데이트 (DB company_name 우선, name, 매핑 순)
     const realFactoryName = data?.company_name || data?.name || getRealFactoryName(factory.factoryId);
+    console.log('최종 공장명 결정:', { 
+      dbCompanyName: data?.company_name, 
+      dbName: data?.name, 
+      fallbackName: getRealFactoryName(factory.factoryId),
+      finalName: realFactoryName 
+    });
+    
     return {
       ...factory,
       factoryName: realFactoryName
@@ -88,9 +117,11 @@ export async function getFactoryAuthWithRealName(username: string, password: str
   } catch (error) {
     console.error('공장명 조회 중 오류:', error);
     // 오류 시 실제 공장명 매핑 사용
+    const fallbackName = getRealFactoryName(factory.factoryId);
+    console.log('예외로 인한 fallback 공장명 사용:', fallbackName);
     return {
       ...factory,
-      factoryName: getRealFactoryName(factory.factoryId)
+      factoryName: fallbackName
     };
   }
 }

@@ -60,15 +60,22 @@ export default function SignInPage() {
       const cleanId = normalizeInvisible(email);
       const cleanPw = normalizeInvisible(password);
 
+      console.log('공장 로그인 시도:', { cleanId, cleanPw: cleanPw.substring(0, 3) + '***' });
+
       const factoryAuth = await getFactoryAuthWithRealName(cleanId, cleanPw);
+      console.log('공장 로그인 결과:', factoryAuth ? '성공' : '실패', factoryAuth);
+      
       if (factoryAuth) {
-              // 봉제공장 로그인 성공 (실제 DB 공장명 포함)
-      localStorage.setItem('factoryAuth', JSON.stringify(factoryAuth));
-      localStorage.setItem('userType', 'factory');
-      // 메인페이지로 리다이렉트
-      window.location.href = '/';
-      return;
+        // 봉제공장 로그인 성공 (실제 DB 공장명 포함)
+        console.log('공장 로그인 성공, localStorage 설정:', factoryAuth);
+        localStorage.setItem('factoryAuth', JSON.stringify(factoryAuth));
+        localStorage.setItem('userType', 'factory');
+        // 메인페이지로 리다이렉트
+        window.location.href = '/';
+        return;
       }
+      
+      console.log('공장 로그인 실패, Clerk 로그인 시도');
       
       // 봉제공장 로그인이 실패하면 일반 사용자(Clerk) 로그인 시도
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
