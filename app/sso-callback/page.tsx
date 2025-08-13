@@ -13,10 +13,27 @@ export default function SSOCallbackPage() {
     const handleSSOCallback = async () => {
       try {
         console.log('SSO 콜백 처리 시작');
+        console.log('현재 URL:', window.location.href);
+        console.log('URL 파라미터:', window.location.search);
         console.log('Clerk 상태:', { isLoaded, isSignedIn, user: user?.id });
 
         if (!isLoaded) {
           console.log('Clerk이 아직 로드되지 않았습니다. 대기 중...');
+          return;
+        }
+
+        // URL 파라미터 확인
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const error = urlParams.get('error');
+        const state = urlParams.get('state');
+
+        console.log('URL 파라미터 상세:', { code: code ? '있음' : '없음', error, state });
+
+        if (error) {
+          console.error('OAuth 오류:', error);
+          setStatus('error');
+          setMessage(`OAuth 오류: ${error}`);
           return;
         }
 
@@ -29,9 +46,33 @@ export default function SSOCallbackPage() {
             window.location.href = '/';
           }, 1000);
         } else {
-          console.log('SSO 로그인 실패');
-          setStatus('error');
-          setMessage('로그인 처리에 실패했습니다.');
+          // OAuth 코드가 있지만 로그인되지 않은 경우
+          if (code) {
+            console.log('OAuth 코드는 있지만 로그인되지 않았습니다. Clerk이 처리 중일 수 있습니다.');
+            setStatus('loading');
+            setMessage('로그인 처리 중...');
+            
+            // Clerk이 OAuth를 처리할 시간을 더 줍니다
+            setTimeout(() => {
+              if (isSignedIn && user) {
+                console.log('지연된 SSO 로그인 성공:', user.id);
+                setStatus('success');
+                setMessage('로그인이 완료되었습니다!');
+                
+                setTimeout(() => {
+                  window.location.href = '/';
+                }, 1000);
+              } else {
+                console.log('지연 후에도 로그인되지 않았습니다.');
+                setStatus('error');
+                setMessage('로그인 처리에 실패했습니다. 다시 시도해주세요.');
+              }
+            }, 5000);
+          } else {
+            console.log('OAuth 코드가 없고 로그인되지 않았습니다.');
+            setStatus('error');
+            setMessage('로그인 처리에 실패했습니다.');
+          }
         }
       } catch (error) {
         console.error('SSO 콜백 처리 오류:', error);
