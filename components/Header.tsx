@@ -64,7 +64,7 @@ export default function Header() {
     } catch (error) {
       console.error('Header initialization error:', error);
     }
-  }, [mounted]);
+  }, [mounted, isSignedIn]); // isSignedIn 상태 변화도 감지
 
   // 로그인 버튼 클릭 핸들러
   const handleSignInClick = useCallback(() => {

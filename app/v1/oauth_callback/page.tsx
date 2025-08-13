@@ -43,9 +43,10 @@ function OAuthCallbackContent() {
               setStatus('success');
               setMessage('로그인이 완료되었습니다!');
               
-              // 잠시 후 메인 페이지로 리다이렉트
+              // 잠시 후 메인 페이지로 리다이렉트 (페이지 새로고침 포함)
               setTimeout(() => {
-                router.push('/');
+                // 페이지를 새로고침하여 Clerk 인증 상태 업데이트
+                window.location.href = '/';
               }, 2000);
             } else {
               console.error('OAuth 로그인 실패:', result);
@@ -54,7 +55,8 @@ function OAuthCallbackContent() {
                 setStatus('success');
                 setMessage('이미 가입된 계정입니다. 로그인을 완료합니다.');
                 setTimeout(() => {
-                  router.push('/');
+                  // 페이지를 새로고침하여 Clerk 인증 상태 업데이트
+                  window.location.href = '/';
                 }, 2000);
               } else {
                 setStatus('error');
@@ -72,9 +74,10 @@ function OAuthCallbackContent() {
           setStatus('success');
           setMessage('로그인이 완료되었습니다!');
           
-          // 잠시 후 메인 페이지로 리다이렉트
+          // 잠시 후 메인 페이지로 리다이렉트 (페이지 새로고침 포함)
           setTimeout(() => {
-            router.push('/');
+            // 페이지를 새로고침하여 Clerk 인증 상태 업데이트
+            window.location.href = '/';
           }, 2000);
         }
       } catch (error) {
