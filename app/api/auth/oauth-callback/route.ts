@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { generateRandomName } from '@/lib/randomNameGenerator';
 
 export async function POST(request: NextRequest) {
   try {
@@ -90,6 +91,13 @@ export async function POST(request: NextRequest) {
 
     const userInfo = await userInfoResponse.json();
 
+    // 이름이 없거나 비어있는 경우 랜덤 이름 생성
+    let userName = userInfo.name;
+    if (!userName || userName.trim() === '') {
+      userName = generateRandomName();
+      console.log('OAuth 사용자 이름이 없어 랜덤 이름 생성:', userName);
+    }
+
     // 여기서 사용자 정보를 데이터베이스에 저장하거나 세션을 설정할 수 있습니다
     // 예시: 세션 쿠키 설정
     const response = NextResponse.json({
@@ -97,8 +105,9 @@ export async function POST(request: NextRequest) {
       user: {
         id: userInfo.id,
         email: userInfo.email,
-        name: userInfo.name,
+        name: userName,
         picture: userInfo.picture,
+        isRandomName: !userInfo.name || userInfo.name.trim() === '',
       },
     });
 

@@ -1,88 +1,112 @@
 # OAuth 문제 빠른 해결 체크리스트
 
-## 🚨 "redirect_uri_mismatch" 오류 해결
+## 🚨 "앱이 Google의 OAuth 2.0 정책을 준수하지 않기 때문에 앱에 로그인할 수 없습니다" 오류
 
-### 1단계: 환경 변수 확인
-- [ ] `.env.local` 파일이 프로젝트 루트에 있는지 확인
-- [ ] `GOOGLE_CLIENT_ID` 설정됨
-- [ ] `GOOGLE_CLIENT_SECRET` 설정됨
-- [ ] `GOOGLE_REDIRECT_URI=http://localhost:3000/v1/oauth_callback` 설정됨
+### 즉시 해결 방법 (5분 내)
 
-### 2단계: Google Cloud Console 설정 확인
-- [ ] [Google Cloud Console](https://console.cloud.google.com/apis/credentials) 접속
-- [ ] 올바른 프로젝트 선택
-- [ ] **API 및 서비스** → **사용자 인증 정보** → **OAuth 2.0 클라이언트 ID** 선택
-- [ ] **승인된 리디렉션 URI**에 다음 URI들이 등록되어 있는지 확인:
-  - [ ] `http://localhost:3000/v1/oauth_callback`
-  - [ ] `http://127.0.0.1:3000/v1/oauth_callback` (선택사항)
+#### 1단계: Google Cloud Console에서 리디렉션 URI 추가
+1. [Google Cloud Console](https://console.cloud.google.com/) 접속
+2. **API 및 서비스** → **사용자 인증 정보** 메뉴로 이동
+3. OAuth 2.0 클라이언트 ID 클릭
+4. **승인된 리디렉션 URI** 섹션에서 **URI 추가** 클릭
+5. 다음 URI 추가:
+   ```
+   https://donggori.clerk.accounts.dev/v1/oauth_callback
+   ```
+6. **저장** 클릭
 
-### 3단계: Clerk 설정 확인
-- [ ] [Clerk 대시보드](https://dashboard.clerk.com/) 접속
-- [ ] **User & Authentication** → **Social Connections** 메뉴로 이동
-- [ ] Google OAuth 설정에서 **Redirect URLs** 확인:
-  - [ ] `http://localhost:3000/v1/oauth_callback` (개발용)
-  - [ ] `https://your-domain.com/v1/oauth_callback` (배포용)
+#### 2단계: 환경 변수 확인
+`.env.local` 파일에서 다음 설정 확인:
+```env
+GOOGLE_REDIRECT_URI=https://donggori.clerk.accounts.dev/v1/oauth_callback
+```
 
-### 4단계: 코드 확인
-- [ ] `app/sign-in/page.tsx`에서 `redirectUrl: '/v1/oauth_callback'` 확인
-- [ ] `app/api/auth/oauth-callback/route.ts`에서 리디렉션 URI 처리 확인
-- [ ] `app/v1/oauth_callback/page.tsx` 파일 존재 확인
+#### 3단계: 개발 서버 재시작
+```bash
+bun run dev
+```
 
-### 5단계: 테스트
-- [ ] 개발 서버 재시작: `bun run dev`
-- [ ] 브라우저 캐시 삭제
-- [ ] OAuth 로그인 시도
-- [ ] 브라우저 개발자 도구 > Network 탭에서 OAuth 요청 확인
+#### 4단계: 브라우저 캐시 삭제
+- 브라우저에서 `Ctrl+Shift+R` (Windows) 또는 `Cmd+Shift+R` (Mac)
+- 또는 개발자 도구에서 **Application** → **Storage** → **Clear storage**
 
-## 🔧 디버깅 도구
+### 상세 진단
 
-### 설정 확인 스크립트
+#### 현재 설정 확인
 ```bash
 bun run scripts/checkOAuthConfig.js
 ```
 
-### 리디렉션 URI 디버깅
-```bash
-bun run scripts/debugOAuthRedirect.js
+#### 예상 출력:
+```
+📋 Google OAuth 설정:
+   Client ID: ✅ 설정됨
+   Client Secret: ✅ 설정됨
+   Redirect URI: https://donggori.clerk.accounts.dev/v1/oauth_callback
+
+📋 Clerk 설정:
+   Publishable Key: ✅ 설정됨
+   Secret Key: ✅ 설정됨
+   Frontend API: 기본 Clerk 도메인 사용
+
+📋 레이아웃 설정:
+   Clerk 커스텀 도메인: ⚠️  주석 처리됨 (기본 도메인 사용)
 ```
 
-## 📋 일반적인 문제와 해결책
+### 문제가 지속되는 경우
 
-### 문제 1: "Missing required parameter: client_id"
-**해결책:**
-- Google OAuth 클라이언트 ID 생성
-- `.env.local`에 `GOOGLE_CLIENT_ID` 설정
+#### 1. 추가 리디렉션 URI 등록
+Google Cloud Console에 다음 URI들도 추가:
+```
+http://localhost:3000/v1/oauth_callback
+http://127.0.0.1:3000/v1/oauth_callback
+```
 
-### 문제 2: "redirect_uri_mismatch"
-**해결책:**
-- Google Cloud Console에서 정확한 리디렉션 URI 등록
-- 환경 변수 `GOOGLE_REDIRECT_URI` 확인
+#### 2. Clerk 설정 확인
+- [Clerk 대시보드](https://dashboard.clerk.com/)에서 OAuth 설정 확인
+- Google OAuth가 활성화되어 있는지 확인
 
-### 문제 3: "invalid_request"
-**해결책:**
-- OAuth 동의 화면 설정 완료
-- 클라이언트 ID와 시크릿 재확인
+#### 3. 네트워크 탭 확인
+브라우저 개발자 도구에서:
+1. **Network** 탭 열기
+2. 로그인 시도
+3. OAuth 요청의 `redirect_uri` 파라미터 확인
+4. 실제 전송되는 URI와 등록된 URI 비교
 
-### 문제 4: "access_denied"
-**해결책:**
-- OAuth 동의 화면에서 테스트 사용자 등록
-- 사용자가 권한을 거부하지 않았는지 확인
+### 커스텀 도메인 사용 시
 
-## 🚀 배포 시 추가 확인사항
+만약 `clerk.donggori.com` 커스텀 도메인을 사용하려면:
 
-### 프로덕션 환경 설정
-- [ ] Google Cloud Console에 프로덕션 도메인 리디렉션 URI 추가
-- [ ] Clerk 대시보드에 프로덕션 도메인 리디렉션 URL 추가
-- [ ] 환경 변수 `GOOGLE_REDIRECT_URI`를 프로덕션 URL로 변경
-- [ ] HTTPS 사용 확인
+#### 1. Google Cloud Console에 추가 URI 등록
+```
+https://clerk.donggori.com/v1/oauth_callback
+```
 
-### OAuth 동의 화면 검토
-- [ ] 프로덕션 배포 시 Google 검토 과정 진행
-- [ ] 검토 완료까지 테스트 사용자만 사용 가능
+#### 2. 환경 변수 수정
+```env
+GOOGLE_REDIRECT_URI=https://clerk.donggori.com/v1/oauth_callback
+NEXT_PUBLIC_CLERK_FRONTEND_API=clerk.donggori.com
+```
 
-## 📞 추가 도움
+#### 3. 레이아웃 파일 수정
+`app/layout.tsx`에서 주석 해제:
+```tsx
+<ClerkProvider
+  publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+  frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}
+>
+```
 
-문제가 지속되면 다음을 확인하세요:
-1. 브라우저 개발자 도구의 Network 탭에서 실제 요청 확인
-2. 서버 로그에서 상세한 오류 메시지 확인
-3. Google Cloud Console의 OAuth 동의 화면 설정 확인
+### 체크리스트
+
+- [ ] Google Cloud Console에 `https://donggori.clerk.accounts.dev/v1/oauth_callback` 등록
+- [ ] `.env.local`에서 `GOOGLE_REDIRECT_URI` 설정 확인
+- [ ] 개발 서버 재시작
+- [ ] 브라우저 캐시 삭제
+- [ ] 로그인 테스트
+
+### 추가 리소스
+
+- [Google Cloud Console](https://console.cloud.google.com/)
+- [Clerk 대시보드](https://dashboard.clerk.com/)
+- [상세 가이드](docs/clerk-domain-issue-guide.md)
