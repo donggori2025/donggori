@@ -1,10 +1,13 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSignIn, useUser } from "@clerk/nextjs";
 
 function OAuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { signIn, isLoaded: signInLoaded } = useSignIn();
+  const { user, isSignedIn, isLoaded: userLoaded } = useUser();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('로그인 처리 중...');
 
@@ -16,6 +19,7 @@ function OAuthCallbackContent() {
         const error = searchParams.get('error');
 
         console.log('OAuth 콜백 파라미터:', { code: code ? '있음' : '없음', error });
+        console.log('Clerk 상태:', { signInLoaded, userLoaded, isSignedIn, user: user?.id });
 
         if (error) {
           console.error('OAuth 오류:', error);
@@ -24,7 +28,26 @@ function OAuthCallbackContent() {
           return;
         }
 
-        // 인증 코드가 있으면 커스텀 OAuth 처리, 없으면 메인 페이지로 리다이렉트
+        // Clerk이 로드될 때까지 대기
+        if (!signInLoaded || !userLoaded) {
+          console.log('Clerk이 아직 로드되지 않았습니다. 대기 중...');
+          return;
+        }
+
+        // 이미 로그인된 상태인지 확인
+        if (isSignedIn && user) {
+          console.log('이미 로그인된 상태입니다:', user.id);
+          setStatus('success');
+          setMessage('로그인이 완료되었습니다!');
+          
+          // 즉시 메인 페이지로 리다이렉트
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1000);
+          return;
+        }
+
+        // 인증 코드가 있으면 커스텀 OAuth 처리
         if (code) {
           try {
             // OAuth 콜백 API 호출
@@ -43,9 +66,8 @@ function OAuthCallbackContent() {
               setStatus('success');
               setMessage('로그인이 완료되었습니다!');
               
-              // 잠시 후 메인 페이지로 리다이렉트 (페이지 새로고침 포함)
+              // 잠시 후 메인 페이지로 리다이렉트
               setTimeout(() => {
-                // 페이지를 새로고침하여 Clerk 인증 상태 업데이트
                 window.location.href = '/';
               }, 2000);
             } else {
@@ -55,7 +77,6 @@ function OAuthCallbackContent() {
                 setStatus('success');
                 setMessage('이미 가입된 계정입니다. 로그인을 완료합니다.');
                 setTimeout(() => {
-                  // 페이지를 새로고침하여 Clerk 인증 상태 업데이트
                   window.location.href = '/';
                 }, 2000);
               } else {
@@ -70,15 +91,28 @@ function OAuthCallbackContent() {
           }
         } else {
           // 인증 코드가 없으면 Clerk이 자동으로 처리했을 가능성이 높음
-          console.log('인증 코드가 없습니다. Clerk이 자동으로 처리했을 가능성이 높습니다.');
-          setStatus('success');
-          setMessage('로그인이 완료되었습니다!');
+          console.log('인증 코드가 없습니다. Clerk 상태 확인 중...');
           
-          // 잠시 후 메인 페이지로 리다이렉트 (페이지 새로고침 포함)
+          // Clerk 상태를 다시 확인
           setTimeout(() => {
-            // 페이지를 새로고침하여 Clerk 인증 상태 업데이트
-            window.location.href = '/';
-          }, 2000);
+            if (isSignedIn && user) {
+              console.log('Clerk이 자동으로 로그인을 처리했습니다:', user.id);
+              setStatus('success');
+              setMessage('로그인이 완료되었습니다!');
+              
+              setTimeout(() => {
+                window.location.href = '/';
+              }, 1000);
+            } else {
+              console.log('Clerk 로그인 상태가 확인되지 않았습니다. 강제 리다이렉트');
+              setStatus('success');
+              setMessage('로그인이 완료되었습니다!');
+              
+              setTimeout(() => {
+                window.location.href = '/';
+              }, 2000);
+            }
+          }, 1000);
         }
       } catch (error) {
         console.error('OAuth 콜백 처리 오류:', error);
@@ -88,7 +122,7 @@ function OAuthCallbackContent() {
     };
 
     handleOAuthCallback();
-  }, [router, searchParams]);
+  }, [router, searchParams, signInLoaded, userLoaded, isSignedIn, user]);
 
   return (
     <div className="text-center">
