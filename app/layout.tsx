@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "의류 디자이너-봉제공장 매칭 플랫폼",
-  description: "의류 디자이너와 봉제공장을 연결하는 플랫폼",
+  title: "동고리 - 봉제공장 찾기",
+  description: "봉제공장을 쉽게 찾고 연결할 수 있는 플랫폼",
 };
 
 export default function RootLayout({
@@ -27,9 +27,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider 
+    <ClerkProvider
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}
+      // TODO: 커스텀 도메인 DNS 문제 해결 후 다시 활성화
+      // frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}
     >
       <html lang="ko">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-toss-gray min-h-screen flex flex-col`}>
