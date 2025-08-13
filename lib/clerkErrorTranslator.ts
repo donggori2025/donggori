@@ -44,6 +44,8 @@ export const translateClerkError = (error: string): string => {
     'user not found': '사용자를 찾을 수 없습니다.',
     'user already exists': '이미 존재하는 사용자입니다.',
     'email already exists': '이미 가입된 이메일 주소입니다.',
+    'that email address is taken': '이미 가입된 이메일 주소입니다.',
+    'email address is taken': '이미 가입된 이메일 주소입니다.',
     'email not verified': '이메일 인증이 완료되지 않았습니다.',
     'email verification required': '이메일 인증이 필요합니다.',
     
