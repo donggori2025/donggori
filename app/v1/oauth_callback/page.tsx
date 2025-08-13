@@ -11,8 +11,11 @@ function OAuthCallbackContent() {
   useEffect(() => {
     const handleOAuthCallback = async () => {
       try {
+        // URL 파라미터 확인
         const code = searchParams.get('code');
         const error = searchParams.get('error');
+
+        console.log('OAuth 콜백 파라미터:', { code: code ? '있음' : '없음', error });
 
         if (error) {
           console.error('OAuth 오류:', error);
