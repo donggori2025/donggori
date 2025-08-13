@@ -15,16 +15,85 @@ export async function GET() {
   const auth = await requireAdmin();
   if (auth) return auth;
   try {
-    const supabase = getServiceSupabase();
+    console.log("GET /api/admin/factories - 시작");
+    console.log("환경변수 확인:", {
+      hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      urlPrefix: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 20),
+      serviceKeyPrefix: process.env.SUPABASE_SERVICE_ROLE_KEY?.substring(0, 20)
+    });
+
+    // Supabase 클라이언트 생성 시도
+    let supabase;
+    try {
+      supabase = getServiceSupabase();
+      console.log("Supabase 클라이언트 생성 완료");
+    } catch (clientError) {
+      console.error("Supabase 클라이언트 생성 실패:", clientError);
+      return NextResponse.json({ 
+        success: false, 
+        error: `Supabase 클라이언트 생성 실패: ${clientError instanceof Error ? clientError.message : '알 수 없는 오류'}` 
+      }, { status: 500 });
+    }
+
+    // 간단한 연결 테스트
+    try {
+      const { data: testData, error: testError } = await supabase
+        .from("donggori")
+        .select("id")
+        .limit(1);
+      
+      console.log("Supabase 연결 테스트 결과:", { 
+        hasTestData: !!testData, 
+        testDataLength: testData?.length, 
+        hasTestError: !!testError,
+        testError: testError?.message 
+      });
+
+      if (testError) {
+        console.error("Supabase 연결 테스트 실패:", testError);
+        return NextResponse.json({ 
+          success: false, 
+          error: `Supabase 연결 테스트 실패: ${testError.message}` 
+        }, { status: 500 });
+      }
+    } catch (testError) {
+      console.error("Supabase 연결 테스트 중 예외 발생:", testError);
+      return NextResponse.json({ 
+        success: false, 
+        error: `Supabase 연결 테스트 중 예외: ${testError instanceof Error ? testError.message : '알 수 없는 오류'}` 
+      }, { status: 500 });
+    }
+
+    // 실제 데이터 조회
     const { data, error } = await supabase
       .from("donggori")
       .select("*")
       .order("id", { ascending: false });
-    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+
+    console.log("Supabase 쿼리 결과:", { 
+      hasData: !!data, 
+      dataLength: data?.length, 
+      hasError: !!error,
+      errorMessage: error?.message 
+    });
+
+    if (error) {
+      console.error("Supabase 쿼리 오류:", error);
+      return NextResponse.json({ 
+        success: false, 
+        error: `데이터베이스 쿼리 오류: ${error.message}` 
+      }, { status: 500 });
+    }
+
     return NextResponse.json({ success: true, data });
   } catch (e) {
+    console.error("GET /api/admin/factories - 예외 발생:", e);
     const message = e instanceof Error ? e.message : "알 수 없는 서버 오류";
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return NextResponse.json({ 
+      success: false, 
+      error: `서버 오류: ${message}` 
+    }, { status: 500 });
   }
 }
 
@@ -41,6 +110,7 @@ export async function POST(req: Request) {
     if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     return NextResponse.json({ success: true });
   } catch (e) {
+    console.error("POST /api/admin/factories - 예외 발생:", e);
     const message = e instanceof Error ? e.message : "알 수 없는 서버 오류";
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
