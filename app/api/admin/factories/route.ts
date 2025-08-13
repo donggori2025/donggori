@@ -14,14 +14,40 @@ async function requireAdmin() {
 export async function GET() {
   const auth = await requireAdmin();
   if (auth) return auth;
+  
+  // 환경변수 상세 검증
+  const envCheck = {
+    hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    urlValue: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    serviceKeyPrefix: process.env.SUPABASE_SERVICE_ROLE_KEY?.substring(0, 20),
+    nodeEnv: process.env.NODE_ENV,
+    vercelEnv: process.env.VERCEL_ENV
+  };
+  
+  console.log("환경변수 상세 확인:", envCheck);
+  
+  // 환경변수 누락 시 즉시 오류 반환
+  if (!envCheck.hasUrl) {
+    console.error("NEXT_PUBLIC_SUPABASE_URL이 설정되지 않음");
+    return NextResponse.json({ 
+      success: false, 
+      error: "환경변수 오류: NEXT_PUBLIC_SUPABASE_URL이 설정되지 않았습니다.",
+      debug: envCheck
+    }, { status: 500 });
+  }
+  
+  if (!envCheck.hasServiceKey) {
+    console.error("SUPABASE_SERVICE_ROLE_KEY가 설정되지 않음");
+    return NextResponse.json({ 
+      success: false, 
+      error: "환경변수 오류: SUPABASE_SERVICE_ROLE_KEY가 설정되지 않았습니다.",
+      debug: envCheck
+    }, { status: 500 });
+  }
+  
   try {
     console.log("GET /api/admin/factories - 시작");
-    console.log("환경변수 확인:", {
-      hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      urlPrefix: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 20),
-      serviceKeyPrefix: process.env.SUPABASE_SERVICE_ROLE_KEY?.substring(0, 20)
-    });
 
     // Supabase 클라이언트 생성 시도
     let supabase;
@@ -32,7 +58,8 @@ export async function GET() {
       console.error("Supabase 클라이언트 생성 실패:", clientError);
       return NextResponse.json({ 
         success: false, 
-        error: `Supabase 클라이언트 생성 실패: ${clientError instanceof Error ? clientError.message : '알 수 없는 오류'}` 
+        error: `Supabase 클라이언트 생성 실패: ${clientError instanceof Error ? clientError.message : '알 수 없는 오류'}`,
+        debug: envCheck
       }, { status: 500 });
     }
 
@@ -54,14 +81,16 @@ export async function GET() {
         console.error("Supabase 연결 테스트 실패:", testError);
         return NextResponse.json({ 
           success: false, 
-          error: `Supabase 연결 테스트 실패: ${testError.message}` 
+          error: `Supabase 연결 테스트 실패: ${testError.message}`,
+          debug: envCheck
         }, { status: 500 });
       }
     } catch (testError) {
       console.error("Supabase 연결 테스트 중 예외 발생:", testError);
       return NextResponse.json({ 
         success: false, 
-        error: `Supabase 연결 테스트 중 예외: ${testError instanceof Error ? testError.message : '알 수 없는 오류'}` 
+        error: `Supabase 연결 테스트 중 예외: ${testError instanceof Error ? testError.message : '알 수 없는 오류'}`,
+        debug: envCheck
       }, { status: 500 });
     }
 
@@ -82,7 +111,8 @@ export async function GET() {
       console.error("Supabase 쿼리 오류:", error);
       return NextResponse.json({ 
         success: false, 
-        error: `데이터베이스 쿼리 오류: ${error.message}` 
+        error: `데이터베이스 쿼리 오류: ${error.message}`,
+        debug: envCheck
       }, { status: 500 });
     }
 
@@ -92,7 +122,8 @@ export async function GET() {
     const message = e instanceof Error ? e.message : "알 수 없는 서버 오류";
     return NextResponse.json({ 
       success: false, 
-      error: `서버 오류: ${message}` 
+      error: `서버 오류: ${message}`,
+      debug: envCheck
     }, { status: 500 });
   }
 }

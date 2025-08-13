@@ -29,10 +29,14 @@ export default function AdminFactoriesPage() {
       const schemaJson = schemaRes.ok ? await schemaRes.json().catch(()=>({ success:false, error:`스키마 응답 파싱 실패(${schemaRes.status})` })) : { success:false, error:`스키마 요청 실패(${schemaRes.status})` };
       
       if (!listRes.ok || !listJson.success) {
-        throw new Error(listJson.error || "목록 불러오기 실패");
+        const errorMsg = listJson.error || "목록 불러오기 실패";
+        const debugInfo = listJson.debug ? `\n\n디버그 정보: ${JSON.stringify(listJson.debug, null, 2)}` : '';
+        throw new Error(`${errorMsg}${debugInfo}`);
       }
       if (!schemaRes.ok || !schemaJson.success) {
-        throw new Error(schemaJson.error || "스키마 불러오기 실패");
+        const errorMsg = schemaJson.error || "스키마 불러오기 실패";
+        const debugInfo = schemaJson.debug ? `\n\n디버그 정보: ${JSON.stringify(schemaJson.debug, null, 2)}` : '';
+        throw new Error(`${errorMsg}${debugInfo}`);
       }
       
       setItems(listJson.data || []);
