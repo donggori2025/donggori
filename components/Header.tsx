@@ -118,6 +118,13 @@ export default function Header() {
                 </Link>
               ))}
             </nav>
+            {/* SSR 초기 렌더에서도 로그인 버튼 노출 (하이드레이션 후 상태에 따라 교체됨) */}
+            <Link
+              href="/sign-in"
+              className="text-sm lg:text-base font-medium text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors"
+            >
+              로그인/회원가입
+            </Link>
           </div>
 
           {/* 모바일 햄버거 버튼 */}
@@ -226,7 +233,7 @@ export default function Header() {
 
         {/* 모바일 드로어 메뉴 */}
         {menuOpen && (
-          <div className="fixed inset-0 z-50 flex items-start justify-end md:hidden">
+            <div className="fixed inset-0 z-50 flex items-start justify-end md:hidden">
             {/* 오버레이 */}
             <div
               className="absolute inset-0 bg-black/20"
@@ -285,6 +292,15 @@ export default function Header() {
                     </button>
                   )}
                 </SignedOut>
+                {/* SSR 대비 폴백 버튼 - 하이드레이션 이전에만 의미 있음 */}
+                {!user && (
+                  <button
+                    className="w-full py-3 px-4 rounded-lg bg-[#222222] hover:bg-[#444] text-white font-medium transition-colors md:hidden"
+                    onClick={handleSignInClick}
+                  >
+                    로그인/회원가입
+                  </button>
+                )}
 
                 <SignedIn>
                   {user && (
