@@ -178,7 +178,7 @@ export default function Header() {
           <div className="flex items-center gap-2">
             {/* 로그인 전: 로그인/회원가입 버튼 */}
             <SignedOut>
-              {userType !== 'factory' && (
+              {!factoryAuth && (
                 <button
                   className="text-sm lg:text-base font-medium text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors"
                   onClick={handleSignInClick}
@@ -283,7 +283,7 @@ export default function Header() {
               {/* 로그인/회원가입 또는 프로필 이미지 */}
               <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-gray-200">
                 <SignedOut>
-                  {userType !== 'factory' && (
+                  {!factoryAuth && (
                     <button
                       className="w-full py-3 px-4 rounded-lg bg-[#222222] hover:bg-[#444] text-white font-medium transition-colors"
                       onClick={handleSignInClick}
