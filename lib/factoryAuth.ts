@@ -26,7 +26,13 @@ for (let i = 1; i <= 70; i++) {
 
 // 봉제공장 로그인 검증 함수
 export function validateFactoryLogin(username: string, password: string): FactoryAuth | null {
-  const input = username.trim().toLowerCase();
+  // 제로폭 문자 및 공백 제거 유틸
+  const stripInvisibles = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '');
+
+  const rawUser = stripInvisibles(username).trim();
+  const rawPass = stripInvisibles(password).trim();
+
+  const input = rawUser.toLowerCase();
 
   // 입력값 정규화: 숫자만 입력 → factoryNN, factoryN → factoryNN
   let normalizedUsername = input;
@@ -46,7 +52,7 @@ export function validateFactoryLogin(username: string, password: string): Factor
   }
 
   const factory = factoryAuthData.find(
-    auth => auth.username.toLowerCase() === normalizedUsername && auth.password === password
+    auth => auth.username.toLowerCase() === normalizedUsername && auth.password === rawPass
   );
   return factory || null;
 }

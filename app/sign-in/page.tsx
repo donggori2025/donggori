@@ -56,7 +56,11 @@ export default function SignInPage() {
     
     try {
       // 먼저 봉제공장 로그인 시도
-      const factoryAuth = await getFactoryAuthWithRealName(email, password);
+      const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+      const cleanId = normalizeInvisible(email);
+      const cleanPw = normalizeInvisible(password);
+
+      const factoryAuth = await getFactoryAuthWithRealName(cleanId, cleanPw);
       if (factoryAuth) {
               // 봉제공장 로그인 성공 (실제 DB 공장명 포함)
       localStorage.setItem('factoryAuth', JSON.stringify(factoryAuth));
