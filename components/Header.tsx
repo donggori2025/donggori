@@ -1,11 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  SignedIn,
-  SignedOut,
-  useUser,
-} from "@clerk/nextjs";
+import { SignedIn, useUser } from "@clerk/nextjs";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getFactoryProfileImage } from "@/lib/factoryAuth";
@@ -14,7 +10,7 @@ import type { FactoryAuth } from "@/lib/types";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useUser();
+  const { user, isSignedIn, isLoaded } = useUser();
   const router = useRouter();
   const [userType, setUserType] = useState<string | null>(null);
   const [factoryAuth, setFactoryAuth] = useState<FactoryAuth | null>(null);
@@ -177,16 +173,14 @@ export default function Header() {
 
           <div className="flex items-center gap-2">
             {/* 로그인 전: 로그인/회원가입 버튼 */}
-            <SignedOut>
-              {!factoryAuth && (
-                <button
-                  className="text-sm lg:text-base font-medium text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors"
-                  onClick={handleSignInClick}
-                >
-                  로그인/회원가입
-                </button>
-              )}
-            </SignedOut>
+            {(!isLoaded || (!isSignedIn && !factoryAuth)) && (
+              <button
+                className="text-sm lg:text-base font-medium text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors"
+                onClick={handleSignInClick}
+              >
+                로그인/회원가입
+              </button>
+            )}
 
             {/* 로그인 후: 프로필 이미지 */}
             <SignedIn>
@@ -282,16 +276,14 @@ export default function Header() {
 
               {/* 로그인/회원가입 또는 프로필 이미지 */}
               <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-gray-200">
-                <SignedOut>
-                  {!factoryAuth && (
-                    <button
-                      className="w-full py-3 px-4 rounded-lg bg-[#222222] hover:bg-[#444] text-white font-medium transition-colors"
-                      onClick={handleSignInClick}
-                    >
-                      로그인/회원가입
-                    </button>
-                  )}
-                </SignedOut>
+                {(!isLoaded || (!isSignedIn && !factoryAuth)) && (
+                  <button
+                    className="w-full py-3 px-4 rounded-lg bg-[#222222] hover:bg-[#444] text-white font-medium transition-colors"
+                    onClick={handleSignInClick}
+                  >
+                    로그인/회원가입
+                  </button>
+                )}
                 {/* SSR 대비 폴백 버튼 - 하이드레이션 이전에만 의미 있음 */}
                 {!user && (
                   <button
