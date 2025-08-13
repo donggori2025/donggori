@@ -98,28 +98,71 @@ export async function POST(request: NextRequest) {
       console.log('OAuth 사용자 이름이 없어 랜덤 이름 생성:', userName);
     }
 
-    // 여기서 사용자 정보를 데이터베이스에 저장하거나 세션을 설정할 수 있습니다
-    // 예시: 세션 쿠키 설정
-    const response = NextResponse.json({
-      success: true,
-      user: {
-        id: userInfo.id,
-        email: userInfo.email,
-        name: userName,
-        picture: userInfo.picture,
-        isRandomName: !userInfo.name || userInfo.name.trim() === '',
-      },
-    });
+    // Clerk OAuth 회원가입 API 호출
+    try {
+      const signupResponse = await fetch(`${request.nextUrl.origin}/api/auth/oauth-signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: userInfo.email,
+          name: userName,
+          picture: userInfo.picture,
+          googleId: userInfo.id,
+        }),
+      });
 
-    // 보안을 위해 HttpOnly 쿠키로 토큰 저장
-    response.cookies.set('auth_token', tokenData.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7일
-    });
+      const signupResult = await signupResponse.json();
 
-    return response;
+      if (signupResponse.ok) {
+        console.log('OAuth 회원가입 성공:', signupResult.user.id);
+        
+        const response = NextResponse.json({
+          success: true,
+          user: signupResult.user,
+          message: signupResult.message,
+        });
+
+        // 보안을 위해 HttpOnly 쿠키로 토큰 저장
+        response.cookies.set('auth_token', tokenData.access_token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 7, // 7일
+        });
+
+        return response;
+      } else {
+        console.error('OAuth 회원가입 실패:', signupResult);
+        
+        // 이미 존재하는 사용자인 경우
+        if (signupResult.code === 'USER_EXISTS') {
+          return NextResponse.json({
+            success: false,
+            error: '이미 가입된 이메일입니다.',
+            code: 'USER_EXISTS',
+            user: {
+              email: userInfo.email,
+              name: userName,
+              picture: userInfo.picture,
+            }
+          }, { status: 409 });
+        }
+
+        return NextResponse.json({
+          success: false,
+          error: signupResult.error || '회원가입 중 오류가 발생했습니다.',
+        }, { status: 500 });
+      }
+
+    } catch (signupError) {
+      console.error('OAuth 회원가입 API 호출 오류:', signupError);
+      return NextResponse.json({
+        success: false,
+        error: '회원가입 서비스에 연결할 수 없습니다.',
+      }, { status: 500 });
+    }
 
   } catch (error) {
     console.error('OAuth callback error:', error);
