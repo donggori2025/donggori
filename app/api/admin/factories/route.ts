@@ -14,23 +14,36 @@ async function requireAdmin() {
 export async function GET() {
   const auth = await requireAdmin();
   if (auth) return auth;
-  const supabase = getServiceSupabase();
-  const { data, error } = await supabase.from("donggori").select("*").order("id", { ascending: false });
-  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true, data });
+  try {
+    const supabase = getServiceSupabase();
+    const { data, error } = await supabase
+      .from("donggori")
+      .select("*")
+      .order("id", { ascending: false });
+    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true, data });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "알 수 없는 서버 오류";
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {
   const auth = await requireAdmin();
   if (auth) return auth;
-  const body = await req.json();
-  const supabase = getServiceSupabase();
-  const { error } = await supabase.from("donggori").insert({
-    // 전달된 모든 컬럼을 그대로 허용 (화이트리스트 필요 시 교체)
-    ...body,
-  });
-  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true });
+  try {
+    const body = await req.json();
+    const supabase = getServiceSupabase();
+    const { error } = await supabase.from("donggori").insert({
+      // 전달된 모든 컬럼을 그대로 허용 (화이트리스트 필요 시 교체)
+      ...body,
+    });
+    if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "알 수 없는 서버 오류";
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
+  }
 }
 
 
