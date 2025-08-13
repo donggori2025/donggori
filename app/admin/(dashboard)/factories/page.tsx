@@ -25,8 +25,8 @@ export default function AdminFactoriesPage() {
         fetch("/api/admin/factories"),
         fetch("/api/admin/factories/schema"),
       ]);
-      const listJson = await listRes.json();
-      const schemaJson = await schemaRes.json();
+      const listJson = listRes.ok ? await listRes.json().catch(()=>({ success:false, error:`목록 응답 파싱 실패(${listRes.status})` })) : { success:false, error:`목록 요청 실패(${listRes.status})` };
+      const schemaJson = schemaRes.ok ? await schemaRes.json().catch(()=>({ success:false, error:`스키마 응답 파싱 실패(${schemaRes.status})` })) : { success:false, error:`스키마 요청 실패(${schemaRes.status})` };
       
       if (!listRes.ok || !listJson.success) {
         throw new Error(listJson.error || "목록 불러오기 실패");
@@ -86,7 +86,7 @@ export default function AdminFactoriesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      const json = await res.json();
+      const json = res.ok ? await res.json().catch(()=>({ success:false, error:`응답 파싱 실패(${res.status})` })) : { success:false, error:`요청 실패(${res.status})` };
       if (!res.ok || !json.success) throw new Error(json.error || "등록 실패");
       setForm({});
       await load();
@@ -108,7 +108,7 @@ export default function AdminFactoriesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Object.fromEntries(Object.entries(patch).filter(([k])=>!k.startsWith("__")))),
       });
-      const json = await res.json();
+      const json = res.ok ? await res.json().catch(()=>({ success:false, error:`응답 파싱 실패(${res.status})` })) : { success:false, error:`요청 실패(${res.status})` };
       if (!res.ok || !json.success) throw new Error(json.error || "수정 실패");
       await load();
       setSelected(null);
@@ -130,7 +130,7 @@ export default function AdminFactoriesPage() {
     setError(null);
     try {
       const res = await fetch(`/api/admin/factories/${id}`, { method: "DELETE" });
-      const json = await res.json();
+      const json = res.ok ? await res.json().catch(()=>({ success:false, error:`응답 파싱 실패(${res.status})` })) : { success:false, error:`요청 실패(${res.status})` };
       if (!res.ok || !json.success) throw new Error(json.error || "삭제 실패");
       await load();
     } catch (e: unknown) {
