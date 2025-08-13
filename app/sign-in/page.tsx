@@ -30,7 +30,6 @@ export default function SignInPage() {
       await signIn.authenticateWithRedirect({
         strategy: provider as unknown as Parameters<typeof signIn.authenticateWithRedirect>[0]['strategy'],
         redirectUrl: '/',
-        redirectUrlComplete: '/',
       });
     } catch (err: unknown) {
       console.error('OAuth 로그인 오류:', err);

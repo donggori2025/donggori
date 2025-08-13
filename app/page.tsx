@@ -35,6 +35,18 @@ function OAuthCallbackHandler() {
           // URL에서 OAuth 파라미터 제거
           const newUrl = window.location.pathname;
           window.history.replaceState({}, document.title, newUrl);
+        } else if (code) {
+          console.log('OAuth 코드는 있지만 로그인되지 않았습니다. Clerk이 처리 중일 수 있습니다.');
+          // Clerk이 OAuth를 처리할 시간을 더 줍니다
+          setTimeout(() => {
+            if (isSignedIn && user) {
+              console.log('지연된 OAuth 로그인 성공:', user.id);
+              const newUrl = window.location.pathname;
+              window.history.replaceState({}, document.title, newUrl);
+            } else {
+              console.log('OAuth 처리 실패');
+            }
+          }, 3000);
         }
       }
     };
