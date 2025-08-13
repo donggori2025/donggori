@@ -7,6 +7,7 @@ import { supabase, testSupabaseConnection, checkMatchRequestsTable } from "@/lib
 import { MatchRequest } from "@/lib/matchRequests";
 import { Factory } from "@/lib/factories";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
+import { validateName } from "@/lib/randomNameGenerator";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
@@ -23,6 +24,7 @@ export default function MyPage() {
   
   const [name, setName] = useState(originalName);
   const [email, setEmail] = useState(originalEmail);
+  const [nameError, setNameError] = useState<string>("");
   
   // 변경사항이 있는지 확인
   const hasChanges = name !== originalName || email !== originalEmail;
@@ -93,6 +95,15 @@ export default function MyPage() {
         alert("사용자 정보를 찾을 수 없습니다.");
         return;
       }
+      
+      // 이름 유효성 검사
+      const nameValidation = validateName(name);
+      if (!nameValidation.isValid) {
+        setNameError(nameValidation.error || "이름이 올바르지 않습니다.");
+        return;
+      }
+      
+      setNameError(""); // 오류 메시지 초기화
       
       // Clerk를 사용하여 사용자 정보 업데이트
       const updatedUser = await user.update({
@@ -423,13 +434,34 @@ export default function MyPage() {
 
               {/* 이름 입력 필드 */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">이름</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  이름
+                  {originalName && originalName.match(/^[가-힣]+[0-9]{2}$/) && (
+                    <span className="ml-2 text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                      랜덤 이름
+                    </span>
+                  )}
+                </label>
                 <input
                   type="text"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setNameError(""); // 입력 시 오류 메시지 초기화
+                  }}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black ${
+                    nameError ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="이름을 입력해주세요 (2-10자)"
                 />
+                {nameError && (
+                  <p className="text-red-500 text-sm mt-1">{nameError}</p>
+                )}
+                {originalName && originalName.match(/^[가-힣]+[0-9]{2}$/) && (
+                  <p className="text-blue-600 text-sm mt-1">
+                    💡 OAuth 로그인 시 이름을 받아오지 못해 랜덤 이름이 생성되었습니다. 원하는 이름으로 변경해주세요!
+                  </p>
+                )}
               </div>
 
               {/* 이메일 입력 필드 */}
@@ -545,13 +577,34 @@ export default function MyPage() {
 
             {/* 이름 입력 필드 */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">이름</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                이름
+                {originalName && originalName.match(/^[가-힣]+[0-9]{2}$/) && (
+                  <span className="ml-2 text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                    랜덤 이름
+                  </span>
+                )}
+              </label>
               <input
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setNameError(""); // 입력 시 오류 메시지 초기화
+                }}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black ${
+                  nameError ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="이름을 입력해주세요 (2-10자)"
               />
+              {nameError && (
+                <p className="text-red-500 text-sm mt-1">{nameError}</p>
+              )}
+              {originalName && originalName.match(/^[가-힣]+[0-9]{2}$/) && (
+                <p className="text-blue-600 text-sm mt-1">
+                  💡 OAuth 로그인 시 이름을 받아오지 못해 랜덤 이름이 생성되었습니다. 원하는 이름으로 변경해주세요!
+                </p>
+              )}
             </div>
 
             {/* 이메일 입력 필드 */}

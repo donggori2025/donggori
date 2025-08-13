@@ -1,118 +1,131 @@
-# Clerk 도메인 제한 문제 해결 가이드
+# Clerk 도메인 문제 해결 가이드
 
-## 문제 상황
-`@faddit.co.kr` 도메인으로 회원가입/로그인하는 사용자들이 문제를 겪고 있습니다.
+## 🚨 "앱이 Google의 OAuth 2.0 정책을 준수하지 않기 때문에 앱에 로그인할 수 없습니다" 오류 해결
+
+### 문제 분석
+오류 메시지: `redirect_uri=https://clerk.donggori.com/v1/oauth_callback`
+
+이 오류는 Clerk이 커스텀 도메인을 사용하여 Google OAuth를 시도하지만, Google Cloud Console에 해당 리디렉션 URI가 등록되지 않았기 때문입니다.
 
 ## 해결 방법
 
-### 1. Clerk 대시보드에서 확인할 설정
+### 방법 1: Google Cloud Console에 Clerk 도메인 등록 (권장)
 
-#### A. Email & Phone 설정
-1. Clerk 대시보드 접속
-2. **User & Authentication** > **Email, Phone, Username** 메뉴로 이동
-3. **Email Addresses** 섹션에서 **Allowed email domains** 확인
-4. 만약 도메인 제한이 설정되어 있다면:
-   - `faddit.co.kr`을 허용 목록에 추가
-   - 또는 도메인 제한을 완전히 해제
+#### 1.1 Google Cloud Console에서 리디렉션 URI 추가
+1. [Google Cloud Console](https://console.cloud.google.com/)에 접속
+2. **API 및 서비스** → **사용자 인증 정보** 메뉴로 이동
+3. 기존 OAuth 2.0 클라이언트 ID 클릭
+4. **승인된 리디렉션 URI** 섹션에서 **URI 추가** 클릭
+5. 다음 URI 추가:
+   ```
+   https://clerk.donggori.com/v1/oauth_callback
+   ```
+6. **저장** 클릭
 
-#### B. OAuth Providers 설정
-1. **User & Authentication** > **Social Connections** 메뉴로 이동
-2. 각 OAuth 제공자(Google, Kakao, Naver)의 설정 확인:
-   - **Redirect URLs**에 `https://your-domain.com/v1/oauth_callback` 포함되어 있는지 확인
-   - **Allowed email domains** 설정 확인
+#### 1.2 Clerk 커스텀 도메인 활성화
+1. `app/layout.tsx` 파일에서 주석 처리된 부분을 활성화:
 
-#### C. User Management 설정
-1. **User & Authentication** > **User Management** 메뉴로 이동
-2. **Sign-up restrictions** 확인:
-   - 도메인 제한이 설정되어 있다면 `faddit.co.kr` 추가
-   - 또는 제한을 해제
+```tsx
+<ClerkProvider
+  publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+  frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}
+>
+```
 
-### 2. 환경 변수 설정
-
-`.env.local` 파일에 다음 설정을 추가하거나 수정:
+2. `.env.local` 파일에 Clerk 프론트엔드 API 설정:
 
 ```env
-# Clerk 인증 설정
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
-CLERK_SECRET_KEY=your-clerk-secret-key
-
-# 도메인 제한 설정 (선택사항)
-# 모든 도메인 허용하려면 이 줄을 주석 처리하거나 삭제
-CLERK_ALLOWED_EMAIL_DOMAINS=gmail.com,naver.com,kakao.com,faddit.co.kr
+NEXT_PUBLIC_CLERK_FRONTEND_API=clerk.donggori.com
 ```
 
-### 3. 코드 수정 사항
+### 방법 2: Clerk 기본 도메인 사용 (임시 해결책)
 
-이미 다음 파일들이 수정되었습니다:
+#### 2.1 Clerk 기본 도메인으로 변경
+1. `app/layout.tsx`에서 커스텀 도메인 설정을 주석 처리:
 
-- `lib/clerkConfig.ts`: 도메인 검증 로직 추가
-- `app/sign-up/page.tsx`: 회원가입 시 도메인 검증 추가
-- `app/sign-in/page.tsx`: 로그인 시 도메인 검증 추가
-
-### 4. 테스트 방법
-
-#### A. 스크립트로 설정 확인
-```bash
-bun run scripts/checkClerkConfig.js
+```tsx
+<ClerkProvider
+  publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+  // frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}
+>
 ```
 
-#### B. 수동 테스트
-1. `@faddit.co.kr` 도메인으로 회원가입 시도
-2. 오류 메시지 확인
-3. 개발자 도구에서 네트워크 탭 확인하여 API 호출 상태 확인
-
-### 5. 추가 확인사항
-
-#### A. Clerk 대시보드에서 확인할 항목
-- **User & Authentication** > **Email, Phone, Username** > **Email Addresses**
-- **User & Authentication** > **Social Connections** > 각 OAuth 제공자
-- **User & Authentication** > **User Management** > **Sign-up restrictions**
-
-#### B. 네트워크 설정
-- **User & Authentication** > **User Management** > **Network**
-- **Redirect URLs** 설정 확인
-- **Allowed origins** 설정 확인
-
-### 6. 문제가 지속되는 경우
-
-1. **Clerk 로그 확인**
-   - Clerk 대시보드에서 **Logs** 섹션 확인
-   - 실패한 인증 시도 로그 확인
-
-2. **브라우저 개발자 도구 확인**
-   - Network 탭에서 API 호출 상태 확인
-   - Console 탭에서 JavaScript 오류 확인
-
-3. **환경 변수 재확인**
-   ```bash
-   bun run scripts/checkClerkConfig.js
+2. Google Cloud Console에서 기본 Clerk 도메인 추가:
+   ```
+   https://donggori.clerk.accounts.dev/v1/oauth_callback
    ```
 
-### 7. 임시 해결책
+#### 2.2 환경 변수에서 커스텀 도메인 제거
+`.env.local` 파일에서 다음 줄을 주석 처리:
+```env
+# NEXT_PUBLIC_CLERK_FRONTEND_API=clerk.donggori.com
+```
 
-만약 즉시 해결이 어려운 경우:
+## 단계별 해결 과정
 
-1. **도메인 제한 완전 해제**
-   - Clerk 대시보드에서 모든 도메인 제한 해제
-   - `.env.local`에서 `CLERK_ALLOWED_EMAIL_DOMAINS` 주석 처리
+### 1단계: 현재 설정 확인
+```bash
+# 환경 변수 확인
+bun run scripts/checkOAuthConfig.js
+```
 
-2. **대체 이메일 사용**
-   - 사용자에게 임시로 다른 이메일 도메인 사용 요청
+### 2단계: Google Cloud Console 설정
+1. [Google Cloud Console](https://console.cloud.google.com/) 접속
+2. 프로젝트 선택
+3. **API 및 서비스** → **사용자 인증 정보**
+4. OAuth 2.0 클라이언트 ID 클릭
+5. **승인된 리디렉션 URI**에 다음 추가:
+   - `https://clerk.donggori.com/v1/oauth_callback` (커스텀 도메인 사용 시)
+   - `https://donggori.clerk.accounts.dev/v1/oauth_callback` (기본 도메인 사용 시)
 
-### 8. 예방 조치
+### 3단계: Clerk 설정 업데이트
+1. `app/layout.tsx` 수정
+2. `.env.local` 파일 업데이트
+3. 개발 서버 재시작: `bun run dev`
 
-향후 유사한 문제를 방지하기 위해:
+### 4단계: 테스트
+1. 브라우저에서 로그인 시도
+2. Google OAuth 플로우 확인
+3. 콜백 처리 확인
 
-1. **정기적인 설정 확인**
-   - 새로운 도메인 추가 시 Clerk 설정 업데이트
-   - 환경 변수 정기 점검
+## 추가 리디렉션 URI 목록
 
-2. **모니터링 설정**
-   - Clerk 로그 모니터링
-   - 사용자 피드백 수집 시스템 구축
+Google Cloud Console에 등록해야 할 모든 리디렉션 URI:
 
-## 연락처
+### 개발 환경
+```
+http://localhost:3000/v1/oauth_callback
+http://127.0.0.1:3000/v1/oauth_callback
+```
 
-문제가 지속되는 경우:
-- Clerk 지원팀: https://clerk.com/support
-- 프로젝트 관리자에게 문의 
+### 프로덕션 환경 (커스텀 도메인)
+```
+https://clerk.donggori.com/v1/oauth_callback
+```
+
+### 프로덕션 환경 (기본 도메인)
+```
+https://donggori.clerk.accounts.dev/v1/oauth_callback
+```
+
+## 문제 해결 체크리스트
+
+- [ ] Google Cloud Console에 올바른 리디렉션 URI 등록
+- [ ] Clerk 커스텀 도메인 설정 확인
+- [ ] 환경 변수 설정 확인
+- [ ] 개발 서버 재시작
+- [ ] 브라우저 캐시 삭제
+- [ ] OAuth 플로우 테스트
+
+## 주의사항
+
+1. **도메인 일치**: Google Cloud Console에 등록된 URI와 실제 사용하는 URI가 정확히 일치해야 합니다.
+2. **프로토콜**: HTTPS와 HTTP를 구분하여 등록해야 합니다.
+3. **경로**: `/v1/oauth_callback` 경로가 정확히 일치해야 합니다.
+4. **캐시**: 설정 변경 후 브라우저 캐시를 삭제해야 할 수 있습니다.
+
+## 추가 리소스
+
+- [Clerk 커스텀 도메인 설정](https://clerk.com/docs/domains/overview)
+- [Google OAuth 2.0 설정](https://developers.google.com/identity/protocols/oauth2)
+- [Google Cloud Console](https://console.cloud.google.com/) 
