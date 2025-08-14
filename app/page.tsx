@@ -1,63 +1,18 @@
-"use client";
-import React, { useEffect, Suspense } from "react";
-import { useUser } from "@clerk/nextjs";
-import { useSearchParams } from "next/navigation";
+import React, { Suspense } from "react";
+import type { Metadata } from "next";
 import HeroSection from "@/components/HeroSection";
 import InfoSection from "@/components/InfoSection"; 
 import StepSection from "@/components/StepSection";
 import RecommendSection from "@/components/RecommendSection";
 import NoticesSection from "@/components/NoticesSection";
 import GlobalPopups from "@/components/GlobalPopups";
+import OAuthCallbackHandler from "@/components/OAuthCallbackHandler";
 
-// OAuth 콜백 처리 컴포넌트
-function OAuthCallbackHandler() {
-  const { user, isSignedIn, isLoaded } = useUser();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    // OAuth 콜백 처리
-    const handleOAuthCallback = () => {
-      const code = searchParams.get('code');
-      const error = searchParams.get('error');
-
-      if (code || error) {
-        console.log('OAuth 콜백 감지:', { code: code ? '있음' : '없음', error });
-        console.log('Clerk 상태:', { isLoaded, isSignedIn, user: user?.id });
-
-        if (error) {
-          console.error('OAuth 오류:', error);
-          alert(`OAuth 오류: ${error}`);
-          return;
-        }
-
-        if (isSignedIn && user) {
-          console.log('OAuth 로그인 성공:', user.id);
-          // URL에서 OAuth 파라미터 제거
-          const newUrl = window.location.pathname;
-          window.history.replaceState({}, document.title, newUrl);
-        } else if (code) {
-          console.log('OAuth 코드는 있지만 로그인되지 않았습니다. Clerk이 처리 중일 수 있습니다.');
-          // Clerk이 OAuth를 처리할 시간을 더 줍니다
-          setTimeout(() => {
-            if (isSignedIn && user) {
-              console.log('지연된 OAuth 로그인 성공:', user.id);
-              const newUrl = window.location.pathname;
-              window.history.replaceState({}, document.title, newUrl);
-            } else {
-              console.log('OAuth 처리 실패');
-            }
-          }, 3000);
-        }
-      }
-    };
-
-    if (isLoaded) {
-      handleOAuthCallback();
-    }
-  }, [searchParams, isLoaded, isSignedIn, user]);
-
-  return null; // 이 컴포넌트는 UI를 렌더링하지 않음
-}
+export const metadata: Metadata = {
+  title: "동고리 - 의류 봉제·생산 연결 플랫폼",
+  description:
+    "동고리는 디자이너와 봉제공장을 연결하는 의류 제작 플랫폼입니다. 소량 제작부터 대량 생산까지, 맞춤형 작업지시서로 빠르고 효율적인 생산을 지원합니다.",
+};
 
 // 메인 페이지 컴포넌트
 export default function HomePage() {
@@ -67,6 +22,12 @@ export default function HomePage() {
         <OAuthCallbackHandler />
       </Suspense>
       <GlobalPopups />
+      <section className="max-w-[1200px] mx-auto px-2 sm:px-4 md:px-6 py-8 sm:py-10">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">동고리, 디자이너와 봉제공장을 잇다</h1>
+        <p className="mt-4 text-gray-700 leading-relaxed">
+          동고리는 의류 제작 과정을 혁신적으로 단축시키는 봉제·생산 연결 플랫폼입니다. 디지털 작업지시서를 통해 의사소통 오류를 줄이고 생산 효율을 높입니다.
+        </p>
+      </section>
       <HeroSection />
       <InfoSection />
       <StepSection />
