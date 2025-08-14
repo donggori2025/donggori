@@ -1,8 +1,10 @@
 "use client";
 import { AuthenticateWithRedirectCallback } from "@clerk/nextjs";
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function SSOCallbackPage() {
+export const dynamic = "force-dynamic";
+function SSOCallbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const error = searchParams.get("error");
@@ -27,5 +29,13 @@ export default function SSOCallbackPage() {
         <AuthenticateWithRedirectCallback redirectUrl="/sso-callback" afterSignInUrl="/" afterSignUpUrl="/" />
       </div>
     </div>
+  );
+}
+
+export default function SSOCallbackPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black" /></div>}>
+      <SSOCallbackContent />
+    </Suspense>
   );
 }
