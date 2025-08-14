@@ -204,7 +204,7 @@ export default function SignUpPage() {
       await signUp.authenticateWithRedirect({
         strategy: provider as any,
         redirectUrl: '/sso-callback',
-        redirectUrlComplete: '/sso-callback',
+        redirectUrlComplete: '/',
       });
     } catch (err: unknown) {
       setError(handleClerkError(err));
