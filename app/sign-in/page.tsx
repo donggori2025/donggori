@@ -28,7 +28,7 @@ export default function SignInPage() {
       await signIn.authenticateWithRedirect({
         strategy: provider as any,
         redirectUrl: '/sso-callback',
-        redirectUrlComplete: '/sso-callback',
+        redirectUrlComplete: '/',
       });
     } catch (err: unknown) {
       console.error('OAuth 로그인 오류:', err);
