@@ -22,9 +22,9 @@ export default function HomePage() {
         <OAuthCallbackHandler />
       </Suspense>
       <GlobalPopups />
-      <section className="max-w-[1200px] mx-auto px-2 sm:px-4 md:px-6 py-8 sm:py-10">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">동고리, 디자이너와 봉제공장을 잇다</h1>
-        <p className="mt-4 text-gray-700 leading-relaxed">
+      <section className="sr-only">
+        <h1>동고리, 디자이너와 봉제공장을 잇다</h1>
+        <p>
           동고리는 의류 제작 과정을 혁신적으로 단축시키는 봉제·생산 연결 플랫폼입니다. 디지털 작업지시서를 통해 의사소통 오류를 줄이고 생산 효율을 높입니다.
         </p>
       </section>
