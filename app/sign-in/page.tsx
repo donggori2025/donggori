@@ -18,17 +18,17 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
 
-  type OAuthStrategy = 'oauth_google' | 'oauth_facebook' | 'oauth_github' | 'oauth_twitter' | 'oauth_gitlab' | 'oauth_bitbucket' | 'oauth_linkedin' | 'oauth_apple' | 'oauth_discord' | 'oauth_twitch' | 'oauth_slack' | 'oauth_tiktok' | 'oauth_kakao' | 'oauth_naver' | 'oauth_line' | 'oauth_yahoo' | 'oauth_wechat' | 'oauth_weibo' | 'oauth_baidu' | 'oauth_gitee' | 'oauth_instagram' | 'oauth_salesforce' | 'oauth_spotify' | 'oauth_wordpress' | 'oauth_yandex' | 'oauth_zoom';
-
   // 소셜 로그인 핸들러
-  const handleSocial = async (provider: OAuthStrategy) => {
+  const handleSocial = async (provider: 'oauth_google' | 'oauth_kakao' | 'oauth_naver') => {
     setError("");
     if (!isLoaded) return;
     setLoading(true);
     try {
       console.log('OAuth 로그인 시작:', provider);
       await signIn.authenticateWithRedirect({
-        strategy: provider as unknown as Parameters<typeof signIn.authenticateWithRedirect>[0]['strategy'],
+        strategy: provider as any,
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/sso-callback',
       });
     } catch (err: unknown) {
       console.error('OAuth 로그인 오류:', err);
@@ -188,7 +188,7 @@ export default function SignInPage() {
             onClick={() => handleSocial("oauth_naver")}
             className="w-12 h-12 rounded-full flex items-center justify-center bg-[#03C75A] shadow-sm hover:shadow-md transition-shadow"
           >
-            <Image src="/naver_lastlast.svg" alt="네이버" width={32} height={32} />
+            <Image src="/Naver_final.svg" alt="네이버" width={32} height={32} />
           </button>
         </div>
       </form>
