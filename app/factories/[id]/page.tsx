@@ -588,8 +588,8 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           </div>
         </div>
 
-        {/* 오른쪽: 고정 사이드바 */}
-        <div className="w-full lg:w-80 flex-shrink-0 bg-white border border-gray-200 rounded-lg p-4 lg:p-6 mb-4 lg:mb-6 h-fit order-1 lg:order-2 lg:mt-4">
+        {/* 오른쪽: 고정 사이드바 (sticky) */}
+        <div className="w-full lg:w-80 flex-shrink-0 bg-white border border-gray-200 rounded-lg p-4 lg:p-6 mb-4 lg:mb-6 h-fit order-1 lg:order-2 lg:mt-4 lg:sticky lg:top-24 lg:self-start">
           {/* 상단 헤더 */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
