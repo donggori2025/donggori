@@ -76,3 +76,4 @@ clearUsedNames();
 console.log(`  초기화 후 사용된 이름 수: ${getUsedNames().length}`);
 
 console.log('\n✅ 테스트 완료!');
+

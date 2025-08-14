@@ -171,14 +171,22 @@ export default function SignUpPage() {
     if (!agreeTerms || !agreePrivacy) return setError("필수 약관에 동의해주세요.");
     setLoading(true);
     try {
-      if (!signUp || !signUp.createdSessionId) {
-        setError("");
-        setLoading(true);
-        setTimeout(() => window.location.replace("/"), 2500);
+      // 회원가입 완료 처리
+      if (signUp?.status === "complete") {
+        localStorage.setItem('userType', 'user');
+        window.location.href = '/';
         return;
       }
-      await setActive({ session: signUp.createdSessionId });
-      router.push("/");
+      
+      // 세션이 생성된 경우 활성화
+      if (signUp?.createdSessionId) {
+        await setActive({ session: signUp.createdSessionId });
+        localStorage.setItem('userType', 'user');
+        window.location.href = '/';
+        return;
+      }
+      
+      setError("회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
     } catch (err: unknown) {
       console.error('Clerk 오류:', err);
       setError(handleClerkError(err));
@@ -195,8 +203,8 @@ export default function SignUpPage() {
     try {
       await signUp.authenticateWithRedirect({
         strategy: provider as any,
-        redirectUrl: '/v1/oauth_callback',
-        redirectUrlComplete: '/',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/sso-callback',
       });
     } catch (err: unknown) {
       setError(handleClerkError(err));
@@ -220,7 +228,7 @@ export default function SignUpPage() {
         <h1 className="text-4xl font-extrabold tracking-tight mb-2">DONG<span className="text-black">GORI</span></h1>
         <div className="text-lg font-semibold text-gray-700 mb-1">봉제공장이 필요한 순간, 동고리</div>
         <div className="text-gray-500 text-sm">
-          아직 회원 아니신가요? <Link href="/sign-up" className="text-blue-500 font-semibold">회원가입</Link>
+          이미 계정이 있으신가요? <Link href="/sign-in" className="text-blue-500 font-semibold">로그인</Link>
         </div>
       </div>
       {/* 회원가입 폼 */}
@@ -401,7 +409,7 @@ export default function SignUpPage() {
             disabled={loading}
             className="w-12 h-12 rounded-full flex items-center justify-center bg-[#03C75A] shadow-sm hover:shadow-md transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/naver_lastlast.svg" alt="네이버" width={32} height={32} />}
+            {loading ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/Naver_final.svg" alt="네이버" width={32} height={32} />}
           </button>
         </div>
       </form>

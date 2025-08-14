@@ -39,6 +39,9 @@ function OAuthCallbackContent() {
           setStatus('success');
           setMessage('로그인이 완료되었습니다!');
           
+          // 사용자 타입 설정
+          localStorage.setItem('userType', 'user');
+          
           // 즉시 메인 페이지로 리다이렉트
           setTimeout(() => {
             window.location.href = '/';
@@ -59,6 +62,9 @@ function OAuthCallbackContent() {
               setStatus('success');
               setMessage('로그인이 완료되었습니다!');
               
+              // 사용자 타입 설정
+              localStorage.setItem('userType', 'user');
+              
               setTimeout(() => {
                 window.location.href = '/';
               }, 1000);
@@ -74,6 +80,9 @@ function OAuthCallbackContent() {
           if (isSignedIn && user) {
             setStatus('success');
             setMessage('로그인이 완료되었습니다!');
+            
+            // 사용자 타입 설정
+            localStorage.setItem('userType', 'user');
             
             setTimeout(() => {
               window.location.href = '/';

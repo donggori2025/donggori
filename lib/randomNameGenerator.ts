@@ -96,3 +96,4 @@ export function validateName(name: string): { isValid: boolean; error?: string }
   
   return { isValid: true };
 }
+

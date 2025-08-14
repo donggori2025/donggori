@@ -42,6 +42,9 @@ export default function SSOCallbackPage() {
           setStatus('success');
           setMessage('로그인이 완료되었습니다!');
           
+          // 사용자 타입 설정
+          localStorage.setItem('userType', 'user');
+          
           setTimeout(() => {
             window.location.href = '/';
           }, 1000);
@@ -59,6 +62,9 @@ export default function SSOCallbackPage() {
                 setStatus('success');
                 setMessage('로그인이 완료되었습니다!');
                 
+                // 사용자 타입 설정
+                localStorage.setItem('userType', 'user');
+                
                 setTimeout(() => {
                   window.location.href = '/';
                 }, 1000);
@@ -67,7 +73,7 @@ export default function SSOCallbackPage() {
                 setStatus('error');
                 setMessage('로그인 처리에 실패했습니다. 다시 시도해주세요.');
               }
-            }, 5000);
+            }, 3000);
           } else {
             console.log('OAuth 코드가 없고 로그인되지 않았습니다.');
             setStatus('error');
