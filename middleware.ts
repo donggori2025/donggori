@@ -13,7 +13,6 @@ export default function middleware(req: NextRequest, ev: NextFetchEvent) {
     const bypassPaths = [
       '/sign-in',
       '/sign-up',
-      '/sso-callback',
       '/v1/oauth_callback',
       '/admin/login',
       '/api/admin',
