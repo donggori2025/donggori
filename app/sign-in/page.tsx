@@ -17,12 +17,15 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
+  // 소셜 로그인 UX: 로딩 중임을 명확히 안내
+  const [socialLoading, setSocialLoading] = useState<null | 'google' | 'kakao' | 'naver'>(null);
 
   // 소셜 로그인 핸들러
   const handleSocial = async (provider: 'oauth_google' | 'oauth_kakao' | 'oauth_naver') => {
     setError("");
     if (!isLoaded) return;
     setLoading(true);
+    setSocialLoading(provider === 'oauth_google' ? 'google' : provider === 'oauth_kakao' ? 'kakao' : 'naver');
     try {
       console.log('OAuth 로그인 시작:', provider);
       await signIn.authenticateWithRedirect({
@@ -35,6 +38,7 @@ export default function SignInPage() {
       setError(handleClerkError(err));
     } finally {
       setLoading(false);
+      setSocialLoading(null);
     }
   };
 
@@ -173,24 +177,38 @@ export default function SignInPage() {
             type="button" 
             onClick={() => handleSocial("oauth_google")}
             className="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-sm hover:shadow-md transition-shadow"
+            aria-busy={socialLoading === 'google'}
+            disabled={!!socialLoading}
           >
-            <Image src="/google.svg" alt="구글" width={32} height={32} />
+            {socialLoading === 'google' ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/google.svg" alt="구글" width={32} height={32} />}
           </button>
           <button 
             type="button" 
             onClick={() => handleSocial("oauth_kakao")}
             className="w-12 h-12 rounded-full flex items-center justify-center bg-[#FEE500] shadow-sm hover:shadow-md transition-shadow"
+            aria-busy={socialLoading === 'kakao'}
+            disabled={!!socialLoading}
           >
-            <Image src="/kakao_lastlast.svg" alt="카카오" width={32} height={32} />
+            {socialLoading === 'kakao' ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/kakao_lastlast.svg" alt="카카오" width={32} height={32} />}
           </button>
           <button 
             type="button" 
             onClick={() => handleSocial("oauth_naver")}
             className="w-12 h-12 rounded-full flex items-center justify-center bg-[#03C75A] shadow-sm hover:shadow-md transition-shadow"
+            aria-busy={socialLoading === 'naver'}
+            disabled={!!socialLoading}
           >
-            <Image src="/Naver_final.svg" alt="네이버" width={32} height={32} />
+            {socialLoading === 'naver' ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/Naver_final.svg" alt="네이버" width={32} height={32} />}
           </button>
         </div>
+        {/* 소셜 리디렉션 안내 */}
+        {socialLoading && (
+          <div className="text-center text-sm text-gray-600 mt-3">
+            {socialLoading === 'google' && '구글로 이동 중입니다...'}
+            {socialLoading === 'kakao' && '카카오로 이동 중입니다...'}
+            {socialLoading === 'naver' && '네이버로 이동 중입니다...'}
+          </div>
+        )}
       </form>
     </div>
   );
