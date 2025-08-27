@@ -10,6 +10,8 @@ import { handleClerkError } from "@/lib/clerkErrorTranslator";
 
 export default function SignUpPage() {
   // 입력값 상태
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [emailVerified, setEmailVerified] = useState(false); // 이메일 인증 여부
   const [password, setPassword] = useState("");
@@ -70,6 +72,24 @@ export default function SignUpPage() {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  // 전화번호 형식 검증
+  const validatePhone = (phone: string) => {
+    const phoneRegex = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/;
+    return phoneRegex.test(phone);
+  };
+
+  // 전화번호 자동 포맷팅
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/[^0-9]/g, '');
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 7) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    } else {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+    }
+  };
 
   // 이메일 인증 요청
   const handleEmailVerify = async () => {
@@ -151,7 +171,13 @@ export default function SignUpPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    
+    // 입력값 검증
+    if (!name.trim()) return setError("이름을 입력해주세요.");
+    if (!phone) return setError("전화번호를 입력해주세요.");
+    if (!validatePhone(phone)) return setError("올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)");
     if (!email) return setError("이메일을 입력해주세요.");
+    
     const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
     const cleanEmail = normalizeInvisible(email).toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -169,11 +195,15 @@ export default function SignUpPage() {
     if (password.length < 6) return setError("비밀번호는 6자 이상이어야 합니다.");
     if (password !== passwordConfirm) return setError("비밀번호가 일치하지 않습니다.");
     if (!agreeTerms || !agreePrivacy) return setError("필수 약관에 동의해주세요.");
+    
     setLoading(true);
     try {
       // 회원가입 완료 처리
       if (signUp?.status === "complete") {
+        // 사용자 정보를 localStorage에 저장
         localStorage.setItem('userType', 'user');
+        localStorage.setItem('userName', name.trim());
+        localStorage.setItem('userPhone', phone);
         window.location.href = '/';
         return;
       }
@@ -181,7 +211,10 @@ export default function SignUpPage() {
       // 세션이 생성된 경우 활성화
       if (signUp?.createdSessionId) {
         await setActive({ session: signUp.createdSessionId });
+        // 사용자 정보를 localStorage에 저장
         localStorage.setItem('userType', 'user');
+        localStorage.setItem('userName', name.trim());
+        localStorage.setItem('userPhone', phone);
         window.location.href = '/';
         return;
       }
@@ -235,7 +268,30 @@ export default function SignUpPage() {
       <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-xl shadow p-8 flex flex-col gap-4">
         {/* Clerk Smart CAPTCHA 위젯 */}
         <div id="clerk-captcha" className="mb-2" />
-        <label className="text-sm font-semibold">이메일</label>
+        
+        {/* 이름 입력 */}
+        <label className="text-sm font-semibold">이름 <span className="text-red-500">*</span></label>
+        <input
+          type="text"
+          placeholder="이름을 입력해주세요."
+          value={name}
+          onChange={e => setName(e.target.value)}
+          required
+          className="border rounded px-3 py-2"
+        />
+        
+        {/* 전화번호 입력 */}
+        <label className="text-sm font-semibold">전화번호 <span className="text-red-500">*</span></label>
+        <input
+          type="tel"
+          placeholder="전화번호를 입력해주세요. (예: 010-1234-5678)"
+          value={phone}
+          onChange={e => setPhone(formatPhone(e.target.value))}
+          required
+          className="border rounded px-3 py-2"
+        />
+        
+        <label className="text-sm font-semibold">이메일 <span className="text-red-500">*</span></label>
         <div className="flex gap-2">
           <input
             type="email"
@@ -283,7 +339,7 @@ export default function SignUpPage() {
             )}
           </div>
         )}
-        <label className="text-sm font-semibold">비밀번호</label>
+        <label className="text-sm font-semibold">비밀번호 <span className="text-red-500">*</span></label>
         <input
           type="password"
           placeholder="비밀번호를 입력해주세요."
@@ -293,7 +349,7 @@ export default function SignUpPage() {
           className="border rounded px-3 py-2"
           disabled={!emailVerified}
         />
-        <label className="text-sm font-semibold">비밀번호 확인</label>
+        <label className="text-sm font-semibold">비밀번호 확인 <span className="text-red-500">*</span></label>
         <input
           type="password"
           placeholder="비밀번호를 다시 입력해주세요."
@@ -368,6 +424,9 @@ export default function SignUpPage() {
           className="w-full bg-black text-white py-3 rounded font-bold text-lg mt-2 hover:bg-gray-900 transition disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
           disabled={
             loading ||
+            !name.trim() ||
+            !phone ||
+            !validatePhone(phone) ||
             !email ||
             !emailVerified ||
             !password ||

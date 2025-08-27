@@ -58,23 +58,46 @@ export default function MyPage() {
   // 원본 데이터와 현재 데이터를 분리
   const [originalName, setOriginalName] = useState(user?.firstName || naverUser?.name || kakaoUser?.name || "김한재");
   const [originalEmail, setOriginalEmail] = useState(user?.emailAddresses?.[0]?.emailAddress || naverUser?.email || kakaoUser?.email || "hanjaekim99@gmail.com");
+  const [originalPhone, setOriginalPhone] = useState("");
   
   const [name, setName] = useState(originalName);
   const [email, setEmail] = useState(originalEmail);
+  const [phone, setPhone] = useState(originalPhone);
   const [nameError, setNameError] = useState<string>("");
   
   // 변경사항이 있는지 확인
-  const hasChanges = name !== originalName || email !== originalEmail;
+  const hasChanges = name !== originalName || email !== originalEmail || phone !== originalPhone;
+
+  // 전화번호 형식 검증
+  const validatePhone = (phone: string) => {
+    const phoneRegex = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/;
+    return phoneRegex.test(phone);
+  };
+
+  // 전화번호 자동 포맷팅
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/[^0-9]/g, '');
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 7) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    } else {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+    }
+  };
 
   // 원본 데이터가 변경되면 현재 데이터도 업데이트
   useEffect(() => {
     const currentName = user?.firstName || naverUser?.name || kakaoUser?.name || "김한재";
     const currentEmail = user?.emailAddresses?.[0]?.emailAddress || naverUser?.email || kakaoUser?.email || "hanjaekim99@gmail.com";
+    const currentPhone = localStorage.getItem('userPhone') || "";
     
     setOriginalName(currentName);
     setOriginalEmail(currentEmail);
+    setOriginalPhone(currentPhone);
     setName(currentName);
     setEmail(currentEmail);
+    setPhone(currentPhone);
   }, [user, naverUser, kakaoUser]);
 
   // 의뢰내역 상태
@@ -183,9 +206,15 @@ export default function MyPage() {
         console.log("업데이트된 카카오 사용자:", updatedKakaoUser);
       }
       
+      // 전화번호 저장
+      if (phone && validatePhone(phone)) {
+        localStorage.setItem('userPhone', phone);
+      }
+      
       // 원본 데이터 업데이트
       setOriginalName(name);
       setOriginalEmail(email);
+      setOriginalPhone(phone);
       
       alert("변경사항이 저장되었습니다.");
     } catch (error) {
@@ -195,6 +224,7 @@ export default function MyPage() {
       // 오류가 발생해도 로컬 상태는 업데이트
       setOriginalName(name);
       setOriginalEmail(email);
+      setOriginalPhone(phone);
       
       alert(`프로필 업데이트에 실패했습니다: ${errorMessage}\n\n로컬 상태는 업데이트되었습니다.`);
     }
@@ -586,6 +616,18 @@ export default function MyPage() {
                 />
               </div>
 
+                             {/* 전화번호 입력 필드 */}
+               <div className="mb-8">
+                 <label className="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
+                 <input
+                   type="text"
+                   value={phone}
+                   onChange={(e) => setPhone(formatPhone(e.target.value))}
+                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                   placeholder="전화번호를 입력해주세요 (예: 010-1234-5678)"
+                 />
+               </div>
+
               {/* 하단 버튼들 */}
               <div className="flex justify-between items-center">
                 <button
@@ -741,6 +783,18 @@ export default function MyPage() {
                 disabled
               />
             </div>
+
+                         {/* 전화번호 입력 필드 */}
+             <div className="mb-6">
+               <label className="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
+               <input
+                 type="text"
+                 value={phone}
+                 onChange={(e) => setPhone(formatPhone(e.target.value))}
+                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                 placeholder="전화번호를 입력해주세요 (예: 010-1234-5678)"
+               />
+             </div>
 
             {/* 하단 버튼들 */}
             <div className="flex justify-between items-center">
