@@ -41,9 +41,15 @@ const Footer = () => {
         <div className="text-xs text-gray-500 mb-1 text-center px-4">
           사단법인 동대문구의류봉제산업연합회
         </div>
-        {/* 저작권 문구 */}
-        <div className="text-xs text-gray-400 text-center">
-          ©2025 donggori. All rights reserved.
+        {/* 연락처 정보 */}
+        <div className="text-xs text-gray-500 text-center px-4 space-y-1">
+          <div>주소 : 서울특별시 동대문구 한빛로62, 7층패션봉제복합지원센터 (용두동)</div>
+          <div>사업자등록번호 : 511-82-07533</div>
+          <div>이메일 : donggori2020@gmail.com</div>
+        </div>
+        {/* 공동관리자 */}
+        <div className="text-xs text-gray-500 text-center px-4 mt-2">
+          공동관리자 : (사)DDM패션봉제산업연합회 | (사)동대문패션봉제발전산업협의회
         </div>
       </div>
       {/* 사이드 드로어 애니메이션 (Tailwind에 없으므로 직접 정의 필요) */}
