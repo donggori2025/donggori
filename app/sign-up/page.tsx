@@ -21,6 +21,7 @@ export default function SignUpPage() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [agreeMarketing, setAgreeMarketing] = useState(false);
+  const [agreeKakaoMessage, setAgreeKakaoMessage] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
@@ -34,12 +35,12 @@ export default function SignUpPage() {
 
   // 전체동의 <-> 개별동의 상태 동기화
   useEffect(() => {
-    if (agreeTerms && agreePrivacy && agreeMarketing) {
+    if (agreeTerms && agreePrivacy && agreeMarketing && agreeKakaoMessage) {
       setAgreeAll(true);
     } else {
       setAgreeAll(false);
     }
-  }, [agreeTerms, agreePrivacy, agreeMarketing]);
+  }, [agreeTerms, agreePrivacy, agreeMarketing, agreeKakaoMessage]);
 
   // 전체동의 클릭 시 모든 항목 동기화
   const handleAgreeAll = (checked: boolean) => {
@@ -47,6 +48,7 @@ export default function SignUpPage() {
     setAgreeTerms(checked);
     setAgreePrivacy(checked);
     setAgreeMarketing(checked);
+    setAgreeKakaoMessage(checked);
   };
 
   // 타이머 시작 함수
@@ -204,6 +206,7 @@ export default function SignUpPage() {
         localStorage.setItem('userType', 'user');
         localStorage.setItem('userName', name.trim());
         localStorage.setItem('userPhone', phone);
+        localStorage.setItem('kakaoMessageConsent', agreeKakaoMessage.toString());
         window.location.href = '/';
         return;
       }
@@ -215,6 +218,7 @@ export default function SignUpPage() {
         localStorage.setItem('userType', 'user');
         localStorage.setItem('userName', name.trim());
         localStorage.setItem('userPhone', phone);
+        localStorage.setItem('kakaoMessageConsent', agreeKakaoMessage.toString());
         window.location.href = '/';
         return;
       }
@@ -405,6 +409,16 @@ export default function SignUpPage() {
                 className="w-4 h-4"
               />
               <Link href="/terms/marketing" target="_blank" className="text-sm text-gray-700 underline hover:text-toss-blue">마케팅정보활용동의(선택)</Link>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={agreeKakaoMessage}
+                onChange={e => setAgreeKakaoMessage(e.target.checked)}
+                id="agree-kakao-message"
+                className="w-4 h-4"
+              />
+              <Link href="/terms/privacy" target="_blank" className="text-sm text-gray-700 underline hover:text-toss-blue">카카오톡 메시지 수신 동의(선택)</Link>
             </div>
           </div>
         </div>
