@@ -59,6 +59,7 @@ export default function MyPage() {
   const [originalName, setOriginalName] = useState(user?.firstName || naverUser?.name || kakaoUser?.name || "김한재");
   const [originalEmail, setOriginalEmail] = useState(user?.emailAddresses?.[0]?.emailAddress || naverUser?.email || kakaoUser?.email || "hanjaekim99@gmail.com");
   const [originalPhone, setOriginalPhone] = useState("");
+  const [kakaoMessageConsent, setKakaoMessageConsent] = useState(false);
   
   const [name, setName] = useState(originalName);
   const [email, setEmail] = useState(originalEmail);
@@ -66,7 +67,7 @@ export default function MyPage() {
   const [nameError, setNameError] = useState<string>("");
   
   // 변경사항이 있는지 확인
-  const hasChanges = name !== originalName || email !== originalEmail || phone !== originalPhone;
+  const hasChanges = name !== originalName || email !== originalEmail || phone !== originalPhone || kakaoMessageConsent !== (localStorage.getItem('kakaoMessageConsent') === 'true');
 
   // 전화번호 형식 검증
   const validatePhone = (phone: string) => {
@@ -91,10 +92,12 @@ export default function MyPage() {
     const currentName = user?.firstName || naverUser?.name || kakaoUser?.name || "김한재";
     const currentEmail = user?.emailAddresses?.[0]?.emailAddress || naverUser?.email || kakaoUser?.email || "hanjaekim99@gmail.com";
     const currentPhone = localStorage.getItem('userPhone') || "";
+    const currentKakaoConsent = localStorage.getItem('kakaoMessageConsent') === 'true';
     
     setOriginalName(currentName);
     setOriginalEmail(currentEmail);
     setOriginalPhone(currentPhone);
+    setKakaoMessageConsent(currentKakaoConsent);
     setName(currentName);
     setEmail(currentEmail);
     setPhone(currentPhone);
@@ -211,6 +214,9 @@ export default function MyPage() {
         localStorage.setItem('userPhone', phone);
       }
       
+      // 카카오톡 메시지 수신 동의 상태 저장
+      localStorage.setItem('kakaoMessageConsent', kakaoMessageConsent.toString());
+      
       // 원본 데이터 업데이트
       setOriginalName(name);
       setOriginalEmail(email);
@@ -234,6 +240,22 @@ export default function MyPage() {
     if (confirm("정말 탈퇴하시겠습니까?")) {
       // 실제로는 탈퇴 처리
       alert("탈퇴 처리가 완료되었습니다.");
+    }
+  };
+
+  const handleKakaoMessageConsentWithdrawal = () => {
+    if (confirm("카카오톡 메시지 수신 동의를 철회하시겠습니까?\n\n철회 시 즉시 카카오톡 메시지 발송이 중단됩니다.")) {
+      setKakaoMessageConsent(false);
+      localStorage.setItem('kakaoMessageConsent', 'false');
+      alert("카카오톡 메시지 수신 동의가 철회되었습니다.\n\n이메일(donggori2020@gmail.com)을 통한 수신 동의 철회 요청도 가능합니다.");
+    }
+  };
+
+  const handleKakaoMessageConsentRestore = () => {
+    if (confirm("카카오톡 메시지 수신 동의를 다시 설정하시겠습니까?")) {
+      setKakaoMessageConsent(true);
+      localStorage.setItem('kakaoMessageConsent', 'true');
+      alert("카카오톡 메시지 수신 동의가 설정되었습니다.");
     }
   };
 
@@ -628,6 +650,50 @@ export default function MyPage() {
                  />
                </div>
 
+              {/* 카카오톡 메시지 수신 동의 상태 */}
+              <div className="mb-8">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  카카오톡 메시지 수신 동의
+                </label>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-4 h-4 rounded-full ${kakaoMessageConsent ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                      <span className="text-sm font-medium">
+                        {kakaoMessageConsent ? '수신 동의' : '수신 거부'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {kakaoMessageConsent ? '활성화됨' : '비활성화됨'}
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-600 mb-3">
+                    • 서비스 안내 및 마케팅 정보를 카카오톡으로 받아보실 수 있습니다.
+                    <br />
+                    • 언제든지 수신 동의를 철회할 수 있습니다.
+                    <br />
+                    • 이메일(donggori2020@gmail.com)을 통한 수신 동의 철회 요청도 가능합니다.
+                  </div>
+                  <div className="flex gap-2">
+                    {kakaoMessageConsent ? (
+                      <button
+                        onClick={handleKakaoMessageConsentWithdrawal}
+                        className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        수신 동의 철회
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleKakaoMessageConsentRestore}
+                        className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        수신 동의 설정
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* 하단 버튼들 */}
               <div className="flex justify-between items-center">
                 <button
@@ -795,6 +861,50 @@ export default function MyPage() {
                  placeholder="전화번호를 입력해주세요 (예: 010-1234-5678)"
                />
              </div>
+
+            {/* 카카오톡 메시지 수신 동의 상태 */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                카카오톡 메시지 수신 동의
+              </label>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-4 h-4 rounded-full ${kakaoMessageConsent ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <span className="text-sm font-medium">
+                      {kakaoMessageConsent ? '수신 동의' : '수신 거부'}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {kakaoMessageConsent ? '활성화됨' : '비활성화됨'}
+                  </div>
+                </div>
+                <div className="text-xs text-gray-600 mb-3">
+                  • 서비스 안내 및 마케팅 정보를 카카오톡으로 받아보실 수 있습니다.
+                  <br />
+                  • 언제든지 수신 동의를 철회할 수 있습니다.
+                  <br />
+                  • 이메일(donggori2020@gmail.com)을 통한 수신 동의 철회 요청도 가능합니다.
+                </div>
+                <div className="flex gap-2">
+                  {kakaoMessageConsent ? (
+                    <button
+                      onClick={handleKakaoMessageConsentWithdrawal}
+                      className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      수신 동의 철회
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleKakaoMessageConsentRestore}
+                      className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      수신 동의 설정
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* 하단 버튼들 */}
             <div className="flex justify-between items-center">
