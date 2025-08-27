@@ -67,7 +67,7 @@ export default function MyPage() {
   const [nameError, setNameError] = useState<string>("");
   
   // 변경사항이 있는지 확인
-  const hasChanges = name !== originalName || email !== originalEmail || phone !== originalPhone || kakaoMessageConsent !== (localStorage.getItem('kakaoMessageConsent') === 'true');
+  const hasChanges = name !== originalName || email !== originalEmail || phone !== originalPhone || kakaoMessageConsent !== (typeof window !== 'undefined' ? localStorage.getItem('kakaoMessageConsent') === 'true' : false);
 
   // 전화번호 형식 검증
   const validatePhone = (phone: string) => {
@@ -89,18 +89,20 @@ export default function MyPage() {
 
   // 원본 데이터가 변경되면 현재 데이터도 업데이트
   useEffect(() => {
-    const currentName = user?.firstName || naverUser?.name || kakaoUser?.name || "김한재";
-    const currentEmail = user?.emailAddresses?.[0]?.emailAddress || naverUser?.email || kakaoUser?.email || "hanjaekim99@gmail.com";
-    const currentPhone = localStorage.getItem('userPhone') || "";
-    const currentKakaoConsent = localStorage.getItem('kakaoMessageConsent') === 'true';
-    
-    setOriginalName(currentName);
-    setOriginalEmail(currentEmail);
-    setOriginalPhone(currentPhone);
-    setKakaoMessageConsent(currentKakaoConsent);
-    setName(currentName);
-    setEmail(currentEmail);
-    setPhone(currentPhone);
+    if (typeof window !== 'undefined') {
+      const currentName = user?.firstName || naverUser?.name || kakaoUser?.name || "김한재";
+      const currentEmail = user?.emailAddresses?.[0]?.emailAddress || naverUser?.email || kakaoUser?.email || "hanjaekim99@gmail.com";
+      const currentPhone = localStorage.getItem('userPhone') || "";
+      const currentKakaoConsent = localStorage.getItem('kakaoMessageConsent') === 'true';
+      
+      setOriginalName(currentName);
+      setOriginalEmail(currentEmail);
+      setOriginalPhone(currentPhone);
+      setKakaoMessageConsent(currentKakaoConsent);
+      setName(currentName);
+      setEmail(currentEmail);
+      setPhone(currentPhone);
+    }
   }, [user, naverUser, kakaoUser]);
 
   // 의뢰내역 상태
@@ -210,12 +212,14 @@ export default function MyPage() {
       }
       
       // 전화번호 저장
-      if (phone && validatePhone(phone)) {
+      if (phone && validatePhone(phone) && typeof window !== 'undefined') {
         localStorage.setItem('userPhone', phone);
       }
       
       // 카카오톡 메시지 수신 동의 상태 저장
-      localStorage.setItem('kakaoMessageConsent', kakaoMessageConsent.toString());
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('kakaoMessageConsent', kakaoMessageConsent.toString());
+      }
       
       // 원본 데이터 업데이트
       setOriginalName(name);
@@ -246,7 +250,9 @@ export default function MyPage() {
   const handleKakaoMessageConsentWithdrawal = () => {
     if (confirm("카카오톡 메시지 수신 동의를 철회하시겠습니까?\n\n철회 시 즉시 카카오톡 메시지 발송이 중단됩니다.")) {
       setKakaoMessageConsent(false);
-      localStorage.setItem('kakaoMessageConsent', 'false');
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('kakaoMessageConsent', 'false');
+      }
       alert("카카오톡 메시지 수신 동의가 철회되었습니다.\n\n이메일(donggori2020@gmail.com)을 통한 수신 동의 철회 요청도 가능합니다.");
     }
   };
@@ -254,7 +260,9 @@ export default function MyPage() {
   const handleKakaoMessageConsentRestore = () => {
     if (confirm("카카오톡 메시지 수신 동의를 다시 설정하시겠습니까?")) {
       setKakaoMessageConsent(true);
-      localStorage.setItem('kakaoMessageConsent', 'true');
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('kakaoMessageConsent', 'true');
+      }
       alert("카카오톡 메시지 수신 동의가 설정되었습니다.");
     }
   };
