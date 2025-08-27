@@ -17,10 +17,47 @@ export default function MyPage() {
   const { signOut } = useClerk();
   const router = useRouter();
   const [selectedMenu, setSelectedMenu] = useState<SidebarMenu>("프로필");
+  const [naverUser, setNaverUser] = useState<any>(null);
+  const [kakaoUser, setKakaoUser] = useState<any>(null);
+  const [mounted, setMounted] = useState(false);
+  
+  // 네이버 사용자 정보 로드
+  useEffect(() => {
+    setMounted(true);
+    
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      return null;
+    };
+
+    const naverUserCookie = getCookie('naver_user');
+    if (naverUserCookie) {
+      try {
+        const userData = JSON.parse(decodeURIComponent(naverUserCookie));
+        setNaverUser(userData);
+        console.log('마이페이지에서 네이버 사용자 정보 로드:', userData);
+      } catch (error) {
+        console.error('네이버 사용자 정보 파싱 오류:', error);
+      }
+    }
+
+    const kakaoUserCookie = getCookie('kakao_user');
+    if (kakaoUserCookie) {
+      try {
+        const userData = JSON.parse(decodeURIComponent(kakaoUserCookie));
+        setKakaoUser(userData);
+        console.log('마이페이지에서 카카오 사용자 정보 로드:', userData);
+      } catch (error) {
+        console.error('카카오 사용자 정보 파싱 오류:', error);
+      }
+    }
+  }, []);
   
   // 원본 데이터와 현재 데이터를 분리
-  const [originalName, setOriginalName] = useState(user?.firstName || "김한재");
-  const [originalEmail, setOriginalEmail] = useState(user?.emailAddresses?.[0]?.emailAddress || "hanjaekim99@gmail.com");
+  const [originalName, setOriginalName] = useState(user?.firstName || naverUser?.name || kakaoUser?.name || "김한재");
+  const [originalEmail, setOriginalEmail] = useState(user?.emailAddresses?.[0]?.emailAddress || naverUser?.email || kakaoUser?.email || "hanjaekim99@gmail.com");
   
   const [name, setName] = useState(originalName);
   const [email, setEmail] = useState(originalEmail);
@@ -31,11 +68,14 @@ export default function MyPage() {
 
   // 원본 데이터가 변경되면 현재 데이터도 업데이트
   useEffect(() => {
-    setOriginalName(user?.firstName || "김한재");
-    setOriginalEmail(user?.emailAddresses?.[0]?.emailAddress || "hanjaekim99@gmail.com");
-    setName(user?.firstName || "김한재");
-    setEmail(user?.emailAddresses?.[0]?.emailAddress || "hanjaekim99@gmail.com");
-  }, [user]);
+    const currentName = user?.firstName || naverUser?.name || kakaoUser?.name || "김한재";
+    const currentEmail = user?.emailAddresses?.[0]?.emailAddress || naverUser?.email || kakaoUser?.email || "hanjaekim99@gmail.com";
+    
+    setOriginalName(currentName);
+    setOriginalEmail(currentEmail);
+    setName(currentName);
+    setEmail(currentEmail);
+  }, [user, naverUser, kakaoUser]);
 
   // 의뢰내역 상태
   const [myMatchRequests, setMyMatchRequests] = useState<MatchRequest[]>([]);
@@ -44,7 +84,7 @@ export default function MyPage() {
   const [debugInfo, setDebugInfo] = useState<string>("");
 
   useEffect(() => {
-    if (selectedMenu === "의뢰내역" && user) {
+    if (selectedMenu === "의뢰내역" && (user || naverUser || kakaoUser)) {
       setIsLoadingRequests(true);
       setRequestError(null);
       setDebugInfo("");
@@ -52,10 +92,11 @@ export default function MyPage() {
       (async () => {
         try {
           console.log("🔍 의뢰내역 로딩 시작...");
-          console.log("사용자 ID:", user.id);
+          const userId = user?.id || naverUser?.email || kakaoUser?.email;
+          console.log("사용자 ID:", userId);
           
           // 내부 API를 통해 조회 (서비스 키 사용, RLS 영향 없음)
-          const res = await fetch(`/api/match-requests?userId=${encodeURIComponent(user.id)}`);
+          const res = await fetch(`/api/match-requests?userId=${encodeURIComponent(userId)}`);
           if (!res.ok) {
             const err = await res.json().catch(() => ({}));
             console.error("의뢰내역 조회 오류(API):", err);
@@ -80,18 +121,22 @@ export default function MyPage() {
         }
       })();
     }
-  }, [selectedMenu, user]);
+  }, [selectedMenu, user, naverUser, kakaoUser]);
 
-  if (!user) {
+  if (!mounted) {
+    return <div className="max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center">로딩 중...</div>;
+  }
+
+  if (!user && !naverUser && !kakaoUser) {
     return <div className="max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center">로그인 후 이용 가능합니다.</div>;
   }
 
   const handleSaveChanges = async () => {
     try {
       console.log("업데이트 시작 - 현재 이름:", name);
-      console.log("현재 사용자 정보:", user);
+      console.log("현재 사용자 정보:", user || naverUser || kakaoUser);
       
-      if (!user) {
+      if (!user && !naverUser && !kakaoUser) {
         alert("사용자 정보를 찾을 수 없습니다.");
         return;
       }
@@ -105,12 +150,38 @@ export default function MyPage() {
       
       setNameError(""); // 오류 메시지 초기화
       
-      // Clerk를 사용하여 사용자 정보 업데이트
-      const updatedUser = await user.update({
-        firstName: name,
-      });
-      
-      console.log("업데이트된 사용자:", updatedUser);
+      if (user) {
+        // Clerk 사용자인 경우
+        const updatedUser = await user.update({
+          firstName: name,
+        });
+        
+        console.log("업데이트된 Clerk 사용자:", updatedUser);
+      } else if (naverUser) {
+        // 네이버 사용자인 경우 - 쿠키 업데이트
+        const updatedNaverUser = {
+          ...naverUser,
+          name: name,
+        };
+        
+        // 쿠키 업데이트
+        document.cookie = `naver_user=${JSON.stringify(updatedNaverUser)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+        setNaverUser(updatedNaverUser);
+        
+        console.log("업데이트된 네이버 사용자:", updatedNaverUser);
+      } else if (kakaoUser) {
+        // 카카오 사용자인 경우 - 쿠키 업데이트
+        const updatedKakaoUser = {
+          ...kakaoUser,
+          name: name,
+        };
+        
+        // 쿠키 업데이트
+        document.cookie = `kakao_user=${JSON.stringify(updatedKakaoUser)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+        setKakaoUser(updatedKakaoUser);
+        
+        console.log("업데이트된 카카오 사용자:", updatedKakaoUser);
+      }
       
       // 원본 데이터 업데이트
       setOriginalName(name);
@@ -138,7 +209,22 @@ export default function MyPage() {
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      if (user) {
+        // Clerk 사용자인 경우
+        await signOut();
+      } else if (naverUser) {
+        // 네이버 사용자인 경우 - 쿠키 삭제
+        document.cookie = "naver_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "userType=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "isLoggedIn=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        setNaverUser(null);
+      } else if (kakaoUser) {
+        // 카카오 사용자인 경우 - 쿠키 삭제
+        document.cookie = "kakao_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "userType=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "isLoggedIn=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        setKakaoUser(null);
+      }
       router.push("/");
     } catch (error) {
       console.error("로그아웃 중 오류가 발생했습니다:", error);
@@ -160,13 +246,26 @@ export default function MyPage() {
     try {
       console.log("이미지 업로드 시작:", file);
       
-      if (!user) {
+      if (!user && !naverUser) {
         alert("사용자 정보를 찾을 수 없습니다.");
         return;
       }
 
-      // Clerk를 사용하여 프로필 이미지 업데이트
-      await user.setProfileImage({ file });
+      if (user) {
+        // Clerk 사용자인 경우
+        await user.setProfileImage({ file });
+        console.log("Clerk 이미지 업로드 완료");
+      } else if (naverUser) {
+        // 네이버 사용자인 경우 - 임시로 알림만 표시
+        alert("네이버 계정의 프로필 이미지는 네이버에서 직접 변경해주세요.");
+        event.target.value = '';
+        return;
+      } else if (kakaoUser) {
+        // 카카오 사용자인 경우 - 임시로 알림만 표시
+        alert("카카오 계정의 프로필 이미지는 카카오에서 직접 변경해주세요.");
+        event.target.value = '';
+        return;
+      }
       
       console.log("이미지 업로드 완료");
       alert("프로필 이미지가 업데이트되었습니다.");
@@ -182,6 +281,7 @@ export default function MyPage() {
   };
 
   console.log("Clerk user 객체:", user);
+  console.log("네이버 user 객체:", naverUser);
 
   // 의뢰내역 카드에서 공장 정보 fetch 및 카드 스타일 적용
   function FactoryRequestCard({ req }: { req: MatchRequest }) {
@@ -408,7 +508,7 @@ export default function MyPage() {
               <div className="flex items-center gap-4 mb-8">
                 <div className="relative">
                   <Image
-                    src={user.imageUrl}
+                    src={user?.imageUrl || naverUser?.profileImage || "/logo_donggori.png"}
                     alt="프로필 이미지"
                     width={80}
                     height={80}
@@ -417,17 +517,27 @@ export default function MyPage() {
                 </div>
                 <div className="flex-1">
                   <div className="text-xl font-semibold mb-2">{originalName}</div>
+                  <div className="text-sm text-gray-600 mb-2">
+                    {naverUser ? "네이버 계정으로 로그인됨" : "일반 계정"}
+                  </div>
                   <div className="flex gap-4 text-sm">
-                    <button className="text-blue-600 hover:underline">사진 삭제</button>
-                    <label className="text-blue-600 hover:underline cursor-pointer">
-                      사진 업로드
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                    </label>
+                    {user && (
+                      <>
+                        <button className="text-blue-600 hover:underline">사진 삭제</button>
+                        <label className="text-blue-600 hover:underline cursor-pointer">
+                          사진 업로드
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                        </label>
+                      </>
+                    )}
+                    {naverUser && (
+                      <span className="text-gray-500 text-sm">네이버 프로필 이미지는 네이버에서 변경해주세요</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -550,27 +660,40 @@ export default function MyPage() {
             {/* 프로필 사진과 이름 */}
             <div className="flex items-center gap-4 mb-6">
               <div className="relative">
-                <Image
-                  src={user.imageUrl}
-                  alt="프로필 이미지"
-                  width={80}
-                  height={80}
-                  className="w-20 h-20 rounded-full object-cover border"
-                />
+                                  <Image
+                    src={user?.imageUrl || naverUser?.profileImage || kakaoUser?.profileImage || "/logo_donggori.png"}
+                    alt="프로필 이미지"
+                    width={80}
+                    height={80}
+                    className="w-20 h-20 rounded-full object-cover border"
+                  />
               </div>
               <div className="flex-1">
                 <div className="text-lg font-semibold mb-2">{originalName}</div>
+                                  <div className="text-sm text-gray-600 mb-2">
+                    {naverUser ? "네이버 계정으로 로그인됨" : kakaoUser ? "카카오 계정으로 로그인됨" : "일반 계정"}
+                  </div>
                 <div className="flex gap-4 text-sm">
-                  <button className="text-blue-600 hover:underline">사진 삭제</button>
-                  <label className="text-blue-600 hover:underline cursor-pointer">
-                    사진 업로드
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </label>
+                  {user && (
+                    <>
+                      <button className="text-blue-600 hover:underline">사진 삭제</button>
+                      <label className="text-blue-600 hover:underline cursor-pointer">
+                        사진 업로드
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    </>
+                  )}
+                  {naverUser && (
+                    <span className="text-gray-500 text-sm">네이버 프로필 이미지는 네이버에서 변경해주세요</span>
+                  )}
+                  {kakaoUser && (
+                    <span className="text-gray-500 text-sm">카카오 프로필 이미지는 카카오에서 변경해주세요</span>
+                  )}
                 </div>
               </div>
             </div>

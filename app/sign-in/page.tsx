@@ -26,7 +26,36 @@ export default function SignInPage() {
     if (!isLoaded) return;
     setLoading(true);
     setSocialLoading(provider === 'oauth_google' ? 'google' : provider === 'oauth_kakao' ? 'kakao' : 'naver');
+    
     try {
+      if (provider === 'oauth_naver') {
+        // 네이버 로그인은 직접 OAuth로 연결
+        const naverClientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
+        const currentPort = window.location.port || '3000';
+        const redirectUri = process.env.NEXT_PUBLIC_NAVER_REDIRECT_URI || `http://localhost:${currentPort}/api/auth/naver/callback`;
+        const state = Math.random().toString(36).substring(7);
+        
+        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=email,name,profile_image`;
+        
+        console.log('네이버 OAuth URL:', naverAuthUrl);
+        window.location.href = naverAuthUrl;
+        return;
+      }
+
+      if (provider === 'oauth_kakao') {
+        // 카카오 로그인은 직접 OAuth로 연결
+        const kakaoClientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
+        const currentPort = window.location.port || '3000';
+        const redirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || `http://localhost:${currentPort}/api/auth/kakao/callback`;
+        const state = Math.random().toString(36).substring(7);
+        
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+        
+        console.log('카카오 OAuth URL:', kakaoAuthUrl);
+        window.location.href = kakaoAuthUrl;
+        return;
+      }
+      
       console.log('OAuth 로그인 시작:', provider);
       await signIn.authenticateWithRedirect({
         strategy: provider as any,
@@ -194,11 +223,15 @@ export default function SignInPage() {
           <button 
             type="button" 
             onClick={() => handleSocial("oauth_naver")}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-[#03C75A] shadow-sm hover:shadow-md transition-shadow"
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-[#00C73C] shadow-sm hover:shadow-md transition-shadow"
             aria-busy={socialLoading === 'naver'}
             disabled={!!socialLoading}
           >
-            {socialLoading === 'naver' ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/Naver_final.svg" alt="네이버" width={32} height={32} />}
+            {socialLoading === 'naver' ? (
+              <Loader className="w-5 h-5 animate-spin text-white" />
+            ) : (
+              <Image src="/naver_icon.svg" alt="네이버" width={28} height={28} />
+            )}
           </button>
         </div>
         {/* 소셜 리디렉션 안내 */}

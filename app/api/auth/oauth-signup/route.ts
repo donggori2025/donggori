@@ -4,7 +4,7 @@ import { generateRandomName } from '@/lib/randomNameGenerator';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, name, picture, googleId } = await request.json();
+    const { email, name, picture, googleId, naverId, signupMethod } = await request.json();
 
     // 입력값 검증
     if (!email) {
@@ -30,8 +30,9 @@ export async function POST(request: NextRequest) {
         imageUrl: picture || undefined,
         publicMetadata: {
           googleId: googleId || null,
+          naverId: naverId || null,
           isOAuthUser: true,
-          signupMethod: 'google',
+          signupMethod: signupMethod || 'google',
         },
       });
 

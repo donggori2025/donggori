@@ -8,6 +8,7 @@ import NoticesSection from "@/components/NoticesSection";
 import GlobalPopups from "@/components/GlobalPopups";
 import OAuthCallbackHandler from "@/components/OAuthCallbackHandler";
 
+
 export const metadata: Metadata = {
   title: "동고리 - 의류 봉제·생산 연결 플랫폼",
   description:
@@ -21,6 +22,7 @@ export default function HomePage() {
       <Suspense fallback={null}>
         <OAuthCallbackHandler />
       </Suspense>
+
       <GlobalPopups />
       <section className="sr-only">
         <h1>동고리, 디자이너와 봉제공장을 잇다</h1>
