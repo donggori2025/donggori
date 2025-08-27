@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'm7fjtbfe2aen7kcw.public.blob.vercel-storage.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'phinf.pstatic.net',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],

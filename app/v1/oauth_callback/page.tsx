@@ -16,8 +16,19 @@ function OAuthCallbackContent() {
         // URL 파라미터 확인
         const code = searchParams.get('code');
         const error = searchParams.get('error');
+        const provider = searchParams.get('provider');
+        const email = searchParams.get('email');
+        const name = searchParams.get('name');
+        const profileImage = searchParams.get('profileImage');
+        const naverId = searchParams.get('naverId');
 
-        console.log('OAuth 콜백 파라미터:', { code: code ? '있음' : '없음', error });
+        console.log('OAuth 콜백 파라미터:', { 
+          code: code ? '있음' : '없음', 
+          error, 
+          provider, 
+          email, 
+          name 
+        });
         console.log('Clerk 상태:', { userLoaded, isSignedIn, user: user?.id });
 
         if (error) {
@@ -27,42 +38,102 @@ function OAuthCallbackContent() {
           return;
         }
 
-        // Clerk이 로드될 때까지 대기
+        // 네이버 OAuth 처리
+        if (provider === 'naver' && email && name) {
+          console.log('네이버 OAuth 처리 시작:', { email, name });
+          setStatus('loading');
+          setMessage('네이버 로그인 처리 중...');
+
+          try {
+            // Clerk OAuth 회원가입 API 호출
+            const signupResponse = await fetch('/api/auth/oauth-signup', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email,
+                name,
+                picture: profileImage,
+                naverId,
+                signupMethod: 'naver',
+              }),
+            });
+
+            const signupResult = await signupResponse.json();
+
+            if (signupResponse.ok) {
+              console.log('네이버 OAuth 회원가입 성공:', signupResult.user.id);
+              setStatus('success');
+              setMessage('네이버 로그인이 완료되었습니다!');
+              
+              // 사용자 타입 설정
+              localStorage.setItem('userType', 'user');
+              
+              // 즉시 메인 페이지로 리다이렉트
+              setTimeout(() => {
+                window.location.href = '/';
+              }, 1000);
+              return;
+            } else {
+              console.error('네이버 OAuth 회원가입 실패:', signupResult);
+              
+              // 이미 존재하는 사용자인 경우
+              if (signupResult.code === 'USER_EXISTS') {
+                setStatus('success');
+                setMessage('네이버 로그인이 완료되었습니다!');
+                
+                // 사용자 타입 설정
+                localStorage.setItem('userType', 'user');
+                
+                setTimeout(() => {
+                  window.location.href = '/';
+                }, 1000);
+                return;
+              }
+
+              setStatus('error');
+              setMessage(signupResult.error || '로그인 처리에 실패했습니다.');
+              return;
+            }
+          } catch (signupError) {
+            console.error('네이버 OAuth 회원가입 API 호출 오류:', signupError);
+            setStatus('error');
+            setMessage('로그인 서비스에 연결할 수 없습니다.');
+            return;
+          }
+        }
+
+        // 기존 Clerk OAuth 처리
         if (!userLoaded) {
           console.log('Clerk이 아직 로드되지 않았습니다. 대기 중...');
           return;
         }
 
-        // 이미 로그인된 상태인지 확인
         if (isSignedIn && user) {
           console.log('로그인된 상태입니다:', user.id);
           setStatus('success');
           setMessage('로그인이 완료되었습니다!');
           
-          // 사용자 타입 설정
           localStorage.setItem('userType', 'user');
           
-          // 즉시 메인 페이지로 리다이렉트
           setTimeout(() => {
             window.location.href = '/';
           }, 1000);
           return;
         }
 
-        // 인증 코드가 있으면 Clerk이 자동으로 처리할 것임
         if (code) {
           console.log('OAuth 코드가 있습니다. Clerk이 자동으로 처리합니다...');
           setStatus('loading');
           setMessage('로그인 처리 중...');
           
-          // Clerk이 자동으로 OAuth 콜백을 처리하도록 대기
           setTimeout(() => {
             if (isSignedIn && user) {
               console.log('Clerk이 OAuth 콜백을 처리했습니다:', user.id);
               setStatus('success');
               setMessage('로그인이 완료되었습니다!');
               
-              // 사용자 타입 설정
               localStorage.setItem('userType', 'user');
               
               setTimeout(() => {
@@ -75,13 +146,11 @@ function OAuthCallbackContent() {
             }
           }, 3000);
         } else {
-          // 인증 코드가 없으면 이미 처리되었거나 오류
           console.log('OAuth 코드가 없습니다.');
           if (isSignedIn && user) {
             setStatus('success');
             setMessage('로그인이 완료되었습니다!');
             
-            // 사용자 타입 설정
             localStorage.setItem('userType', 'user');
             
             setTimeout(() => {

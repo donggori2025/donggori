@@ -15,6 +15,8 @@ export default function Header() {
   const [userType, setUserType] = useState<string | null>(null);
   const [factoryAuth, setFactoryAuth] = useState<FactoryAuth | null>(null);
   const [factoryProfileImage, setFactoryProfileImage] = useState<string | null>(null);
+  const [naverUser, setNaverUser] = useState<any>(null);
+  const [kakaoUser, setKakaoUser] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
 
   // 네비게이션 메뉴 항목을 메모이제이션
@@ -59,6 +61,37 @@ export default function Header() {
               });
               setFactoryProfileImage(null);
             });
+        }
+      }
+
+      // 네이버 사용자 정보 로드
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        return null;
+      };
+
+      const naverUserCookie = getCookie('naver_user');
+      if (naverUserCookie) {
+        try {
+          const userData = JSON.parse(decodeURIComponent(naverUserCookie));
+          setNaverUser(userData);
+          console.log('네이버 사용자 정보 로드:', userData);
+        } catch (error) {
+          console.error('네이버 사용자 정보 파싱 오류:', error);
+        }
+      }
+
+      // 카카오 사용자 정보 로드
+      const kakaoUserCookie = getCookie('kakao_user');
+      if (kakaoUserCookie) {
+        try {
+          const userData = JSON.parse(decodeURIComponent(kakaoUserCookie));
+          setKakaoUser(userData);
+          console.log('카카오 사용자 정보 로드:', userData);
+        } catch (error) {
+          console.error('카카오 사용자 정보 파싱 오류:', error);
         }
       }
     } catch (error) {
@@ -173,7 +206,7 @@ export default function Header() {
 
           <div className="flex items-center gap-2">
             {/* 로그인 전: 로그인/회원가입 버튼 */}
-            {(!isLoaded || (!isSignedIn && !factoryAuth)) && (
+            {(!isLoaded || (!isSignedIn && !factoryAuth && !naverUser && !kakaoUser)) && (
               <button
                 className="text-sm lg:text-base font-medium text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors"
                 onClick={handleSignInClick}
@@ -182,12 +215,38 @@ export default function Header() {
               </button>
             )}
 
-            {/* 로그인 후: 프로필 이미지 */}
+            {/* Clerk 로그인 후: 프로필 이미지 */}
             {isSignedIn && user && (
               <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
                 <Image
                   src={user.imageUrl}
                   alt="프로필 이미지"
+                  width={40}
+                  height={40}
+                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
+                />
+              </Link>
+            )}
+
+            {/* 네이버 로그인 후: 네이버 프로필 이미지 */}
+            {naverUser && (
+              <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
+                <Image
+                  src={naverUser.profileImage || "/logo_donggori.png"}
+                  alt="네이버 프로필 이미지"
+                  width={40}
+                  height={40}
+                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
+                />
+              </Link>
+            )}
+
+            {/* 카카오 로그인 후: 카카오 프로필 이미지 */}
+            {kakaoUser && (
+              <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
+                <Image
+                  src={kakaoUser.profileImage || "/logo_donggori.png"}
+                  alt="카카오 프로필 이미지"
                   width={40}
                   height={40}
                   className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
@@ -274,7 +333,7 @@ export default function Header() {
 
                               {/* 로그인/회원가입 또는 프로필 이미지 */}
                 <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-gray-200">
-                  {(!isLoaded || (!isSignedIn && !factoryAuth)) && (
+                  {(!isLoaded || (!isSignedIn && !factoryAuth && !naverUser && !kakaoUser)) && (
                     <button
                       className="w-full py-3 px-4 rounded-lg bg-[#222222] hover:bg-[#444] text-white font-medium transition-colors"
                       onClick={handleSignInClick}
@@ -283,12 +342,40 @@ export default function Header() {
                     </button>
                   )}
 
-                  {/* 로그인 후: 프로필 이미지 */}
+                  {/* Clerk 로그인 후: 프로필 이미지 */}
                   {isSignedIn && user && (
                     <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
                       <Image
                         src={user.imageUrl}
                         alt="프로필 이미지"
+                        width={40}
+                        height={40}
+                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                      />
+                      <span className="font-medium">마이페이지</span>
+                    </Link>
+                  )}
+
+                  {/* 네이버 로그인 후 모바일 메뉴 */}
+                  {naverUser && (
+                    <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
+                      <Image
+                        src={naverUser.profileImage || "/logo_donggori.png"}
+                        alt="네이버 프로필 이미지"
+                        width={40}
+                        height={40}
+                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                      />
+                      <span className="font-medium">마이페이지</span>
+                    </Link>
+                  )}
+
+                  {/* 카카오 로그인 후 모바일 메뉴 */}
+                  {kakaoUser && (
+                    <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
+                      <Image
+                        src={kakaoUser.profileImage || "/logo_donggori.png"}
+                        alt="카카오 프로필 이미지"
                         width={40}
                         height={40}
                         className="w-8 h-8 rounded-full object-cover border border-gray-200"
