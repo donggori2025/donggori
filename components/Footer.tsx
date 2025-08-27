@@ -39,7 +39,7 @@ const Footer = () => {
         </nav>
         {/* 협회 정보 */}
         <div className="text-xs text-gray-500 mb-1 text-center px-4">
-          (사)동대문구의류봉제산업연합회
+          사단법인 동대문구의류봉제산업연합회
         </div>
         {/* 저작권 문구 */}
         <div className="text-xs text-gray-400 text-center">
