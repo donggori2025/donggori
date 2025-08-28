@@ -18,6 +18,7 @@ export default function SimpleNaverMap({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorDetails, setErrorDetails] = useState<string>('');
+  const [mapInstance, setMapInstance] = useState<any>(null);
 
   useEffect(() => {
     const loadNaverMap = () => {
@@ -28,6 +29,8 @@ export default function SimpleNaverMap({
       console.log('- Client ID 길이:', clientId.length);
       console.log('- 현재 도메인:', typeof window !== 'undefined' ? window.location.hostname : '서버사이드');
       console.log('- 현재 URL:', typeof window !== 'undefined' ? window.location.href : '서버사이드');
+      console.log('- 환경:', process.env.NODE_ENV);
+      console.log('- Vercel URL:', process.env.VERCEL_URL);
       
       // 환경 변수 체크
       if (!clientId || clientId === 'your-naver-map-client-id') {
@@ -89,6 +92,17 @@ export default function SimpleNaverMap({
         console.error('- 프로토콜:', window.location.protocol);
         console.error('- User Agent:', navigator.userAgent);
         
+        // 배포 환경에서 도메인 설정 가이드 제공
+        if (window.location.hostname !== 'localhost') {
+          console.error('🌐 배포 환경 도메인 설정 가이드:');
+          console.error('1. 네이버 클라우드 플랫폼 접속: https://www.ncloud.com/');
+          console.error('2. AI·NAVER API → Maps 선택');
+          console.error('3. Application 등록 확인');
+          console.error('4. Web Service URL에 다음 도메인 추가:');
+          console.error(`   - ${window.location.origin}`);
+          console.error('5. 환경 변수 확인: NEXT_PUBLIC_NAVER_MAP_CLIENT_ID');
+        }
+        
         setErrorDetails('네이버맵 스크립트를 로드할 수 없습니다. 클라이언트 ID와 도메인 설정을 확인해주세요.');
         setHasError(true);
       };
@@ -100,90 +114,91 @@ export default function SimpleNaverMap({
   }, []);
 
   useEffect(() => {
-    if (!isLoaded || !mapRef.current) return;
-
-    console.log('🗺️ 지도 생성 시작...');
-    console.log('- isLoaded:', isLoaded);
-    console.log('- mapRef.current:', !!mapRef.current);
-    console.log('- center:', center);
-    console.log('- level:', level);
+    if (!isLoaded || !mapRef.current || !window.naver?.maps) {
+      return;
+    }
 
     try {
-      if (!window.naver || !window.naver.maps) {
-        console.error('❌ 네이버맵 API가 완전히 로드되지 않았습니다');
-        console.error('window.naver:', window.naver);
-        return;
-      }
+      console.log('🗺️ 네이버맵 초기화 시작...');
+      console.log('- 중심점:', center);
+      console.log('- 줌 레벨:', level);
+      console.log('- 맵 컨테이너:', mapRef.current);
 
-      console.log('✅ 네이버맵 API 확인됨');
-      const container = mapRef.current;
-      console.log('✅ 컨테이너 요소 확인됨:', container);
-      
-      const mapOptions = {
+      const map = new window.naver.maps.Map(mapRef.current, {
         center: new window.naver.maps.LatLng(center.lat, center.lng),
         zoom: level,
         mapTypeControl: true,
         mapTypeControlOptions: {
-          style: window.naver.maps.MapTypeControlStyle.DROPDOWN,
-          position: window.naver.maps.Position.TOP_RIGHT
+          style: window.naver.maps.MapTypeControlStyle.DROPDOWN
         },
         zoomControl: true,
         zoomControlOptions: {
           style: window.naver.maps.ZoomControlStyle.SMALL,
           position: window.naver.maps.Position.TOP_RIGHT
-        },
-        clickableIcons: false
-      };
-
-      console.log('🗺️ 지도 옵션:', mapOptions);
-      const naverMap = new window.naver.maps.Map(container, mapOptions);
-      console.log('✅ 네이버맵 인스턴스 생성 성공:', naverMap);
-      
-      // 지도 클릭 시 줌 레벨 8로 설정 (마커가 아닌 지도 영역 클릭 시에만)
-      window.naver.maps.Event.addListener(naverMap, 'click', (e: { overlay?: any }) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-        // 마커를 클릭한 것이 아닌 지도 영역을 클릭한 경우에만 줌 레벨 변경
-        if (!e.overlay) {
-          naverMap.setZoom(8);
         }
       });
+
+      console.log('✅ 네이버맵 초기화 성공!');
+      setMapInstance(map);
+      setHasError(false);
+
+      // 마커 추가
+      const marker = new window.naver.maps.Marker({
+        position: new window.naver.maps.LatLng(center.lat, center.lng),
+        map: map
+      });
+
+      console.log('📍 마커 추가 완료');
+
     } catch (error) {
-      console.error('❌ 네이버지도 생성에 실패했습니다:', error);
-      setErrorDetails('지도를 생성하는 중 오류가 발생했습니다.');
+      console.error('❌ 네이버맵 초기화 실패:', error);
+      setErrorDetails(`네이버맵 초기화 중 오류가 발생했습니다: ${error}`);
       setHasError(true);
     }
-  }, [isLoaded, center, level]);
+  }, [isLoaded, center.lat, center.lng, level]);
 
+  // 로딩 중 표시
+  if (!isLoaded && !hasError) {
+    return (
+      <div className={`${className} flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">네이버맵 로딩 중...</p>
+          <p className="text-sm text-gray-500 mt-2">잠시만 기다려주세요</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 오류 표시
   if (hasError) {
     return (
-      <div className={`${className} flex items-center justify-center bg-gray-100 border border-gray-300 rounded-lg`}>
-        <div className="text-center p-8 max-w-md">
-          <div className="text-red-500 text-lg font-semibold mb-3">
-            🗺️ 지도를 불러올 수 없습니다
-          </div>
-          <div className="text-gray-600 text-sm mb-4">
-            {errorDetails}
-          </div>
+      <div className={`${className} flex items-center justify-center bg-red-50 border-2 border-dashed border-red-300`}>
+        <div className="text-center p-4">
+          <div className="text-red-600 text-2xl mb-2">⚠️</div>
+          <h3 className="text-red-800 font-semibold mb-2">네이버맵 로드 실패</h3>
+          <p className="text-red-600 text-sm mb-4">{errorDetails}</p>
           
-          {/* 해결 방법 안내 */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
-            <h4 className="font-semibold text-blue-800 mb-2">🔧 해결 방법:</h4>
-            <ol className="text-xs text-blue-700 space-y-1 list-decimal list-inside">
-              <li>네이버 클라우드 플랫폼에서 Maps API 신청</li>
-              <li>새로운 Client ID 발급</li>
-              <li>웹 서비스 URL에 <code className="bg-blue-100 px-1 rounded">http://localhost:3000</code> 등록</li>
-              <li>.env.local 파일에 Client ID 설정</li>
-            </ol>
-            <div className="mt-3">
-              <a 
-                href="https://www.ncloud.com/product/applicationService/maps" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-xs"
-              >
-                📖 네이버 클라우드 플랫폼 바로가기
-              </a>
+          {/* 배포 환경에서 도메인 설정 안내 */}
+          {typeof window !== 'undefined' && window.location.hostname !== 'localhost' && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-left">
+              <h4 className="text-blue-800 font-semibold mb-2">🔧 해결 방법:</h4>
+              <ol className="text-blue-700 text-sm space-y-1">
+                <li>1. <a href="https://www.ncloud.com/" target="_blank" rel="noopener noreferrer" className="underline">네이버 클라우드 플랫폼</a> 접속</li>
+                <li>2. AI·NAVER API → Maps 선택</li>
+                <li>3. Application 등록 확인</li>
+                <li>4. Web Service URL에 <code className="bg-blue-100 px-1 rounded">{window.location.origin}</code> 추가</li>
+                <li>5. 환경 변수 <code className="bg-blue-100 px-1 rounded">NEXT_PUBLIC_NAVER_MAP_CLIENT_ID</code> 확인</li>
+              </ol>
             </div>
-          </div>
+          )}
+          
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            새로고침
+          </button>
         </div>
       </div>
     );
@@ -193,17 +208,9 @@ export default function SimpleNaverMap({
     <div className={className}>
       <div 
         ref={mapRef} 
-        className="w-full h-full rounded-lg overflow-hidden bg-gray-100"
-        style={{ minHeight: '400px' }}
+        className="w-full h-full rounded-lg shadow-lg"
+        style={{ minHeight: '300px' }}
       />
-      {!isLoaded && !hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            <p className="text-gray-600 text-sm">네이버맵 로딩 중...</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 
