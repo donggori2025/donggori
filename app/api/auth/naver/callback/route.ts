@@ -82,6 +82,13 @@ export async function GET(request: NextRequest) {
     const name = naverUser.name || naverUser.nickname || generateRandomName();
     const profileImage = naverUser.profile_image;
 
+    console.log('네이버 사용자 정보 추출:', {
+      email,
+      name,
+      profileImage,
+      naverId: naverUser.id
+    });
+
     if (!email) {
       console.error('네이버 사용자 이메일이 없습니다.');
       return NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
