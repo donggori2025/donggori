@@ -11,14 +11,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 사용자 인증을 위한 모델
+// 통합 사용자 관리 모델
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  phone         String?  // 전화번호 (카카오 로그인 시 자동 입력)
+  profileImage  String?  // 프로필 이미지 URL
+  loginMethod   String   // 'google', 'naver', 'kakao', 'email'
+  externalId    String?  // 소셜 로그인 외부 ID (Google ID, Naver ID, Kakao ID)
+  kakaoMessageConsent Boolean @default(false) // 카카오톡 메시지 수신 동의
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // 관계 설정
+  matchRequests MatchRequest[]
+  
+  @@map("users")
 }
 
 // 봉제공장 인증을 위한 모델
@@ -29,4 +38,29 @@ model FactoryAuth {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// 매칭 요청 모델 (기존 match_requests 테이블과 연동)
+model MatchRequest {
+  id            String   @id @default(cuid())
+  userId        String
+  userEmail     String
+  userName      String
+  factoryId     String
+  factoryName   String
+  status        String   @default("pending") // 'pending', 'accepted', 'rejected', 'completed'
+  items         String[] @default([])
+  quantity      Int      @default(0)
+  description   String
+  contact       String
+  deadline      String?
+  budget        String?
+  additionalInfo String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // 관계 설정
+  user          User     @relation(fields: [userId], references: [id])
+  
+  @@map("match_requests")
 } 
