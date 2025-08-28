@@ -31,7 +31,7 @@ console.log('   - Redirect URLs에 다음이 포함되어 있는지 확인:');
 console.log('     ✅ https://clerk.donggori.com/v1/oauth_callback');
 console.log('     ✅ https://donggori.clerk.accounts.dev/v1/oauth_callback');
 console.log('     ✅ http://localhost:3000/v1/oauth_callback');
-console.log('     ✅ http://localhost:3001/v1/oauth_callback');
+console.log('     ✅ http://localhost:3000/v1/oauth_callback');
 
 console.log('\n🔧 문제 해결 방법:');
 
@@ -46,7 +46,7 @@ console.log('2. 승인된 리디렉션 URI에 다음이 모두 포함되어 있�
 console.log('   - https://clerk.donggori.com/v1/oauth_callback');
 console.log('   - https://donggori.clerk.accounts.dev/v1/oauth_callback');
 console.log('   - http://localhost:3000/v1/oauth_callback');
-console.log('   - http://localhost:3001/v1/oauth_callback');
+console.log('   - http://localhost:3000/v1/oauth_callback');
 
 console.log('\n방법 3: 개발 서버 재시작');
 console.log('1. 개발 서버 중지: Ctrl+C');
@@ -54,7 +54,7 @@ console.log('2. 개발 서버 재시작: bun run dev');
 console.log('3. 브라우저 캐시 삭제');
 
 console.log('\n방법 4: 간단한 테스트');
-console.log('1. 브라우저에서 http://localhost:3001 접속');
+console.log('1. 브라우저에서 http://localhost:3000 접속');
 console.log('2. 로그인 버튼 클릭');
 console.log('3. Google 로그인 선택');
 console.log('4. 개발자 도구 > Console 탭에서 오류 메시지 확인');

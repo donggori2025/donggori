@@ -21,7 +21,7 @@ console.log(`   프로필 사진: ${testUserData.picture}`);
 console.log(`   Google ID: ${testUserData.googleId}`);
 
 console.log('\n🔗 테스트 방법:');
-console.log('1. 브라우저에서 http://localhost:3001 접속');
+console.log('1. 브라우저에서 http://localhost:3000 접속');
 console.log('2. 로그인 버튼 클릭');
 console.log('3. Google 로그인 선택');
 console.log('4. 계정 선택 후 OAuth 동의');
