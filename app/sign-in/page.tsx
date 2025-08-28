@@ -31,6 +31,11 @@ export default function SignInPage() {
     try {
       if (provider === 'oauth_naver') {
         // 네이버 로그인은 직접 OAuth로 연결
+        if (!config.oauth.naver.clientId) {
+          setError('네이버 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+          return;
+        }
+        
         const state = Math.random().toString(36).substring(7);
         
         const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${config.oauth.naver.clientId}&redirect_uri=${encodeURIComponent(config.oauth.naver.redirectUri)}&state=${state}&scope=email,name,profile_image`;
@@ -42,6 +47,11 @@ export default function SignInPage() {
 
       if (provider === 'oauth_kakao') {
         // 카카오 로그인은 직접 OAuth로 연결
+        if (!config.oauth.kakao.clientId) {
+          setError('카카오 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+          return;
+        }
+        
         const state = Math.random().toString(36).substring(7);
         
         const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${config.oauth.kakao.clientId}&redirect_uri=${encodeURIComponent(config.oauth.kakao.redirectUri)}&state=${state}`;

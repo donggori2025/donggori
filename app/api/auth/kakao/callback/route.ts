@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         hasClientId: !!kakaoClientId,
         hasClientSecret: !!kakaoClientSecret,
       });
-      return NextResponse.redirect(new URL('/sign-in?error=oauth_config_missing', request.url));
+      return NextResponse.redirect(new URL('/sign-in?error=oauth_config_missing&provider=kakao', request.url));
     }
 
     // 카카오 OAuth 토큰 교환

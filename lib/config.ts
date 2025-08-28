@@ -2,15 +2,15 @@
 export const config = {
   // Supabase 설정
   supabase: {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   },
 
   // Clerk 설정
   clerk: {
-    publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!,
-    secretKey: process.env.CLERK_SECRET_KEY!,
+    publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
+    secretKey: process.env.CLERK_SECRET_KEY || '',
     frontendApi: process.env.NEXT_PUBLIC_CLERK_FRONTEND_API,
   },
 
@@ -19,7 +19,7 @@ export const config = {
 
   // Vercel Blob 설정
   vercelBlob: {
-    token: process.env.BLOB_READ_WRITE_TOKEN!,
+    token: process.env.BLOB_READ_WRITE_TOKEN || '',
   },
 
   // AWS S3 설정
@@ -37,24 +37,24 @@ export const config = {
 
   // 네이버맵 설정
   naverMap: {
-    clientId: process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID!,
+    clientId: process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || '',
   },
 
   // OAuth 설정
   oauth: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      redirectUri: process.env.GOOGLE_REDIRECT_URI!,
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      redirectUri: process.env.GOOGLE_REDIRECT_URI || '',
     },
     naver: {
-      clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID!,
-      clientSecret: process.env.NAVER_CLIENT_SECRET!,
+      clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || '',
+      clientSecret: process.env.NAVER_CLIENT_SECRET || '',
       redirectUri: getRedirectUri('naver'),
     },
     kakao: {
-      clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID!,
-      clientSecret: process.env.KAKAO_CLIENT_SECRET!,
+      clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '',
+      clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
       redirectUri: getRedirectUri('kakao'),
     },
   },
@@ -77,8 +77,13 @@ function getRedirectUri(provider: 'naver' | 'kakao'): string {
   return `${baseUrl}/api/auth/${provider}/callback`;
 }
 
-// 환경 변수 검증
+// 환경 변수 검증 (빌드 시에는 실행하지 않음)
 export function validateConfig() {
+  // 빌드 시에는 검증하지 않음
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL_URL) {
+    return true;
+  }
+
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
@@ -96,7 +101,8 @@ export function validateConfig() {
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
   if (missingVars.length > 0) {
-    console.error('❌ 누락된 환경 변수:', missingVars);
+    console.warn('⚠️ 누락된 환경 변수:', missingVars);
+    console.warn('⚠️ 일부 기능이 제한될 수 있습니다.');
     return false;
   }
 
