@@ -3,13 +3,15 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSignUp } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Loader } from "lucide-react";
 import { clerkConfig } from "@/lib/clerkConfig";
 import { handleClerkError } from "@/lib/clerkErrorTranslator";
-import { config } from "@/lib/config"; // Added import for config
 
 export default function SignUpPage() {
+  const searchParams = useSearchParams();
+  const provider = searchParams.get('provider');
+  
   // 입력값 상태
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -33,6 +35,31 @@ export default function SignUpPage() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { signUp, setActive } = useSignUp();
   const router = useRouter();
+
+  // OAuth 사용자 정보 로드
+  useEffect(() => {
+    if (provider === 'kakao' || provider === 'naver') {
+      const tempUserKey = provider === 'kakao' ? 'temp_kakao_user' : 'temp_naver_user';
+      const tempUserStr = document.cookie
+        .split('; ')
+        .find(row => row.startsWith(tempUserKey + '='))
+        ?.split('=')[1];
+      
+      if (tempUserStr) {
+        try {
+          const tempUser = JSON.parse(decodeURIComponent(tempUserStr));
+          setName(tempUser.name || "");
+          setEmail(tempUser.email || "");
+          // OAuth 사용자는 이메일 인증을 건너뛰고 비밀번호 입력을 숨김
+          setEmailVerified(true);
+          setPassword("OAuthUserPassword123!"); // 임시 비밀번호
+          setPasswordConfirm("OAuthUserPassword123!");
+        } catch (error) {
+          console.error('OAuth 사용자 정보 파싱 오류:', error);
+        }
+      }
+    }
+  }, [provider]);
 
   // 전체동의 <-> 개별동의 상태 동기화
   useEffect(() => {
@@ -194,13 +221,51 @@ export default function SignUpPage() {
     // }
     
     if (!emailVerified) return setError("이메일 인증을 완료해주세요.");
-    if (!password) return setError("비밀번호를 입력해주세요.");
-    if (password.length < 6) return setError("비밀번호는 6자 이상이어야 합니다.");
-    if (password !== passwordConfirm) return setError("비밀번호가 일치하지 않습니다.");
     if (!agreeTerms || !agreePrivacy) return setError("필수 약관에 동의해주세요.");
     
     setLoading(true);
     try {
+      // OAuth 사용자인 경우
+      if (provider === 'kakao' || provider === 'naver') {
+        const tempUserKey = provider === 'kakao' ? 'temp_kakao_user' : 'temp_naver_user';
+        const tempUserStr = document.cookie
+          .split('; ')
+          .find(row => row.startsWith(tempUserKey + '='))
+          ?.split('=')[1];
+        
+        if (tempUserStr) {
+          const tempUser = JSON.parse(decodeURIComponent(tempUserStr));
+          
+          // OAuth 사용자 정보를 쿠키에 저장
+          const userData = {
+            ...tempUser,
+            phoneNumber: phone, // 사용자가 입력한 전화번호 추가
+          };
+          
+          const finalUserKey = provider === 'kakao' ? 'kakao_user' : 'naver_user';
+          document.cookie = `${finalUserKey}=${JSON.stringify(userData)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+          document.cookie = `userType=user; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+          document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+          
+          // 임시 쿠키 삭제
+          document.cookie = `${tempUserKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+          
+          // 사용자 정보를 localStorage에 저장
+          localStorage.setItem('userType', 'user');
+          localStorage.setItem('userName', name.trim());
+          localStorage.setItem('userPhone', phone);
+          localStorage.setItem('kakaoMessageConsent', agreeKakaoMessage.toString());
+          
+          window.location.href = '/';
+          return;
+        }
+      }
+      
+      // 일반 회원가입 (Clerk 사용)
+      if (!password) return setError("비밀번호를 입력해주세요.");
+      if (password.length < 6) return setError("비밀번호는 6자 이상이어야 합니다.");
+      if (password !== passwordConfirm) return setError("비밀번호가 일치하지 않습니다.");
+      
       // 회원가입 완료 처리
       if (signUp?.status === "complete") {
         // 사용자 정보를 localStorage에 저장
@@ -239,77 +304,6 @@ export default function SignUpPage() {
     if (!signUp) return;
     setLoading(true);
     try {
-      if (provider === 'oauth_naver') {
-        // 네이버 로그인은 직접 OAuth로 연결
-        if (!config.oauth.naver.clientId) {
-          setError('네이버 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
-          console.error('네이버 클라이언트 ID 없음:', config.oauth.naver.clientId);
-          return;
-        }
-        
-        const state = Math.random().toString(36).substring(7);
-        const redirectUri = config.oauth.naver.redirectUri;
-        
-        if (!redirectUri) {
-          setError('네이버 리다이렉트 URI가 설정되지 않았습니다.');
-          console.error('네이버 리다이렉트 URI 없음:', redirectUri);
-          return;
-        }
-        
-        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${config.oauth.naver.clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=email,name,profile_image`;
-        
-        console.log('네이버 OAuth URL:', naverAuthUrl);
-        console.log('네이버 설정:', {
-          clientId: config.oauth.naver.clientId,
-          redirectUri: redirectUri,
-          state: state
-        });
-        
-        window.location.href = naverAuthUrl;
-        return;
-      }
-
-      if (provider === 'oauth_kakao') {
-        // 카카오 로그인은 직접 OAuth로 연결
-        if (!config.oauth.kakao.clientId) {
-          setError('카카오 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
-          console.error('카카오 클라이언트 ID 없음:', config.oauth.kakao.clientId);
-          return;
-        }
-        
-        const state = Math.random().toString(36).substring(7);
-        const redirectUri = config.oauth.kakao.redirectUri;
-        
-        if (!redirectUri) {
-          setError('카카오 리다이렉트 URI가 설정되지 않았습니다.');
-          console.error('카카오 리다이렉트 URI 없음:', redirectUri);
-          return;
-        }
-        
-        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${config.oauth.kakao.clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
-        
-        console.log('카카오 OAuth URL:', kakaoAuthUrl);
-        console.log('카카오 설정:', {
-          clientId: config.oauth.kakao.clientId,
-          redirectUri: redirectUri,
-          state: state
-        });
-        
-        window.location.href = kakaoAuthUrl;
-        return;
-      }
-
-      if (provider === 'oauth_google') {
-        // 구글 로그인은 Clerk를 통해 처리
-        console.log('구글 OAuth 회원가입 시작');
-        await signUp.authenticateWithRedirect({
-          strategy: 'oauth_google',
-          redirectUrl: '/sso-callback',
-          redirectUrlComplete: '/sso-callback',
-        });
-        return;
-      }
-      
       await signUp.authenticateWithRedirect({
         strategy: provider as any,
         redirectUrl: '/sso-callback',
@@ -415,26 +409,33 @@ export default function SignUpPage() {
             )}
           </div>
         )}
-        <label className="text-sm font-semibold">비밀번호 <span className="text-red-500">*</span></label>
-        <input
-          type="password"
-          placeholder="비밀번호를 입력해주세요."
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-          className="border rounded px-3 py-2"
-          disabled={!emailVerified}
-        />
-        <label className="text-sm font-semibold">비밀번호 확인 <span className="text-red-500">*</span></label>
-        <input
-          type="password"
-          placeholder="비밀번호를 다시 입력해주세요."
-          value={passwordConfirm}
-          onChange={e => setPasswordConfirm(e.target.value)}
-          required
-          className="border rounded px-3 py-2"
-          disabled={!emailVerified}
-        />
+        
+        {/* OAuth 사용자가 아닌 경우에만 비밀번호 입력 표시 */}
+        {!provider && (
+          <>
+            <label className="text-sm font-semibold">비밀번호 <span className="text-red-500">*</span></label>
+            <input
+              type="password"
+              placeholder="비밀번호를 입력해주세요."
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              className="border rounded px-3 py-2"
+              disabled={!emailVerified}
+            />
+            <label className="text-sm font-semibold">비밀번호 확인 <span className="text-red-500">*</span></label>
+            <input
+              type="password"
+              placeholder="비밀번호를 다시 입력해주세요."
+              value={passwordConfirm}
+              onChange={e => setPasswordConfirm(e.target.value)}
+              required
+              className="border rounded px-3 py-2"
+              disabled={!emailVerified}
+            />
+          </>
+        )}
+        
         {/* 약관 동의 영역 */}
         <div className="flex flex-col gap-2 mt-2">
           {/* 전체 동의 */}
@@ -515,9 +516,7 @@ export default function SignUpPage() {
             !validatePhone(phone) ||
             !email ||
             !emailVerified ||
-            !password ||
-            password.length < 6 ||
-            password !== passwordConfirm ||
+            (!provider && (!password || password.length < 6 || password !== passwordConfirm)) ||
             !agreeTerms ||
             !agreePrivacy
           }
