@@ -243,14 +243,28 @@ export default function SignUpPage() {
         // 네이버 로그인은 직접 OAuth로 연결
         if (!config.oauth.naver.clientId) {
           setError('네이버 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+          console.error('네이버 클라이언트 ID 없음:', config.oauth.naver.clientId);
           return;
         }
         
         const state = Math.random().toString(36).substring(7);
+        const redirectUri = config.oauth.naver.redirectUri;
         
-        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${config.oauth.naver.clientId}&redirect_uri=${encodeURIComponent(config.oauth.naver.redirectUri)}&state=${state}&scope=email,name,profile_image`;
+        if (!redirectUri) {
+          setError('네이버 리다이렉트 URI가 설정되지 않았습니다.');
+          console.error('네이버 리다이렉트 URI 없음:', redirectUri);
+          return;
+        }
+        
+        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${config.oauth.naver.clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=email,name,profile_image`;
         
         console.log('네이버 OAuth URL:', naverAuthUrl);
+        console.log('네이버 설정:', {
+          clientId: config.oauth.naver.clientId,
+          redirectUri: redirectUri,
+          state: state
+        });
+        
         window.location.href = naverAuthUrl;
         return;
       }
@@ -259,14 +273,28 @@ export default function SignUpPage() {
         // 카카오 로그인은 직접 OAuth로 연결
         if (!config.oauth.kakao.clientId) {
           setError('카카오 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+          console.error('카카오 클라이언트 ID 없음:', config.oauth.kakao.clientId);
           return;
         }
         
         const state = Math.random().toString(36).substring(7);
+        const redirectUri = config.oauth.kakao.redirectUri;
         
-        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${config.oauth.kakao.clientId}&redirect_uri=${encodeURIComponent(config.oauth.kakao.redirectUri)}&state=${state}`;
+        if (!redirectUri) {
+          setError('카카오 리다이렉트 URI가 설정되지 않았습니다.');
+          console.error('카카오 리다이렉트 URI 없음:', redirectUri);
+          return;
+        }
+        
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${config.oauth.kakao.clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
+        console.log('카카오 설정:', {
+          clientId: config.oauth.kakao.clientId,
+          redirectUri: redirectUri,
+          state: state
+        });
+        
         window.location.href = kakaoAuthUrl;
         return;
       }
