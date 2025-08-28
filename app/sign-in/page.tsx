@@ -7,6 +7,7 @@ import { Eye, EyeOff, Loader } from "lucide-react";
 import { getFactoryAuthWithRealName } from "@/lib/factoryAuth";
 import { clerkConfig } from "@/lib/clerkConfig";
 import { handleClerkError } from "@/lib/clerkErrorTranslator";
+import { config } from "@/lib/config";
 
 
 export default function SignInPage() {
@@ -30,12 +31,9 @@ export default function SignInPage() {
     try {
       if (provider === 'oauth_naver') {
         // 네이버 로그인은 직접 OAuth로 연결
-        const naverClientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
-        const currentPort = window.location.port || '3000';
-        const redirectUri = process.env.NEXT_PUBLIC_NAVER_REDIRECT_URI || `http://localhost:${currentPort}/api/auth/naver/callback`;
         const state = Math.random().toString(36).substring(7);
         
-        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=email,name,profile_image`;
+        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${config.oauth.naver.clientId}&redirect_uri=${encodeURIComponent(config.oauth.naver.redirectUri)}&state=${state}&scope=email,name,profile_image`;
         
         console.log('네이버 OAuth URL:', naverAuthUrl);
         window.location.href = naverAuthUrl;
@@ -44,12 +42,9 @@ export default function SignInPage() {
 
       if (provider === 'oauth_kakao') {
         // 카카오 로그인은 직접 OAuth로 연결
-        const kakaoClientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
-        const currentPort = window.location.port || '3000';
-        const redirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || `http://localhost:${currentPort}/api/auth/kakao/callback`;
         const state = Math.random().toString(36).substring(7);
         
-        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${config.oauth.kakao.clientId}&redirect_uri=${encodeURIComponent(config.oauth.kakao.redirectUri)}&state=${state}`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
         window.location.href = kakaoAuthUrl;

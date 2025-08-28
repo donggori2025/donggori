@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateRandomName } from '@/lib/randomNameGenerator';
+import { config } from '@/lib/config';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,9 +22,9 @@ export async function GET(request: NextRequest) {
     }
 
     // 카카오 OAuth 환경 변수 검증
-    const kakaoClientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
-    const kakaoClientSecret = process.env.KAKAO_CLIENT_SECRET;
-    const kakaoRedirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || 'http://localhost:3000/api/auth/kakao/callback';
+    const kakaoClientId = config.oauth.kakao.clientId;
+    const kakaoClientSecret = config.oauth.kakao.clientSecret;
+    const kakaoRedirectUri = config.oauth.kakao.redirectUri;
 
     if (!kakaoClientId || !kakaoClientSecret) {
       console.error('카카오 OAuth 설정이 누락되었습니다:', {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateRandomName } from '@/lib/randomNameGenerator';
+import { config } from '@/lib/config';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,9 +22,8 @@ export async function GET(request: NextRequest) {
     }
 
     // 네이버 OAuth 환경 변수 검증
-    const naverClientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
-    const naverClientSecret = process.env.NAVER_CLIENT_SECRET;
-    const naverRedirectUri = process.env.NEXT_PUBLIC_NAVER_REDIRECT_URI || 'http://localhost:3000/api/auth/naver/callback';
+    const naverClientId = config.oauth.naver.clientId;
+    const naverClientSecret = config.oauth.naver.clientSecret;
 
     if (!naverClientId || !naverClientSecret) {
       console.error('네이버 OAuth 설정이 누락되었습니다:', {
