@@ -244,11 +244,9 @@ export default function Header() {
             {/* 카카오 로그인 후: 카카오 프로필 이미지 */}
             {kakaoUser && (
               <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
-                <Image
+                <img
                   src={kakaoUser.profileImage || "/logo_donggori.png"}
                   alt="카카오 프로필 이미지"
-                  width={40}
-                  height={40}
                   className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
                 />
               </Link>
@@ -373,11 +371,9 @@ export default function Header() {
                   {/* 카카오 로그인 후 모바일 메뉴 */}
                   {kakaoUser && (
                     <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
-                      <Image
+                      <img
                         src={kakaoUser.profileImage || "/logo_donggori.png"}
                         alt="카카오 프로필 이미지"
-                        width={40}
-                        height={40}
                         className="w-8 h-8 rounded-full object-cover border border-gray-200"
                       />
                       <span className="font-medium">마이페이지</span>
