@@ -31,7 +31,7 @@ console.log('   - [Google Cloud Console](https://console.cloud.google.com/)에�
 console.log('     ✅ https://clerk.donggori.com/v1/oauth_callback');
 console.log('     ✅ https://donggori.clerk.accounts.dev/v1/oauth_callback');
 console.log('     ✅ http://localhost:3000/v1/oauth_callback');
-console.log('     ✅ http://localhost:3001/v1/oauth_callback');
+console.log('     ✅ http://localhost:3000/v1/oauth_callback');
 
 // 2. Clerk 설정 확인
 console.log('\n2️⃣ Clerk 설정:');
@@ -42,7 +42,7 @@ console.log('     ✅ 리디렉션 URL이 올바르게 설정되어 있는지 �
 // 3. 개발 서버 확인
 console.log('\n3️⃣ 개발 서버:');
 console.log('   - 개발 서버가 실행 중인지 확인: bun run dev');
-console.log('   - 포트 3001에서 실행 중인지 확인');
+console.log('   - 포트 3000에서 실행 중인지 확인');
 
 // 4. 브라우저 확인
 console.log('\n4️⃣ 브라우저:');

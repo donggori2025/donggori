@@ -38,9 +38,9 @@ console.log('   ✅ https://donggori.clerk.accounts.dev/v1/oauth_callback (Clerk
 
 // 4. 개발 환경
 console.log('   ✅ http://localhost:3000/v1/oauth_callback (개발용)');
-console.log('   ✅ http://localhost:3001/v1/oauth_callback (개발용 포트 3001)');
+console.log('   ✅ http://localhost:3000/v1/oauth_callback (개발용 포트 3000)');
 console.log('   ✅ http://127.0.0.1:3000/v1/oauth_callback (개발용 대안)');
-console.log('   ✅ http://127.0.0.1:3001/v1/oauth_callback (개발용 대안 포트 3001)');
+console.log('   ✅ http://127.0.0.1:3000/v1/oauth_callback (개발용 대안 포트 3000)');
 
 console.log('\n🚨 즉시 해결 방법:');
 console.log('1. [Google Cloud Console](https://console.cloud.google.com/) 접속');
