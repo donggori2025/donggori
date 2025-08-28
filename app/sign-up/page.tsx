@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSignUp } from "@clerk/nextjs";
@@ -8,7 +8,7 @@ import { Loader } from "lucide-react";
 import { clerkConfig } from "@/lib/clerkConfig";
 import { handleClerkError } from "@/lib/clerkErrorTranslator";
 
-export default function SignUpPage() {
+function SignUpForm() {
   const searchParams = useSearchParams();
   const provider = searchParams.get('provider');
   
@@ -558,5 +558,25 @@ export default function SignUpPage() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+        <div className="mb-8 flex flex-col items-center">
+          <Image src="/logo_0624.svg" alt="동고리 로고" width={80} height={80} className="mb-2" />
+          <h1 className="text-4xl font-extrabold tracking-tight mb-2">DONG<span className="text-black">GORI</span></h1>
+          <div className="text-lg font-semibold text-gray-700 mb-1">봉제공장이 필요한 순간, 동고리</div>
+        </div>
+        <div className="w-full max-w-md bg-white rounded-xl shadow p-8 flex flex-col items-center">
+          <Loader className="w-8 h-8 animate-spin text-gray-400" />
+          <p className="mt-4 text-gray-500">로딩 중...</p>
+        </div>
+      </div>
+    }>
+      <SignUpForm />
+    </Suspense>
   );
 } 
