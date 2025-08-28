@@ -64,6 +64,9 @@ export async function GET(request: NextRequest) {
         'Authorization': `Bearer ${tokenData.access_token}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
+      body: new URLSearchParams({
+        property_keys: '["kakao_account.email", "kakao_account.name", "kakao_account.phone_number", "properties.nickname", "properties.profile_image"]',
+      }),
     });
 
     if (!userInfoResponse.ok) {
