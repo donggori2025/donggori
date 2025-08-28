@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         hasClientId: !!naverClientId,
         hasClientSecret: !!naverClientSecret,
       });
-      return NextResponse.redirect(new URL('/sign-in?error=oauth_config_missing', request.url));
+      return NextResponse.redirect(new URL('/sign-in?error=oauth_config_missing&provider=naver', request.url));
     }
 
     // 네이버 OAuth 토큰 교환
