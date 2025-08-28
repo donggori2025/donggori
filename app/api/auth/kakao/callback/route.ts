@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        property_keys: '["kakao_account.email", "kakao_account.name", "kakao_account.phone_number", "properties.profile_image"]',
+        property_keys: '["kakao_account.email", "kakao_account.name", "kakao_account.phone_number"]',
       }),
     });
 
@@ -84,9 +84,9 @@ export async function GET(request: NextRequest) {
 
     const kakaoUser = userInfo;
     const email = kakaoUser.kakao_account?.email;
-    const name = kakaoUser.kakao_account?.name || kakaoUser.properties?.nickname || generateRandomName();
+    const name = kakaoUser.kakao_account?.name || generateRandomName();
     const phoneNumber = kakaoUser.kakao_account?.phone_number;
-    const profileImage = kakaoUser.properties?.profile_image;
+    const profileImage = null; // profile_image scope가 제거되어 null로 설정
 
     console.log('카카오 사용자 정보 추출:', {
       email,
