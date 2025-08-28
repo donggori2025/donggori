@@ -60,6 +60,17 @@ export default function SignInPage() {
         window.location.href = kakaoAuthUrl;
         return;
       }
+
+      if (provider === 'oauth_google') {
+        // 구글 로그인은 Clerk를 통해 처리
+        console.log('구글 OAuth 로그인 시작');
+        await signIn.authenticateWithRedirect({
+          strategy: 'oauth_google',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+        });
+        return;
+      }
       
       console.log('OAuth 로그인 시작:', provider);
       await signIn.authenticateWithRedirect({
