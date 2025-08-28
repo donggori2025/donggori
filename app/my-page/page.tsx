@@ -567,18 +567,16 @@ export default function MyPage() {
               {/* 프로필 사진과 이름 */}
               <div className="flex items-center gap-4 mb-8">
                 <div className="relative">
-                  <Image
-                    src={user?.imageUrl || naverUser?.profileImage || "/logo_donggori.png"}
+                  <img
+                    src={user?.imageUrl || naverUser?.profileImage || kakaoUser?.profileImage || "/logo_donggori.png"}
                     alt="프로필 이미지"
-                    width={80}
-                    height={80}
                     className="w-20 h-20 rounded-full object-cover border"
                   />
                 </div>
                 <div className="flex-1">
                   <div className="text-xl font-semibold mb-2">{originalName}</div>
                   <div className="text-sm text-gray-600 mb-2">
-                    {naverUser ? "네이버 계정으로 로그인됨" : "일반 계정"}
+                    {naverUser ? "네이버 계정으로 로그인됨" : kakaoUser ? "카카오 계정으로 로그인됨" : "일반 계정"}
                   </div>
                   <div className="flex gap-4 text-sm">
                     {user && (
@@ -597,6 +595,9 @@ export default function MyPage() {
                     )}
                     {naverUser && (
                       <span className="text-gray-500 text-sm">네이버 프로필 이미지는 네이버에서 변경해주세요</span>
+                    )}
+                    {kakaoUser && (
+                      <span className="text-gray-500 text-sm">카카오 프로필 이미지는 카카오에서 변경해주세요</span>
                     )}
                   </div>
                 </div>
@@ -776,11 +777,9 @@ export default function MyPage() {
             {/* 프로필 사진과 이름 */}
             <div className="flex items-center gap-4 mb-6">
               <div className="relative">
-                                  <Image
+                                  <img
                     src={user?.imageUrl || naverUser?.profileImage || kakaoUser?.profileImage || "/logo_donggori.png"}
                     alt="프로필 이미지"
-                    width={80}
-                    height={80}
                     className="w-20 h-20 rounded-full object-cover border"
                   />
               </div>
