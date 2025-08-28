@@ -278,14 +278,20 @@ export default function MyPage() {
         document.cookie = "userType=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         document.cookie = "isLoggedIn=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         setNaverUser(null);
+        // 소셜 로그인 후 새로고침하고 메인페이지로 이동
+        window.location.href = "/";
       } else if (kakaoUser) {
         // 카카오 사용자인 경우 - 쿠키 삭제
         document.cookie = "kakao_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         document.cookie = "userType=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         document.cookie = "isLoggedIn=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         setKakaoUser(null);
+        // 소셜 로그인 후 새로고침하고 메인페이지로 이동
+        window.location.href = "/";
+      } else {
+        // 일반적인 경우 메인 페이지로 이동
+        router.push("/");
       }
-      router.push("/");
     } catch (error) {
       console.error("로그아웃 중 오류가 발생했습니다:", error);
     }
