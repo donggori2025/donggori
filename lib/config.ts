@@ -1,69 +1,105 @@
-// 환경 변수 검증 및 설정
+// 환경 변수 설정
 export const config = {
+  // Supabase 설정
   supabase: {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
   },
+
+  // Clerk 설정
   clerk: {
-    publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!,
+    secretKey: process.env.CLERK_SECRET_KEY!,
+    frontendApi: process.env.NEXT_PUBLIC_CLERK_FRONTEND_API,
   },
-  naver: {
-    clientId: process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID,
-    clientSecret: process.env.NAVER_CLIENT_SECRET,
+
+  // 이미지 서비스 설정
+  imageService: process.env.IMAGE_SERVICE || 'vercel-blob',
+
+  // Vercel Blob 설정
+  vercelBlob: {
+    token: process.env.BLOB_READ_WRITE_TOKEN!,
   },
-  vercel: {
-    blobStoreToken: process.env.BLOB_READ_WRITE_TOKEN,
+
+  // AWS S3 설정
+  aws: {
+    region: process.env.AWS_REGION || 'ap-northeast-2',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    bucketName: process.env.S3_BUCKET_NAME || 'donggori-images',
   },
-} as const;
 
-// 환경 변수 검증 함수
-export const validateConfig = () => {
-  const errors: string[] = [];
-  const warnings: string[] = [];
+  // CloudFront 설정
+  cloudfront: {
+    domain: process.env.CLOUDFRONT_DOMAIN,
+  },
 
-  // Supabase 설정 검증
-  if (!config.supabase.url) {
-    errors.push('NEXT_PUBLIC_SUPABASE_URL이 설정되지 않았습니다.');
-  }
-  if (!config.supabase.anonKey) {
-    errors.push('NEXT_PUBLIC_SUPABASE_ANON_KEY가 설정되지 않았습니다.');
-  }
+  // 네이버맵 설정
+  naverMap: {
+    clientId: process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID!,
+  },
 
-  // Clerk 설정 검증
-  if (!config.clerk.publishableKey) {
-    errors.push('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY가 설정되지 않았습니다.');
-  }
-
-  // Naver Maps 설정 검증
-  if (!config.naver.clientId) {
-    warnings.push('NEXT_PUBLIC_NAVER_MAP_CLIENT_ID가 설정되지 않았습니다. (지도 기능 제한)');
-  }
-
-  // Vercel Blob 설정 검증
-  if (!config.vercel.blobStoreToken) {
-    warnings.push('BLOB_READ_WRITE_TOKEN이 설정되지 않았습니다. (이미지 업로드 기능 제한)');
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-    warnings,
-  };
+  // OAuth 설정
+  oauth: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      redirectUri: process.env.GOOGLE_REDIRECT_URI!,
+    },
+    naver: {
+      clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID!,
+      clientSecret: process.env.NAVER_CLIENT_SECRET!,
+      redirectUri: getRedirectUri('naver'),
+    },
+    kakao: {
+      clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID!,
+      clientSecret: process.env.KAKAO_CLIENT_SECRET!,
+      redirectUri: getRedirectUri('kakao'),
+    },
+  },
 };
 
-// 개발 환경에서만 설정 검증 로그 출력
-if (process.env.NODE_ENV === 'development') {
-  const validation = validateConfig();
-  
-  if (validation.errors.length > 0) {
-    console.error('❌ 필수 환경 변수가 누락되었습니다:', validation.errors);
+// 배포 환경에서 동적으로 리다이렉트 URI 생성
+function getRedirectUri(provider: 'naver' | 'kakao'): string {
+  // 개발 환경
+  if (process.env.NODE_ENV === 'development') {
+    return provider === 'naver' 
+      ? 'http://localhost:3000/api/auth/naver/callback'
+      : 'http://localhost:3000/api/auth/kakao/callback';
   }
-  
-  if (validation.warnings.length > 0) {
-    console.warn('⚠️ 선택적 환경 변수가 누락되었습니다:', validation.warnings);
+
+  // 프로덕션 환경
+  const baseUrl = process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}` 
+    : process.env.NEXT_PUBLIC_SITE_URL || 'https://donggori.vercel.app';
+
+  return `${baseUrl}/api/auth/${provider}/callback`;
+}
+
+// 환경 변수 검증
+export function validateConfig() {
+  const requiredEnvVars = [
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
+    'CLERK_SECRET_KEY',
+    'BLOB_READ_WRITE_TOKEN',
+    'NEXT_PUBLIC_NAVER_MAP_CLIENT_ID',
+    'NEXT_PUBLIC_NAVER_CLIENT_ID',
+    'NAVER_CLIENT_SECRET',
+    'NEXT_PUBLIC_KAKAO_CLIENT_ID',
+    'KAKAO_CLIENT_SECRET',
+  ];
+
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+  if (missingVars.length > 0) {
+    console.error('❌ 누락된 환경 변수:', missingVars);
+    return false;
   }
-  
-  if (validation.isValid) {
-    console.log('✅ 모든 필수 환경 변수가 설정되었습니다.');
-  }
+
+  console.log('✅ 모든 필수 환경 변수가 설정되었습니다.');
+  return true;
 } 
