@@ -53,8 +53,9 @@ export default function SimpleNaverMap({
 
       console.log('🚀 네이버맵 스크립트 로드 시작...');
       const script = document.createElement('script');
-      script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}`;
+      script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}&submodules=geocoder`;
       script.async = true;
+      script.defer = true;
       console.log('📡 스크립트 URL:', script.src);
       
       script.onload = () => {
@@ -192,9 +193,17 @@ export default function SimpleNaverMap({
     <div className={className}>
       <div 
         ref={mapRef} 
-        className="w-full h-full rounded-lg overflow-hidden"
+        className="w-full h-full rounded-lg overflow-hidden bg-gray-100"
         style={{ minHeight: '400px' }}
       />
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+            <p className="text-gray-600 text-sm">네이버맵 로딩 중...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
