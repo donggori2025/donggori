@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        property_keys: '["kakao_account.email", "kakao_account.name", "kakao_account.phone_number", "properties.nickname", "properties.profile_image"]',
+        property_keys: '["kakao_account.email", "kakao_account.name", "kakao_account.phone_number", "properties.profile_image"]',
       }),
     });
 
