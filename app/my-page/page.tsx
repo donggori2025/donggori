@@ -92,7 +92,8 @@ export default function MyPage() {
     if (typeof window !== 'undefined') {
       const currentName = user?.firstName || naverUser?.name || kakaoUser?.name || "김한재";
       const currentEmail = user?.emailAddresses?.[0]?.emailAddress || naverUser?.email || kakaoUser?.email || "hanjaekim99@gmail.com";
-      const currentPhone = localStorage.getItem('userPhone') || "";
+      // 카카오 사용자의 경우 전화번호를 우선적으로 사용
+      const currentPhone = kakaoUser?.phoneNumber || localStorage.getItem('userPhone') || "";
       const currentKakaoConsent = localStorage.getItem('kakaoMessageConsent') === 'true';
       
       setOriginalName(currentName);
@@ -202,6 +203,7 @@ export default function MyPage() {
         const updatedKakaoUser = {
           ...kakaoUser,
           name: name,
+          phoneNumber: phone, // 전화번호도 함께 저장
         };
         
         // 쿠키 업데이트

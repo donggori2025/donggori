@@ -81,8 +81,17 @@ export async function GET(request: NextRequest) {
 
     const kakaoUser = userInfo;
     const email = kakaoUser.kakao_account?.email;
-    const name = kakaoUser.properties?.nickname || generateRandomName();
+    const name = kakaoUser.kakao_account?.name || kakaoUser.properties?.nickname || generateRandomName();
+    const phoneNumber = kakaoUser.kakao_account?.phone_number;
     const profileImage = kakaoUser.properties?.profile_image;
+
+    console.log('카카오 사용자 정보 추출:', {
+      email,
+      name,
+      phoneNumber,
+      profileImage,
+      kakaoId: kakaoUser.id
+    });
 
     if (!email) {
       console.error('카카오 사용자 이메일이 없습니다.');
@@ -96,6 +105,7 @@ export async function GET(request: NextRequest) {
     response.cookies.set('kakao_user', JSON.stringify({
       email,
       name,
+      phoneNumber,
       profileImage,
       kakaoId: kakaoUser.id,
       isOAuthUser: true,
