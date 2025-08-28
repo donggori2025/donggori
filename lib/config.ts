@@ -69,10 +69,8 @@ function getRedirectUri(provider: 'naver' | 'kakao'): string {
       : 'http://localhost:3000/api/auth/kakao/callback';
   }
 
-  // 프로덕션 환경
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : process.env.NEXT_PUBLIC_SITE_URL || 'https://donggori.vercel.app';
+  // 프로덕션 환경 - donggori.com 도메인 사용
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://donggori.com';
 
   return `${baseUrl}/api/auth/${provider}/callback`;
 }
