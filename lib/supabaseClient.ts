@@ -1,37 +1,68 @@
 import { createClient } from "@supabase/supabase-js";
-import { config, validateConfig } from "./config";
+import { config } from "./config";
 
-// 환경 변수 검증
-const validation = validateConfig();
+// Supabase 클라이언트 생성 (빌드 시 안전하게 처리)
+let supabase: any;
 
-if (!validation.isValid) {
-  throw new Error(`Supabase 설정 오류: ${validation.errors.join(', ')}`);
+try {
+  if (config.supabase.url && config.supabase.anonKey) {
+    supabase = createClient(
+      config.supabase.url,
+      config.supabase.anonKey,
+      {
+        auth: {
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: true
+        },
+        db: {
+          schema: 'public'
+        },
+        global: {
+          headers: {
+            'X-Client-Info': 'donggori-app'
+          }
+        }
+      }
+    );
+  } else {
+    // 환경 변수가 없을 때 더미 클라이언트 생성
+    console.warn('⚠️ Supabase 설정이 누락되어 더미 클라이언트를 생성합니다.');
+    supabase = {
+      from: () => ({
+        select: () => ({
+          limit: () => Promise.resolve({ data: [], error: null })
+        })
+      })
+    };
+  }
+} catch (error) {
+  console.warn('⚠️ Supabase 클라이언트 생성 실패:', error);
+  // 더미 클라이언트 생성
+  supabase = {
+    from: () => ({
+      select: () => ({
+        limit: () => Promise.resolve({ data: [], error: null })
+      })
+    })
+  };
 }
 
-// Supabase 클라이언트 생성
-export const supabase = createClient(
-  config.supabase.url!,
-  config.supabase.anonKey!,
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true
-    },
-    db: {
-      schema: 'public'
-    },
-    global: {
-      headers: {
-        'X-Client-Info': 'donggori-app'
-      }
-    }
-  }
-);
+export { supabase };
 
 // Supabase 연결 테스트 함수
 export const testSupabaseConnection = async () => {
   try {
+    // 더미 클라이언트인 경우
+    if (!config.supabase.url || !config.supabase.anonKey) {
+      return {
+        success: false,
+        error: 'Supabase 설정이 누락되었습니다.',
+        data: null,
+        count: 0
+      };
+    }
+
     const { data, error } = await supabase
       .from("donggori")
       .select("id")
@@ -64,6 +95,16 @@ export const testSupabaseConnection = async () => {
 // match_requests 테이블 구조 확인 함수
 export const checkMatchRequestsTable = async () => {
   try {
+    // 더미 클라이언트인 경우
+    if (!config.supabase.url || !config.supabase.anonKey) {
+      return {
+        success: false,
+        error: 'Supabase 설정이 누락되었습니다.',
+        data: null,
+        count: 0
+      };
+    }
+
     const { data, error } = await supabase
       .from("match_requests")
       .select("*")
