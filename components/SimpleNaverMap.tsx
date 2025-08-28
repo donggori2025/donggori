@@ -22,7 +22,8 @@ export default function SimpleNaverMap({
 
   useEffect(() => {
     const loadNaverMap = () => {
-      const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || '';
+      // 임시로 하드코딩된 클라이언트 ID 사용 (테스트용)
+      const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || 'c1jy0j43p5';
       
       console.log('🔍 SimpleNaverMap 디버깅 정보:');
       console.log('- Client ID:', clientId);
@@ -32,7 +33,7 @@ export default function SimpleNaverMap({
       console.log('- 환경:', process.env.NODE_ENV);
       console.log('- Vercel URL:', process.env.VERCEL_URL);
       
-      // 환경 변수 체크
+      // 환경 변수 체크 (하드코딩된 값도 허용)
       if (!clientId || clientId === 'your-naver-map-client-id') {
         const errorMsg = '❌ 네이버맵 클라이언트 ID가 설정되지 않았습니다.';
         console.error(errorMsg);
