@@ -72,7 +72,7 @@ export default function NaverMap({
 
   // 환경 변수 검증
   const clientId = useMemo(() => {
-    return config.naver.clientId;
+    return config.naverMap.clientId;
   }, []);
 
   // 에러 상태가 변경될 때 onLoadError 콜백 호출

@@ -21,7 +21,7 @@ export default function SimpleNaverMap({
 
   useEffect(() => {
     const loadNaverMap = () => {
-      const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
+      const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || '';
       
       // 환경 변수 체크
       if (!clientId || clientId === 'your-naver-map-client-id') {
