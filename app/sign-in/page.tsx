@@ -218,7 +218,10 @@ export default function SignInPage() {
           </button>
           <button 
             type="button" 
-            onClick={() => handleSocial("oauth_kakao")}
+            onClick={() => {
+              console.log('카카오 버튼 클릭됨');
+              handleSocial("oauth_kakao");
+            }}
             className="w-12 h-12 rounded-full flex items-center justify-center bg-[#FEE500] shadow-sm hover:shadow-md transition-shadow"
             aria-busy={socialLoading === 'kakao'}
             disabled={!!socialLoading}
