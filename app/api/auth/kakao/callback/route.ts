@@ -1,35 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { generateRandomName } from '@/lib/randomNameGenerator';
 import { config } from '@/lib/config';
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const code = searchParams.get('code');
-  const error = searchParams.get('error');
-
-  console.log('카카오 OAuth 콜백 시작:', { code: !!code, error });
-
-  if (error) {
-    console.error('카카오 OAuth 에러:', error);
-    return NextResponse.redirect(new URL(`/sign-in?error=kakao_oauth_error&message=${encodeURIComponent(error)}`, request.url));
-  }
-
-  if (!code) {
-    console.error('카카오 OAuth: code가 없습니다.');
-    return NextResponse.redirect(new URL('/sign-in?error=no_code', request.url));
-  }
-
-  if (!config.oauth.kakao.clientId || !config.oauth.kakao.clientSecret) {
-    console.error('카카오 OAuth 설정 누락:', {
-      clientId: !!config.oauth.kakao.clientId,
-      clientSecret: !!config.oauth.kakao.clientSecret
-    });
-    return NextResponse.redirect(new URL('/sign-in?error=oauth_config_missing', request.url));
-  }
-
   try {
-    console.log('카카오 액세스 토큰 교환 시작');
-    
-    // 1. 액세스 토큰 교환
+    const { searchParams } = new URL(request.url);
+    const code = searchParams.get('code');
+    const state = searchParams.get('state');
+    const error = searchParams.get('error');
+
+    console.log('카카오 OAuth 콜백 파라미터:', { code: code ? '있음' : '없음', state, error });
+
+    if (error) {
+      console.error('카카오 OAuth 오류:', error);
+      return NextResponse.redirect(new URL('/sign-in?error=kakao_oauth_error', request.url));
+    }
+
+    if (!code) {
+      console.error('카카오 OAuth 코드가 없습니다.');
+      return NextResponse.redirect(new URL('/sign-in?error=no_code', request.url));
+    }
+
+    // 카카오 OAuth 환경 변수 검증
+    const kakaoClientId = config.oauth.kakao.clientId;
+    const kakaoClientSecret = config.oauth.kakao.clientSecret;
+    const kakaoRedirectUri = config.oauth.kakao.redirectUri;
+
+    if (!kakaoClientId || !kakaoClientSecret) {
+      console.error('카카오 OAuth 설정이 누락되었습니다:', {
+        hasClientId: !!kakaoClientId,
+        hasClientSecret: !!kakaoClientSecret,
+      });
+      return NextResponse.redirect(new URL('/sign-in?error=oauth_config_missing&provider=kakao', request.url));
+    }
+
+    // 카카오 OAuth 토큰 교환
     const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', {
       method: 'POST',
       headers: {
@@ -37,135 +42,102 @@ export async function GET(request: NextRequest) {
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
-        client_id: config.oauth.kakao.clientId,
-        client_secret: config.oauth.kakao.clientSecret,
-        code: code,
-        redirect_uri: config.oauth.kakao.redirectUri,
+        client_id: kakaoClientId,
+        client_secret: kakaoClientSecret,
+        code,
+        redirect_uri: kakaoRedirectUri,
       }),
     });
 
     if (!tokenResponse.ok) {
-      const errorText = await tokenResponse.text();
-      console.error('카카오 OAuth: 토큰 교환 실패', {
-        status: tokenResponse.status,
-        statusText: tokenResponse.statusText,
-        error: errorText
-      });
+      const errorData = await tokenResponse.text();
+      console.error('카카오 OAuth 토큰 교환 실패:', errorData);
       return NextResponse.redirect(new URL('/sign-in?error=token_exchange_failed', request.url));
     }
 
     const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
+    console.log('카카오 OAuth 토큰 교환 성공');
 
-    console.log('카카오 액세스 토큰 획득 성공');
-
-    // 2. 사용자 정보 가져오기
-    const userResponse = await fetch('https://kapi.kakao.com/v2/user/me', {
+    // 액세스 토큰을 사용하여 사용자 정보 가져오기
+    const userInfoResponse = await fetch('https://kapi.kakao.com/v2/user/me', {
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Authorization': `Bearer ${tokenData.access_token}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        property_keys: '["kakao_account.email", "kakao_account.name", "kakao_account.phone_number", "properties.nickname", "properties.profile_image"]',
-      }),
     });
 
-    if (!userResponse.ok) {
-      const errorText = await userResponse.text();
-      console.error('카카오 OAuth: 사용자 정보 가져오기 실패', {
-        status: userResponse.status,
-        statusText: userResponse.statusText,
-        error: errorText
-      });
+    if (!userInfoResponse.ok) {
+      console.error('카카오 사용자 정보 조회 실패');
       return NextResponse.redirect(new URL('/sign-in?error=user_info_failed', request.url));
     }
 
-    const userData = await userResponse.json();
-    const kakaoUser = userData;
+    const userInfo = await userInfoResponse.json();
+    console.log('카카오 사용자 정보:', userInfo);
 
-    console.log('카카오 사용자 정보:', {
-      email: kakaoUser.kakao_account?.email,
-      name: kakaoUser.kakao_account?.name || kakaoUser.properties?.nickname,
-      profileImage: kakaoUser.properties?.profile_image,
-      phoneNumber: kakaoUser.kakao_account?.phone_number,
-      kakaoId: kakaoUser.id
-    });
-
-    // 3. 통합 사용자 관리 시스템에 저장
-    const userPayload = {
-      email: kakaoUser.kakao_account?.email,
-      name: kakaoUser.kakao_account?.name || kakaoUser.properties?.nickname,
-      phone: kakaoUser.kakao_account?.phone_number,
-      profileImage: kakaoUser.properties?.profile_image,
-      loginMethod: 'kakao' as const,
-      externalId: kakaoUser.id.toString(),
-      kakaoMessageConsent: false
-    };
-
-    console.log('통합 사용자 시스템에 저장 시작:', userPayload);
-
-    const userResponse2 = await fetch(`${request.nextUrl.origin}/api/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userPayload),
-    });
-
-    if (!userResponse2.ok) {
-      const errorText = await userResponse2.text();
-      console.error('통합 사용자 관리: 사용자 저장 실패', {
-        status: userResponse2.status,
-        statusText: userResponse2.statusText,
-        error: errorText
-      });
-      return NextResponse.redirect(new URL('/sign-in?error=user_save_failed', request.url));
+    if (userInfo.id === undefined) {
+      console.error('카카오 사용자 정보 조회 실패:', userInfo);
+      return NextResponse.redirect(new URL('/sign-in?error=user_info_error', request.url));
     }
 
-    const { data: savedUser } = await userResponse2.json();
-    console.log('통합 사용자 시스템 저장 성공:', savedUser);
+    const kakaoUser = userInfo;
+    const email = kakaoUser.kakao_account?.email;
+    const name = kakaoUser.kakao_account?.name || kakaoUser.properties?.nickname || generateRandomName();
+    const phoneNumber = kakaoUser.kakao_account?.phone_number;
+    const profileImage = kakaoUser.properties?.profile_image;
 
-    // 4. 쿠키 설정 (기존 호환성 유지)
-    const kakaoUserCookie = JSON.stringify({
-      email: kakaoUser.kakao_account?.email,
-      name: kakaoUser.kakao_account?.name || kakaoUser.properties?.nickname,
-      profileImage: kakaoUser.properties?.profile_image,
-      phoneNumber: kakaoUser.kakao_account?.phone_number,
+    console.log('카카오 사용자 정보 추출:', {
+      email,
+      name,
+      phoneNumber,
+      profileImage,
       kakaoId: kakaoUser.id
     });
 
-    const response = NextResponse.redirect(new URL('/', request.url));
+    if (!email) {
+      console.error('카카오 사용자 이메일이 없습니다.');
+      return NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
+    }
+
+    // 카카오 로그인 성공 - 쿠키 설정
+    const response = NextResponse.redirect(new URL('/sign-up?provider=kakao', request.url));
     
-    // 쿠키 설정
-    response.cookies.set('kakao_user', kakaoUserCookie, {
+    // 카카오 사용자 정보를 임시 쿠키에 저장 (회원가입 완료 후 삭제)
+    response.cookies.set('temp_kakao_user', JSON.stringify({
+      email,
+      name,
+      phoneNumber,
+      profileImage,
+      kakaoId: kakaoUser.id,
+      isOAuthUser: true,
+      signupMethod: 'kakao',
+    }), {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60, // 24시간
-      path: '/',
+      maxAge: 60 * 60 * 24, // 24시간 (임시)
     });
 
-    response.cookies.set('userType', 'kakao', {
+    // 사용자 타입 설정
+    response.cookies.set('userType', 'user', {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60, // 24시간
-      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7일
     });
 
+    // 로그인 상태 표시
     response.cookies.set('isLoggedIn', 'true', {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60, // 24시간
-      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7일
     });
 
-    console.log('카카오 OAuth 로그인 완료 - 홈페이지로 리다이렉트');
+    console.log('카카오 로그인 성공:', email);
     return response;
 
   } catch (error) {
-    console.error('카카오 OAuth 콜백 오류:', error);
-    return NextResponse.redirect(new URL('/sign-in?error=callback_failed', request.url));
+    console.error('카카오 OAuth 콜백 처리 오류:', error);
+    return NextResponse.redirect(new URL('/sign-in?error=server_error', request.url));
   }
 }

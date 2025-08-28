@@ -15,10 +15,6 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   const [factoryId, setFactoryId] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string>("standard");
   
-  // 소셜 로그인 사용자 정보 상태
-  const [naverUser, setNaverUser] = useState<any>(null);
-  const [kakaoUser, setKakaoUser] = useState<any>(null);
-  
   // 폼 상태
   const [formData, setFormData] = useState({
     brandName: "",
@@ -45,37 +41,6 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     })();
   }, [params]);
 
-  // 소셜 로그인 사용자 정보 가져오기
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // 네이버 사용자 정보 가져오기
-      const naverUserCookie = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('naver_user='));
-      if (naverUserCookie) {
-        try {
-          const naverUserData = JSON.parse(decodeURIComponent(naverUserCookie.split('=')[1]));
-          setNaverUser(naverUserData);
-        } catch (error) {
-          console.error('네이버 사용자 정보 파싱 오류:', error);
-        }
-      }
-
-      // 카카오 사용자 정보 가져오기
-      const kakaoUserCookie = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('kakao_user='));
-      if (kakaoUserCookie) {
-        try {
-          const kakaoUserData = JSON.parse(decodeURIComponent(kakaoUserCookie.split('=')[1]));
-          setKakaoUser(kakaoUserData);
-        } catch (error) {
-          console.error('카카오 사용자 정보 파싱 오류:', error);
-        }
-      }
-    }
-  }, []);
-
   useEffect(() => {
     if (!factoryId) return;
     async function fetchFactory() {
@@ -94,7 +59,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }
   }, [searchParams]);
 
-  // 로그인한 유저의 이름과 연락처를 자동으로 입력
+  // 로그인한 유저의 이름을 자동으로 입력
   useEffect(() => {
     // URL 파라미터에서 이름을 먼저 확인
     const nameFromUrl = searchParams.get("name");
@@ -103,33 +68,14 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         ...prev,
         name: decodeURIComponent(nameFromUrl)
       }));
-    } else {
-      // 소셜 로그인 사용자 정보에서 이름 가져오기
-      let userName = "";
-      if (user && user.firstName) {
-        userName = user.firstName;
-      } else if (naverUser && naverUser.name) {
-        userName = naverUser.name;
-      } else if (kakaoUser && kakaoUser.name) {
-        userName = kakaoUser.name;
-      }
-      
-      if (userName) {
-        setFormData(prev => ({
-          ...prev,
-          name: userName
-        }));
-      }
-    }
-
-    // 연락처 자동 입력 (카카오 사용자의 경우)
-    if (kakaoUser && kakaoUser.phoneNumber) {
+    } else if (user && user.firstName) {
+      // URL에 이름이 없으면 Clerk 유저 정보에서 가져오기
       setFormData(prev => ({
         ...prev,
-        contact: kakaoUser.phoneNumber
+        name: user.firstName || ''
       }));
     }
-  }, [user, naverUser, kakaoUser, searchParams]);
+  }, [user, searchParams]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
@@ -261,14 +207,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
       // 서버 API 경유로 의뢰 데이터 저장 (RLS 회피 및 상세 오류 전달)
       try {
-        // 사용자 정보 결정 (Clerk > 네이버 > 카카오 순서)
-        const currentUser = user || naverUser || kakaoUser;
-        const userId = currentUser?.id || currentUser?.email || `user_${Date.now()}`;
-        const userEmail = currentUser?.emailAddresses?.[0]?.emailAddress || currentUser?.email || `${formData.name}@example.com`;
-        
         const payload = {
-          user_id: userId,
-          user_email: userEmail,
+          user_id: user?.id || `user_${Date.now()}`,
+          user_email: user?.emailAddresses?.[0]?.emailAddress || `${formData.name}@example.com`,
           user_name: formData.name,
           factory_id: factoryId,
           factory_name: factoryName,
@@ -457,15 +398,12 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                   <label className="block text-sm font-medium text-gray-700 mb-1">연락처 *</label>
                   <input
                     type="tel"
-                    placeholder="연락처를 입력해주세요. (예: 010-1234-5678)"
+                    placeholder="연락처를 입력해주세요."
                     value={formData.contact}
                     onChange={(e) => handleInputChange("contact", e.target.value)}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    봉제공장 사장님이 연락드릴 수 있도록 정확한 연락처를 입력해주세요.
-                  </p>
                 </div>
               </div>
             </div>
