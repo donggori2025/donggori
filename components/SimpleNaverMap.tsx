@@ -23,6 +23,12 @@ export default function SimpleNaverMap({
     const loadNaverMap = () => {
       const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || '';
       
+      console.log('🔍 SimpleNaverMap 디버깅 정보:');
+      console.log('- Client ID:', clientId);
+      console.log('- Client ID 길이:', clientId.length);
+      console.log('- 현재 도메인:', typeof window !== 'undefined' ? window.location.hostname : '서버사이드');
+      console.log('- 현재 URL:', typeof window !== 'undefined' ? window.location.href : '서버사이드');
+      
       // 환경 변수 체크
       if (!clientId || clientId === 'your-naver-map-client-id') {
         const errorMsg = '❌ 네이버맵 클라이언트 ID가 설정되지 않았습니다.';
@@ -34,27 +40,34 @@ export default function SimpleNaverMap({
 
       // 이미 로드되어 있는지 확인
       if (window.naver && window.naver.maps) {
+        console.log('✅ 네이버맵이 이미 로드되어 있습니다.');
         setIsLoaded(true);
         return;
       }
 
       // 스크립트가 이미 로드 중인지 확인
       if (document.querySelector('script[src*="maps.js.ncp"]')) {
+        console.log('⏳ 네이버맵 스크립트가 이미 로드 중입니다.');
         return;
       }
 
+      console.log('🚀 네이버맵 스크립트 로드 시작...');
       const script = document.createElement('script');
       script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}`;
       script.async = true;
+      console.log('📡 스크립트 URL:', script.src);
       
       script.onload = () => {
+        console.log('✅ 네이버맵 스크립트 로드 성공!');
         setTimeout(() => {
           if (window.naver && window.naver.maps) {
+            console.log('✅ 네이버맵 객체 확인됨:', window.naver.maps);
             setIsLoaded(true);
             setHasError(false);
           } else {
             const errorMsg = '❌ 네이버맵 객체를 찾을 수 없습니다';
             console.error(errorMsg);
+            console.error('window.naver:', window.naver);
             setErrorDetails('스크립트는 로드되었지만 네이버맵 객체를 찾을 수 없습니다. 클라이언트 ID를 확인해주세요.');
             setHasError(true);
           }
@@ -88,13 +101,23 @@ export default function SimpleNaverMap({
   useEffect(() => {
     if (!isLoaded || !mapRef.current) return;
 
+    console.log('🗺️ 지도 생성 시작...');
+    console.log('- isLoaded:', isLoaded);
+    console.log('- mapRef.current:', !!mapRef.current);
+    console.log('- center:', center);
+    console.log('- level:', level);
+
     try {
       if (!window.naver || !window.naver.maps) {
         console.error('❌ 네이버맵 API가 완전히 로드되지 않았습니다');
+        console.error('window.naver:', window.naver);
         return;
       }
 
+      console.log('✅ 네이버맵 API 확인됨');
       const container = mapRef.current;
+      console.log('✅ 컨테이너 요소 확인됨:', container);
+      
       const mapOptions = {
         center: new window.naver.maps.LatLng(center.lat, center.lng),
         zoom: level,
@@ -111,7 +134,9 @@ export default function SimpleNaverMap({
         clickableIcons: false
       };
 
+      console.log('🗺️ 지도 옵션:', mapOptions);
       const naverMap = new window.naver.maps.Map(container, mapOptions);
+      console.log('✅ 네이버맵 인스턴스 생성 성공:', naverMap);
       
       // 지도 클릭 시 줌 레벨 8로 설정 (마커가 아닌 지도 영역 클릭 시에만)
       window.naver.maps.Event.addListener(naverMap, 'click', (e: { overlay?: any }) => { // eslint-disable-line @typescript-eslint/no-explicit-any
