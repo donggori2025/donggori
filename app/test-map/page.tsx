@@ -23,7 +23,7 @@ export default function TestMapPage() {
     }
   ];
 
-  const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || '';
   const hasValidClientId = clientId && clientId !== 'your-naver-map-client-id' && clientId.length > 10;
 
   return (
