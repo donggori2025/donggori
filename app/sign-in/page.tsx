@@ -54,7 +54,7 @@ export default function SignInPage() {
         
         const state = Math.random().toString(36).substring(7);
         
-        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${config.oauth.kakao.clientId}&redirect_uri=${encodeURIComponent(config.oauth.kakao.redirectUri)}&state=${state}`;
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${config.oauth.kakao.clientId}&redirect_uri=${encodeURIComponent(config.oauth.kakao.redirectUri)}&state=${state}&scope=profile_nickname,profile_image,account_email,phone_number`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
         window.location.href = kakaoAuthUrl;
