@@ -565,14 +565,22 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 <p className="text-base text-gray-600 mb-6">
                   {factory.intro || "동대문구장한로34길23~2 지층에 위치하고있읍니다"}
                 </p>
-                <h4 className="font-semibold mb-3">특수 장비</h4>
-                <p className="text-base text-gray-600 mb-6">
-                  {factory.special_machines || "특수 장비 정보가 없습니다"}
-                </p>
-                <h4 className="font-semibold mb-3">주요 거래처</h4>
-                <p className="text-base text-gray-600">
-                  {factory.brands_supplied || "거래처 정보가 없습니다"}
-                </p>
+                {factory.special_machines && factory.special_machines.trim() !== '' && (
+                  <>
+                    <h4 className="font-semibold mb-3">특수 장비</h4>
+                    <p className="text-base text-gray-600 mb-6">
+                      {factory.special_machines}
+                    </p>
+                  </>
+                )}
+                {factory.brands_supplied && factory.brands_supplied.trim() !== '' && (
+                  <>
+                    <h4 className="font-semibold mb-3">주요 거래처</h4>
+                    <p className="text-base text-gray-600">
+                      {factory.brands_supplied}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
