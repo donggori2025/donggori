@@ -397,27 +397,37 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 주요 정보 */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold mb-3">주요 정보</h2>
-              <div className="space-y-4">
-                <div>
-                  <span className="font-semibold text-gray-600">업태:</span>
-                  <span className="ml-2">{factory.business_type || "봉제업"}</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-600">주요품목:</span>
-                  <span className="ml-2">{factory.top_items_upper || factory.top_items_lower || factory.top_items_outer || "상의, 하의, 아우터"}</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-600">주요원단:</span>
-                  <span className="ml-2">{factory.main_fabrics || "다이마루"}</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-600">MOQ(최소 주문 수량):</span>
-                  <span className="ml-2">{factory.moq || factory.minOrder || "100"}</span>
+            {(factory.business_type || factory.top_items_upper || factory.top_items_lower || factory.top_items_outer || factory.main_fabrics || factory.moq || factory.minOrder) && (
+              <div className="mb-8">
+                <h2 className="text-lg font-bold mb-3">주요 정보</h2>
+                <div className="space-y-4">
+                  {factory.business_type && (
+                    <div>
+                      <span className="font-semibold text-gray-600">업태:</span>
+                      <span className="ml-2">{factory.business_type}</span>
+                    </div>
+                  )}
+                  {(factory.top_items_upper || factory.top_items_lower || factory.top_items_outer) && (
+                    <div>
+                      <span className="font-semibold text-gray-600">주요품목:</span>
+                      <span className="ml-2">{factory.top_items_upper || factory.top_items_lower || factory.top_items_outer}</span>
+                    </div>
+                  )}
+                  {factory.main_fabrics && (
+                    <div>
+                      <span className="font-semibold text-gray-600">주요원단:</span>
+                      <span className="ml-2">{factory.main_fabrics}</span>
+                    </div>
+                  )}
+                  {(factory.moq || factory.minOrder) && (
+                    <div>
+                      <span className="font-semibold text-gray-600">MOQ(최소 주문 수량):</span>
+                      <span className="ml-2">{factory.moq || factory.minOrder}</span>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
             <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 보유 장비 */}
@@ -550,10 +560,14 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
               <div className="mt-6">
-                <h4 className="font-semibold mb-3">소개</h4>
-                <p className="text-base text-gray-600 mb-6">
-                  {factory.intro || "동대문구장한로34길23~2 지층에 위치하고있읍니다"}
-                </p>
+                {factory.intro && (
+                  <>
+                    <h4 className="font-semibold mb-3">소개</h4>
+                    <p className="text-base text-gray-600 mb-6">
+                      {factory.intro}
+                    </p>
+                  </>
+                )}
                 {factory.special_machines && factory.special_machines.trim() !== '' && (
                   <>
                     <h4 className="font-semibold mb-3">특수 장비</h4>
@@ -592,7 +606,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div>
-                <h3 className="font-bold text-sm lg:text-base">{factory.company_name || "재민상사"}</h3>
+                <h3 className="font-bold text-sm lg:text-base">{factory.company_name}</h3>
                 <p className="text-xs text-gray-500">봉제공장</p>
               </div>
             </div>
