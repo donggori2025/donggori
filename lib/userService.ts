@@ -73,13 +73,13 @@ export async function createUser(userData: CreateUserData): Promise<User> {
     // 전화번호 중복 체크
     const phoneExists = await checkPhoneNumberExists(userData.phoneNumber);
     if (phoneExists) {
-      throw new Error('이미 등록된 전화번호입니다.');
+      throw new Error('이미 등록된 전화번호입니다. 다른 전화번호를 사용해주세요.');
     }
 
     // 이메일 중복 체크
     const emailExists = await checkEmailExists(userData.email);
     if (emailExists) {
-      throw new Error('이미 등록된 이메일입니다.');
+      throw new Error('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
     }
 
     const { data, error } = await supabase
@@ -99,7 +99,17 @@ export async function createUser(userData: CreateUserData): Promise<User> {
 
     if (error) {
       console.error('사용자 생성 오류:', error);
-      throw error;
+      
+      // Supabase 제약 조건 오류 처리
+      if (error.code === '23505') {
+        if (error.message.includes('phoneNumber')) {
+          throw new Error('이미 등록된 전화번호입니다. 다른 전화번호를 사용해주세요.');
+        } else if (error.message.includes('email')) {
+          throw new Error('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
+        }
+      }
+      
+      throw new Error('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
 
     return data as User;

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSignIn } from "@clerk/nextjs";
 import { Eye, EyeOff, Loader } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { getFactoryAuthWithRealName } from "@/lib/factoryAuth";
 import { clerkConfig } from "@/lib/clerkConfig";
 import { handleClerkError } from "@/lib/clerkErrorTranslator";
@@ -18,8 +19,50 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
+  const searchParams = useSearchParams();
   // 소셜 로그인 UX: 로딩 중임을 명확히 안내
   const [socialLoading, setSocialLoading] = useState<null | 'google' | 'kakao' | 'naver'>(null);
+
+  // URL 파라미터에서 오류 메시지 처리
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      switch (errorParam) {
+        case 'duplicate_phone':
+          setError('이미 등록된 전화번호입니다. 다른 전화번호를 사용해주세요.');
+          break;
+        case 'duplicate_email':
+          setError('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
+          break;
+        case 'kakao_oauth_error':
+          setError('카카오 로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+          break;
+        case 'naver_oauth_error':
+          setError('네이버 로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+          break;
+        case 'no_code':
+          setError('인증 코드를 받지 못했습니다. 다시 시도해주세요.');
+          break;
+        case 'token_exchange_failed':
+          setError('인증 토큰 교환에 실패했습니다. 다시 시도해주세요.');
+          break;
+        case 'user_info_failed':
+          setError('사용자 정보를 가져오는데 실패했습니다. 다시 시도해주세요.');
+          break;
+        case 'no_email':
+          setError('이메일 정보를 받지 못했습니다. 다시 시도해주세요.');
+          break;
+        case 'user_creation_failed':
+          setError('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+          break;
+        case 'server_error':
+          setError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+          break;
+        default:
+          setError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  }, [searchParams]);
 
   // 소셜 로그인 핸들러
   const handleSocial = async (provider: 'oauth_google' | 'oauth_kakao' | 'oauth_naver') => {

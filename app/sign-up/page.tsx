@@ -303,7 +303,7 @@ function SignUpForm() {
       // 이메일 중복 체크
       const emailExists = await checkEmailExists(cleanEmail);
       if (emailExists) {
-        setError('이미 등록된 이메일입니다.');
+        setError('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
         return;
       }
       
