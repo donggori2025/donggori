@@ -13,12 +13,17 @@ datasource db {
 
 // 사용자 인증을 위한 모델
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  phoneNumber  String   @unique
+  password     String?
+  profileImage String?
+  signupMethod String   @default("email") // email, kakao, naver, google
+  externalId   String?  // 소셜 로그인 외부 ID
+  kakaoMessageConsent Boolean @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 // 봉제공장 인증을 위한 모델

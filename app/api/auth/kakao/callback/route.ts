@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateRandomName } from '@/lib/randomNameGenerator';
 import { config } from '@/lib/config';
+import { createUser, getUserByExternalId, getUserByEmail } from '@/lib/userService';
 
 export async function GET(request: NextRequest) {
   try {
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
     const email = kakaoUser.kakao_account?.email;
     const name = kakaoUser.kakao_account?.name || generateRandomName();
     const phoneNumber = kakaoUser.kakao_account?.phone_number;
-    const profileImage = null; // profile_image scope가 제거되어 null로 설정
+    const profileImage = undefined;
 
     console.log('카카오 사용자 정보 추출:', {
       email,
@@ -101,43 +102,135 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
     }
 
-    // 카카오 로그인 성공 - 쿠키 설정
-    const response = NextResponse.redirect(new URL('/sign-up?provider=kakao', request.url));
+    // 기존 사용자 확인
+    let existingUser = await getUserByExternalId(kakaoUser.id.toString(), 'kakao');
     
-    // 카카오 사용자 정보를 임시 쿠키에 저장 (회원가입 완료 후 삭제)
-    response.cookies.set('temp_kakao_user', JSON.stringify({
-      email,
-      name,
-      phoneNumber,
-      profileImage,
-      kakaoId: kakaoUser.id,
-      isOAuthUser: true,
-      signupMethod: 'kakao',
-    }), {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24, // 24시간 (임시)
-    });
+    if (!existingUser) {
+      // 이메일로도 확인
+      existingUser = await getUserByEmail(email);
+    }
 
-    // 사용자 타입 설정
-    response.cookies.set('userType', 'user', {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7일
-    });
+    if (existingUser) {
+      // 기존 사용자가 있으면 로그인 처리
+      console.log('기존 카카오 사용자 로그인:', existingUser.email);
+      
+      const response = NextResponse.redirect(new URL('/', request.url));
+      
+      // 사용자 정보를 쿠키에 저장
+      response.cookies.set('kakao_user', JSON.stringify({
+        email: existingUser.email,
+        name: existingUser.name,
+        phoneNumber: existingUser.phoneNumber,
+        profileImage: existingUser.profileImage,
+        kakaoId: kakaoUser.id,
+        isOAuthUser: true,
+        signupMethod: 'kakao',
+      }), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7일
+      });
 
-    // 로그인 상태 표시
-    response.cookies.set('isLoggedIn', 'true', {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7일
-    });
+      response.cookies.set('userType', 'user', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7일
+      });
 
-    console.log('카카오 로그인 성공:', email);
-    return response;
+      response.cookies.set('isLoggedIn', 'true', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7일
+      });
+
+      return response;
+    }
+
+    // 전화번호가 없으면 회원가입 페이지로 이동
+    if (!phoneNumber) {
+      console.log('카카오 사용자 전화번호 없음, 회원가입 페이지로 이동');
+      
+      const response = NextResponse.redirect(new URL('/sign-up?provider=kakao', request.url));
+      
+      // 임시 사용자 정보를 쿠키에 저장
+      response.cookies.set('temp_kakao_user', JSON.stringify({
+        email,
+        name,
+        phoneNumber: undefined,
+        profileImage,
+        kakaoId: kakaoUser.id,
+        isOAuthUser: true,
+        signupMethod: 'kakao',
+      }), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24, // 24시간 (임시)
+      });
+
+      return response;
+    }
+
+    // 새 사용자 생성
+    try {
+      const newUser = await createUser({
+        email,
+        name,
+        phoneNumber,
+        profileImage,
+        signupMethod: 'kakao',
+        externalId: kakaoUser.id.toString(),
+        kakaoMessageConsent: false,
+      });
+
+      console.log('새 카카오 사용자 생성 성공:', newUser.email);
+
+      const response = NextResponse.redirect(new URL('/', request.url));
+      
+      // 사용자 정보를 쿠키에 저장
+      response.cookies.set('kakao_user', JSON.stringify({
+        email: newUser.email,
+        name: newUser.name,
+        phoneNumber: newUser.phoneNumber,
+        profileImage: newUser.profileImage,
+        kakaoId: kakaoUser.id,
+        isOAuthUser: true,
+        signupMethod: 'kakao',
+      }), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7일
+      });
+
+      response.cookies.set('userType', 'user', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7일
+      });
+
+      response.cookies.set('isLoggedIn', 'true', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7일
+      });
+
+      return response;
+
+    } catch (error) {
+      console.error('카카오 사용자 생성 실패:', error);
+      
+      if (error instanceof Error && error.message.includes('이미 등록된')) {
+        return NextResponse.redirect(new URL('/sign-in?error=duplicate_user', request.url));
+      }
+      
+      return NextResponse.redirect(new URL('/sign-in?error=user_creation_failed', request.url));
+    }
 
   } catch (error) {
     console.error('카카오 OAuth 콜백 처리 오류:', error);

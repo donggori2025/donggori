@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loader } from "lucide-react";
 import { clerkConfig } from "@/lib/clerkConfig";
 import { handleClerkError } from "@/lib/clerkErrorTranslator";
+import { checkPhoneNumberExists, createUser } from "@/lib/supabase";
 
 function SignUpForm() {
   const searchParams = useSearchParams();
@@ -236,10 +237,36 @@ function SignUpForm() {
         if (tempUserStr) {
           const tempUser = JSON.parse(decodeURIComponent(tempUserStr));
           
+          // 전화번호 중복 체크
+          const phoneExists = await checkPhoneNumberExists(phone);
+          if (phoneExists) {
+            setError('이미 등록된 전화번호입니다.');
+            return;
+          }
+          
+          // Supabase에 사용자 저장
+          const newUser = await createUser({
+            email: tempUser.email,
+            name: tempUser.name,
+            phoneNumber: phone,
+            profileImage: tempUser.profileImage,
+            signupMethod: provider,
+            externalId: tempUser.kakaoId || tempUser.naverId,
+            kakaoMessageConsent: agreeKakaoMessage,
+          });
+          
+          console.log('OAuth 사용자 생성 성공:', newUser.email);
+          
           // OAuth 사용자 정보를 쿠키에 저장
           const userData = {
-            ...tempUser,
-            phoneNumber: phone, // 사용자가 입력한 전화번호 추가
+            email: newUser.email,
+            name: newUser.name,
+            phoneNumber: newUser.phoneNumber,
+            profileImage: newUser.profileImage,
+            kakaoId: tempUser.kakaoId,
+            naverId: tempUser.naverId,
+            isOAuthUser: true,
+            signupMethod: provider,
           };
           
           const finalUserKey = provider === 'kakao' ? 'kakao_user' : 'naver_user';
