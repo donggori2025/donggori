@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateRandomName } from '@/lib/randomNameGenerator';
 import { config } from '@/lib/config';
+import { createUser, getUserByExternalId, getUserByEmail } from '@/lib/userService';
 
 export async function GET(request: NextRequest) {
   try {
@@ -94,13 +95,63 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
     }
 
-    // 네이버 로그인 성공 - 쿠키 설정
+    // 기존 사용자 확인
+    let existingUser = await getUserByExternalId(naverUser.id, 'naver');
+    
+    if (!existingUser) {
+      // 이메일로도 확인
+      existingUser = await getUserByEmail(email);
+    }
+
+    if (existingUser) {
+      // 기존 사용자가 있으면 로그인 처리
+      console.log('기존 네이버 사용자 로그인:', existingUser.email);
+      
+      const response = NextResponse.redirect(new URL('/', request.url));
+      
+      // 사용자 정보를 쿠키에 저장
+      response.cookies.set('naver_user', JSON.stringify({
+        email: existingUser.email,
+        name: existingUser.name,
+        phoneNumber: existingUser.phoneNumber,
+        profileImage: existingUser.profileImage,
+        naverId: naverUser.id,
+        isOAuthUser: true,
+        signupMethod: 'naver',
+      }), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7일
+      });
+
+      response.cookies.set('userType', 'user', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7일
+      });
+
+      response.cookies.set('isLoggedIn', 'true', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7일
+      });
+
+      return response;
+    }
+
+    // 네이버는 전화번호를 제공하지 않으므로 회원가입 페이지로 이동
+    console.log('네이버 사용자 회원가입 페이지로 이동');
+    
     const response = NextResponse.redirect(new URL('/sign-up?provider=naver', request.url));
     
-    // 네이버 사용자 정보를 임시 쿠키에 저장 (회원가입 완료 후 삭제)
+    // 임시 사용자 정보를 쿠키에 저장
     response.cookies.set('temp_naver_user', JSON.stringify({
       email,
       name,
+      phoneNumber: undefined,
       profileImage,
       naverId: naverUser.id,
       isOAuthUser: true,
@@ -112,23 +163,6 @@ export async function GET(request: NextRequest) {
       maxAge: 60 * 60 * 24, // 24시간 (임시)
     });
 
-    // 사용자 타입 설정
-    response.cookies.set('userType', 'user', {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7일
-    });
-
-    // 로그인 상태 표시
-    response.cookies.set('isLoggedIn', 'true', {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7일
-    });
-
-    console.log('네이버 로그인 성공:', email);
     return response;
 
   } catch (error) {

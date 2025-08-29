@@ -225,8 +225,12 @@ export async function GET(request: NextRequest) {
     } catch (error) {
       console.error('카카오 사용자 생성 실패:', error);
       
-      if (error instanceof Error && error.message.includes('이미 등록된')) {
-        return NextResponse.redirect(new URL('/sign-in?error=duplicate_user', request.url));
+      if (error instanceof Error) {
+        if (error.message.includes('이미 등록된 전화번호')) {
+          return NextResponse.redirect(new URL('/sign-in?error=duplicate_phone', request.url));
+        } else if (error.message.includes('이미 등록된 이메일')) {
+          return NextResponse.redirect(new URL('/sign-in?error=duplicate_email', request.url));
+        }
       }
       
       return NextResponse.redirect(new URL('/sign-in?error=user_creation_failed', request.url));
