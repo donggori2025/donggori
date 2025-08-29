@@ -45,6 +45,7 @@ export interface Factory {
   email?: string;
   address?: string;
   established_year?: number;
+  brands_supplied?: string;
   [key: string]: string | number | string[] | undefined;
 }
 
@@ -567,6 +568,7 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
         email: item.email as string | undefined,
         address: item.address as string | undefined,
         established_year: Number(item.established_year) || undefined,
+        brands_supplied: item.brands_supplied as string | undefined,
       };
     });
 

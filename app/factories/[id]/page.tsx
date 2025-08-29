@@ -81,6 +81,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           email: data.email as string | undefined,
           address: data.address as string | undefined,
           established_year: Number(data.established_year) || undefined,
+          brands_supplied: data.brands_supplied as string | undefined,
         };
         
         // 디버깅을 위한 로그 추가
@@ -564,13 +565,13 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 <p className="text-base text-gray-600 mb-6">
                   {factory.intro || "동대문구장한로34길23~2 지층에 위치하고있읍니다"}
                 </p>
-                <h4 className="font-semibold mb-3">특수 보유 기술</h4>
+                <h4 className="font-semibold mb-3">특수 장비</h4>
                 <p className="text-base text-gray-600 mb-6">
-                  {factory.special_tech || "주로 다이마루티의류제조업이면서 바지및 반직기도 가능한업체이며 되도록이면 꼼꼼하게 작업해서업체만족도가 높습니다"}
+                  {factory.special_machines || "특수 장비 정보가 없습니다"}
                 </p>
                 <h4 className="font-semibold mb-3">주요 거래처</h4>
                 <p className="text-base text-gray-600">
-                  길트프리, 브랜다브랜든, 헬더
+                  {factory.brands_supplied || "거래처 정보가 없습니다"}
                 </p>
               </div>
             </div>
