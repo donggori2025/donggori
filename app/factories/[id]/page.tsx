@@ -421,60 +421,49 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             <div className="border-b border-gray-200 mb-8"></div>
 
             {/* 보유 장비 */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold mb-3">보유 장비</h2>
-              <div className="flex flex-wrap gap-2">
-                {splitChips(factory.sewing_machines).length > 0 ? (
-                  splitChips(factory.sewing_machines).map((item, i) => (
-                    <span key={i} className="bg-gray-50 px-3 py-1 rounded text-sm">{item}</span>
-                  ))
-                ) : (
-                  <>
-                    <span className="bg-gray-50 px-3 py-1 rounded text-sm">사절본봉기</span>
-                    <span className="bg-gray-50 px-3 py-1 rounded text-sm">사절삼봉</span>
-                    <span className="bg-gray-50 px-3 py-1 rounded text-sm">쌍침기</span>
-                    <span className="bg-gray-50 px-3 py-1 rounded text-sm">가이루퍼</span>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="border-b border-gray-200 mb-8"></div>
+            {splitChips(factory.sewing_machines).length > 0 && (
+              <>
+                <div className="mb-8">
+                  <h2 className="text-lg font-bold mb-3">보유 장비</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {splitChips(factory.sewing_machines).map((item, i) => (
+                      <span key={i} className="bg-gray-50 px-3 py-1 rounded text-sm">{item}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-b border-gray-200 mb-8"></div>
+              </>
+            )}
 
             {/* 패턴 장비 */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold mb-3">패턴 장비</h2>
-              <div className="flex flex-wrap gap-2">
-                {splitChips(factory.pattern_machines).length > 0 ? (
-                  splitChips(factory.pattern_machines).map((item, i) => (
-                    <span key={i} className="bg-gray-50 px-3 py-1 rounded text-sm">{item}</span>
-                  ))
-                ) : (
-                  <>
-                    <span className="bg-gray-50 px-3 py-1 rounded text-sm">나나인치</span>
-                    <span className="bg-gray-50 px-3 py-1 rounded text-sm">바텍</span>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="border-b border-gray-200 mb-8"></div>
+            {splitChips(factory.pattern_machines).length > 0 && (
+              <>
+                <div className="mb-8">
+                  <h2 className="text-lg font-bold mb-3">패턴 장비</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {splitChips(factory.pattern_machines).map((item, i) => (
+                      <span key={i} className="bg-gray-50 px-3 py-1 rounded text-sm">{item}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-b border-gray-200 mb-8"></div>
+              </>
+            )}
 
             {/* 특수 장비 */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold mb-3">특수 장비</h2>
-              <div className="flex flex-wrap gap-2">
-                {splitChips(factory.special_machines).length > 0 ? (
-                  splitChips(factory.special_machines).map((item, i) => (
-                    <span key={i} className="bg-gray-50 px-3 py-1 rounded text-sm">{item}</span>
-                  ))
-                ) : (
-                  <>
-                    <span className="bg-gray-50 px-3 py-1 rounded text-sm">나나인치</span>
-                    <span className="bg-gray-50 px-3 py-1 rounded text-sm">바텍</span>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="border-b border-gray-200 mb-8"></div>
+            {splitChips(factory.special_machines).length > 0 && (
+              <>
+                <div className="mb-8">
+                  <h2 className="text-lg font-bold mb-3">특수 장비</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {splitChips(factory.special_machines).map((item, i) => (
+                      <span key={i} className="bg-gray-50 px-3 py-1 rounded text-sm">{item}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-b border-gray-200 mb-8"></div>
+              </>
+            )}
 
             {/* 플랜 */}
             <div className="mb-8">
