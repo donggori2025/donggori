@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSignIn } from "@clerk/nextjs";
@@ -10,8 +10,54 @@ import { clerkConfig } from "@/lib/clerkConfig";
 import { handleClerkError } from "@/lib/clerkErrorTranslator";
 import { config } from "@/lib/config";
 
+// 오류 메시지 처리를 위한 컴포넌트
+function ErrorHandler({ onError }: { onError: (error: string) => void }) {
+  const searchParams = useSearchParams();
+  
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      switch (errorParam) {
+        case 'duplicate_phone':
+          onError('이미 등록된 전화번호입니다. 다른 전화번호를 사용해주세요.');
+          break;
+        case 'duplicate_email':
+          onError('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
+          break;
+        case 'kakao_oauth_error':
+          onError('카카오 로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+          break;
+        case 'naver_oauth_error':
+          onError('네이버 로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+          break;
+        case 'no_code':
+          onError('인증 코드를 받지 못했습니다. 다시 시도해주세요.');
+          break;
+        case 'token_exchange_failed':
+          onError('인증 토큰 교환에 실패했습니다. 다시 시도해주세요.');
+          break;
+        case 'user_info_failed':
+          onError('사용자 정보를 가져오는데 실패했습니다. 다시 시도해주세요.');
+          break;
+        case 'no_email':
+          onError('이메일 정보를 받지 못했습니다. 다시 시도해주세요.');
+          break;
+        case 'user_creation_failed':
+          onError('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+          break;
+        case 'server_error':
+          onError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+          break;
+        default:
+          onError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  }, [searchParams, onError]);
 
-export default function SignInPage() {
+  return null;
+}
+
+function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -19,50 +65,7 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
-  const searchParams = useSearchParams();
-  // 소셜 로그인 UX: 로딩 중임을 명확히 안내
   const [socialLoading, setSocialLoading] = useState<null | 'google' | 'kakao' | 'naver'>(null);
-
-  // URL 파라미터에서 오류 메시지 처리
-  useEffect(() => {
-    const errorParam = searchParams.get('error');
-    if (errorParam) {
-      switch (errorParam) {
-        case 'duplicate_phone':
-          setError('이미 등록된 전화번호입니다. 다른 전화번호를 사용해주세요.');
-          break;
-        case 'duplicate_email':
-          setError('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
-          break;
-        case 'kakao_oauth_error':
-          setError('카카오 로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
-          break;
-        case 'naver_oauth_error':
-          setError('네이버 로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
-          break;
-        case 'no_code':
-          setError('인증 코드를 받지 못했습니다. 다시 시도해주세요.');
-          break;
-        case 'token_exchange_failed':
-          setError('인증 토큰 교환에 실패했습니다. 다시 시도해주세요.');
-          break;
-        case 'user_info_failed':
-          setError('사용자 정보를 가져오는데 실패했습니다. 다시 시도해주세요.');
-          break;
-        case 'no_email':
-          setError('이메일 정보를 받지 못했습니다. 다시 시도해주세요.');
-          break;
-        case 'user_creation_failed':
-          setError('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
-          break;
-        case 'server_error':
-          setError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-          break;
-        default:
-          setError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
-      }
-    }
-  }, [searchParams]);
 
   // 소셜 로그인 핸들러
   const handleSocial = async (provider: 'oauth_google' | 'oauth_kakao' | 'oauth_naver') => {
@@ -73,14 +76,12 @@ export default function SignInPage() {
     
     try {
       if (provider === 'oauth_naver') {
-        // 네이버 로그인은 직접 OAuth로 연결
         if (!config.oauth.naver.clientId) {
           setError('네이버 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
           return;
         }
         
         const state = Math.random().toString(36).substring(7);
-        
         const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${config.oauth.naver.clientId}&redirect_uri=${encodeURIComponent(config.oauth.naver.redirectUri)}&state=${state}&scope=email,name,profile_image`;
         
         console.log('네이버 OAuth URL:', naverAuthUrl);
@@ -89,14 +90,12 @@ export default function SignInPage() {
       }
 
       if (provider === 'oauth_kakao') {
-        // 카카오 로그인은 직접 OAuth로 연결
         if (!config.oauth.kakao.clientId) {
           setError('카카오 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
           return;
         }
         
         const state = Math.random().toString(36).substring(7);
-        
         const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${config.oauth.kakao.clientId}&redirect_uri=${encodeURIComponent(config.oauth.kakao.redirectUri)}&state=${state}&scope=profile_image,account_email,phone_number`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
@@ -123,16 +122,6 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    
-    // 도메인 제한 확인 (임시로 비활성화)
-    // if (email.includes('@')) {
-    //   const domainError = clerkConfig.getDomainError(email);
-    //   if (domainError) {
-    //     setError(domainError);
-    //     return;
-    //   }
-    // }
-    
     setLoading(true);
     
     try {
@@ -141,47 +130,162 @@ export default function SignInPage() {
       const cleanId = normalizeInvisible(email);
       const cleanPw = normalizeInvisible(password);
 
-      console.log('공장 로그인 시도:', { cleanId, cleanPw: cleanPw.substring(0, 3) + '***' });
-
       const factoryAuth = await getFactoryAuthWithRealName(cleanId, cleanPw);
-      console.log('공장 로그인 결과:', factoryAuth ? '성공' : '실패', factoryAuth);
       
       if (factoryAuth) {
-        // 봉제공장 로그인 성공 (실제 DB 공장명 포함)
-        console.log('공장 로그인 성공, localStorage 설정:', factoryAuth);
-        localStorage.setItem('factoryAuth', JSON.stringify(factoryAuth));
-        localStorage.setItem('userType', 'factory');
-        // 메인페이지로 리다이렉트
+        console.log('봉제공장 로그인 성공:', factoryAuth.factoryName);
+        
+        document.cookie = `factory_user=${JSON.stringify({
+          id: cleanId,
+          realName: factoryAuth.factoryName,
+          isFactoryUser: true,
+        })}; path=/; max-age=${60 * 60 * 24 * 7}`;
+
+        document.cookie = `userType=factory; path=/; max-age=${60 * 60 * 24 * 7}`;
+        document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}`;
+
         window.location.href = '/';
         return;
       }
+
+      // 봉제공장 로그인 실패 시 일반 사용자 로그인 시도
+      console.log('봉제공장 로그인 실패, 일반 사용자 로그인 시도');
       
-      console.log('공장 로그인 실패, Clerk 로그인 시도');
-      
-      // 봉제공장 로그인이 실패하면 일반 사용자(Clerk) 로그인 시도
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        // 이메일 형식이 아니면 Clerk 경로로 진행하지 않고 자격 증명 오류를 안내
-        setError("아이디 또는 비밀번호가 올바르지 않습니다. 관리자라면 /admin/login 을 이용하세요.");
+      if (!isLoaded || !signIn) {
+        setError('로그인 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
         return;
       }
-      if (!isLoaded) return;
 
-      const res = await signIn.create({ identifier: email, password });
-      if (res.status === "complete") {
-        localStorage.setItem('userType', 'user');
-        // 메인페이지로 리다이렉트
+      const result = await signIn.create({
+        identifier: email,
+        password,
+      });
+
+      if (result.status === 'complete') {
+        console.log('일반 사용자 로그인 성공');
+        
+        document.cookie = `userType=user; path=/; max-age=${60 * 60 * 24 * 7}`;
+        document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}`;
+
         window.location.href = '/';
       } else {
-        setError("추가 인증이 필요합니다.");
+        console.log('로그인 상태:', result.status);
+        setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
       }
     } catch (err: unknown) {
-      console.error('Clerk 오류:', err);
+      console.error('로그인 오류:', err);
       setError(handleClerkError(err));
     } finally {
       setLoading(false);
     }
   };
+
+  return (
+    <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-xl shadow p-8 flex flex-col gap-4">
+      <label className="text-sm font-semibold">이메일</label>
+      <input
+        type="text"
+        placeholder="이메일(사용자) 또는 봉제공장 아이디 입력"
+        value={email}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+        required
+        className="border rounded px-3 py-2"
+      />
+      <label className="text-sm font-semibold">비밀번호</label>
+      <div className="flex items-center border rounded px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-black">
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="비밀번호를 입력해주세요."
+          value={password}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+          required
+          className="flex-1 outline-none bg-transparent"
+          style={{ minWidth: 0 }}
+        />
+        <button
+          type="button"
+          tabIndex={-1}
+          className="ml-2 text-gray-400 hover:text-black"
+          onClick={() => setShowPassword((v) => !v)}
+          aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+        >
+          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+        </button>
+      </div>
+      <div className="flex items-center justify-between text-sm mt-2 mb-2">
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRemember(e.target.checked)}
+            id="remember"
+            className="w-4 h-4"
+          />
+          <label htmlFor="remember" className="text-gray-700">아이디 저장</label>
+        </div>
+        <a href="#" className="text-gray-400 hover:text-black">비밀번호를 잊으셨나요?</a>
+      </div>
+      {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+      <button type="submit" className="w-full bg-black text-white py-3 rounded font-bold text-lg mt-2 hover:bg-gray-900 transition flex items-center justify-center" disabled={loading}>
+        {loading ? <Loader className="w-5 h-5 animate-spin" /> : "로그인"}
+      </button>
+      {/* 구분선 */}
+      <div className="flex items-center my-4">
+        <div className="flex-1 h-px bg-gray-200" />
+        <span className="mx-4 text-gray-400 text-sm">SNS 계정으로 로그인/회원가입</span>
+        <div className="flex-1 h-px bg-gray-200" />
+      </div>
+      {/* 소셜 로그인 버튼 */}
+      <div className="flex justify-center gap-6 mt-4">
+        <button 
+          type="button" 
+          onClick={() => handleSocial("oauth_google")}
+          className="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-sm hover:shadow-md transition-shadow"
+          aria-busy={socialLoading === 'google'}
+          disabled={!!socialLoading}
+        >
+          {socialLoading === 'google' ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/google.svg" alt="구글" width={32} height={32} />}
+        </button>
+        <button 
+          type="button" 
+          onClick={() => {
+            console.log('카카오 버튼 클릭됨');
+            handleSocial("oauth_kakao");
+          }}
+          className="w-12 h-12 rounded-full flex items-center justify-center bg-[#FEE500] shadow-sm hover:shadow-md transition-shadow"
+          aria-busy={socialLoading === 'kakao'}
+          disabled={!!socialLoading}
+        >
+          {socialLoading === 'kakao' ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/kakao_lastlast.svg" alt="카카오" width={32} height={32} />}
+        </button>
+        <button 
+          type="button" 
+          onClick={() => handleSocial("oauth_naver")}
+          className="w-12 h-12 rounded-full flex items-center justify-center bg-[#00C73C] shadow-sm hover:shadow-md transition-shadow"
+          aria-busy={socialLoading === 'naver'}
+          disabled={!!socialLoading}
+        >
+          {socialLoading === 'naver' ? (
+            <Loader className="w-5 h-5 animate-spin text-white" />
+          ) : (
+            <Image src="/naver_icon.svg" alt="네이버" width={28} height={28} />
+          )}
+        </button>
+      </div>
+      {/* 소셜 리디렉션 안내 */}
+      {socialLoading && (
+        <div className="text-center text-sm text-gray-600 mt-3">
+          {socialLoading === 'google' && '구글로 이동 중입니다...'}
+          {socialLoading === 'kakao' && '카카오로 이동 중입니다...'}
+          {socialLoading === 'naver' && '네이버로 이동 중입니다...'}
+        </div>
+      )}
+    </form>
+  );
+}
+
+export default function SignInPage() {
+  const [error, setError] = useState("");
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white">
@@ -194,106 +298,10 @@ export default function SignInPage() {
         </div>
       </div>
       {/* 로그인 폼 */}
-      <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-xl shadow p-8 flex flex-col gap-4">
-        <label className="text-sm font-semibold">이메일</label>
-        <input
-          type="text"
-          placeholder="이메일(사용자) 또는 봉제공장 아이디 입력"
-          value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          required
-          className="border rounded px-3 py-2"
-        />
-        <label className="text-sm font-semibold">비밀번호</label>
-        <div className="flex items-center border rounded px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-black">
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="비밀번호를 입력해주세요."
-            value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-            required
-            className="flex-1 outline-none bg-transparent"
-            style={{ minWidth: 0 }}
-          />
-          <button
-            type="button"
-            tabIndex={-1}
-            className="ml-2 text-gray-400 hover:text-black"
-            onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
-          >
-            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-          </button>
-        </div>
-        <div className="flex items-center justify-between text-sm mt-2 mb-2">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={remember}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRemember(e.target.checked)}
-              id="remember"
-              className="w-4 h-4"
-            />
-            <label htmlFor="remember" className="text-gray-700">아이디 저장</label>
-          </div>
-          <a href="#" className="text-gray-400 hover:text-black">비밀번호를 잊으셨나요?</a>
-        </div>
-        {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-        <button type="submit" className="w-full bg-black text-white py-3 rounded font-bold text-lg mt-2 hover:bg-gray-900 transition flex items-center justify-center" disabled={loading}>
-          {loading ? <Loader className="w-5 h-5 animate-spin" /> : "로그인"}
-        </button>
-        {/* 구분선 */}
-        <div className="flex items-center my-4">
-          <div className="flex-1 h-px bg-gray-200" />
-          <span className="mx-4 text-gray-400 text-sm">SNS 계정으로 로그인/회원가입</span>
-          <div className="flex-1 h-px bg-gray-200" />
-        </div>
-        {/* 소셜 로그인 버튼 */}
-        <div className="flex justify-center gap-6 mt-4">
-          <button 
-            type="button" 
-            onClick={() => handleSocial("oauth_google")}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-sm hover:shadow-md transition-shadow"
-            aria-busy={socialLoading === 'google'}
-            disabled={!!socialLoading}
-          >
-            {socialLoading === 'google' ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/google.svg" alt="구글" width={32} height={32} />}
-          </button>
-          <button 
-            type="button" 
-            onClick={() => {
-              console.log('카카오 버튼 클릭됨');
-              handleSocial("oauth_kakao");
-            }}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-[#FEE500] shadow-sm hover:shadow-md transition-shadow"
-            aria-busy={socialLoading === 'kakao'}
-            disabled={!!socialLoading}
-          >
-            {socialLoading === 'kakao' ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/kakao_lastlast.svg" alt="카카오" width={32} height={32} />}
-          </button>
-          <button 
-            type="button" 
-            onClick={() => handleSocial("oauth_naver")}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-[#00C73C] shadow-sm hover:shadow-md transition-shadow"
-            aria-busy={socialLoading === 'naver'}
-            disabled={!!socialLoading}
-          >
-            {socialLoading === 'naver' ? (
-              <Loader className="w-5 h-5 animate-spin text-white" />
-            ) : (
-              <Image src="/naver_icon.svg" alt="네이버" width={28} height={28} />
-            )}
-          </button>
-        </div>
-        {/* 소셜 리디렉션 안내 */}
-        {socialLoading && (
-          <div className="text-center text-sm text-gray-600 mt-3">
-            {socialLoading === 'google' && '구글로 이동 중입니다...'}
-            {socialLoading === 'kakao' && '카카오로 이동 중입니다...'}
-            {socialLoading === 'naver' && '네이버로 이동 중입니다...'}
-          </div>
-        )}
-      </form>
+      <Suspense fallback={<Loader className="w-10 h-10 animate-spin text-black" />}>
+        <ErrorHandler onError={setError} />
+        <SignInForm />
+      </Suspense>
     </div>
   );
 } 
