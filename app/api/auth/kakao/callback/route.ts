@@ -60,6 +60,8 @@ export async function GET(request: NextRequest) {
     console.log('카카오 OAuth 토큰 교환 성공');
 
     // 액세스 토큰을 사용하여 사용자 정보 가져오기
+    console.log('카카오 사용자 정보 조회 시작...');
+    
     const userInfoResponse = await fetch('https://kapi.kakao.com/v2/user/me', {
       headers: {
         'Authorization': `Bearer ${tokenData.access_token}`,
@@ -70,16 +72,29 @@ export async function GET(request: NextRequest) {
       }),
     });
 
+    console.log('카카오 사용자 정보 응답 상태:', userInfoResponse.status);
+
     if (!userInfoResponse.ok) {
-      console.error('카카오 사용자 정보 조회 실패');
+      const errorText = await userInfoResponse.text();
+      console.error('카카오 사용자 정보 조회 실패:', {
+        status: userInfoResponse.status,
+        statusText: userInfoResponse.statusText,
+        error: errorText
+      });
       return NextResponse.redirect(new URL('/sign-in?error=user_info_failed', request.url));
     }
 
     const userInfo = await userInfoResponse.json();
-    console.log('카카오 사용자 정보:', userInfo);
+    console.log('카카오 사용자 정보 조회 성공:', {
+      id: userInfo.id,
+      hasKakaoAccount: !!userInfo.kakao_account,
+      email: userInfo.kakao_account?.email,
+      name: userInfo.kakao_account?.name,
+      phoneNumber: userInfo.kakao_account?.phone_number
+    });
 
     if (userInfo.id === undefined) {
-      console.error('카카오 사용자 정보 조회 실패:', userInfo);
+      console.error('카카오 사용자 ID가 없습니다:', userInfo);
       return NextResponse.redirect(new URL('/sign-in?error=user_info_error', request.url));
     }
 
@@ -90,24 +105,37 @@ export async function GET(request: NextRequest) {
     const profileImage = kakaoUser.properties?.profile_image || kakaoUser.kakao_account?.profile?.profile_image_url;
 
     console.log('카카오 사용자 정보 추출:', {
-      email,
-      name,
-      phoneNumber,
-      profileImage,
+      email: email || '없음',
+      name: name || '없음',
+      phoneNumber: phoneNumber || '없음',
+      profileImage: profileImage || '없음',
       kakaoId: kakaoUser.id
     });
 
     if (!email) {
-      console.error('카카오 사용자 이메일이 없습니다.');
+      console.error('카카오 사용자 이메일이 없습니다. kakao_account:', kakaoUser.kakao_account);
       return NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
     }
 
     // 기존 사용자 확인
-    let existingUser = await getUserByExternalId(kakaoUser.id.toString(), 'kakao');
+    console.log('기존 사용자 확인 시작...');
+    
+    let existingUser = null;
+    try {
+      existingUser = await getUserByExternalId(kakaoUser.id.toString(), 'kakao');
+      console.log('외부 ID로 사용자 확인 결과:', existingUser ? '찾음' : '없음');
+    } catch (error) {
+      console.log('외부 ID로 사용자 확인 중 오류 (무시):', error);
+    }
     
     if (!existingUser) {
-      // 이메일로도 확인
-      existingUser = await getUserByEmail(email);
+      try {
+        // 이메일로도 확인
+        existingUser = await getUserByEmail(email);
+        console.log('이메일로 사용자 확인 결과:', existingUser ? '찾음' : '없음');
+      } catch (error) {
+        console.log('이메일로 사용자 확인 중 오류 (무시):', error);
+      }
     }
 
     if (existingUser) {
