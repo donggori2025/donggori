@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        property_keys: '["kakao_account.email", "kakao_account.name", "kakao_account.phone_number"]',
+        property_keys: '["kakao_account.email", "kakao_account.name", "kakao_account.phone_number", "kakao_account.profile"]',
       }),
     });
 
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
     const email = kakaoUser.kakao_account?.email;
     const name = kakaoUser.kakao_account?.name || generateRandomName();
     const phoneNumber = kakaoUser.kakao_account?.phone_number;
-    const profileImage = undefined;
+    const profileImage = kakaoUser.properties?.profile_image || kakaoUser.kakao_account?.profile?.profile_image_url;
 
     console.log('카카오 사용자 정보 추출:', {
       email,
@@ -116,8 +116,7 @@ export async function GET(request: NextRequest) {
       
       const response = NextResponse.redirect(new URL('/', request.url));
       
-      // 사용자 정보를 쿠키에 저장
-      response.cookies.set('kakao_user', JSON.stringify({
+      const userData = {
         email: existingUser.email,
         name: existingUser.name,
         phoneNumber: existingUser.phoneNumber,
@@ -125,7 +124,12 @@ export async function GET(request: NextRequest) {
         kakaoId: kakaoUser.id,
         isOAuthUser: true,
         signupMethod: 'kakao',
-      }), {
+      };
+      
+      console.log('카카오 사용자 쿠키 설정:', userData);
+      
+      // 사용자 정보를 쿠키에 저장
+      response.cookies.set('kakao_user', JSON.stringify(userData), {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -146,6 +150,7 @@ export async function GET(request: NextRequest) {
         maxAge: 60 * 60 * 24 * 7, // 7일
       });
 
+      console.log('카카오 로그인 완료 - 쿠키 설정됨');
       return response;
     }
 
@@ -190,8 +195,7 @@ export async function GET(request: NextRequest) {
 
       const response = NextResponse.redirect(new URL('/', request.url));
       
-      // 사용자 정보를 쿠키에 저장
-      response.cookies.set('kakao_user', JSON.stringify({
+      const userData = {
         email: newUser.email,
         name: newUser.name,
         phoneNumber: newUser.phoneNumber,
@@ -199,7 +203,12 @@ export async function GET(request: NextRequest) {
         kakaoId: kakaoUser.id,
         isOAuthUser: true,
         signupMethod: 'kakao',
-      }), {
+      };
+      
+      console.log('새 카카오 사용자 쿠키 설정:', userData);
+      
+      // 사용자 정보를 쿠키에 저장
+      response.cookies.set('kakao_user', JSON.stringify(userData), {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -220,6 +229,7 @@ export async function GET(request: NextRequest) {
         maxAge: 60 * 60 * 24 * 7, // 7일
       });
 
+      console.log('카카오 회원가입 완료 - 쿠키 설정됨');
       return response;
 
     } catch (error) {

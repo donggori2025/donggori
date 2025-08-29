@@ -64,7 +64,7 @@ export default function Header() {
         }
       }
 
-      // 네이버 사용자 정보 로드
+      // 쿠키에서 사용자 정보 로드
       const getCookie = (name: string) => {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
@@ -72,6 +72,11 @@ export default function Header() {
         return null;
       };
 
+      // isLoggedIn 쿠키 확인
+      const isLoggedInCookie = getCookie('isLoggedIn');
+      console.log('isLoggedIn 쿠키:', isLoggedInCookie);
+
+      // 네이버 사용자 정보 로드
       const naverUserCookie = getCookie('naver_user');
       if (naverUserCookie) {
         try {
@@ -92,6 +97,18 @@ export default function Header() {
           console.log('카카오 사용자 정보 로드:', userData);
         } catch (error) {
           console.error('카카오 사용자 정보 파싱 오류:', error);
+        }
+      }
+
+      // 임시 카카오 사용자 정보도 확인 (회원가입 중인 경우)
+      const tempKakaoUserCookie = getCookie('temp_kakao_user');
+      if (tempKakaoUserCookie) {
+        try {
+          const userData = JSON.parse(decodeURIComponent(tempKakaoUserCookie));
+          setKakaoUser(userData);
+          console.log('임시 카카오 사용자 정보 로드:', userData);
+        } catch (error) {
+          console.error('임시 카카오 사용자 정보 파싱 오류:', error);
         }
       }
     } catch (error) {
