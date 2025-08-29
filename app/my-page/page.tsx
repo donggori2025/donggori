@@ -415,6 +415,7 @@ export default function MyPage() {
             email: data.email as string | undefined,
             address: data.address as string | undefined,
             established_year: Number(data.established_year) || undefined,
+            brands_supplied: data.brands_supplied as string | undefined,
           };
           setFactory(mappedFactory);
         } else {
