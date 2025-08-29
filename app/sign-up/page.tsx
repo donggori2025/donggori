@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loader } from "lucide-react";
 import { clerkConfig } from "@/lib/clerkConfig";
 import { handleClerkError } from "@/lib/clerkErrorTranslator";
-import { checkPhoneNumberExists, createUser } from "@/lib/supabase";
+import { createUser, checkPhoneNumberExists, checkEmailExists } from '@/lib/userService';
 
 function SignUpForm() {
   const searchParams = useSearchParams();
@@ -292,6 +292,32 @@ function SignUpForm() {
       if (!password) return setError("비밀번호를 입력해주세요.");
       if (password.length < 6) return setError("비밀번호는 6자 이상이어야 합니다.");
       if (password !== passwordConfirm) return setError("비밀번호가 일치하지 않습니다.");
+      
+      // 전화번호 중복 체크
+      const phoneExists = await checkPhoneNumberExists(phone);
+      if (phoneExists) {
+        setError('이미 등록된 전화번호입니다.');
+        return;
+      }
+      
+      // 이메일 중복 체크
+      const emailExists = await checkEmailExists(cleanEmail);
+      if (emailExists) {
+        setError('이미 등록된 이메일입니다.');
+        return;
+      }
+      
+      // Supabase에 사용자 저장
+      const newUser = await createUser({
+        email: cleanEmail,
+        name: name.trim(),
+        phoneNumber: phone,
+        password: password,
+        signupMethod: 'email',
+        kakaoMessageConsent: agreeKakaoMessage,
+      });
+      
+      console.log('일반 사용자 생성 성공:', newUser.email);
       
       // 회원가입 완료 처리
       if (signUp?.status === "complete") {
