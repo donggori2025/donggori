@@ -10,6 +10,27 @@ import { clerkConfig } from "@/lib/clerkConfig";
 import { handleClerkError } from "@/lib/clerkErrorTranslator";
 import { config, safeValidateOAuthConfig } from "@/lib/config";
 
+// Clerk 설정 검증
+function validateClerkSetup() {
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  
+  if (!publishableKey) {
+    return {
+      isValid: false,
+      message: '인증 서비스 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.'
+    };
+  }
+  
+  if (!publishableKey.startsWith('pk_')) {
+    return {
+      isValid: false,
+      message: '인증 서비스 설정이 올바르지 않습니다. 관리자에게 문의해주세요.'
+    };
+  }
+  
+  return { isValid: true, message: '' };
+}
+
 // 오류 메시지 처리를 위한 컴포넌트
 function ErrorHandler({ onError }: { onError: (error: string) => void }) {
   const searchParams = useSearchParams();
