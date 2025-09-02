@@ -56,13 +56,31 @@ export async function GET(request: NextRequest) {
     });
 
     if (!tokenResponse.ok) {
-      const errorData = await tokenResponse.text();
-      console.error('카카오 OAuth 토큰 교환 실패:', errorData);
-      return NextResponse.redirect(new URL('/sign-in?error=token_exchange_failed', request.url));
+      const errorText = await tokenResponse.text();
+      console.error('카카오 OAuth 토큰 교환 실패:', errorText);
+      const url = new URL('/sign-in', request.url);
+      url.searchParams.set('error', 'kakao_token_http_error');
+      url.searchParams.set('detail', encodeURIComponent(errorText.slice(0, 180)));
+      return NextResponse.redirect(url);
     }
 
-    const tokenData = await tokenResponse.json();
+    let tokenData: any;
+    try {
+      tokenData = await tokenResponse.json();
+    } catch (e) {
+      console.error('카카오 토큰 JSON 파싱 실패');
+      const url = new URL('/sign-in', request.url);
+      url.searchParams.set('error', 'kakao_token_parse_error');
+      return NextResponse.redirect(url);
+    }
     console.log('카카오 OAuth 토큰 교환 성공');
+
+    if (!tokenData?.access_token) {
+      console.error('카카오 액세스 토큰 없음:', tokenData);
+      const url = new URL('/sign-in', request.url);
+      url.searchParams.set('error', 'kakao_token_missing');
+      return NextResponse.redirect(url);
+    }
 
     // 액세스 토큰을 사용하여 사용자 정보 가져오기 (GET + query 로 요청)
     const propertyKeys = '["kakao_account.email","kakao_account.name","kakao_account.phone_number","kakao_account.profile"]';
@@ -75,11 +93,23 @@ export async function GET(request: NextRequest) {
     });
 
     if (!userInfoResponse.ok) {
-      console.error('카카오 사용자 정보 조회 실패');
-      return NextResponse.redirect(new URL('/sign-in?error=user_info_failed', request.url));
+      const errorText = await userInfoResponse.text();
+      console.error('카카오 사용자 정보 조회 실패:', errorText);
+      const url = new URL('/sign-in', request.url);
+      url.searchParams.set('error', 'kakao_userinfo_http_error');
+      url.searchParams.set('detail', encodeURIComponent(errorText.slice(0, 180)));
+      return NextResponse.redirect(url);
     }
 
-    const userInfo = await userInfoResponse.json();
+    let userInfo: any;
+    try {
+      userInfo = await userInfoResponse.json();
+    } catch (e) {
+      console.error('카카오 사용자 정보 JSON 파싱 실패');
+      const url = new URL('/sign-in', request.url);
+      url.searchParams.set('error', 'kakao_userinfo_parse_error');
+      return NextResponse.redirect(url);
+    }
     console.log('카카오 사용자 정보:', userInfo);
 
     if (userInfo.id === undefined) {
