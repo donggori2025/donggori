@@ -1,140 +1,136 @@
-# 동고리 (Donggori) - 의류 디자이너-봉제공장 매칭 플랫폼
+# 동고리 (DONGGORI)
 
-의류 디자이너와 봉제공장을 연결하는 AI 기반 매칭 플랫폼입니다.
+봉제공장이 필요한 순간, 동고리
 
-## 🚀 주요 기능
+## 🚀 시작하기
 
-- **AI 매칭**: 디자이너의 요구사항에 맞는 최적의 봉제공장 추천
-- **공장 검색**: 지역별, 업태별 봉제공장 검색 및 지도 시각화
-- **의뢰 관리**: 디자이너의 의뢰 내역 및 공장의 의뢰 접수 관리
-- **실시간 알림**: 매칭 상태 및 의뢰 진행 상황 실시간 알림
-- **결제 시스템**: 안전한 결제 처리 (Toss Payments 연동)
+### 필수 요구사항
 
-## 🛠️ 기술 스택
+- Node.js 18+ 또는 Bun
+- PostgreSQL 데이터베이스
+- Supabase 계정
+- Clerk 인증 서비스 계정
 
-### Frontend
-- **Next.js 15** - React 기반 풀스택 프레임워크
-- **TypeScript** - 타입 안전성 보장
-- **Tailwind CSS** - 유틸리티 퍼스트 CSS 프레임워크
-- **Framer Motion** - 애니메이션 라이브러리
+### 설치 및 실행
 
-### Backend & Database
-- **Supabase** - PostgreSQL 기반 백엔드 서비스
-- **Clerk** - 사용자 인증 및 권한 관리
-- **Vercel Blob Storage** - 이미지 저장소
+1. **의존성 설치**
+   ```bash
+   bun install
+   ```
 
-### External Services
-- **Naver Maps API** - 지도 서비스
-- **Toss Payments** - 결제 시스템
+2. **환경 변수 설정**
+   ```bash
+   cp env.example .env
+   # .env 파일을 편집하여 필요한 값들을 설정하세요
+   ```
 
-## 📦 설치 및 실행
+3. **데이터베이스 마이그레이션**
+   ```bash
+   bun run db:push
+   ```
 
-### 1. 저장소 클론
+4. **개발 서버 실행**
+   ```bash
+   bun dev
+   ```
+
+## 🔐 OAuth 설정
+
+### 자동 설정 (권장)
+
+OAuth 설정을 위한 환경 변수를 자동으로 설정할 수 있습니다:
+
 ```bash
-git clone https://github.com/your-username/donggori.git
-cd donggori
+./scripts/setup-oauth.sh
 ```
 
-### 2. 의존성 설치
+### 수동 설정
+
+#### 1. 네이버 OAuth
+- [네이버 개발자 센터](https://developers.naver.com/apps/#/list)에서 애플리케이션 등록
+- 서비스 URL: `http://localhost:3000` (개발), `https://donggori.com` (프로덕션)
+- Callback URL: `http://localhost:3000/api/auth/naver/callback` (개발), `https://donggori.com/api/auth/naver/callback` (프로덕션)
+
+#### 2. 카카오 OAuth
+- [카카오 개발자 센터](https://developers.kakao.com/console/app)에서 애플리케이션 등록
+- 플랫폼 > Web > 사이트 도메인: `http://localhost:3000` (개발), `https://donggori.com` (프로덕션)
+- Redirect URI: `http://localhost:3000/api/auth/kakao/callback` (개발), `https://donggori.com/api/auth/kakao/callback` (프로덕션)
+
+#### 3. 구글 OAuth
+- [Google Cloud Console](https://console.cloud.google.com/apis/credentials)에서 OAuth 2.0 클라이언트 ID 생성
+- 승인된 리디렉션 URI: `https://donggori.clerk.accounts.dev/v1/oauth_callback` (개발), `https://clerk.donggori.com/v1/oauth_callback` (프로덕션)
+
+### 환경 변수
+
 ```bash
-bun install
-```
-
-### 3. 환경 변수 설정
-```bash
-cp env.example .env.local
-```
-
-`.env.local` 파일을 편집하여 필요한 환경 변수를 설정하세요:
-
-```env
-# Supabase 설정
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-
-# Clerk 인증 설정
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
-CLERK_SECRET_KEY=your-clerk-secret-key
-
-# Naver Maps 설정
+# 네이버 OAuth
 NEXT_PUBLIC_NAVER_CLIENT_ID=your-naver-client-id
 NAVER_CLIENT_SECRET=your-naver-client-secret
 
-# Vercel Blob Storage 설정
-BLOB_READ_WRITE_TOKEN=your-vercel-blob-token
+# 카카오 OAuth
+NEXT_PUBLIC_KAKAO_CLIENT_ID=your-kakao-client-id
+KAKAO_CLIENT_SECRET=your-kakao-client-secret
+
+# 구글 OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
 
-### 4. 개발 서버 실행
-```bash
-bun dev
-```
+## 🛡️ 중복 회원가입 방지
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
+동고리는 이메일 기반으로 중복 회원가입을 방지합니다:
+
+- **동일 이메일**: 하나의 이메일로는 하나의 계정만 생성 가능
+- **소셜 로그인 연동**: 기존 계정이 있는 경우 소셜 계정을 연동하여 로그인 가능
+- **계정 통합**: 여러 소셜 로그인을 하나의 계정에 연동 가능
+
+### 지원하는 로그인 방법
+
+1. **이메일/비밀번호**: 전통적인 회원가입 및 로그인
+2. **구글 OAuth**: Clerk을 통한 구글 계정 연동
+3. **네이버 OAuth**: 네이버 계정으로 로그인
+4. **카카오 OAuth**: 카카오 계정으로 로그인
 
 ## 🏗️ 프로젝트 구조
 
 ```
 donggori/
-├── app/                    # Next.js App Router
-│   ├── factories/         # 공장 관련 페이지
-│   ├── matching/          # AI 매칭 페이지
-│   ├── my-page/          # 사용자 마이페이지
-│   ├── factory-my-page/  # 공장 마이페이지
+├── app/                    # Next.js 13+ App Router
+│   ├── api/               # API 라우트
+│   │   └── auth/          # 인증 관련 API
+│   ├── sign-in/           # 로그인 페이지
+│   ├── sign-up/           # 회원가입 페이지
 │   └── ...
-├── components/            # 재사용 가능한 컴포넌트
-│   ├── ui/               # 기본 UI 컴포넌트
-│   └── ...
-├── lib/                  # 유틸리티 및 설정
-│   ├── hooks/            # 커스텀 훅
-│   ├── types.ts          # TypeScript 타입 정의
-│   ├── utils.ts          # 유틸리티 함수
-│   └── ...
-└── public/               # 정적 파일
+├── components/             # React 컴포넌트
+├── lib/                    # 유틸리티 및 서비스
+├── prisma/                 # 데이터베이스 스키마
+└── scripts/                # 유틸리티 스크립트
 ```
 
-## 🔧 개발 가이드
+## 🧪 테스트
 
-### 코드 스타일
-- **ESLint**: 코드 품질 및 일관성 유지
-- **Prettier**: 코드 포맷팅
-- **TypeScript**: 타입 안전성 보장
-
-### 커밋 컨벤션
+```bash
+bun test
 ```
-feat: 새로운 기능 추가
-fix: 버그 수정
-docs: 문서 수정
-style: 코드 포맷팅
-refactor: 코드 리팩토링
-test: 테스트 추가
-chore: 빌드 프로세스 또는 보조 도구 변경
-```
-
-### 성능 최적화
-- **이미지 최적화**: Next.js Image 컴포넌트 사용
-- **코드 분할**: 동적 임포트로 번들 크기 최적화
-- **캐싱**: 적절한 캐싱 전략 적용
-- **SEO**: 메타데이터 및 구조화된 데이터 최적화
 
 ## 🚀 배포
 
-### Vercel 배포 (권장)
-1. Vercel 계정 생성
-2. GitHub 저장소 연결
-3. 환경 변수 설정
-4. 자동 배포 활성화
+### Vercel (권장)
+
+1. Vercel에 프로젝트 연결
+2. 환경 변수 설정
+3. 자동 배포
 
 ### 수동 배포
+
 ```bash
-bun build
+bun run build
 bun start
 ```
 
-## 📊 모니터링 및 분석
+## 📝 라이선스
 
-- **Vercel Analytics**: 웹사이트 성능 모니터링
-- **Sentry**: 에러 추적 및 성능 모니터링
-- **Google Analytics**: 사용자 행동 분석
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
 
 ## 🤝 기여하기
 
@@ -144,14 +140,6 @@ bun start
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 라이선스
+## 📞 지원
 
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
-
-## 📞 문의
-
-프로젝트에 대한 문의사항이 있으시면 이슈를 생성해 주세요.
-
----
-
-**동고리** - 의류 디자이너와 봉제공장을 연결하는 플랫폼
+문제가 발생하거나 질문이 있으시면 이슈를 생성해주세요.

@@ -358,6 +358,57 @@ function SignUpForm() {
     if (!signUp) return;
     setLoading(true);
     try {
+      if (provider === 'oauth_naver') {
+        const naverConfig = config.oauth.naver;
+        if (!naverConfig.clientId) {
+          setError('네이버 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+          setLoading(false);
+          return;
+        }
+        
+        const state = Math.random().toString(36).substring(7);
+        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverConfig.clientId}&redirect_uri=${encodeURIComponent(naverConfig.redirectUri)}&state=${state}&scope=email,name,profile_image`;
+        
+        console.log('네이버 OAuth URL:', naverAuthUrl);
+        window.location.href = naverAuthUrl;
+        return;
+      }
+
+      if (provider === 'oauth_kakao') {
+        const kakaoConfig = config.oauth.kakao;
+        if (!kakaoConfig.clientId) {
+          setError('카카오 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+          setLoading(false);
+          return;
+        }
+        
+        const state = Math.random().toString(36).substring(7);
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&state=${state}&scope=profile_image,account_email,phone_number`;
+        
+        console.log('카카오 OAuth URL:', kakaoAuthUrl);
+        window.location.href = kakaoAuthUrl;
+        return;
+      }
+      
+      // Google OAuth는 Clerk을 통해 처리
+      if (provider === 'oauth_google') {
+        const googleConfig = config.oauth.google;
+        if (!googleConfig.clientId) {
+          setError('구글 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+          setLoading(false);
+          return;
+        }
+        
+        console.log('Google OAuth 로그인 시작');
+        await signUp.authenticateWithRedirect({
+          strategy: provider as any,
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/sso-callback',
+        });
+        return;
+      }
+      
+      console.log('OAuth 로그인 시작:', provider);
       await signUp.authenticateWithRedirect({
         strategy: provider as any,
         redirectUrl: '/sso-callback',

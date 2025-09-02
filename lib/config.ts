@@ -40,22 +40,22 @@ export const config = {
     clientId: process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || '',
   },
 
-  // OAuth 설정 (하드코딩된 값으로 안정성 확보)
+  // OAuth 설정 (환경 변수 기반)
   oauth: {
     google: {
-      clientId: '712026478491-8cko17l4bjn5tiu7gl2q95cmvnecv7bv.apps.googleusercontent.com',
+      clientId: process.env.GOOGLE_CLIENT_ID || '712026478491-8cko17l4bjn5tiu7gl2q95cmvnecv7bv.apps.googleusercontent.com',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      redirectUri: 'https://donggori.com/api/auth/oauth-callback',
+      redirectUri: getRedirectUri('google'),
     },
     naver: {
-      clientId: 'i7SHra722KMphfUUcPJX',
+      clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || 'i7SHra722KMphfUUcPJX',
       clientSecret: process.env.NAVER_CLIENT_SECRET || '',
-      redirectUri: 'https://donggori.com/api/auth/naver/callback',
+      redirectUri: getRedirectUri('naver'),
     },
     kakao: {
-      clientId: '6313ad2150be482d9c9e2936f06439db',
+      clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '6313ad2150be482d9c9e2936f06439db',
       clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
-      redirectUri: 'https://donggori.com/api/auth/kakao/callback',
+      redirectUri: getRedirectUri('kakao'),
     },
   },
 };
@@ -64,9 +64,11 @@ export const config = {
 function getRedirectUri(provider: 'google' | 'naver' | 'kakao'): string {
   // 개발 환경
   if (process.env.NODE_ENV === 'development') {
-    return provider === 'google'
-      ? 'http://localhost:3000/api/auth/oauth-callback'
-      : `http://localhost:3000/api/auth/${provider}/callback`;
+    if (provider === 'google') {
+      return 'http://localhost:3000/api/auth/oauth-callback';
+    } else {
+      return `http://localhost:3000/api/auth/${provider}/callback`;
+    }
   }
 
   // 프로덕션 환경 - 환경 변수에서 가져오거나 기본값 사용
@@ -114,15 +116,15 @@ export function safeValidateOAuthConfig(provider: 'google' | 'naver' | 'kakao'):
   // 환경 변수 로딩 문제를 우회하기 위해 하드코딩된 값 사용
   const oauthConfigs = {
     google: {
-      clientId: '712026478491-8cko17l4bjn5tiu7gl2q95cmvnecv7bv.apps.googleusercontent.com',
+      clientId: process.env.GOOGLE_CLIENT_ID || '712026478491-8cko17l4bjn5tiu7gl2q95cmvnecv7bv.apps.googleusercontent.com',
       isValid: true
     },
     naver: {
-      clientId: 'i7SHra722KMphfUUcPJX',
+      clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || 'i7SHra722KMphfUUcPJX',
       isValid: true
     },
     kakao: {
-      clientId: '6313ad2150be482d9c9e2936f06439db',
+      clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '6313ad2150be482d9c9e2936f06439db',
       isValid: true
     }
   };

@@ -97,7 +97,8 @@ function SignInForm() {
     
     try {
       if (provider === 'oauth_naver') {
-        if (!config.oauth.naver.clientId) {
+        const naverConfig = config.oauth.naver;
+        if (!naverConfig.clientId) {
           setError('네이버 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
           setLoading(false);
           setSocialLoading(null);
@@ -105,7 +106,7 @@ function SignInForm() {
         }
         
         const state = Math.random().toString(36).substring(7);
-        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${config.oauth.naver.clientId}&redirect_uri=${encodeURIComponent(config.oauth.naver.redirectUri)}&state=${state}&scope=email,name,profile_image`;
+        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverConfig.clientId}&redirect_uri=${encodeURIComponent(naverConfig.redirectUri)}&state=${state}&scope=email,name,profile_image`;
         
         console.log('네이버 OAuth URL:', naverAuthUrl);
         window.location.href = naverAuthUrl;
@@ -113,7 +114,8 @@ function SignInForm() {
       }
 
       if (provider === 'oauth_kakao') {
-        if (!config.oauth.kakao.clientId) {
+        const kakaoConfig = config.oauth.kakao;
+        if (!kakaoConfig.clientId) {
           setError('카카오 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
           setLoading(false);
           setSocialLoading(null);
@@ -121,7 +123,7 @@ function SignInForm() {
         }
         
         const state = Math.random().toString(36).substring(7);
-        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${config.oauth.kakao.clientId}&redirect_uri=${encodeURIComponent(config.oauth.kakao.redirectUri)}&state=${state}&scope=profile_image,account_email,phone_number`;
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&state=${state}&scope=profile_image,account_email,phone_number`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
         window.location.href = kakaoAuthUrl;
@@ -130,7 +132,8 @@ function SignInForm() {
       
       // Google OAuth는 Clerk을 통해 처리
       if (provider === 'oauth_google') {
-        if (!config.oauth.google.clientId) {
+        const googleConfig = config.oauth.google;
+        if (!googleConfig.clientId) {
           setError('구글 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
           setLoading(false);
           setSocialLoading(null);

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateRandomName } from '@/lib/randomNameGenerator';
 import { config } from '@/lib/config';
-import { createUser, getUserByExternalId, getUserByEmail } from '@/lib/userService';
+import { createUser, getUserByExternalId, getUserByEmail, linkSocialAccount } from '@/lib/userService';
 
 export async function GET(request: NextRequest) {
   try {
@@ -95,12 +95,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
     }
 
-    // 기존 사용자 확인
+    // 기존 사용자 확인 (중복 회원가입 방지)
     let existingUser = await getUserByExternalId(naverUser.id, 'naver');
     
     if (!existingUser) {
-      // 이메일로도 확인
+      // 이메일로도 확인 (다른 소셜 로그인으로 가입한 사용자)
       existingUser = await getUserByEmail(email);
+      if (existingUser) {
+        console.log('이미 다른 방법으로 가입된 사용자:', existingUser.email);
+        // 기존 사용자 정보를 업데이트하여 네이버 연동
+        try {
+          const updatedUser = await linkSocialAccount(existingUser.id, naverUser.id, 'naver');
+          existingUser = updatedUser;
+          console.log('네이버 계정 연동 완료:', existingUser.email);
+        } catch (updateError) {
+          console.error('사용자 정보 업데이트 실패:', updateError);
+        }
+      }
     }
 
     if (existingUser) {
