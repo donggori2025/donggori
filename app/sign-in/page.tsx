@@ -123,7 +123,9 @@ function SignInForm() {
         }
         
         const state = Math.random().toString(36).substring(7);
-        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&state=${state}&scope=profile_image,account_email,phone_number`;
+        // Kakao 권한: 이메일과 프로필 이미지만 요청 (전화번호는 민감/제공 제한)
+        const scope = 'account_email,profile_image,profile_nickname';
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
         window.location.href = kakaoAuthUrl;

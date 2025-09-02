@@ -155,7 +155,6 @@ export function validateConfig() {
     'NEXT_PUBLIC_NAVER_CLIENT_ID',
     'NAVER_CLIENT_SECRET',
     'NEXT_PUBLIC_KAKAO_CLIENT_ID',
-    'KAKAO_CLIENT_SECRET',
   ];
 
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
