@@ -27,7 +27,8 @@ export async function GET(request: NextRequest) {
     const kakaoClientSecret = config.oauth.kakao.clientSecret;
     const kakaoRedirectUri = config.oauth.kakao.redirectUri;
 
-    if (!kakaoClientId || !kakaoClientSecret) {
+    // Kakao는 client_secret이 선택 사항일 수 있으므로 clientId만 필수로 체크
+    if (!kakaoClientId) {
       console.error('카카오 OAuth 설정이 누락되었습니다:', {
         hasClientId: !!kakaoClientId,
         hasClientSecret: !!kakaoClientSecret,
@@ -36,18 +37,22 @@ export async function GET(request: NextRequest) {
     }
 
     // 카카오 OAuth 토큰 교환
+    const tokenParams = new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: kakaoClientId,
+      code,
+      redirect_uri: kakaoRedirectUri,
+    });
+    if (kakaoClientSecret) {
+      tokenParams.append('client_secret', kakaoClientSecret);
+    }
+
     const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        client_id: kakaoClientId,
-        client_secret: kakaoClientSecret,
-        code,
-        redirect_uri: kakaoRedirectUri,
-      }),
+      body: tokenParams,
     });
 
     if (!tokenResponse.ok) {
@@ -59,15 +64,14 @@ export async function GET(request: NextRequest) {
     const tokenData = await tokenResponse.json();
     console.log('카카오 OAuth 토큰 교환 성공');
 
-    // 액세스 토큰을 사용하여 사용자 정보 가져오기
-    const userInfoResponse = await fetch('https://kapi.kakao.com/v2/user/me', {
+    // 액세스 토큰을 사용하여 사용자 정보 가져오기 (GET + query 로 요청)
+    const propertyKeys = '["kakao_account.email","kakao_account.name","kakao_account.phone_number","kakao_account.profile"]';
+    const userInfoUrl = `https://kapi.kakao.com/v2/user/me?property_keys=${encodeURIComponent(propertyKeys)}`;
+    const userInfoResponse = await fetch(userInfoUrl, {
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${tokenData.access_token}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        property_keys: '["kakao_account.email", "kakao_account.name", "kakao_account.phone_number"]',
-      }),
     });
 
     if (!userInfoResponse.ok) {
@@ -85,9 +89,9 @@ export async function GET(request: NextRequest) {
 
     const kakaoUser = userInfo;
     const email = kakaoUser.kakao_account?.email;
-    const name = kakaoUser.kakao_account?.name || generateRandomName();
+    const name = kakaoUser.kakao_account?.profile?.nickname || kakaoUser.kakao_account?.name || generateRandomName();
     const phoneNumber = kakaoUser.kakao_account?.phone_number;
-    const profileImage = undefined;
+    const profileImage = kakaoUser.kakao_account?.profile?.profile_image_url || undefined;
 
     console.log('카카오 사용자 정보 추출:', {
       email,
