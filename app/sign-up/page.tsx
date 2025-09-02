@@ -8,7 +8,7 @@ import { Loader } from "lucide-react";
 import { clerkConfig } from "@/lib/clerkConfig";
 import { handleClerkError } from "@/lib/clerkErrorTranslator";
 import { createUser, checkPhoneNumberExists, checkEmailExists } from '@/lib/userService';
-import { config, validateOAuthConfig } from "@/lib/config";
+import { config, safeValidateOAuthConfig } from "@/lib/config";
 
 function SignUpForm() {
   const searchParams = useSearchParams();
