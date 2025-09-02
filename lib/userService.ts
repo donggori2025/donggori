@@ -204,3 +204,46 @@ export async function updateUser(userId: string, updates: Partial<User>): Promis
     throw error;
   }
 }
+
+// 소셜 로그인 연동 정보 업데이트 (중복 회원가입 방지용)
+export async function linkSocialAccount(userId: string, externalId: string, signupMethod: string): Promise<User> {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        externalId,
+        signupMethod,
+        updatedAt: new Date().toISOString(),
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('소셜 계정 연동 오류:', error);
+      throw error;
+    }
+
+    return data as User;
+  } catch (error) {
+    console.error('소셜 계정 연동 중 오류:', error);
+    throw error;
+  }
+}
+
+// 이메일로 기존 사용자 확인 및 소셜 계정 연동
+export async function findAndLinkUser(email: string, externalId: string, signupMethod: string): Promise<User | null> {
+  try {
+    const existingUser = await getUserByEmail(email);
+    
+    if (existingUser) {
+      // 기존 사용자를 찾았으면 소셜 계정 연동
+      return await linkSocialAccount(existingUser.id, externalId, signupMethod);
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('사용자 찾기 및 연동 중 오류:', error);
+    throw error;
+  }
+}
