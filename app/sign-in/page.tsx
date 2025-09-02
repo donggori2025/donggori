@@ -8,7 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { getFactoryAuthWithRealName } from "@/lib/factoryAuth";
 import { clerkConfig } from "@/lib/clerkConfig";
 import { handleClerkError } from "@/lib/clerkErrorTranslator";
-import { config, validateOAuthConfig } from "@/lib/config";
+import { config, safeValidateOAuthConfig } from "@/lib/config";
 
 // 오류 메시지 처리를 위한 컴포넌트
 function ErrorHandler({ onError }: { onError: (error: string) => void }) {
