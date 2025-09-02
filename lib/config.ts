@@ -45,33 +45,37 @@ export const config = {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      redirectUri: process.env.GOOGLE_REDIRECT_URI || '',
+      redirectUri: process.env.GOOGLE_REDIRECT_URI || getRedirectUri('google'),
     },
     naver: {
       clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || '',
       clientSecret: process.env.NAVER_CLIENT_SECRET || '',
-      redirectUri: getRedirectUri('naver'),
+      redirectUri: process.env.NEXT_PUBLIC_NAVER_REDIRECT_URI || getRedirectUri('naver'),
     },
     kakao: {
       clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '',
       clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
-      redirectUri: getRedirectUri('kakao'),
+      redirectUri: process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || getRedirectUri('kakao'),
     },
   },
 };
 
 // 배포 환경에서 동적으로 리다이렉트 URI 생성
-function getRedirectUri(provider: 'naver' | 'kakao'): string {
+function getRedirectUri(provider: 'google' | 'naver' | 'kakao'): string {
   // 개발 환경
   if (process.env.NODE_ENV === 'development') {
-    return provider === 'naver' 
-      ? 'http://localhost:3000/api/auth/naver/callback'
-      : 'http://localhost:3000/api/auth/kakao/callback';
+    return provider === 'google'
+      ? 'http://localhost:3000/api/auth/oauth-callback'
+      : `http://localhost:3000/api/auth/${provider}/callback`;
   }
 
-  // 프로덕션 환경 - donggori.com 도메인 사용
+  // 프로덕션 환경 - 환경 변수에서 가져오거나 기본값 사용
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://donggori.com';
-
+  
+  if (provider === 'google') {
+    return `${baseUrl}/api/auth/oauth-callback`;
+  }
+  
   return `${baseUrl}/api/auth/${provider}/callback`;
 }
 

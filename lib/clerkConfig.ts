@@ -3,12 +3,12 @@ export const clerkConfig = {
   // 허용된 이메일 도메인 목록
   allowedEmailDomains: process.env.CLERK_ALLOWED_EMAIL_DOMAINS 
     ? process.env.CLERK_ALLOWED_EMAIL_DOMAINS.split(',').map((domain: string) => domain.trim())
-    : [], // 빈 배열이면 모든 도메인 허용
+    : ['gmail.com', 'naver.com', 'kakao.com', 'faddit.co.kr'], // 기본 허용 도메인
   
   // 특정 도메인 제한이 있는지 확인
   hasDomainRestriction: process.env.CLERK_ALLOWED_EMAIL_DOMAINS 
     ? process.env.CLERK_ALLOWED_EMAIL_DOMAINS.split(',').length > 0
-    : false,
+    : false, // 환경 변수가 없으면 도메인 제한 비활성화
   
   // 특정 도메인이 허용되는지 확인
   isDomainAllowed: (email: string) => {

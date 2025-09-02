@@ -78,6 +78,8 @@ function SignInForm() {
       if (provider === 'oauth_naver') {
         if (!config.oauth.naver.clientId) {
           setError('네이버 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+          setLoading(false);
+          setSocialLoading(null);
           return;
         }
         
@@ -92,6 +94,8 @@ function SignInForm() {
       if (provider === 'oauth_kakao') {
         if (!config.oauth.kakao.clientId) {
           setError('카카오 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+          setLoading(false);
+          setSocialLoading(null);
           return;
         }
         
@@ -100,6 +104,24 @@ function SignInForm() {
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
         window.location.href = kakaoAuthUrl;
+        return;
+      }
+      
+      // Google OAuth는 Clerk을 통해 처리
+      if (provider === 'oauth_google') {
+        if (!config.oauth.google.clientId) {
+          setError('구글 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
+          setLoading(false);
+          setSocialLoading(null);
+          return;
+        }
+        
+        console.log('Google OAuth 로그인 시작');
+        await signIn.authenticateWithRedirect({
+          strategy: provider as any,
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+        });
         return;
       }
       
@@ -112,7 +134,6 @@ function SignInForm() {
     } catch (err: unknown) {
       console.error('OAuth 로그인 오류:', err);
       setError(handleClerkError(err));
-    } finally {
       setLoading(false);
       setSocialLoading(null);
     }
