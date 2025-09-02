@@ -123,8 +123,8 @@ function SignInForm() {
         }
         
         const state = Math.random().toString(36).substring(7);
-        // Kakao 권한: 이메일과 프로필 이미지만 요청 (전화번호는 민감/제공 제한)
-        const scope = 'account_email,profile_image,profile_nickname';
+        // Kakao 권한: 이메일만 요청 (profile_nickname은 일부 앱 권한 미지원)
+        const scope = 'account_email';
         const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
