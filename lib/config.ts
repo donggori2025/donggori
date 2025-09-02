@@ -79,6 +79,56 @@ function getRedirectUri(provider: 'google' | 'naver' | 'kakao'): string {
   return `${baseUrl}/api/auth/${provider}/callback`;
 }
 
+// OAuth 설정 검증 함수
+export function validateOAuthConfig(provider: 'google' | 'naver' | 'kakao'): {
+  isValid: boolean;
+  missingFields: string[];
+  message: string;
+} {
+  const oauthConfig = config.oauth[provider];
+  const missingFields: string[] = [];
+  
+  // 환경 변수를 직접 확인
+  let clientId = '';
+  let clientSecret = '';
+  
+  if (provider === 'google') {
+    clientId = process.env.GOOGLE_CLIENT_ID || '';
+    clientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
+  } else if (provider === 'naver') {
+    clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || '';
+    clientSecret = process.env.NAVER_CLIENT_SECRET || '';
+  } else if (provider === 'kakao') {
+    clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '';
+    clientSecret = process.env.KAKAO_CLIENT_SECRET || '';
+  }
+  
+  if (!clientId) {
+    missingFields.push('Client ID');
+  }
+  
+  if (!clientSecret) {
+    missingFields.push('Client Secret');
+  }
+  
+  if (!oauthConfig.redirectUri) {
+    missingFields.push('Redirect URI');
+  }
+  
+  const isValid = missingFields.length === 0;
+  
+  let message = '';
+  if (!isValid) {
+    message = `${provider.charAt(0).toUpperCase() + provider.slice(1)} OAuth 설정이 완료되지 않았습니다.`;
+    if (missingFields.length > 0) {
+      message += ` 누락된 설정: ${missingFields.join(', ')}`;
+    }
+    message += ' 관리자에게 문의해주세요.';
+  }
+  
+  return { isValid, missingFields, message };
+}
+
 // 환경 변수 검증 (빌드 시에는 실행하지 않음)
 export function validateConfig() {
   // 빌드 시에는 검증하지 않음
