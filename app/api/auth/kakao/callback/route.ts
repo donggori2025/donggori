@@ -102,8 +102,23 @@ export async function GET(request: NextRequest) {
     });
 
     if (!email) {
-      console.error('카카오 사용자 이메일이 없습니다.');
-      return NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
+      console.error('카카오 사용자 이메일이 없습니다. 회원가입 페이지로 유도합니다.');
+      const response = NextResponse.redirect(new URL('/sign-up?provider=kakao', request.url));
+      response.cookies.set('temp_kakao_user', JSON.stringify({
+        email: undefined,
+        name,
+        phoneNumber: undefined,
+        profileImage,
+        kakaoId: kakaoUser.id,
+        isOAuthUser: true,
+        signupMethod: 'kakao',
+      }), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24, // 24시간 (임시)
+      });
+      return response;
     }
 
     // 기존 사용자 확인 (중복 회원가입 방지)

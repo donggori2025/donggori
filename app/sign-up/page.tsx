@@ -52,10 +52,13 @@ function SignUpForm() {
           const tempUser = JSON.parse(decodeURIComponent(tempUserStr));
           setName(tempUser.name || "");
           setEmail(tempUser.email || "");
-          // OAuth 사용자는 이메일 인증을 건너뛰고 비밀번호 입력을 숨김
-          setEmailVerified(true);
-          setPassword("OAuthUserPassword123!"); // 임시 비밀번호
-          setPasswordConfirm("OAuthUserPassword123!");
+          // 이메일이 있는 OAuth의 경우 이메일 인증을 건너뜀, 없는 경우 인증 절차 유지
+          const hasEmail = !!tempUser.email;
+          setEmailVerified(hasEmail);
+          if (hasEmail) {
+            setPassword("OAuthUserPassword123!");
+            setPasswordConfirm("OAuthUserPassword123!");
+          }
         } catch (error) {
           console.error('OAuth 사용자 정보 파싱 오류:', error);
         }
@@ -247,7 +250,7 @@ function SignUpForm() {
           
           // Supabase에 사용자 저장
           const newUser = await createUser({
-            email: tempUser.email,
+            email: tempUser.email || cleanEmail,
             name: tempUser.name,
             phoneNumber: phone,
             profileImage: tempUser.profileImage,
