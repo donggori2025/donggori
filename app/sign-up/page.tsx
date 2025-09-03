@@ -417,7 +417,7 @@ function SignUpForm() {
         
         const state = Math.random().toString(36).substring(7);
         const baseOrigin = typeof window !== 'undefined'
-          ? window.location.origin
+          ? (window.location.hostname.endsWith('donggori.com') ? 'https://www.donggori.com' : window.location.origin)
           : (process.env.NEXT_PUBLIC_SITE_URL || (naverConfig.redirectUri ? new URL(naverConfig.redirectUri).origin : ''));
         const naverRedirect = `${baseOrigin}/api/auth/naver/callback`;
         const naverState = btoa(JSON.stringify({ nonce: state, redirectUri: naverRedirect }));
@@ -439,7 +439,7 @@ function SignUpForm() {
         const state = Math.random().toString(36).substring(7);
         const scope = 'account_email';
         const baseOrigin2 = typeof window !== 'undefined'
-          ? window.location.origin
+          ? (window.location.hostname.endsWith('donggori.com') ? 'https://www.donggori.com' : window.location.origin)
           : (process.env.NEXT_PUBLIC_SITE_URL || (kakaoConfig.redirectUri ? new URL(kakaoConfig.redirectUri).origin : ''));
         const kakaoRedirect = `${baseOrigin2}/api/auth/kakao/callback`;
         const kakaoState = btoa(JSON.stringify({ nonce: state, redirectUri: kakaoRedirect }));
