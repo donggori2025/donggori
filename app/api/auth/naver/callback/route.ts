@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateRandomName } from '@/lib/randomNameGenerator';
 import { config } from '@/lib/config';
-import { createUser, getUserByExternalId, getUserByEmail, linkSocialAccount } from '@/lib/userService';
+import { createUser, createUserWithServiceRole, getUserByExternalId, getUserByEmail, linkSocialAccount } from '@/lib/userService';
 
 export async function GET(request: NextRequest) {
   try {
