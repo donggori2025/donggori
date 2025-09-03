@@ -92,7 +92,16 @@ export async function GET(request: NextRequest) {
 
     if (!email) {
       console.error('네이버 사용자 이메일이 없습니다.');
-      return NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
+      const response = NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
+      // snsAccessToken 발급 (초기화되지 않음)
+      try {
+        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ externalId: naverUser.id, provider: 'naver', isInitialized: false })
+        });
+      } catch {}
+      return response;
     }
 
     // 기존 사용자 확인 (중복 회원가입 방지)
@@ -149,6 +158,14 @@ export async function GET(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 7일
       });
+      // snsAccessToken 발급 (초기화됨)
+      try {
+        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: existingUser.email, externalId: naverUser.id, provider: 'naver', isInitialized: true })
+        });
+      } catch {}
 
       return response;
     }
@@ -173,6 +190,15 @@ export async function GET(request: NextRequest) {
       sameSite: 'lax',
       maxAge: 60 * 60 * 24, // 24시간 (임시)
     });
+
+    // snsAccessToken 발급 (초기화되지 않음)
+    try {
+      await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, externalId: naverUser.id, provider: 'naver', isInitialized: false })
+      });
+    } catch {}
 
     return response;
 
