@@ -128,8 +128,8 @@ function SignInForm() {
         }
         
         const state = Math.random().toString(36).substring(7);
-        // Kakao 권한: 이메일만 요청 (profile_nickname은 일부 앱 권한 미지원)
-        const scope = 'account_email';
+        // 카카오 닉네임도 받아오기 위해 profile_nickname 포함
+        const scope = 'account_email profile_nickname';
         const baseOrigin2 = typeof window !== 'undefined'
           ? (window.location.hostname.endsWith('donggori.com') ? 'https://www.donggori.com' : window.location.origin)
           : (process.env.NEXT_PUBLIC_SITE_URL || (kakaoConfig.redirectUri ? new URL(kakaoConfig.redirectUri).origin : ''));
