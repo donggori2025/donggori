@@ -179,12 +179,36 @@ export async function GET(request: NextRequest) {
     }
 
     if (existingUser) {
-      // 기존 사용자가 있으면 로그인 처리
+      // 기존 사용자가 있으나 전화번호가 없다면 보완입력으로 유도
+      if (!existingUser.phoneNumber) {
+        const response = NextResponse.redirect(new URL('/sign-up?provider=kakao', request.url));
+        response.cookies.set('temp_kakao_user', JSON.stringify({
+          email: existingUser.email,
+          name,
+          phoneNumber: undefined,
+          profileImage,
+          kakaoId: kakaoUser.id,
+          isOAuthUser: true,
+          signupMethod: 'kakao',
+        }), {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24,
+        });
+        try {
+          await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: existingUser.email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: false })
+          });
+        } catch {}
+        return response;
+      }
+
+      // 전화번호가 있으면 로그인 처리
       console.log('기존 카카오 사용자 로그인:', existingUser.email);
-      
       const response = NextResponse.redirect(new URL('/', request.url));
-      
-      // 사용자 정보를 쿠키에 저장
       response.cookies.set('kakao_user', JSON.stringify({
         email: existingUser.email,
         name: existingUser.name,
@@ -197,27 +221,13 @@ export async function GET(request: NextRequest) {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7일
+        maxAge: 60 * 60 * 24 * 7,
       });
-
-      response.cookies.set('userType', 'user', {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7일
-      });
-
-      response.cookies.set('isLoggedIn', 'true', {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7일
-      });
-      // snsAccessToken 발급 (초기화됨)
+      response.cookies.set('userType', 'user', { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 });
+      response.cookies.set('isLoggedIn', 'true', { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 });
       try {
         await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: existingUser.email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: true })
         });
       } catch {}
