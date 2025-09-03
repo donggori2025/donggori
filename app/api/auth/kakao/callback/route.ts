@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 액세스 토큰을 사용하여 사용자 정보 가져오기 (GET + query 로 요청)
-    const propertyKeys = '["kakao_account.email","kakao_account.name","kakao_account.phone_number","kakao_account.profile"]';
+    const propertyKeys = '["kakao_account.email","kakao_account.name","kakao_account.profile.nickname","kakao_account.phone_number","kakao_account.profile"]';
     const userInfoUrl = `https://kapi.kakao.com/v2/user/me?property_keys=${encodeURIComponent(propertyKeys)}`;
     const userInfoResponse = await fetch(userInfoUrl, {
       method: 'GET',
