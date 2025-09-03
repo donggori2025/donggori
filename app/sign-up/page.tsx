@@ -108,7 +108,7 @@ function SignUpForm() {
     };
   }, []);
 
-  // 전화번호 형식 검증
+  // 전화번호 형식 검증 (국내 하이픈 포함 입력 허용)
   const validatePhone = (phone: string) => {
     const phoneRegex = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/;
     return phoneRegex.test(phone);
@@ -202,6 +202,52 @@ function SignUpForm() {
     }
   };
 
+  // 휴대폰 OTP 요청
+  const requestPhoneOtp = async () => {
+    setError("");
+    if (!phone || !validatePhone(phone)) return setError("올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)");
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/phone/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, purpose: 'signup' })
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error || '인증번호 요청 실패');
+      setVerificationSent(true);
+      setVerificationCode("");
+      startTimer();
+    } catch (e: any) {
+      setError(e?.message || '인증번호 요청 실패');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 휴대폰 OTP 검증
+  const verifyPhoneOtp = async () => {
+    setError("");
+    if (!verificationCode.trim()) return setError("인증 코드를 입력해주세요.");
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/phone/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code: verificationCode.trim(), purpose: 'signup' })
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error || '인증 실패');
+      // 휴대폰 인증 성공 시 이메일 인증과 동일하게 취급
+      setEmailVerified(true);
+      if (timerRef.current) clearInterval(timerRef.current);
+    } catch (e: any) {
+      setError(e?.message || '인증 실패');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 회원가입 폼 제출
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,7 +271,7 @@ function SignUpForm() {
     //   return;
     // }
     
-    if (!emailVerified) return setError("이메일 인증을 완료해주세요.");
+    if (!emailVerified) return setError("휴대폰 인증 또는 이메일 인증을 완료해주세요.");
     if (!agreeTerms || !agreePrivacy) return setError("필수 약관에 동의해주세요.");
     
     setLoading(true);
