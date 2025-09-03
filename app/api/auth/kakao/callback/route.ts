@@ -350,18 +350,22 @@ export async function GET(request: NextRequest) {
 
       return response;
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('카카오 사용자 생성 실패:', error);
-      
-      if (error instanceof Error) {
+      const base = new URL('/sign-in', request.url);
+      if (error?.message && typeof error.message === 'string') {
         if (error.message.includes('이미 등록된 전화번호')) {
-          return NextResponse.redirect(new URL('/sign-in?error=duplicate_phone', request.url));
+          base.searchParams.set('error', 'duplicate_phone');
         } else if (error.message.includes('이미 등록된 이메일')) {
-          return NextResponse.redirect(new URL('/sign-in?error=duplicate_email', request.url));
+          base.searchParams.set('error', 'duplicate_email');
+        } else {
+          base.searchParams.set('error', 'user_creation_failed');
         }
+        base.searchParams.set('detail', encodeURIComponent(error.message.slice(0, 300)));
+      } else {
+        base.searchParams.set('error', 'user_creation_failed');
       }
-      
-      return NextResponse.redirect(new URL('/sign-in?error=user_creation_failed', request.url));
+      return NextResponse.redirect(base);
     }
 
   } catch (error: any) {
