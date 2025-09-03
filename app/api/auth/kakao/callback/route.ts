@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateRandomName } from '@/lib/randomNameGenerator';
 import { config } from '@/lib/config';
-import { createUser, getUserByExternalId, getUserByEmail, linkSocialAccount } from '@/lib/userService';
+import { createUser, createUserWithServiceRole, getUserByExternalId, getUserByEmail, linkSocialAccount } from '@/lib/userService';
 
 export async function GET(request: NextRequest) {
   try {
@@ -294,7 +294,8 @@ export async function GET(request: NextRequest) {
 
     // 새 사용자 생성
     try {
-      const newUser = await createUser({
+      // RLS/권한 문제를 피하기 위해 service role 경로 사용
+      const newUser = await createUserWithServiceRole({
         email,
         name,
         phoneNumber,

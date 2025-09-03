@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { getServiceSupabase } from './supabaseService';
 
 export interface CreateUserData {
   email: string;
@@ -117,6 +118,36 @@ export async function createUser(userData: CreateUserData): Promise<User> {
     console.error('사용자 생성 중 오류:', error);
     throw error;
   }
+}
+
+// 서버 라우트(Edge/Node)에서 RLS를 우회해 확실히 생성하고자 할 때 사용
+export async function createUserWithServiceRole(userData: CreateUserData): Promise<User> {
+  const svc = getServiceSupabase();
+  // 중복 체크 (service role로 수행)
+  const { data: byPhone } = await svc.from('users').select('id').eq('phoneNumber', userData.phoneNumber).maybeSingle();
+  if (byPhone) throw new Error('이미 등록된 전화번호입니다. 다른 전화번호를 사용해주세요.');
+  const { data: byEmail } = await svc.from('users').select('id').eq('email', userData.email).maybeSingle();
+  if (byEmail) throw new Error('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
+
+  const { data, error } = await svc
+    .from('users')
+    .insert([{
+      email: userData.email,
+      name: userData.name,
+      phoneNumber: userData.phoneNumber,
+      password: userData.password,
+      profileImage: userData.profileImage,
+      signupMethod: userData.signupMethod,
+      externalId: userData.externalId,
+      kakaoMessageConsent: userData.kakaoMessageConsent || false,
+    }])
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(error.message || '회원 생성 실패');
+  }
+  return data as User;
 }
 
 // 이메일로 사용자 조회
