@@ -108,7 +108,8 @@ function SignInForm() {
         const state = Math.random().toString(36).substring(7);
         const baseOrigin = (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SITE_URL) ? process.env.NEXT_PUBLIC_SITE_URL : (typeof window !== 'undefined' ? window.location.origin : naverConfig.redirectUri);
         const naverRedirect = `${baseOrigin}/api/auth/naver/callback`;
-        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverConfig.clientId}&redirect_uri=${encodeURIComponent(naverRedirect)}&state=${state}&scope=email,name,profile_image`;
+        const naverState = btoa(JSON.stringify({ nonce: state, redirectUri: naverRedirect }));
+        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverConfig.clientId}&redirect_uri=${encodeURIComponent(naverRedirect)}&state=${encodeURIComponent(naverState)}&scope=email,name,profile_image`;
         
         console.log('네이버 OAuth URL:', naverAuthUrl);
         window.location.href = naverAuthUrl;
@@ -129,7 +130,8 @@ function SignInForm() {
         const scope = 'account_email';
         const baseOrigin2 = (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SITE_URL) ? process.env.NEXT_PUBLIC_SITE_URL : (typeof window !== 'undefined' ? window.location.origin : kakaoConfig.redirectUri);
         const kakaoRedirect = `${baseOrigin2}/api/auth/kakao/callback`;
-        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoRedirect)}&state=${state}&scope=${encodeURIComponent(scope)}&prompt=consent`;
+        const kakaoState = btoa(JSON.stringify({ nonce: state, redirectUri: kakaoRedirect }));
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoRedirect)}&state=${encodeURIComponent(kakaoState)}&scope=${encodeURIComponent(scope)}&prompt=consent`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
         window.location.href = kakaoAuthUrl;
