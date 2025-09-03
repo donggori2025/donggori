@@ -106,7 +106,8 @@ function SignInForm() {
         }
         
         const state = Math.random().toString(36).substring(7);
-        const naverRedirect = typeof window !== 'undefined' ? `${window.location.origin}/api/auth/naver/callback` : naverConfig.redirectUri;
+        const baseOrigin = (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SITE_URL) ? process.env.NEXT_PUBLIC_SITE_URL : (typeof window !== 'undefined' ? window.location.origin : naverConfig.redirectUri);
+        const naverRedirect = `${baseOrigin}/api/auth/naver/callback`;
         const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverConfig.clientId}&redirect_uri=${encodeURIComponent(naverRedirect)}&state=${state}&scope=email,name,profile_image`;
         
         console.log('네이버 OAuth URL:', naverAuthUrl);
@@ -126,7 +127,8 @@ function SignInForm() {
         const state = Math.random().toString(36).substring(7);
         // Kakao 권한: 이메일만 요청 (profile_nickname은 일부 앱 권한 미지원)
         const scope = 'account_email';
-        const kakaoRedirect = typeof window !== 'undefined' ? `${window.location.origin}/api/auth/kakao/callback` : kakaoConfig.redirectUri;
+        const baseOrigin2 = (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SITE_URL) ? process.env.NEXT_PUBLIC_SITE_URL : (typeof window !== 'undefined' ? window.location.origin : kakaoConfig.redirectUri);
+        const kakaoRedirect = `${baseOrigin2}/api/auth/kakao/callback`;
         const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoRedirect)}&state=${state}&scope=${encodeURIComponent(scope)}&prompt=consent`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
