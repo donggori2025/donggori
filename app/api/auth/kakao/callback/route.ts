@@ -148,6 +148,14 @@ export async function GET(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 60 * 60 * 24, // 24시간 (임시)
       });
+      // snsAccessToken 발급 (초기화되지 않음)
+      try {
+        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: false })
+        });
+      } catch {}
       return response;
     }
 
@@ -205,7 +213,14 @@ export async function GET(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 7일
       });
-
+      // snsAccessToken 발급 (초기화됨)
+      try {
+        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: existingUser.email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: true })
+        });
+      } catch {}
       return response;
     }
 
@@ -230,6 +245,14 @@ export async function GET(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 60 * 60 * 24, // 24시간 (임시)
       });
+      // snsAccessToken 발급 (초기화되지 않음)
+      try {
+        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: false })
+        });
+      } catch {}
 
       return response;
     }
@@ -279,6 +302,15 @@ export async function GET(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 7일
       });
+
+      // snsAccessToken 발급 (초기화됨)
+      try {
+        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: newUser.email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: true })
+        });
+      } catch {}
 
       return response;
 
