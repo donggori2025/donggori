@@ -1,0 +1,67 @@
+import { createClient } from '@supabase/supabase-js';
+import { config } from './config';
+import { sendSMS } from './messaging';
+
+const supabaseServer = config.supabase.url && config.supabase.serviceRoleKey
+  ? createClient(config.supabase.url, config.supabase.serviceRoleKey, { auth: { persistSession: false } })
+  : null;
+
+export type OtpPurpose = 'signup' | 'login' | 'reset';
+
+export async function requestPhoneOtp(phoneE164: string, purpose: OtpPurpose) {
+  if (!supabaseServer) throw new Error('Supabase service key is missing');
+  const code = generateCode(6);
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+
+  // rate limit: 최근 60초 내 발송 체크
+  const { data: recent } = await supabaseServer
+    .from('phone_otps')
+    .select('*')
+    .eq('phone', phoneE164)
+    .order('created_at', { ascending: false })
+    .limit(1);
+  if (recent && recent[0]) {
+    const last = new Date(recent[0].created_at).getTime();
+    if (Date.now() - last < 60 * 1000) {
+      throw new Error('요청이 너무 잦습니다. 잠시 후 다시 시도해주세요.');
+    }
+  }
+
+  const { error } = await supabaseServer.from('phone_otps').insert([
+    { phone: phoneE164, code, purpose, expires_at: expiresAt, created_at: new Date().toISOString() },
+  ]);
+  if (error) throw new Error(error.message);
+
+  await sendSMS(phoneE164, `[동고리] 인증번호 ${code} (5분 내 유효)`);
+  return { ok: true };
+}
+
+export async function verifyPhoneOtp(phoneE164: string, code: string, purpose: OtpPurpose) {
+  if (!supabaseServer) throw new Error('Supabase service key is missing');
+  const { data, error } = await supabaseServer
+    .from('phone_otps')
+    .select('*')
+    .eq('phone', phoneE164)
+    .eq('purpose', purpose)
+    .order('created_at', { ascending: false })
+    .limit(1);
+  if (error) throw new Error(error.message);
+  const record = data?.[0];
+  if (!record) throw new Error('인증 요청을 찾을 수 없습니다.');
+  if (record.code !== code) throw new Error('인증 코드가 올바르지 않습니다.');
+  if (new Date(record.expires_at).getTime() < Date.now()) throw new Error('인증 코드가 만료되었습니다.');
+
+  // 일회성 사용 처리
+  await supabaseServer.from('phone_otps').update({ consumed_at: new Date().toISOString() }).eq('id', record.id);
+  return { ok: true };
+}
+
+function generateCode(length: number) {
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += Math.floor(Math.random() * 10).toString();
+  }
+  return result;
+}
+
+

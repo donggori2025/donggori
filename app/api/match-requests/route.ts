@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { error: insertError } = await supabase
+    const { data: inserted, error: insertError } = await supabase
       .from('match_requests')
       .insert({
         user_id: body.user_id,
@@ -57,7 +57,9 @@ export async function POST(req: Request) {
         additional_info: body.additional_info ?? null,
         created_at: body.created_at ?? new Date().toISOString(),
         updated_at: body.updated_at ?? new Date().toISOString(),
-      });
+      })
+      .select('id')
+      .single();
 
     if (insertError) {
       return NextResponse.json(
@@ -72,7 +74,7 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, id: inserted?.id });
   } catch (err: any) {
     return NextResponse.json(
       {

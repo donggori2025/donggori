@@ -252,6 +252,16 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           alert(`의뢰 제출 중 오류가 발생했습니다.\n${err?.error || res.statusText}`);
           return;
         }
+
+        // 성공 시 알림톡 전송 호출
+        const { id: newId } = await res.json();
+        if (newId) {
+          try {
+            await fetch(`/api/requests/${newId}/notify-factory`, { method: 'POST' });
+          } catch (notifyErr) {
+            console.warn('알림톡 전송 호출 실패(무시):', notifyErr);
+          }
+        }
       } catch (dbError: any) {
         console.error('데이터베이스 저장 중 예외 발생:', dbError, {
           message: dbError?.message,
