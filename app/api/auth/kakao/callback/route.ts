@@ -26,7 +26,15 @@ export async function GET(request: NextRequest) {
     const kakaoClientId = config.oauth.kakao.clientId;
     const kakaoClientSecret = config.oauth.kakao.clientSecret;
     // 클라이언트에서 사용한 것과 정확히 동일한 redirect_uri 사용 (도메인 www 여부 포함)
-    const kakaoRedirectUri = `${new URL(request.url).origin}/api/auth/kakao/callback`;
+    // state에 redirectUri를 담았다면 우선 사용
+    let parsedRedirect: string | null = null;
+    try {
+      if (state) {
+        const decoded = JSON.parse(Buffer.from(state, 'base64').toString('utf-8'));
+        if (decoded?.redirectUri) parsedRedirect = decoded.redirectUri;
+      }
+    } catch {}
+    const kakaoRedirectUri = parsedRedirect || `${new URL(request.url).origin}/api/auth/kakao/callback`;
 
     // Kakao는 client_secret이 선택 사항일 수 있으므로 clientId만 필수로 체크
     if (!kakaoClientId) {

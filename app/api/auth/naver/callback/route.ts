@@ -35,6 +35,14 @@ export async function GET(request: NextRequest) {
     }
 
     // 네이버 OAuth 토큰 교환
+    let parsedRedirect: string | null = null;
+    try {
+      if (state) {
+        const decoded = JSON.parse(Buffer.from(state, 'base64').toString('utf-8'));
+        if (decoded?.redirectUri) parsedRedirect = decoded.redirectUri;
+      }
+    } catch {}
+
     const tokenResponse = await fetch('https://nid.naver.com/oauth2.0/token', {
       method: 'POST',
       headers: {
@@ -46,7 +54,7 @@ export async function GET(request: NextRequest) {
         client_secret: naverClientSecret,
         code,
         state: state || '',
-        redirect_uri: `${new URL(request.url).origin}/api/auth/naver/callback`,
+        redirect_uri: parsedRedirect || `${new URL(request.url).origin}/api/auth/naver/callback`,
       }),
     });
 
