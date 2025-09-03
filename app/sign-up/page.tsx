@@ -416,7 +416,7 @@ function SignUpForm() {
         }
         
         const state = Math.random().toString(36).substring(7);
-        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverConfig.clientId}&redirect_uri=${encodeURIComponent(naverConfig.redirectUri)}&state=${state}&scope=email,name,profile_image`;
+        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverConfig.clientId}&redirect_uri=${encodeURIComponent(naverConfig.redirectUri)}&state=${state}&scope=email,name,profile_image&auth_type=reprompt`;
         
         console.log('네이버 OAuth URL:', naverAuthUrl);
         window.location.href = naverAuthUrl;
@@ -432,8 +432,8 @@ function SignUpForm() {
         }
         
         const state = Math.random().toString(36).substring(7);
-        const scope = 'account_email';
-        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
+        const scope = 'account_email profile_nickname';
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}&prompt=login+consent`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
         window.location.href = kakaoAuthUrl;
