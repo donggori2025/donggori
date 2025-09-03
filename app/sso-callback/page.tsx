@@ -40,11 +40,26 @@ function SSOCallbackContent() {
           signupMethod: "google",
         };
         document.cookie = `temp_google_user=${encodeURIComponent(JSON.stringify(temp))}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
+        // snsAccessToken 발급(초기화 안됨)
+        try {
+          await fetch('/api/auth/sns/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, externalId: user.id, provider: 'google', isInitialized: false })
+          });
+        } catch {}
         router.replace("/sign-up?provider=google");
         return;
       }
 
-      // 전화번호가 있으면 홈으로 이동
+      // 전화번호가 있으면 snsAccessToken 발급 후 홈으로 이동
+      try {
+        await fetch('/api/auth/sns/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, externalId: user.id, provider: 'google', isInitialized: true })
+        });
+      } catch {}
       router.replace("/");
     };
     run();
