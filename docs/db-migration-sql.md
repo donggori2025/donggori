@@ -28,6 +28,20 @@ create table if not exists public.message_logs (
 -- users 테이블 (필요 시 확장)
 alter table public.users
   add column if not exists kakaoMessageConsent boolean default false;
+
+-- 세션 테이블 (일반/소셜 토큰 관리)
+create table if not exists public.sessions (
+  id text primary key, -- 토큰 자체를 키로 사용
+  type text not null check (type in ('local', 'sns')),
+  user_id text,
+  user_email text,
+  external_id text,
+  provider text,
+  is_initialized boolean default false,
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_sessions_user_email on public.sessions(user_email);
 ```
 
 

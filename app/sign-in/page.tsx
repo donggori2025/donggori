@@ -211,6 +211,16 @@ function SignInForm() {
       if (result.status === 'complete') {
         console.log('일반 사용자 로그인 성공');
         
+        // accessToken 발급
+        try {
+          const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+          const js = await res.json();
+          if (!res.ok) throw new Error(js.error || '토큰 발급 실패');
+          document.cookie = `access_token=${js.accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+        } catch (e) {
+          console.warn('accessToken 발급 실패(계속 진행):', e);
+        }
+
         document.cookie = `userType=user; path=/; max-age=${60 * 60 * 24 * 7}`;
         document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}`;
 
