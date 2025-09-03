@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
     const state = searchParams.get('state');
+    const debug = searchParams.get('debug') === '1';
     const error = searchParams.get('error');
 
     console.log('카카오 OAuth 콜백 파라미터:', { code: code ? '있음' : '없음', state, error });
@@ -79,10 +80,11 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
+      if (debug) return NextResponse.json({ step: 'token', ok: false, status: tokenResponse.status, errorText });
       console.error('카카오 OAuth 토큰 교환 실패:', errorText);
       const url = new URL('/sign-in', request.url);
       url.searchParams.set('error', 'kakao_token_http_error');
-      url.searchParams.set('detail', encodeURIComponent(errorText.slice(0, 180)));
+      url.searchParams.set('detail', encodeURIComponent(errorText.slice(0, 300)));
       return NextResponse.redirect(url);
     }
 
@@ -116,10 +118,11 @@ export async function GET(request: NextRequest) {
 
     if (!userInfoResponse.ok) {
       const errorText = await userInfoResponse.text();
+      if (debug) return NextResponse.json({ step: 'userinfo', ok: false, status: userInfoResponse.status, errorText });
       console.error('카카오 사용자 정보 조회 실패:', errorText);
       const url = new URL('/sign-in', request.url);
       url.searchParams.set('error', 'kakao_userinfo_http_error');
-      url.searchParams.set('detail', encodeURIComponent(errorText.slice(0, 180)));
+      url.searchParams.set('detail', encodeURIComponent(errorText.slice(0, 300)));
       return NextResponse.redirect(url);
     }
 
@@ -360,8 +363,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/sign-in?error=user_creation_failed', request.url));
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('카카오 OAuth 콜백 처리 오류:', error);
-    return NextResponse.redirect(new URL('/sign-in?error=server_error', request.url));
+    const url = new URL('/sign-in', request.url);
+    url.searchParams.set('error', 'server_error');
+    if (error?.message) url.searchParams.set('detail', encodeURIComponent(String(error.message).slice(0, 300)));
+    return NextResponse.redirect(url);
   }
 }
