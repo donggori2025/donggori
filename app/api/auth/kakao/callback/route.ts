@@ -25,7 +25,8 @@ export async function GET(request: NextRequest) {
     // 카카오 OAuth 환경 변수 검증
     const kakaoClientId = config.oauth.kakao.clientId;
     const kakaoClientSecret = config.oauth.kakao.clientSecret;
-    const kakaoRedirectUri = config.oauth.kakao.redirectUri;
+    // 클라이언트에서 사용한 것과 정확히 동일한 redirect_uri 사용 (도메인 www 여부 포함)
+    const kakaoRedirectUri = `${new URL(request.url).origin}/api/auth/kakao/callback`;
 
     // Kakao는 client_secret이 선택 사항일 수 있으므로 clientId만 필수로 체크
     if (!kakaoClientId) {

@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
         client_secret: naverClientSecret,
         code,
         state: state || '',
+        redirect_uri: `${new URL(request.url).origin}/api/auth/naver/callback`,
       }),
     });
 
