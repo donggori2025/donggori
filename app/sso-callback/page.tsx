@@ -1,13 +1,54 @@
 "use client";
-import { AuthenticateWithRedirectCallback } from "@clerk/nextjs";
-import { Suspense } from "react";
+import { AuthenticateWithRedirectCallback, useUser } from "@clerk/nextjs";
+import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export const dynamic = "force-dynamic";
 function SSOCallbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const error = searchParams.get("error");
+  const { isLoaded, isSignedIn, user } = useUser();
+
+  useEffect(() => {
+    const run = async () => {
+      if (!isLoaded || !isSignedIn || !user) return;
+      // 이메일 기준으로 사용자 레코드 조회
+      const email = user.emailAddresses?.[0]?.emailAddress || "";
+      if (!email) {
+        router.push("/sign-in?error=no_email");
+        return;
+      }
+
+      const { data, error: dbError } = await supabase
+        .from("users")
+        .select("id, phoneNumber, name, profileImage")
+        .eq("email", email)
+        .limit(1)
+        .maybeSingle();
+
+      // 클라이언트 쿠키에 임시 사용자 저장 후 가입 폼으로 유도 (전화번호가 없거나 사용자 레코드 없음)
+      if (dbError || !data || !data.phoneNumber) {
+        const temp = {
+          email,
+          name: user.firstName || user.username || "",
+          phoneNumber: undefined,
+          profileImage: user.imageUrl,
+          googleId: user.id,
+          isOAuthUser: true,
+          signupMethod: "google",
+        };
+        document.cookie = `temp_google_user=${encodeURIComponent(JSON.stringify(temp))}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
+        router.replace("/sign-up?provider=google");
+        return;
+      }
+
+      // 전화번호가 있으면 홈으로 이동
+      router.replace("/");
+    };
+    run();
+  }, [isLoaded, isSignedIn, user, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white p-6">
@@ -26,7 +67,7 @@ function SSOCallbackContent() {
             <button onClick={() => router.push('/sign-in')} className="px-4 py-2 bg-black text-white rounded">로그인 페이지로 돌아가기</button>
           </>
         )}
-        <AuthenticateWithRedirectCallback redirectUrl="/sso-callback" afterSignInUrl="/" afterSignUpUrl="/" />
+        <AuthenticateWithRedirectCallback redirectUrl="/sso-callback" afterSignInUrl="/sso-callback" afterSignUpUrl="/sso-callback" />
       </div>
     </div>
   );

@@ -40,8 +40,8 @@ function SignUpForm() {
 
   // OAuth 사용자 정보 로드
   useEffect(() => {
-    if (provider === 'kakao' || provider === 'naver') {
-      const tempUserKey = provider === 'kakao' ? 'temp_kakao_user' : 'temp_naver_user';
+    if (provider === 'kakao' || provider === 'naver' || provider === 'google') {
+      const tempUserKey = provider === 'kakao' ? 'temp_kakao_user' : provider === 'naver' ? 'temp_naver_user' : 'temp_google_user';
       const tempUserStr = document.cookie
         .split('; ')
         .find(row => row.startsWith(tempUserKey + '='))

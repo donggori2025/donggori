@@ -124,8 +124,8 @@ function SignInForm() {
         
         const state = Math.random().toString(36).substring(7);
         // Kakao 권한: 이메일만 요청 (profile_nickname은 일부 앱 권한 미지원)
-        const scope = 'account_email';
-        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
+        const scope = 'account_email profile_nickname phone_number age_range';
+        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoConfig.redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}&prompt=consent`;
         
         console.log('카카오 OAuth URL:', kakaoAuthUrl);
         window.location.href = kakaoAuthUrl;
