@@ -35,13 +35,26 @@ export async function GET(request: NextRequest) {
     }
 
     // 네이버 OAuth 토큰 교환
+    // 안전한 base64 JSON 디코더 (Edge/Node 모두 동작)
+    const safeDecodeState = (s: string | null) => {
+      if (!s) return null as any;
+      try {
+        if (typeof Buffer !== 'undefined') {
+          return JSON.parse(Buffer.from(s, 'base64').toString('utf-8'));
+        }
+      } catch {}
+      try {
+        const bin = atob(s);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        return JSON.parse(new TextDecoder().decode(bytes));
+      } catch {}
+      return null as any;
+    };
+
     let parsedRedirect: string | null = null;
-    try {
-      if (state) {
-        const decoded = JSON.parse(Buffer.from(state, 'base64').toString('utf-8'));
-        if (decoded?.redirectUri) parsedRedirect = decoded.redirectUri;
-      }
-    } catch {}
+    const stateObj = safeDecodeState(state);
+    if (stateObj?.redirectUri) parsedRedirect = stateObj.redirectUri;
 
     const tokenResponse = await fetch('https://nid.naver.com/oauth2.0/token', {
       method: 'POST',
