@@ -9,6 +9,13 @@ export default function middleware(req: NextRequest, ev: NextFetchEvent) {
     const host = (req.headers.get('host') || '').toLowerCase();
     const pathname = req.nextUrl.pathname;
 
+    // 프로덕션에서 non-www를 www로 정규화 (OAuth redirect_uri 안정화)
+    if (process.env.NODE_ENV === 'production' && host === 'donggori.com') {
+      const url = new URL(req.url);
+      url.hostname = 'www.donggori.com';
+      return NextResponse.redirect(url, 308);
+    }
+
     // 팩토리/관리자 로그인 및 공개 페이지에서는 Clerk 미들웨어 완전 우회
     const bypassPaths = [
       '/sign-in',
