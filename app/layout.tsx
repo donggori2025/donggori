@@ -19,6 +19,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "동고리 - 봉제공장 찾기",
   description: "봉제공장을 쉽게 찾고 연결할 수 있는 플랫폼",
+  verification: {
+    google: "LCeILHoTlwmHGlbfN4HuuXz3FcZtrmw_iQppOlEOO4s",
+  },
 };
 
 // Clerk 설정 검증
