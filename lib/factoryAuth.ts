@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import { getFactoryImages as getPresetImagesByName } from "./factoryImages";
 
 // 봉제공장 업장별 로그인 정보
 export interface FactoryAuth {
@@ -316,7 +317,7 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
 
     const { data, error } = await supabase
       .from('donggori')
-      .select('image')
+      .select('image, company_name, name')
       .eq('id', factoryId)
       .single();
 
@@ -332,12 +333,19 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
       return [];
     }
 
-    // image 컬럼은 단일 문자열이므로 배열로 변환
-    const imageUrl = data?.image;
-    const images = imageUrl ? [imageUrl] : [];
-    
-    console.log('공장 이미지 조회 성공:', { factoryId, imageUrl, images });
-    return images;
+    // DB 대표 이미지
+    const primary = data?.image ? [data.image as string] : [];
+    // 프리셋 이미지(공장명 기반) 병합
+    const factoryName = (data?.company_name || data?.name || getRealFactoryName(factoryId)) as string;
+    const preset = factoryName ? getPresetImagesByName(factoryName) : [];
+    // 중복 제거
+    const merged = Array.from(new Set([...
+      primary,
+      ...preset
+    ].filter(Boolean)));
+
+    console.log('공장 이미지 조회 성공:', { factoryId, primary, presetCount: preset.length });
+    return merged;
   } catch (error) {
     console.error('공장 이미지 조회 중 예외 발생:', {
       factoryId,
@@ -351,7 +359,7 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
 // 공장 이미지 업데이트
 export async function updateFactoryImages(factoryId: string, images: string[]) {
   try {
-    // images 배열의 첫 번째 이미지를 image 컬럼에 저장
+    // images 배열의 첫 번째 이미지를 DB 대표 이미지로 저장
     const imageUrl = images.length > 0 ? images[0] : null;
     
     const { data, error } = await supabase
