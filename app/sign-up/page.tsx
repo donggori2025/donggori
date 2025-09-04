@@ -481,14 +481,29 @@ function SignUpForm() {
         
         {/* 전화번호 입력 */}
         <label className="text-sm font-semibold">전화번호 <span className="text-red-500">*</span></label>
-        <input
-          type="tel"
-          placeholder="전화번호를 입력해주세요. (예: 010-1234-5678)"
-          value={phone}
-          onChange={e => setPhone(formatPhone(e.target.value))}
-          required
-          className="border rounded px-3 py-2"
-        />
+        <div className="flex gap-2">
+          <input
+            type="tel"
+            placeholder="전화번호를 입력해주세요. (예: 010-1234-5678)"
+            value={phone}
+            onChange={e => setPhone(formatPhone(e.target.value))}
+            required
+            className="border rounded px-3 py-2 flex-1"
+          />
+          {!verificationSent && (
+            <button type="button" onClick={requestPhoneOtp} className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold hover:bg-gray-300" disabled={loading || !validatePhone(phone)}>
+              휴대폰 인증
+            </button>
+          )}
+          {verificationSent && !emailVerified && (
+            <button type="button" className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold" disabled>
+              인증코드 발송됨
+            </button>
+          )}
+          {emailVerified && (
+            <span className="px-4 py-2 bg-green-100 text-green-700 rounded text-sm font-semibold">인증완료</span>
+          )}
+        </div>
         
         <label className="text-sm font-semibold">이메일</label>
         <div className="flex gap-2">
@@ -499,9 +514,9 @@ function SignUpForm() {
             onChange={e => setEmail(e.target.value)}
             required
             className="border rounded px-3 py-2 flex-1"
-            disabled={emailVerified}
+            disabled={false}
           />
-          <span className="px-4 py-2 bg-gray-100 text-gray-500 rounded text-sm">이메일 인증 불필요</span>
+          {/* 이메일 인증 불필요 표시 제거 */}
         </div>
         {/* 인증코드 입력 및 타이머 */}
         {verificationSent && !emailVerified && (
