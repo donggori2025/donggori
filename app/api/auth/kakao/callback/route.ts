@@ -203,14 +203,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // 정책: 소셜 신규 또는 기존 사용자라도 약관 동의를 위해 항상 회원가입 폼으로 유도
+    // 단, 폼에서 필요한 동의/부족정보 채운 뒤 최종 가입/로그인 처리
     if (existingUser) {
-      // 기존 사용자가 있으나 전화번호가 없다면 보완입력으로 유도
-      if (!existingUser.phoneNumber) {
-        const response = NextResponse.redirect(new URL('/sign-up?provider=kakao', request.url));
+      const response = NextResponse.redirect(new URL('/sign-up?provider=kakao', request.url));
         response.cookies.set('temp_kakao_user', JSON.stringify({
           email: existingUser.email,
-          name,
-          phoneNumber: undefined,
+          name: existingUser.name || name,
+          phoneNumber: existingUser.phoneNumber,
           profileImage,
           kakaoId: kakaoUser.id,
           isOAuthUser: true,
@@ -221,39 +221,10 @@ export async function GET(request: NextRequest) {
           sameSite: 'lax',
           maxAge: 60 * 60 * 24,
         });
-        try {
-          await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: existingUser.email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: false })
-          });
-        } catch {}
-        return response;
-      }
-
-      // 전화번호가 있으면 로그인 처리
-      console.log('기존 카카오 사용자 로그인:', existingUser.email);
-      const response = NextResponse.redirect(new URL('/', request.url));
-      response.cookies.set('kakao_user', JSON.stringify({
-        email: existingUser.email,
-        name: existingUser.name,
-        phoneNumber: existingUser.phoneNumber,
-        profileImage: existingUser.profileImage,
-        kakaoId: kakaoUser.id,
-        isOAuthUser: true,
-        signupMethod: 'kakao',
-      }), {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7,
-      });
-      response.cookies.set('userType', 'user', { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 });
-      response.cookies.set('isLoggedIn', 'true', { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 });
       try {
         await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: existingUser.email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: true })
+          body: JSON.stringify({ email: existingUser.email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: false })
         });
       } catch {}
       return response;
@@ -292,29 +263,14 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
-    // 새 사용자 생성
+    // 새 사용자라도 폼에서 동의 후 가입하도록 temp 쿠키만 설정하고 폼으로 이동
     try {
-      // RLS/권한 문제를 피하기 위해 service role 경로 사용
-      const newUser = await createUserWithServiceRole({
+      const response = NextResponse.redirect(new URL('/sign-up?provider=kakao', request.url));
+      response.cookies.set('temp_kakao_user', JSON.stringify({
         email,
         name,
-        phoneNumber,
+        phoneNumber: undefined,
         profileImage,
-        signupMethod: 'kakao',
-        externalId: kakaoUser.id.toString(),
-        kakaoMessageConsent: false,
-      });
-
-      console.log('새 카카오 사용자 생성 성공:', newUser.email);
-
-      const response = NextResponse.redirect(new URL('/', request.url));
-      
-      // 사용자 정보를 쿠키에 저장
-      response.cookies.set('kakao_user', JSON.stringify({
-        email: newUser.email,
-        name: newUser.name,
-        phoneNumber: newUser.phoneNumber,
-        profileImage: newUser.profileImage,
         kakaoId: kakaoUser.id,
         isOAuthUser: true,
         signupMethod: 'kakao',
@@ -322,34 +278,15 @@ export async function GET(request: NextRequest) {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7일
+        maxAge: 60 * 60 * 24,
       });
-
-      response.cookies.set('userType', 'user', {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7일
-      });
-
-      response.cookies.set('isLoggedIn', 'true', {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7일
-      });
-
-      // snsAccessToken 발급 (초기화됨)
       try {
         await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: newUser.email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: true })
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: false })
         });
       } catch {}
-
       return response;
-
     } catch (error: any) {
       console.error('카카오 사용자 생성 실패:', error);
       const base = new URL('/sign-in', request.url);

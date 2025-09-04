@@ -18,7 +18,7 @@ function SignUpForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [emailVerified, setEmailVerified] = useState(false); // 이메일 인증 여부
+  const [emailVerified, setEmailVerified] = useState(true); // 이메일 인증 비활성화
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   // 약관 동의 상태
@@ -126,44 +126,8 @@ function SignUpForm() {
     }
   };
 
-  // 이메일 인증 요청
-  const handleEmailVerify = async () => {
-    setError("");
-    if (!email) {
-      setError("이메일을 입력해주세요.");
-      return;
-    }
-    const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
-    const cleanEmail = normalizeInvisible(email).toLowerCase();
-    const cleanPassword = normalizeInvisible(password || "TempPassword!1");
-    // 기본 이메일 형식 검증
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(cleanEmail)) {
-      setError("올바른 이메일 형식이 아닙니다.");
-      return;
-    }
-    
-    // 도메인 제한 확인 (임시로 비활성화)
-    // const domainError = clerkConfig.getDomainError(email);
-    // if (domainError) {
-    //   setError(domainError);
-    //   return;
-    // }
-    
-    setLoading(true);
-    try {
-      await signUp?.create({ emailAddress: cleanEmail, password: cleanPassword });
-      await signUp?.prepareEmailAddressVerification({ strategy: "email_code" });
-      setVerificationSent(true);
-      setVerificationCode("");
-      startTimer();
-    } catch (err: unknown) {
-      console.error('Clerk 오류:', err);
-      setError(handleClerkError(err));
-    } finally {
-      setLoading(false);
-    }
-  };
+  // 이메일 인증 제거
+  const handleEmailVerify = async () => {};
 
   // 인증번호 재요청
   const handleResend = async () => {
@@ -271,7 +235,7 @@ function SignUpForm() {
     //   return;
     // }
     
-    if (!emailVerified) return setError("휴대폰 인증 또는 이메일 인증을 완료해주세요.");
+    if (!emailVerified) return setError("휴대폰 인증을 완료해주세요.");
     if (!agreeTerms || !agreePrivacy) return setError("필수 약관에 동의해주세요.");
     
     setLoading(true);
@@ -526,7 +490,7 @@ function SignUpForm() {
           className="border rounded px-3 py-2"
         />
         
-        <label className="text-sm font-semibold">이메일 <span className="text-red-500">*</span></label>
+        <label className="text-sm font-semibold">이메일</label>
         <div className="flex gap-2">
           <input
             type="email"
@@ -537,19 +501,7 @@ function SignUpForm() {
             className="border rounded px-3 py-2 flex-1"
             disabled={emailVerified}
           />
-          {!emailVerified && !verificationSent && (
-            <button type="button" onClick={handleEmailVerify} className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold hover:bg-gray-300" disabled={loading}>
-              이메일 인증
-            </button>
-          )}
-          {verificationSent && !emailVerified && (
-            <button type="button" className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold" disabled>
-              인증코드 발송됨
-            </button>
-          )}
-          {emailVerified && (
-            <span className="px-4 py-2 bg-green-100 text-green-700 rounded text-sm font-semibold">인증완료</span>
-          )}
+          <span className="px-4 py-2 bg-gray-100 text-gray-500 rounded text-sm">이메일 인증 불필요</span>
         </div>
         {/* 인증코드 입력 및 타이머 */}
         {verificationSent && !emailVerified && (
@@ -586,7 +538,7 @@ function SignUpForm() {
               onChange={e => setPassword(e.target.value)}
               required
               className="border rounded px-3 py-2"
-              disabled={!emailVerified}
+              disabled={false}
             />
             <label className="text-sm font-semibold">비밀번호 확인 <span className="text-red-500">*</span></label>
             <input
@@ -596,7 +548,7 @@ function SignUpForm() {
               onChange={e => setPasswordConfirm(e.target.value)}
               required
               className="border rounded px-3 py-2"
-              disabled={!emailVerified}
+              disabled={false}
             />
           </>
         )}

@@ -146,69 +146,22 @@ export async function GET(request: NextRequest) {
     }
 
     if (existingUser) {
-      // 전화번호가 없으면 보완입력으로 유도
-      if (!existingUser.phoneNumber) {
-        const response = NextResponse.redirect(new URL('/sign-up?provider=naver', request.url));
-        response.cookies.set('temp_naver_user', JSON.stringify({
-          email: existingUser.email,
-          name,
-          phoneNumber: undefined,
-          profileImage,
-          naverId: naverUser.id,
-          isOAuthUser: true,
-          signupMethod: 'naver',
-        }), { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 60 * 60 * 24 });
-        try {
-          await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: existingUser.email, externalId: naverUser.id, provider: 'naver', isInitialized: false })
-          });
-        } catch {}
-        return response;
-      }
-
-      // 기존 사용자가 있으면 로그인 처리
-      console.log('기존 네이버 사용자 로그인:', existingUser.email);
-      const response = NextResponse.redirect(new URL('/', request.url));
-      
-      // 사용자 정보를 쿠키에 저장
-      response.cookies.set('naver_user', JSON.stringify({
+      const response = NextResponse.redirect(new URL('/sign-up?provider=naver', request.url));
+      response.cookies.set('temp_naver_user', JSON.stringify({
         email: existingUser.email,
-        name: existingUser.name,
+        name: existingUser.name || name,
         phoneNumber: existingUser.phoneNumber,
-        profileImage: existingUser.profileImage,
+        profileImage,
         naverId: naverUser.id,
         isOAuthUser: true,
         signupMethod: 'naver',
-      }), {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7일
-      });
-
-      response.cookies.set('userType', 'user', {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7일
-      });
-
-      response.cookies.set('isLoggedIn', 'true', {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7일
-      });
-      // snsAccessToken 발급 (초기화됨)
+      }), { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 60 * 60 * 24 });
       try {
         await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: existingUser.email, externalId: naverUser.id, provider: 'naver', isInitialized: true })
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: existingUser.email, externalId: naverUser.id, provider: 'naver', isInitialized: false })
         });
       } catch {}
-
       return response;
     }
 
