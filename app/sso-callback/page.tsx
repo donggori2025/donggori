@@ -14,53 +14,31 @@ function SSOCallbackContent() {
   useEffect(() => {
     const run = async () => {
       if (!isLoaded || !isSignedIn || !user) return;
-      // 이메일 기준으로 사용자 레코드 조회
       const email = user.emailAddresses?.[0]?.emailAddress || "";
       if (!email) {
         router.push("/sign-in?error=no_email");
         return;
       }
 
-      const { data, error: dbError } = await supabase
-        .from("users")
-        .select("id, phoneNumber, name, profileImage")
-        .eq("email", email)
-        .limit(1)
-        .maybeSingle();
-
-      // 클라이언트 쿠키에 임시 사용자 저장 후 가입 폼으로 유도 (전화번호가 없거나 사용자 레코드 없음)
-      if (dbError || !data || !data.phoneNumber) {
-        const temp = {
-          email,
-          name: user.firstName || user.username || "",
-          phoneNumber: undefined,
-          profileImage: user.imageUrl,
-          googleId: user.id,
-          isOAuthUser: true,
-          signupMethod: "google",
-        };
-        document.cookie = `temp_google_user=${encodeURIComponent(JSON.stringify(temp))}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
-        // snsAccessToken 발급(초기화 안됨)
-        try {
-          await fetch('/api/auth/sns/session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, externalId: user.id, provider: 'google', isInitialized: false })
-          });
-        } catch {}
-        router.replace("/sign-up?provider=google");
-        return;
-      }
-
-      // 전화번호가 있으면 snsAccessToken 발급 후 홈으로 이동
+      // 정책: 소셜 로그인은 항상 회원가입 폼으로 유도하여 동의 항목 확인 후 가입
+      const temp = {
+        email,
+        name: user.firstName || user.username || "",
+        phoneNumber: undefined,
+        profileImage: user.imageUrl,
+        googleId: user.id,
+        isOAuthUser: true,
+        signupMethod: "google",
+      };
+      document.cookie = `temp_google_user=${encodeURIComponent(JSON.stringify(temp))}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
       try {
         await fetch('/api/auth/sns/session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, externalId: user.id, provider: 'google', isInitialized: true })
+          body: JSON.stringify({ email, externalId: user.id, provider: 'google', isInitialized: false })
         });
       } catch {}
-      router.replace("/");
+      router.replace("/sign-up?provider=google");
     };
     run();
   }, [isLoaded, isSignedIn, user, router]);
