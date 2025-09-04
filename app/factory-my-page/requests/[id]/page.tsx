@@ -77,12 +77,9 @@ export default function RequestDetailPage() {
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-8">
-        <div className="flex justify-between items-start mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">의뢰 상세보기</h1>
-            <p className="text-gray-600">의뢰 ID: {request.id}</p>
-          </div>
-          <div className="flex items-center gap-4">
+        <div className="mb-8">
+          <div className="flex justify-between items-start mb-4">
+            <h1 className="text-3xl font-bold text-gray-900">의뢰 상세보기</h1>
             <span className={`px-4 py-2 rounded-full text-sm font-medium ${
               request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
               request.status === 'accepted' ? 'bg-green-100 text-green-800' :
@@ -94,23 +91,24 @@ export default function RequestDetailPage() {
                request.status === 'rejected' ? '거절됨' :
                '완료됨'}
             </span>
-            {request.status === 'pending' && (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleStatusUpdate('accepted')}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                >
-                  수락
-                </button>
-                <button
-                  onClick={() => handleStatusUpdate('rejected')}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-                >
-                  거절
-                </button>
-              </div>
-            )}
           </div>
+          <p className="text-gray-600 mb-4">의뢰 ID: {request.id}</p>
+          {request.status === 'pending' && (
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleStatusUpdate('accepted')}
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+              >
+                수락
+              </button>
+              <button
+                onClick={() => handleStatusUpdate('rejected')}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              >
+                거절
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 의뢰자 정보 */}
@@ -288,18 +286,10 @@ export default function RequestDetailPage() {
         <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
           <button
             onClick={() => router.back()}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >
             목록으로
           </button>
-          {request.status === 'pending' && (
-            <button
-              onClick={() => handleStatusUpdate('accepted')}
-              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-            >
-              의뢰 수락
-            </button>
-          )}
         </div>
       </div>
     </div>
