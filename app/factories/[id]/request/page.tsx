@@ -10,9 +10,56 @@ import Image from "next/image";
 
 function isAppLoggedIn() {
   try {
-    if (typeof document !== 'undefined' && document.cookie.includes('isLoggedIn=true')) return true;
+    if (typeof document === 'undefined') return false;
+    
+    // 일반 로그인 확인
+    if (document.cookie.includes('isLoggedIn=true')) return true;
     if (typeof localStorage !== 'undefined' && (localStorage.getItem('userType') || localStorage.getItem('isLoggedIn') === 'true')) return true;
-  } catch {}
+    
+    // 소셜 로그인 쿠키 확인
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+      return null;
+    };
+    
+    // 카카오 로그인 확인
+    const kakaoUser = getCookie('kakao_user');
+    if (kakaoUser) {
+      try {
+        const user = JSON.parse(decodeURIComponent(kakaoUser));
+        if (user && user.id && user.email) return true;
+      } catch (e) {
+        console.error('카카오 사용자 쿠키 파싱 오류:', e);
+      }
+    }
+    
+    // 네이버 로그인 확인
+    const naverUser = getCookie('naver_user');
+    if (naverUser) {
+      try {
+        const user = JSON.parse(decodeURIComponent(naverUser));
+        if (user && user.id && user.email) return true;
+      } catch (e) {
+        console.error('네이버 사용자 쿠키 파싱 오류:', e);
+      }
+    }
+    
+    // 팩토리 로그인 확인
+    const factoryUser = getCookie('factory_user');
+    if (factoryUser) {
+      try {
+        const user = JSON.parse(decodeURIComponent(factoryUser));
+        if (user && user.id) return true;
+      } catch (e) {
+        console.error('팩토리 사용자 쿠키 파싱 오류:', e);
+      }
+    }
+    
+  } catch (error) {
+    console.error('로그인 상태 확인 오류:', error);
+  }
   return false;
 }
 
@@ -26,19 +73,47 @@ function getAppUserIdentity() {
       if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
       return null;
     };
+    
+    // 카카오 사용자 정보 확인
     const kakao = getCookie('kakao_user');
-    if (kakao && !name) {
-      const u = JSON.parse(decodeURIComponent(kakao));
-      return { name: u?.name || '', phone: u?.phoneNumber || phone };
+    if (kakao) {
+      try {
+        const u = JSON.parse(decodeURIComponent(kakao));
+        if (u && u.id && u.email) {
+          return { 
+            name: u.name || name, 
+            phone: u.phoneNumber || phone,
+            id: u.id,
+            email: u.email
+          };
+        }
+      } catch (e) {
+        console.error('카카오 사용자 정보 파싱 오류:', e);
+      }
     }
+    
+    // 네이버 사용자 정보 확인
     const naver = getCookie('naver_user');
-    if (naver && !name) {
-      const u = JSON.parse(decodeURIComponent(naver));
-      return { name: u?.name || '', phone };
+    if (naver) {
+      try {
+        const u = JSON.parse(decodeURIComponent(naver));
+        if (u && u.id && u.email) {
+          return { 
+            name: u.name || name, 
+            phone: u.phoneNumber || phone,
+            id: u.id,
+            email: u.email
+          };
+        }
+      } catch (e) {
+        console.error('네이버 사용자 정보 파싱 오류:', e);
+      }
     }
-    return { name, phone };
-  } catch {
-    return { name: '', phone: '' };
+    
+    return { name, phone, id: '', email: '' };
+  } catch (error) {
+    console.error('사용자 정보 가져오기 오류:', error);
+    return { name: '', phone: '', id: '', email: '' };
   }
 }
 
@@ -241,9 +316,10 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
       // 서버 API 경유로 의뢰 데이터 저장 (RLS 회피 및 상세 오류 전달)
       try {
+        const loggedInUser = getAppUserIdentity();
         const payload = {
-          user_id: `user_${Date.now()}`,
-          user_email: `${formData.name || 'user'}@example.com`,
+          user_id: loggedInUser.id || `user_${Date.now()}`,
+          user_email: loggedInUser.email || `${formData.name || 'user'}@example.com`,
           user_name: formData.name,
           factory_id: factoryId,
           factory_name: factoryName,
