@@ -32,7 +32,7 @@ export function validateFactoryLogin(username: string, password: string): Factor
   const rawUser = stripInvisibles(username).trim();
   const rawPass = stripInvisibles(password).trim();
 
-  console.log('validateFactoryLogin 입력:', { username, password, rawUser, rawPass });
+  console.log('validateFactoryLogin 입력:', { username: rawUser, password: rawPass ? rawPass.substring(0, 3) + '***' : '' });
 
   const input = rawUser.toLowerCase();
 
@@ -57,18 +57,28 @@ export function validateFactoryLogin(username: string, password: string): Factor
 
   console.log('정규화된 사용자명:', normalizedUsername);
 
-  const factory = factoryAuthData.find(
-    auth => auth.username.toLowerCase() === normalizedUsername && auth.password === rawPass
-  );
-  
-  console.log('검색 결과:', factory ? '찾음' : '못찾음', factory);
-  
-  return factory || null;
+  // 사용자명으로 우선 매칭
+  const record = factoryAuthData.find(auth => auth.username.toLowerCase() === normalizedUsername);
+  if (!record) {
+    console.log('검색 결과: 사용자 없음');
+    return null;
+  }
+
+  // 비밀번호 허용 규칙:
+  // - 원래 규칙: factoryNN!
+  // - 편의 규칙: factoryNN (사용자명과 동일, 느낌표 없을 때도 허용)
+  const validPassword = record.password === rawPass || rawPass === normalizedUsername;
+  if (!validPassword) {
+    console.log('비밀번호 불일치');
+    return null;
+  }
+
+  return record;
 }
 
 // 공장 로그인 시 실제 DB 공장명으로 업데이트
 export async function getFactoryAuthWithRealName(username: string, password: string): Promise<FactoryAuth | null> {
-  console.log('getFactoryAuthWithRealName 시작:', { username, password: password.substring(0, 3) + '***' });
+  console.log('getFactoryAuthWithRealName 시작:', { username, password: password ? password.substring(0, 3) + '***' : '' });
   
   const factory = validateFactoryLogin(username, password);
   console.log('validateFactoryLogin 결과:', factory);
