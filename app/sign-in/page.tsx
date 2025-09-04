@@ -177,6 +177,12 @@ function SignInForm() {
         document.cookie = `userType=factory; path=/; max-age=${60 * 60 * 24 * 7}`;
         document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}`;
 
+        // Header는 localStorage의 userType/factoryAuth를 읽으므로 로컬에도 저장
+        try {
+          localStorage.setItem('userType', 'factory');
+          localStorage.setItem('factoryAuth', JSON.stringify(factoryAuth));
+        } catch {}
+
         window.location.href = '/';
         return;
       }
