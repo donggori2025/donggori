@@ -173,6 +173,20 @@ function SignUpForm() {
   const requestPhoneOtp = async () => {
     setError("");
     if (!phone || !validatePhone(phone)) return setError("올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)");
+    // 소셜 회원가입(전화번호 미제공 케이스 포함)에서는 인증 전에 중복 번호 체크
+    if (provider === 'kakao' || provider === 'naver' || provider === 'google') {
+      try {
+        const exists = await checkPhoneNumberExists(phone);
+        if (exists) {
+          const msg = '이미 등록된 전화번호라 해당 소셜로는 회원가입할 수 없습니다.';
+          setError(msg);
+          if (typeof window !== 'undefined') alert(msg);
+          return;
+        }
+      } catch (e) {
+        // 중복 체크 실패 시에도 인증 요청을 막지는 않음
+      }
+    }
     setLoading(true);
     try {
       const res = await fetch('/api/auth/phone/request', {
@@ -257,7 +271,10 @@ function SignUpForm() {
           // 전화번호 중복 체크
           const phoneExists = await checkPhoneNumberExists(phone);
           if (phoneExists) {
-            setError('이미 등록된 전화번호입니다.');
+            const msg = '이미 등록된 전화번호라 해당 소셜로는 회원가입이 불가합니다. 메인으로 이동합니다.';
+            setError(msg);
+            if (typeof window !== 'undefined') alert(msg);
+            window.location.href = '/';
             return;
           }
           
