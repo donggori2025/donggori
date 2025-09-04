@@ -20,6 +20,44 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const thumbnailRef = useRef<HTMLDivElement>(null);
 
+  // 앱 레벨 로그인 감지 (Clerk 또는 커스텀 쿠키/스토리지)
+  const isAppLoggedIn = () => {
+    try {
+      if (user) return true;
+      if (typeof document !== 'undefined' && document.cookie.includes('isLoggedIn=true')) return true;
+      if (typeof localStorage !== 'undefined' && (localStorage.getItem('userType') || localStorage.getItem('isLoggedIn') === 'true')) return true;
+    } catch {}
+    return false;
+  };
+
+  const getAppUserName = () => {
+    // Clerk 우선, 없으면 로컬 저장된 이름 사용
+    const n = user?.firstName || user?.username || '';
+    if (n) return n;
+    try {
+      const lsName = localStorage.getItem('userName');
+      if (lsName) return lsName;
+      // 쿠키에서 카카오/네이버 사용자명 시도
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+        return null;
+      };
+      const kakao = getCookie('kakao_user');
+      if (kakao) {
+        const u = JSON.parse(decodeURIComponent(kakao));
+        if (u?.name) return u.name;
+      }
+      const naver = getCookie('naver_user');
+      if (naver) {
+        const u = JSON.parse(decodeURIComponent(naver));
+        if (u?.name) return u.name;
+      }
+    } catch {}
+    return '';
+  };
+
   useEffect(() => {
     (async () => {
       const resolved = await params;
@@ -126,10 +164,13 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   if (!factory) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 공장입니다.</div>;
 
   const handleKakaoInquiry = () => {
-    if (!user) return;
+    if (!isAppLoggedIn()) {
+      alert('로그인 후 이용 가능합니다.');
+      return;
+    }
     const inquiry = {
       id: Date.now(),
-      userId: user.id,
+      userId: user?.id || 'custom',
       factoryId: factory.id,
       factoryName: factory.company_name,
       date: new Date().toISOString().slice(0, 10),
@@ -634,11 +675,11 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                   <Button 
                     className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
                     onClick={() => {
-                      if (!user) {
+                      if (!isAppLoggedIn()) {
                         alert('로그인 후 이용 가능합니다.');
                         return;
                       }
-                      const userName = user.firstName || '';
+                      const userName = getAppUserName();
                       window.location.href = `/factories/${factoryId}/request?service=standard&name=${encodeURIComponent(userName)}`;
                     }}
                   >
@@ -667,11 +708,11 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                   <Button 
                     className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
                     onClick={() => {
-                      if (!user) {
+                      if (!isAppLoggedIn()) {
                         alert('로그인 후 이용 가능합니다.');
                         return;
                       }
-                      const userName = user.firstName || '';
+                      const userName = getAppUserName();
                       window.location.href = `/factories/${factoryId}/request?service=deluxe&name=${encodeURIComponent(userName)}`;
                     }}
                   >
@@ -701,11 +742,11 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                   <Button 
                     className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
                     onClick={() => {
-                      if (!user) {
+                      if (!isAppLoggedIn()) {
                         alert('로그인 후 이용 가능합니다.');
                         return;
                       }
-                      const userName = user.firstName || '';
+                      const userName = getAppUserName();
                       window.location.href = `/factories/${factoryId}/request?service=premium&name=${encodeURIComponent(userName)}`;
                     }}
                   >
