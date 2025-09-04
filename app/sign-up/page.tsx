@@ -494,18 +494,16 @@ function SignUpForm() {
             required
             className="border rounded px-3 py-2 flex-1"
           />
-          {!verificationSent && (
-            <button type="button" onClick={requestPhoneOtp} className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold hover:bg-gray-300" disabled={loading || !validatePhone(phone)}>
-              휴대폰 인증
-            </button>
-          )}
-          {verificationSent && !emailVerified && (
+          {emailVerified ? (
+            <span className="px-4 py-2 bg-green-100 text-green-700 rounded text-sm font-semibold">인증완료</span>
+          ) : verificationSent ? (
             <button type="button" className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold" disabled>
               인증코드 발송됨
             </button>
-          )}
-          {emailVerified && (
-            <span className="px-4 py-2 bg-green-100 text-green-700 rounded text-sm font-semibold">인증완료</span>
+          ) : (
+            <button type="button" onClick={requestPhoneOtp} className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold hover:bg-gray-300" disabled={loading || !validatePhone(phone)}>
+              휴대폰 인증
+            </button>
           )}
         </div>
         
