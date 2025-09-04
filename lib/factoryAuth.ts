@@ -1,6 +1,6 @@
 import { supabase } from "./supabaseClient";
 import { getFactoryImages as getPresetImagesByName } from "./factoryImages";
-import { uploadImageToBlob, deleteImageFromBlob, getVercelBlobImageUrl } from "./vercelBlobConfig";
+import { getVercelBlobImageUrl } from "./vercelBlobConfig";
 
 // 봉제공장 업장별 로그인 정보
 export interface FactoryAuth {
@@ -404,9 +404,14 @@ export async function getFactoryProfileImage(factoryId: string): Promise<string 
 export async function uploadFactoryImage(file: File, factoryId: string): Promise<string | null> {
   try {
     const folder = getRealFactoryName(factoryId);
-    const fileName = `${Date.now()}_${file.name}`;
-    const url = await uploadImageToBlob(file, folder, fileName);
-    return url;
+    const form = new FormData();
+    form.append('file', file);
+    form.append('folder', folder);
+    form.append('filename', file.name);
+    const res = await fetch('/api/factory-images/upload', { method: 'POST', body: form });
+    const json = await res.json();
+    if (!res.ok || !json?.ok) throw new Error(json?.error || 'upload failed');
+    return json.url as string;
   } catch (e) {
     console.error('uploadFactoryImage 실패:', e);
     return null;
@@ -415,10 +420,12 @@ export async function uploadFactoryImage(file: File, factoryId: string): Promise
 
 export async function deleteFactoryImage(url: string): Promise<boolean> {
   try {
-    await deleteImageFromBlob(url);
+    const res = await fetch('/api/factory-images/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
+    const json = await res.json();
+    if (!res.ok || !json?.ok) throw new Error(json?.error || 'delete failed');
     return true;
   } catch (e) {
     console.error('deleteFactoryImage 실패:', e);
     return false;
   }
-} 
+}
