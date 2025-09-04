@@ -145,23 +145,44 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // 기존 사용자가 있으면 바로 로그인 처리
     if (existingUser) {
-      const response = NextResponse.redirect(new URL('/sign-up?provider=naver', request.url));
-      response.cookies.set('temp_naver_user', JSON.stringify({
+      console.log('기존 네이버 사용자 로그인:', existingUser.email);
+      
+      // 로그인 세션 생성 (초기화 완료 상태)
+      try {
+        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: existingUser.email, 
+            externalId: naverUser.id, 
+            provider: 'naver', 
+            isInitialized: true 
+          })
+        });
+      } catch (sessionError) {
+        console.error('세션 생성 실패:', sessionError);
+      }
+
+      // 사용자 정보를 쿠키에 저장 (로그인 상태)
+      const response = NextResponse.redirect(new URL('/', request.url));
+      response.cookies.set('naver_user', JSON.stringify({
+        id: existingUser.id,
         email: existingUser.email,
         name: existingUser.name || name,
         phoneNumber: existingUser.phoneNumber,
-        profileImage,
+        profileImage: existingUser.profileImage || profileImage,
         naverId: naverUser.id,
         isOAuthUser: true,
         signupMethod: 'naver',
-      }), { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 60 * 60 * 24 });
-      try {
-        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: existingUser.email, externalId: naverUser.id, provider: 'naver', isInitialized: false })
-        });
-      } catch {}
+      }), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30, // 30일
+      });
+      
       return response;
     }
 
