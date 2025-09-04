@@ -120,15 +120,15 @@ export default function Header() {
       <header className="w-full bg-white border-b px-4 sm:px-6 sticky top-0 z-[9999]">
         <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-3 sm:py-4">
           {/* 로고 */}
-          <Link href="/" className="select-none" aria-label="동고리 홈">
+          <Link href="/" className="select-none flex-shrink-0" aria-label="동고리 홈">
             <Image
               src="/logo_donggori.svg"
               alt="동고리 로고"
               width={113}
               height={47}
               priority
-              className="w-20 sm:w-24 md:w-[113px] h-auto"
-              style={{ height: 'auto' }}
+              className="w-24 sm:w-28 md:w-[113px] h-auto min-h-[32px]"
+              style={{ height: 'auto', minHeight: '32px' }}
             />
           </Link>
 
@@ -176,15 +176,15 @@ export default function Header() {
     <header className="w-full bg-white border-b px-4 sm:px-6 sticky top-0 z-[9999]">
       <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-3 sm:py-4">
         {/* 로고 */}
-        <Link href="/" className="select-none" aria-label="동고리 홈">
+        <Link href="/" className="select-none flex-shrink-0" aria-label="동고리 홈">
           <Image
             src="/logo_donggori.svg"
             alt="동고리 로고"
             width={113}
             height={47}
             priority
-            className="w-20 sm:w-24 md:w-[113px] h-auto"
-            style={{ height: 'auto' }}
+            className="w-24 sm:w-28 md:w-[113px] h-auto min-h-[32px]"
+            style={{ height: 'auto', minHeight: '32px' }}
           />
         </Link>
 
