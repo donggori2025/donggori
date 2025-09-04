@@ -40,8 +40,8 @@ function SignUpForm() {
 
   // OAuth 사용자 정보 로드
   useEffect(() => {
-    if (provider === 'kakao' || provider === 'naver' || provider === 'google') {
-      const tempUserKey = provider === 'kakao' ? 'temp_kakao_user' : provider === 'naver' ? 'temp_naver_user' : 'temp_google_user';
+    if (provider === 'kakao' || provider === 'naver') {
+      const tempUserKey = provider === 'kakao' ? 'temp_kakao_user' : 'temp_naver_user';
       const tempUserStr = document.cookie
         .split('; ')
         .find(row => row.startsWith(tempUserKey + '='))
@@ -52,9 +52,7 @@ function SignUpForm() {
           const tempUser = JSON.parse(decodeURIComponent(tempUserStr));
           setName(tempUser.name || "");
           setEmail(tempUser.email || "");
-          // 이메일이 있는 OAuth의 경우 이메일 인증을 건너뜀, 없는 경우 인증 절차 유지
           const hasEmail = !!tempUser.email;
-          // 소셜에서 전화번호가 오면 정규화 후 인증완료 처리, 없으면 인증 필요 상태 유지
           if (tempUser.phoneNumber) {
             const normalized = formatPhone(tempUser.phoneNumber);
             setPhone(normalized);
@@ -174,7 +172,7 @@ function SignUpForm() {
     setError("");
     if (!phone || !validatePhone(phone)) return setError("올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)");
     // 소셜 회원가입(전화번호 미제공 케이스 포함)에서는 인증 전에 중복 번호 체크
-    if (provider === 'kakao' || provider === 'naver' || provider === 'google') {
+    if (provider === 'kakao' || provider === 'naver') {
       try {
         const exists = await checkPhoneNumberExists(phone);
         if (exists) {
@@ -386,7 +384,7 @@ function SignUpForm() {
   };
 
   // 소셜 로그인 핸들러
-  const handleSocial = async (provider: 'oauth_google' | 'oauth_kakao' | 'oauth_naver') => {
+  const handleSocial = async (provider: 'oauth_kakao' | 'oauth_naver') => {
     setError("");
     if (!signUp) return;
     setLoading(true);
@@ -434,30 +432,8 @@ function SignUpForm() {
         return;
       }
       
-      // Google OAuth는 Clerk을 통해 처리
-      if (provider === 'oauth_google') {
-        const googleConfig = config.oauth.google;
-        if (!googleConfig.clientId) {
-          setError('구글 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
-          setLoading(false);
-          return;
-        }
-        
-        console.log('Google OAuth 로그인 시작');
-        await signUp.authenticateWithRedirect({
-          strategy: provider as any,
-          redirectUrl: '/sso-callback',
-          redirectUrlComplete: '/sso-callback',
-        });
-        return;
-      }
-      
       console.log('OAuth 로그인 시작:', provider);
-      await signUp.authenticateWithRedirect({
-        strategy: provider as any,
-        redirectUrl: '/sso-callback',
-        redirectUrlComplete: '/sso-callback',
-      });
+      // Kakao/Naver만 지원. Clerk 리다이렉트 사용 안함
     } catch (err: unknown) {
       setError(handleClerkError(err));
     } finally {
@@ -680,15 +656,8 @@ function SignUpForm() {
           <div className="flex-1 h-px bg-gray-200" />
         </div>
         {/* 소셜 로그인 버튼 */}
-        <div className="flex justify-center gap-6 mt-4">
-          <button 
-            type="button" 
-            onClick={() => handleSocial("oauth_google")}
-            disabled={loading}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-sm hover:shadow-md transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/google.svg" alt="구글" width={32} height={32} />}
-          </button>
+        <div className="flex justify-center gap-6 mt-5">
+          {/* 구글 버튼 제거 */}
           <button 
             type="button" 
             onClick={() => handleSocial("oauth_kakao")}
