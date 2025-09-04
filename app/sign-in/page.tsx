@@ -168,11 +168,12 @@ function SignInForm() {
       if (factoryAuth) {
         console.log('봉제공장 로그인 성공:', factoryAuth.factoryName);
         
-        document.cookie = `factory_user=${encodeURIComponent(JSON.stringify({
+        document.cookie = `factory_user=${JSON.stringify({
+          id: cleanId,
           factoryId: factoryAuth.factoryId,
-          factoryName: factoryAuth.factoryName,
+          realName: factoryAuth.factoryName,
           isFactoryUser: true,
-        }))}; path=/; max-age=${60 * 60 * 24 * 7}`;
+        })}; path=/; max-age=${60 * 60 * 24 * 7}`;
 
         document.cookie = `userType=factory; path=/; max-age=${60 * 60 * 24 * 7}`;
         document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}`;
@@ -183,8 +184,7 @@ function SignInForm() {
           localStorage.setItem('factoryAuth', JSON.stringify(factoryAuth));
         } catch {}
 
-        // 공장 로그인 성공 시 전용 마이페이지로 이동
-        window.location.replace('/factory-my-page');
+        window.location.href = '/';
         return;
       }
 

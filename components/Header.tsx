@@ -64,7 +64,7 @@ export default function Header() {
         }
       }
 
-      // 쿠키 기반 폴백: userType, factory_user
+      // 네이버 사용자 정보 로드
       const getCookie = (name: string) => {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
@@ -72,37 +72,6 @@ export default function Header() {
         return null;
       };
 
-      if (!storedUserType) {
-        const cookieUserType = getCookie('userType');
-        if (cookieUserType) setUserType(cookieUserType);
-      }
-
-      if (!storedFactoryAuth) {
-        const factoryUserCookie = getCookie('factory_user');
-        if (factoryUserCookie) {
-          try {
-            const raw = decodeURIComponent(factoryUserCookie);
-            const fa = JSON.parse(raw);
-            setFactoryAuth(fa);
-            const id = fa?.factoryId || fa?.id;
-            if (id) {
-              getFactoryProfileImage(id).then(setFactoryProfileImage).catch(() => setFactoryProfileImage(null));
-            }
-          } catch {}
-        }
-      }
-
-      // 공장 로그인 상태면 홈 페이지에서 전용 페이지로 유도(초기 진입 UX 개선)
-      try {
-        const nowPath = window.location.pathname;
-        const finalUserType = storedUserType || getCookie('userType');
-        if (finalUserType === 'factory' && (nowPath === '/' || nowPath === '/index')) {
-          // 소프트 리다이렉트 방지 위해 replace 사용
-          window.location.replace('/factory-my-page');
-        }
-      } catch {}
-
-      // 네이버 사용자 정보 로드
       const naverUserCookie = getCookie('naver_user');
       if (naverUserCookie) {
         try {
