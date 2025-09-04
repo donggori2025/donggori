@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { config } from '@/lib/config';
 import { createSessionRecord } from '@/lib/session';
+import { SESSION_DURATIONS } from '@/lib/sessionConfig';
 
 // SNS 로그인 이후(카카오/네이버/구글 콜백 시점 또는 가입 완료 시점)에 호출해
 // snsAccessToken 과 isInitialized 를 발급하는 엔드포인트
@@ -29,10 +30,16 @@ export async function POST(req: NextRequest) {
       externalId: externalId ?? null,
       provider: provider ?? null,
       isInitialized: init,
+      ttlSec: SESSION_DURATIONS.SOCIAL
     });
 
     const res = NextResponse.json({ success: true, snsAccessToken: token, isInitialized: init });
-    res.cookies.set('sns_access_token', token, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 60 * 60 * 24 * 7 });
+    res.cookies.set('sns_access_token', token, { 
+      httpOnly: true, 
+      sameSite: 'lax', 
+      secure: process.env.NODE_ENV === 'production', 
+      maxAge: SESSION_DURATIONS.SOCIAL 
+    });
     return res;
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || 'server error' }, { status: 500 });

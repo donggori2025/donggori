@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { SESSION_DURATIONS } from "@/lib/sessionConfig";
 
 const ADMIN_ID = "donggori2025";
 const ADMIN_PW = "donggori2025";
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: SESSION_DURATIONS.ADMIN,
       path: "/",
     });
     return res;
