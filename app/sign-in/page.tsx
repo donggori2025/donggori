@@ -183,7 +183,8 @@ function SignInForm() {
           localStorage.setItem('factoryAuth', JSON.stringify(factoryAuth));
         } catch {}
 
-        window.location.href = '/';
+        // 공장 로그인 성공 시 전용 마이페이지로 이동
+        window.location.replace('/factory-my-page');
         return;
       }
 
