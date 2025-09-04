@@ -319,6 +319,7 @@ export default function FactoryMyPage() {
   };
 
   const hasChanges = JSON.stringify(formData) !== JSON.stringify(originalData);
+  const showExtra = false;
 
   return (
     <div className="max-w-[1400px] mx-auto py-4 md:py-16 px-4 h-full min-h-[500px]">
@@ -435,6 +436,7 @@ export default function FactoryMyPage() {
                 </div>
               </div>
 
+              {showExtra && (<>
               {/* 이미지 관리 섹션 */}
               <div className="mb-6 md:mb-8">
                 <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">이미지 관리</h3>
@@ -768,6 +770,7 @@ export default function FactoryMyPage() {
                   </div>
                 </div>
               </div>
+              </>)}
 
               {/* 소개 및 설명 섹션 */}
               <div className="mb-6 md:mb-8">
