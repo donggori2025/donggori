@@ -7,7 +7,13 @@ export const BLOB_READ_WRITE_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || '';
 export function getVercelBlobImageUrl(folderName: string, fileName: string): string {
   const encodedFolderName = encodeURIComponent(folderName);
   const encodedFileName = encodeURIComponent(fileName);
-  return `https://m7fjtbfe2aen7kcw.public.blob.vercel-storage.com/${encodedFolderName}/${encodedFileName}`;
+  // 우선 순위: 커스텀 이미지 베이스 도메인 → 로컬 public 폴더 경로
+  const base = process.env.NEXT_PUBLIC_BLOB_IMAGE_BASE;
+  if (base) {
+    return `${base.replace(/\/$/, '')}/${encodedFolderName}/${encodedFileName}`;
+  }
+  // public 디렉토리에 있는 정적 자산 사용
+  return `/동고리_사진데이터/${encodedFolderName}/${encodedFileName}`;
 }
 
 // Vercel Blob 썸네일 이미지 URL 생성
