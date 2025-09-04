@@ -226,17 +226,23 @@ export default function RequestDetailPage() {
                           <h3 className="text-lg font-medium text-gray-900 mb-3">첨부 파일</h3>
                           <div className="space-y-2">
                             {additionalInfo.files.map((file: string, index: number) => (
-                              <div key={index} className="flex items-center gap-2">
-                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-gray-500">
+                              <div key={index} className="flex items-start gap-2">
+                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-gray-500 mt-0.5 flex-shrink-0">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                {file.startsWith('http') ? (
-                                  <a href={file} download={file.split('/').pop() || undefined} className="text-blue-600 hover:text-blue-800 underline">
-                                    {file.split('/').pop() || '파일 다운로드'}
-                                  </a>
-                                ) : (
-                                  <span className="text-gray-900">{file}</span>
-                                )}
+                                <div className="min-w-0 flex-1">
+                                  {file.startsWith('http') ? (
+                                    <a 
+                                      href={file} 
+                                      download={file.split('/').pop() || undefined} 
+                                      className="text-blue-600 hover:text-blue-800 underline break-all block"
+                                    >
+                                      {file.split('/').pop() || '파일 다운로드'}
+                                    </a>
+                                  ) : (
+                                    <span className="text-gray-900 break-all block">{file}</span>
+                                  )}
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -249,13 +255,20 @@ export default function RequestDetailPage() {
                           <h3 className="text-lg font-medium text-gray-900 mb-3">참고 링크</h3>
                           <div className="space-y-2">
                             {additionalInfo.links.map((link: string, index: number) => (
-                              <div key={index} className="flex items-center gap-2">
-                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-gray-500">
+                              <div key={index} className="flex items-start gap-2">
+                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-gray-500 mt-0.5 flex-shrink-0">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
-                                <a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">
-                                  {link}
-                                </a>
+                                <div className="min-w-0 flex-1">
+                                  <a 
+                                    href={link} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="text-blue-600 hover:text-blue-800 underline break-all block"
+                                  >
+                                    {link}
+                                  </a>
+                                </div>
                               </div>
                             ))}
                           </div>
