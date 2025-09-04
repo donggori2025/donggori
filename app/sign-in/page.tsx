@@ -168,11 +168,11 @@ function SignInForm() {
       if (factoryAuth) {
         console.log('봉제공장 로그인 성공:', factoryAuth.factoryName);
         
-        document.cookie = `factory_user=${JSON.stringify({
-          id: cleanId,
-          realName: factoryAuth.factoryName,
+        document.cookie = `factory_user=${encodeURIComponent(JSON.stringify({
+          factoryId: factoryAuth.factoryId,
+          factoryName: factoryAuth.factoryName,
           isFactoryUser: true,
-        })}; path=/; max-age=${60 * 60 * 24 * 7}`;
+        }))}; path=/; max-age=${60 * 60 * 24 * 7}`;
 
         document.cookie = `userType=factory; path=/; max-age=${60 * 60 * 24 * 7}`;
         document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}`;

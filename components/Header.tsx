@@ -81,7 +81,8 @@ export default function Header() {
         const factoryUserCookie = getCookie('factory_user');
         if (factoryUserCookie) {
           try {
-            const fa = JSON.parse(factoryUserCookie);
+            const raw = decodeURIComponent(factoryUserCookie);
+            const fa = JSON.parse(raw);
             setFactoryAuth(fa);
             const id = fa?.factoryId || fa?.id;
             if (id) {
