@@ -1,6 +1,10 @@
 // Vercel Blob Storage 사용
 import { getVercelBlobImageUrl } from './vercelBlobConfig';
 
+function getProxyUrl(folderName: string, fileName: string) {
+  return `/api/factory-images/url?folder=${encodeURIComponent(folderName)}&file=${encodeURIComponent(fileName)}`;
+}
+
 // 업장 이름과 이미지 폴더 매칭
 const factoryImageMapping: Record<string, string> = {
   // 정확한 매칭
@@ -333,7 +337,7 @@ export function getFactoryThumbnailImage(factoryName: string): string {
   }
 
   // 첫 번째 이미지를 썸네일로 사용
-  return getVercelBlobImageUrl(folderName, imageFiles[0]);
+  return getProxyUrl(folderName, imageFiles[0]);
 }
 
 // 업장 이름으로 모든 이미지 URL 생성 (Vercel Blob 사용)
@@ -357,7 +361,7 @@ export function getFactoryImages(factoryName: string): string[] {
   }
 
   // Vercel Blob에서 이미지 URL들 생성
-  return imageFiles.map(fileName => getVercelBlobImageUrl(folderName, fileName));
+  return imageFiles.map(fileName => getProxyUrl(folderName, fileName));
 }
 
 // 업장 이름으로 대표 이미지 경로 생성 (썸네일용)
