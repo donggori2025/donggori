@@ -121,11 +121,32 @@ export default function MyPage() {
       (async () => {
         try {
           console.log("🔍 의뢰내역 로딩 시작...");
-          const userId = user?.id || naverUser?.email || kakaoUser?.email;
-          console.log("사용자 ID:", userId);
           
-          // 내부 API를 통해 조회 (서비스 키 사용, RLS 영향 없음)
-          const res = await fetch(`/api/match-requests?userId=${encodeURIComponent(userId)}`);
+          // 사용자 ID와 이메일을 모두 가져오기
+          let userId = user?.id;
+          let userEmail = user?.emailAddresses?.[0]?.emailAddress;
+          
+          if (naverUser) {
+            userId = naverUser.id;
+            userEmail = naverUser.email;
+          } else if (kakaoUser) {
+            userId = kakaoUser.id;
+            userEmail = kakaoUser.email;
+          }
+          
+          console.log("사용자 ID:", userId);
+          console.log("사용자 이메일:", userEmail);
+          
+          // userId와 userEmail 모두로 조회 시도
+          let res;
+          if (userId) {
+            res = await fetch(`/api/match-requests?userId=${encodeURIComponent(userId)}`);
+          } else if (userEmail) {
+            res = await fetch(`/api/match-requests?userEmail=${encodeURIComponent(userEmail)}`);
+          } else {
+            throw new Error("사용자 ID와 이메일을 모두 찾을 수 없습니다.");
+          }
+          
           if (!res.ok) {
             const err = await res.json().catch(() => ({}));
             console.error("의뢰내역 조회 오류(API):", err);

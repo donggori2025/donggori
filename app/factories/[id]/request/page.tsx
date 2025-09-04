@@ -317,6 +317,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       // 서버 API 경유로 의뢰 데이터 저장 (RLS 회피 및 상세 오류 전달)
       try {
         const loggedInUser = getAppUserIdentity();
+        console.log('의뢰 제출 시 사용자 정보:', loggedInUser);
+        
         const payload = {
           user_id: loggedInUser.id || `user_${Date.now()}`,
           user_email: loggedInUser.email || `${formData.name || 'user'}@example.com`,
@@ -349,6 +351,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         } as const;
+        
+        console.log('의뢰 제출 payload:', payload);
 
         const res = await fetch('/api/match-requests', {
           method: 'POST',
