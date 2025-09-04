@@ -321,13 +321,41 @@ export default function FactoryMyPage() {
   const hasChanges = JSON.stringify(formData) !== JSON.stringify(originalData);
 
   return (
-    <div className="max-w-[1400px] mx-auto py-16 px-4">
-      <div className="mb-8">
-        <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">마이페이지</h1>
+    <div className="max-w-[1400px] mx-auto py-4 md:py-16 px-4 h-full min-h-[500px]">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-[40px] font-extrabold text-gray-900 mb-2">마이페이지</h1>
       </div>
-      <div className="flex flex-row gap-8">
-        {/* 왼쪽 사이드바: 메뉴만 */}
-        <aside className="w-1/4 min-w-[220px] bg-white rounded-xl shadow p-6 h-fit">
+      
+      {/* 모바일 탭 메뉴 */}
+      <div className="md:hidden bg-gray-100 rounded-xl p-1 shadow-sm mb-4">
+        <div className="flex">
+          {SIDEBAR_MENUS.map((menu) => (
+            <button
+              key={menu}
+              className={`flex-1 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                selectedMenu === menu
+                  ? "bg-white text-black shadow-sm"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+              onClick={() => setSelectedMenu(menu)}
+            >
+              {menu}
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 pt-3 border-t border-gray-200">
+          <button
+            onClick={handleLogout}
+            className="w-full text-gray-500 hover:text-gray-700 text-sm transition-colors px-4 py-2 rounded-lg hover:bg-gray-100"
+          >
+            로그아웃
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8">
+        {/* 데스크톱 사이드바: 메뉴만 */}
+        <aside className="hidden md:block w-1/4 min-w-[220px] bg-white rounded-xl shadow p-6 h-fit">
           <nav className="w-full flex flex-col gap-2 mb-6">
             {SIDEBAR_MENUS.map((menu) => (
               <button
@@ -353,16 +381,17 @@ export default function FactoryMyPage() {
             </button>
           </div>
         </aside>
-        {/* 오른쪽 메인 컨텐츠 */}
-        <section className="flex-1 bg-white rounded-xl p-8">
+        
+        {/* 메인 컨텐츠 */}
+        <section className="flex-1 bg-white rounded-xl p-4 md:p-8 shadow-sm">
           {selectedMenu === "프로필" && (
             <div>
-              <h2 className="text-2xl font-bold mb-8">프로필</h2>
+              <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8">프로필</h2>
               
               {/* 기본 정보 섹션 */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">기본 정보</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">기본 정보</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                   <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">공장명</label>
                   <input
@@ -407,9 +436,9 @@ export default function FactoryMyPage() {
               </div>
 
               {/* 이미지 관리 섹션 */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">이미지 관리</h3>
-                <div className="space-y-4">
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">이미지 관리</h3>
+                <div className="space-y-3 md:space-y-4">
                   <div className="flex gap-2">
                     <label className="flex-1 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                       <input
@@ -423,27 +452,27 @@ export default function FactoryMyPage() {
                         {isUploading ? (
                           <>
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                            <span>업로드 중...</span>
+                            <span className="text-sm">업로드 중...</span>
                           </>
                         ) : (
                           <>
-                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
-                            <span>이미지 파일 선택</span>
+                            <span className="text-sm">이미지 파일 선택</span>
                           </>
                         )}
                       </div>
                     </label>
                   </div>
                   
-                  <div className="text-sm text-gray-600 mb-4">
+                  <div className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4 space-y-1">
                     <p>• 첫 번째 이미지가 헤더의 프로필 이미지로 사용됩니다.</p>
                     <p>• 이미지 파일은 5MB 이하여야 합니다.</p>
                     <p>• JPG, PNG, GIF 형식을 지원합니다.</p>
                   </div>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                     {factoryImages.map((image, index) => (
                       <div key={index} className="relative group">
                         <div className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
@@ -501,9 +530,9 @@ export default function FactoryMyPage() {
               </div>
 
               {/* 사업 정보 섹션 */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">사업 정보</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">사업 정보</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">사업 유형</label>
                     <input
@@ -547,9 +576,9 @@ export default function FactoryMyPage() {
               </div>
 
               {/* 제작 품목 섹션 */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">제작 품목</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">제작 품목</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">상의 (상단)</label>
                     <input
@@ -652,9 +681,9 @@ export default function FactoryMyPage() {
               </div>
 
               {/* 설비 정보 섹션 */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">설비 정보</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">설비 정보</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">봉제 기계</label>
                     <input
@@ -702,9 +731,9 @@ export default function FactoryMyPage() {
               </div>
 
               {/* 공정 정보 섹션 */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">공정 정보</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">공정 정보</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">가능한 공정</label>
                     <input
@@ -741,9 +770,9 @@ export default function FactoryMyPage() {
               </div>
 
               {/* 소개 및 설명 섹션 */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">소개 및 설명</h3>
-                <div className="space-y-6">
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">소개 및 설명</h3>
+                <div className="space-y-4 md:space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">공장 소개</label>
                     <textarea
@@ -769,9 +798,9 @@ export default function FactoryMyPage() {
               </div>
 
               {/* 연락처 정보 섹션 */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">연락처 정보</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">연락처 정보</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">카카오톡 URL</label>
                     <input
@@ -790,7 +819,7 @@ export default function FactoryMyPage() {
                 <button
                   onClick={handleSaveChanges}
                   disabled={!hasChanges}
-                  className={`px-6 py-2 rounded-lg transition-colors ${
+                  className={`px-4 md:px-6 py-2 rounded-lg transition-colors text-sm md:text-base ${
                     hasChanges 
                       ? "bg-black hover:bg-gray-800 text-white" 
                       : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -804,8 +833,8 @@ export default function FactoryMyPage() {
 
           {selectedMenu === "문의내역" && (
             <div>
-              <h2 className="text-2xl font-bold mb-8">문의내역</h2>
-              <div className="text-center py-20 text-gray-400 text-lg">
+              <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8">문의내역</h2>
+              <div className="text-center py-16 md:py-20 text-gray-400 text-base md:text-lg">
                 카카오톡 연동 예정입니다.
               </div>
             </div>
@@ -813,10 +842,10 @@ export default function FactoryMyPage() {
 
           {selectedMenu === "의뢰내역" && (
             <div>
-              <h2 className="text-2xl font-bold mb-8">의뢰내역</h2>
+              <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8">의뢰내역</h2>
               
               {/* 상태별 필터 */}
-              <div className="mb-6">
+              <div className="mb-4 md:mb-6">
                 <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={() => setMatchRequests(allMatchRequests)}
@@ -846,22 +875,22 @@ export default function FactoryMyPage() {
               </div>
               
               {matchRequests.length === 0 ? (
-                <div className="text-center py-20">
-                  <div className="text-gray-400 text-lg mb-2">의뢰내역이 없습니다</div>
+                <div className="text-center py-16 md:py-20">
+                  <div className="text-gray-400 text-base md:text-lg mb-2">의뢰내역이 없습니다</div>
                   <div className="text-gray-500 text-sm">새로운 의뢰가 들어오면 여기에 표시됩니다</div>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {matchRequests.map((request) => (
-                    <div key={request.id} className="border border-gray-200 rounded-lg p-6">
-                      <div className="flex justify-between items-start mb-4">
+                    <div key={request.id} className="border border-gray-200 rounded-xl p-4 md:p-6 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+                      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3 md:gap-4 mb-4">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900">{request.userName}</h3>
-                          <p className="text-sm text-gray-600">{request.userEmail}</p>
-                          <p className="text-sm text-gray-600">{request.contact}</p>
+                          <h3 className="text-base md:text-lg font-semibold text-gray-900">{request.userName}</h3>
+                          <p className="text-xs md:text-sm text-gray-600">{request.userEmail}</p>
+                          <p className="text-xs md:text-sm text-gray-600">{request.contact}</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                        <div className="flex flex-col md:flex-row md:items-center gap-2">
+                          <span className={`px-2 md:px-3 py-1 rounded-full text-xs font-medium border ${
                             request.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' :
                             request.status === 'accepted' ? 'bg-green-100 text-green-700 border-green-300' :
                             request.status === 'rejected' ? 'bg-red-100 text-red-700 border-red-300' :
@@ -872,7 +901,7 @@ export default function FactoryMyPage() {
                              request.status === 'rejected' ? '거절됨' :
                              '완료됨'}
                           </span>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-xs md:text-sm text-gray-500">
                             {request.created_at ? new Date(request.created_at).toLocaleDateString('ko-KR', {
                               year: 'numeric',
                               month: 'long',
@@ -961,10 +990,10 @@ export default function FactoryMyPage() {
                         </div>
                       )}
                       
-                      <div className="flex justify-end gap-3">
+                      <div className="flex flex-col sm:flex-row justify-end gap-2 md:gap-3">
                         <button 
                           onClick={() => router.push(`/factory-my-page/requests/${request.id}`)}
-                          className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors border border-gray-300"
+                          className="w-full sm:w-auto px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors border border-gray-300"
                         >
                           상세보기
                         </button>
@@ -983,7 +1012,7 @@ export default function FactoryMyPage() {
                                   alert('수락 처리 중 오류가 발생했습니다.');
                                 }
                               }}
-                              className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors border border-green-300"
+                              className="w-full sm:w-auto px-4 py-2 text-sm bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors border border-green-300"
                             >
                               수락
                             </button>
@@ -1000,7 +1029,7 @@ export default function FactoryMyPage() {
                                   alert('거절 처리 중 오류가 발생했습니다.');
                                 }
                               }}
-                              className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-colors border border-red-300"
+                              className="w-full sm:w-auto px-4 py-2 text-sm bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition-colors border border-red-300"
                             >
                               거절
                             </button>
