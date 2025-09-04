@@ -86,14 +86,14 @@ function SignInForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
-  const [socialLoading, setSocialLoading] = useState<null | 'google' | 'kakao' | 'naver'>(null);
+  const [socialLoading, setSocialLoading] = useState<null | 'kakao' | 'naver'>(null);
 
   // 소셜 로그인 핸들러
-  const handleSocial = async (provider: 'oauth_google' | 'oauth_kakao' | 'oauth_naver') => {
+  const handleSocial = async (provider: 'oauth_kakao' | 'oauth_naver') => {
     setError("");
     if (!isLoaded) return;
     setLoading(true);
-    setSocialLoading(provider === 'oauth_google' ? 'google' : provider === 'oauth_kakao' ? 'kakao' : 'naver');
+    setSocialLoading(provider === 'oauth_kakao' ? 'kakao' : 'naver');
     
     try {
       if (provider === 'oauth_naver') {
@@ -142,31 +142,7 @@ function SignInForm() {
         return;
       }
       
-      // Google OAuth는 Clerk을 통해 처리
-      if (provider === 'oauth_google') {
-        const googleConfig = config.oauth.google;
-        if (!googleConfig.clientId) {
-          setError('구글 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
-          setLoading(false);
-          setSocialLoading(null);
-          return;
-        }
-        
-        console.log('Google OAuth 로그인 시작');
-        await signIn.authenticateWithRedirect({
-          strategy: provider as any,
-          redirectUrl: '/sso-callback',
-          redirectUrlComplete: '/',
-        });
-        return;
-      }
-      
-      console.log('OAuth 로그인 시작:', provider);
-      await signIn.authenticateWithRedirect({
-        strategy: provider as any,
-        redirectUrl: '/sso-callback',
-        redirectUrlComplete: '/',
-      });
+      // Kakao/Naver만 지원: 방어적 코드 (여기 도달하지 않음)
     } catch (err: unknown) {
       console.error('OAuth 로그인 오류:', err);
       setError(handleClerkError(err));
@@ -304,15 +280,7 @@ function SignInForm() {
       </div>
       {/* 소셜 로그인 버튼 */}
       <div className="flex justify-center gap-6 mt-4">
-        <button 
-          type="button" 
-          onClick={() => handleSocial("oauth_google")}
-          className="w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-sm hover:shadow-md transition-shadow"
-          aria-busy={socialLoading === 'google'}
-          disabled={!!socialLoading}
-        >
-          {socialLoading === 'google' ? <Loader className="w-5 h-5 animate-spin" /> : <Image src="/google.svg" alt="구글" width={32} height={32} />}
-        </button>
+        {/* 구글 버튼 제거 */}
         <button 
           type="button" 
           onClick={() => {
@@ -342,7 +310,6 @@ function SignInForm() {
       {/* 소셜 리디렉션 안내 */}
       {socialLoading && (
         <div className="text-center text-sm text-gray-600 mt-3">
-          {socialLoading === 'google' && '구글로 이동 중입니다...'}
           {socialLoading === 'kakao' && '카카오로 이동 중입니다...'}
           {socialLoading === 'naver' && '네이버로 이동 중입니다...'}
         </div>
