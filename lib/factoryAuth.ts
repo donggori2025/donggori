@@ -1,5 +1,6 @@
 import { supabase } from "./supabaseClient";
 import { getFactoryImages as getPresetImagesByName } from "./factoryImages";
+import { uploadImageToBlob, deleteImageFromBlob, getVercelBlobImageUrl } from "./vercelBlobConfig";
 
 // 봉제공장 업장별 로그인 정보
 export interface FactoryAuth {
@@ -356,12 +357,10 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
   }
 }
 
-// 공장 이미지 업데이트
+// 공장 이미지 업데이트(대표 이미지만 DB에 저장)
 export async function updateFactoryImages(factoryId: string, images: string[]) {
   try {
-    // images 배열의 첫 번째 이미지를 DB 대표 이미지로 저장
     const imageUrl = images.length > 0 ? images[0] : null;
-    
     const { data, error } = await supabase
       .from('donggori')
       .update({ image: imageUrl })
@@ -401,54 +400,25 @@ export async function getFactoryProfileImage(factoryId: string): Promise<string 
   }
 }
 
-// 파일을 Supabase Storage에 업로드
+// 업로드/삭제 헬퍼 (Vercel Blob)
 export async function uploadFactoryImage(file: File, factoryId: string): Promise<string | null> {
   try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${factoryId}_${Date.now()}.${fileExt}`;
-    const filePath = `factory-images/${fileName}`;
-
-    const { error } = await supabase.storage
-      .from('factory-images')
-      .upload(filePath, file);
-
-    if (error) {
-      console.error('이미지 업로드 중 오류:', error);
-      return null;
-    }
-
-    // 공개 URL 가져오기
-    const { data: urlData } = supabase.storage
-      .from('factory-images')
-      .getPublicUrl(filePath);
-
-    return urlData.publicUrl;
-  } catch (error) {
-    console.error('이미지 업로드 중 오류:', error);
+    const folder = getRealFactoryName(factoryId);
+    const fileName = `${Date.now()}_${file.name}`;
+    const url = await uploadImageToBlob(file, folder, fileName);
+    return url;
+  } catch (e) {
+    console.error('uploadFactoryImage 실패:', e);
     return null;
   }
 }
 
-// Supabase Storage에서 이미지 삭제
-export async function deleteFactoryImage(imageUrl: string): Promise<boolean> {
+export async function deleteFactoryImage(url: string): Promise<boolean> {
   try {
-    // URL에서 파일 경로 추출
-    const urlParts = imageUrl.split('/');
-    const fileName = urlParts[urlParts.length - 1];
-    const filePath = `factory-images/${fileName}`;
-
-    const { error } = await supabase.storage
-      .from('factory-images')
-      .remove([filePath]);
-
-    if (error) {
-      console.error('이미지 삭제 중 오류:', error);
-      return false;
-    }
-
+    await deleteImageFromBlob(url);
     return true;
-  } catch (error) {
-    console.error('이미지 삭제 중 오류:', error);
+  } catch (e) {
+    console.error('deleteFactoryImage 실패:', e);
     return false;
   }
 } 
