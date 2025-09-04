@@ -18,7 +18,7 @@ function SignUpForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [emailVerified, setEmailVerified] = useState(true); // 이메일 인증 비활성화
+  const [emailVerified, setEmailVerified] = useState(false); // 휴대폰 인증 여부
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   // 약관 동의 상태
@@ -54,10 +54,13 @@ function SignUpForm() {
           setEmail(tempUser.email || "");
           // 이메일이 있는 OAuth의 경우 이메일 인증을 건너뜀, 없는 경우 인증 절차 유지
           const hasEmail = !!tempUser.email;
-          // 소셜에서 전화번호가 오면 즉시 인증완료 처리 및 입력 잠금
+          // 소셜에서 전화번호가 오면 정규화 후 인증완료 처리, 없으면 인증 필요 상태 유지
           if (tempUser.phoneNumber) {
-            setPhone(tempUser.phoneNumber.replace(/^\+82/, '0').replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3'));
-            setEmailVerified(true);
+            const normalized = formatPhone(tempUser.phoneNumber);
+            setPhone(normalized);
+            setEmailVerified(validatePhone(normalized));
+          } else {
+            setEmailVerified(false);
           }
           if (hasEmail) {
             setPassword("OAuthUserPassword123!");
@@ -120,14 +123,14 @@ function SignUpForm() {
 
   // 전화번호 자동 포맷팅
   const formatPhone = (value: string) => {
-    const numbers = value.replace(/[^0-9]/g, '');
-    if (numbers.length <= 3) {
-      return numbers;
-    } else if (numbers.length <= 7) {
-      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
-    } else {
-      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
-    }
+    const digitsOnly = String(value || '').replace(/[^0-9]/g, '');
+    if (!digitsOnly) return '';
+    // +82로 온 경우 국내형식으로 변환
+    const local = digitsOnly.startsWith('82') ? `0${digitsOnly.slice(2)}` : digitsOnly;
+    const n = local.replace(/^0+/, '0');
+    if (n.length <= 3) return n;
+    if (n.length <= 7) return `${n.slice(0, 3)}-${n.slice(3)}`;
+    return `${n.slice(0, 3)}-${n.slice(3, 7)}-${n.slice(7, 11)}`;
   };
 
   // 이메일 인증 제거
@@ -138,11 +141,7 @@ function SignUpForm() {
     setError("");
     setLoading(true);
     try {
-      await signUp?.prepareEmailAddressVerification({ strategy: "email_code" });
-      setVerificationCode("");
-      startTimer();
-    } catch (err: unknown) {
-      setError(handleClerkError(err));
+      await requestPhoneOtp();
     } finally {
       setLoading(false);
     }
