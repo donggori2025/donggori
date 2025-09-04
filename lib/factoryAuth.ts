@@ -64,10 +64,8 @@ export function validateFactoryLogin(username: string, password: string): Factor
     return null;
   }
 
-  // 비밀번호 허용 규칙:
-  // - 원래 규칙: factoryNN!
-  // - 편의 규칙: factoryNN (사용자명과 동일, 느낌표 없을 때도 허용)
-  const validPassword = record.password === rawPass || rawPass === normalizedUsername;
+  // 비밀번호 허용 규칙: 반드시 factoryNN! 형식과 일치해야 함
+  const validPassword = record.password === rawPass;
   if (!validPassword) {
     console.log('비밀번호 불일치');
     return null;
