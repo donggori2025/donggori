@@ -294,7 +294,10 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       if (formData.files.length > 0) {
         try {
           for (const file of formData.files) {
-            const filePath = `match-request-files/${Date.now()}_${file.name}`;
+            // Supabase Storage 키는 일부 특수문자를 허용하지 않으므로 안전한 파일명으로 정규화
+            const safeName = file.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
+            // 버킷 내부 경로만 전달 (버킷명 중복 제거)
+            const filePath = `${Date.now()}_${safeName}`;
             const { error: uploadError } = await supabase.storage.from('match-request-files').upload(filePath, file);
             if (uploadError) {
               console.error('파일 업로드 오류:', uploadError);
