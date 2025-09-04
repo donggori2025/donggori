@@ -487,60 +487,77 @@ export default function MyPage() {
       .join(', ') || '-';
 
     return (
-      <div
-        className="border border-gray-200 rounded-lg p-6 flex gap-6 items-center"
-        // 카드 전체 클릭 이벤트 제거
-      >
-        <div className="w-28 h-28 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center group">
-          {(factory?.images && factory.images.length > 0 && factory.images[0] && factory.images[0] !== '/logo_donggori.png' && !factory.images[0].includes('logo_donggori')) || 
-           (factory?.image && factory.image !== '/logo_donggori.png' && !factory.image.includes('logo_donggori') && !factory.image.includes('unsplash')) ? (
-            <Image 
-              src={factory.images && factory.images.length > 0 ? factory.images[0] : factory.image} 
-              alt={factory?.company_name || factory?.name || '공장 이미지'} 
-              width={112} 
-              height={112} 
-              className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300" 
-              unoptimized
-            />
-          ) : (
-            <div className="text-gray-400 text-xs font-medium text-center">
-              이미지<br />준비 중
-            </div>
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-lg font-bold text-gray-900 truncate">{factory?.company_name || factory?.name || '공장명 없음'}</span>
+      <div className="border border-gray-200 rounded-xl p-4 md:p-6 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+        {/* 모바일: 세로 레이아웃, 데스크톱: 가로 레이아웃 */}
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+          {/* 공장 이미지 */}
+          <div className="w-full md:w-28 h-32 md:h-28 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center group mx-auto md:mx-0">
+            {(factory?.images && factory.images.length > 0 && factory.images[0] && factory.images[0] !== '/logo_donggori.png' && !factory.images[0].includes('logo_donggori')) || 
+             (factory?.image && factory.image !== '/logo_donggori.png' && !factory.image.includes('logo_donggori') && !factory.image.includes('unsplash')) ? (
+              <Image 
+                src={factory.images && factory.images.length > 0 ? factory.images[0] : factory.image} 
+                alt={factory?.company_name || factory?.name || '공장 이미지'} 
+                width={112} 
+                height={112} 
+                className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300" 
+                unoptimized
+              />
+            ) : (
+              <div className="text-gray-400 text-xs font-medium text-center">
+                이미지<br />준비 중
+              </div>
+            )}
           </div>
-          <div className="text-xs text-gray-400 mb-1">의뢰번호: {req.id}</div>
-          <div className="text-xs text-gray-500 mb-1">{factory?.business_type || '봉제업'}</div>
-          <div className="text-sm text-gray-700 mb-1"><b>주요품목</b>: {mainItems}</div>
-          <div className="text-sm text-gray-700 mb-1"><b>MOQ</b>: {factory?.moq || factory?.minOrder || '-'}</div>
-          <div className="text-xs text-gray-400">문의일 {req.created_at ? new Date(req.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '날짜 없음'}</div>
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          {statusBadge}
-          <button
-            className="mt-2 px-4 py-2 bg-gray-800 text-white rounded-lg text-xs hover:bg-gray-900"
-            onClick={() => { window.location.href = `/my-page/requests/${req.id}`; }}
-          >상세보기</button>
+          
+          {/* 공장 정보 */}
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-lg md:text-lg font-bold text-gray-900 truncate">{factory?.company_name || factory?.name || '공장명 없음'}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {statusBadge}
+              </div>
+            </div>
+            
+            <div className="text-xs text-gray-400 mb-2">의뢰번호: {req.id}</div>
+            <div className="text-xs text-gray-500 mb-2">{factory?.business_type || '봉제업'}</div>
+            
+            {/* 모바일에서 정보를 더 컴팩트하게 표시 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-2 text-sm text-gray-700">
+              <div><b>주요품목</b>: <span className="text-xs">{mainItems}</span></div>
+              <div><b>MOQ</b>: {factory?.moq || factory?.minOrder || '-'}</div>
+            </div>
+            
+            <div className="text-xs text-gray-400 mt-2">문의일 {req.created_at ? new Date(req.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '날짜 없음'}</div>
+          </div>
+          
+          {/* 버튼 영역 */}
+          <div className="flex flex-col items-stretch md:items-end gap-2 mt-4 md:mt-0">
+            <button
+              className="w-full md:w-auto px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900 transition-colors duration-200"
+              onClick={() => { window.location.href = `/my-page/requests/${req.id}`; }}
+            >
+              상세보기
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto py-16 px-4 h-full min-h-[500px]">
+    <div className="max-w-[1400px] mx-auto py-4 md:py-16 px-4 h-full min-h-[500px]">
       {/* 모바일 탭 메뉴 */}
       <div className="md:hidden mb-6">
-        <div className="flex bg-gray-100 rounded-lg p-1">
+        <div className="flex bg-gray-100 rounded-xl p-1 shadow-sm">
           {SIDEBAR_MENUS.map((menu) => (
             <button
               key={menu}
-              className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex-1 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                 selectedMenu === menu
-                  ? "bg-white text-black shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-white text-black shadow-sm font-semibold"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
               }`}
               onClick={() => setSelectedMenu(menu)}
             >
@@ -552,7 +569,7 @@ export default function MyPage() {
         <div className="mt-4 text-center">
           <button
             onClick={handleLogout}
-            className="text-gray-600 hover:text-gray-800 text-sm transition-colors"
+            className="text-gray-500 hover:text-gray-700 text-sm transition-colors px-4 py-2 rounded-lg hover:bg-gray-100"
           >
             로그아웃
           </button>
@@ -799,30 +816,30 @@ export default function MyPage() {
       </div>
 
       {/* 모바일 메인 컨텐츠 */}
-      <div className="md:hidden bg-white rounded-xl p-6">
+      <div className="md:hidden bg-white rounded-xl p-4 shadow-sm">
         {selectedMenu === "프로필" && (
           <div>
             <h2 className="text-xl font-bold mb-6">프로필</h2>
             
             {/* 프로필 사진과 이름 */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
               <div className="relative">
-                                  <img
-                    src={user?.imageUrl || naverUser?.profileImage || kakaoUser?.profileImage || "/logo_donggori.png"}
-                    alt="프로필 이미지"
-                    className="w-20 h-20 rounded-full object-cover border"
-                  />
+                <img
+                  src={user?.imageUrl || naverUser?.profileImage || kakaoUser?.profileImage || "/logo_donggori.png"}
+                  alt="프로필 이미지"
+                  className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 text-center sm:text-left">
                 <div className="text-lg font-semibold mb-2">{originalName}</div>
-                                  <div className="text-sm text-gray-600 mb-2">
-                    {naverUser ? "네이버 계정으로 로그인됨" : kakaoUser ? "카카오 계정으로 로그인됨" : "일반 계정"}
-                  </div>
-                <div className="flex gap-4 text-sm">
+                <div className="text-sm text-gray-600 mb-3">
+                  {naverUser ? "네이버 계정으로 로그인됨" : kakaoUser ? "카카오 계정으로 로그인됨" : "일반 계정"}
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 text-sm">
                   {user && (
                     <>
-                      <button className="text-blue-600 hover:underline">사진 삭제</button>
-                      <label className="text-blue-600 hover:underline cursor-pointer">
+                      <button className="text-blue-600 hover:underline px-3 py-1 rounded-lg hover:bg-blue-50">사진 삭제</button>
+                      <label className="text-blue-600 hover:underline cursor-pointer px-3 py-1 rounded-lg hover:bg-blue-50">
                         사진 업로드
                         <input
                           type="file"
@@ -834,10 +851,10 @@ export default function MyPage() {
                     </>
                   )}
                   {naverUser && (
-                    <span className="text-gray-500 text-sm">네이버 프로필 이미지는 네이버에서 변경해주세요</span>
+                    <span className="text-gray-500 text-sm px-3 py-1">네이버 프로필 이미지는 네이버에서 변경해주세요</span>
                   )}
                   {kakaoUser && (
-                    <span className="text-gray-500 text-sm">카카오 프로필 이미지는 카카오에서 변경해주세요</span>
+                    <span className="text-gray-500 text-sm px-3 py-1">카카오 프로필 이미지는 카카오에서 변경해주세요</span>
                   )}
                 </div>
               </div>
@@ -904,8 +921,8 @@ export default function MyPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 카카오톡 메시지 수신 동의
               </label>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
                     <div className={`w-4 h-4 rounded-full ${kakaoMessageConsent ? 'bg-green-500' : 'bg-red-500'}`}></div>
                     <span className="text-sm font-medium">
@@ -916,25 +933,23 @@ export default function MyPage() {
                     {kakaoMessageConsent ? '활성화됨' : '비활성화됨'}
                   </div>
                 </div>
-                <div className="text-xs text-gray-600 mb-3">
-                  • 서비스 안내 및 마케팅 정보를 카카오톡으로 받아보실 수 있습니다.
-                  <br />
-                  • 언제든지 수신 동의를 철회할 수 있습니다.
-                  <br />
-                  • 이메일(donggori2020@gmail.com)을 통한 수신 동의 철회 요청도 가능합니다.
+                <div className="text-xs text-gray-600 mb-4 space-y-1">
+                  <div>• 서비스 안내 및 마케팅 정보를 카카오톡으로 받아보실 수 있습니다.</div>
+                  <div>• 언제든지 수신 동의를 철회할 수 있습니다.</div>
+                  <div>• 이메일(donggori2020@gmail.com)을 통한 수신 동의 철회 요청도 가능합니다.</div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   {kakaoMessageConsent ? (
                     <button
                       onClick={handleKakaoMessageConsentWithdrawal}
-                      className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                      className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
                     >
                       수신 동의 철회
                     </button>
                   ) : (
                     <button
                       onClick={handleKakaoMessageConsentRestore}
-                      className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                      className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
                     >
                       수신 동의 설정
                     </button>
@@ -944,17 +959,17 @@ export default function MyPage() {
             </div>
 
             {/* 하단 버튼들 */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
               <button
                 onClick={handleWithdraw}
-                className="text-red-600 hover:text-red-800 transition-colors text-sm"
+                className="text-red-600 hover:text-red-800 transition-colors text-sm px-4 py-2 rounded-lg hover:bg-red-50"
               >
                 탈퇴하기
               </button>
               <button
                 onClick={handleSaveChanges}
                 disabled={!hasChanges}
-                className={`px-4 py-2 rounded-lg transition-colors text-sm ${
+                className={`w-full sm:w-auto px-6 py-2 rounded-lg transition-colors text-sm ${
                   hasChanges 
                     ? "bg-black hover:bg-gray-800 text-white" 
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -979,9 +994,9 @@ export default function MyPage() {
           <div>
             <h2 className="text-xl font-bold mb-6">의뢰내역</h2>
             {isLoadingRequests ? (
-              <div className="text-center py-16 text-gray-400 text-lg">의뢰내역을 불러오는 중...</div>
+              <div className="text-center py-12 text-gray-400 text-lg">의뢰내역을 불러오는 중...</div>
             ) : requestError ? (
-              <div className="text-center py-16">
+              <div className="text-center py-12">
                 <div className="text-red-500 text-lg mb-4">{requestError}</div>
                 {debugInfo && (
                   <div className="text-sm text-gray-600 bg-gray-100 p-4 rounded-lg">
@@ -989,15 +1004,15 @@ export default function MyPage() {
                     <div className="text-xs">{debugInfo}</div>
                   </div>
                 )}
-                <div className="mt-4 text-sm text-gray-500">
+                <div className="mt-4 text-sm text-gray-500 space-y-1">
                   <div>• 브라우저 개발자 도구(F12)의 Console 탭에서 더 자세한 오류 정보를 확인할 수 있습니다.</div>
                   <div>• 환경 변수가 올바르게 설정되어 있는지 확인해주세요.</div>
                 </div>
               </div>
             ) : myMatchRequests.length === 0 ? (
-              <div className="text-center py-16 text-gray-400 text-lg">의뢰내역이 없습니다.</div>
+              <div className="text-center py-12 text-gray-400 text-lg">의뢰내역이 없습니다.</div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {myMatchRequests.map((req) => (
                   <FactoryRequestCard key={req.id} req={req} />
                 ))}
