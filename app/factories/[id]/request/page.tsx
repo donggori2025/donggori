@@ -103,12 +103,12 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       return;
     }
     const nameFromUrl = searchParams.get("name");
-    if (nameFromUrl) {
-      setFormData(prev => ({ ...prev, name: decodeURIComponent(nameFromUrl) }));
-    } else {
-      const id = getAppUserIdentity();
-      setFormData(prev => ({ ...prev, name: prev.name || id.name, contact: prev.contact || id.phone }));
-    }
+    const id = getAppUserIdentity();
+    setFormData(prev => ({
+      ...prev,
+      name: prev.name || (nameFromUrl ? decodeURIComponent(nameFromUrl) : id.name),
+      contact: prev.contact || id.phone
+    }));
   }, [searchParams, factoryId, router]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
