@@ -972,12 +972,44 @@ export default function FactoryMyPage() {
                                     <div><span className="font-medium">포장:</span> {additionalInfo.packaging || '미희망'}</div>
                                     {additionalInfo.links && additionalInfo.links.length > 0 && (
                                       <div className="md:col-span-2">
-                                        <span className="font-medium">참고 링크:</span> {additionalInfo.links.join(', ')}
+                                        <span className="font-medium">참고 링크:</span>
+                                        <div className="mt-1 space-y-1">
+                                          {additionalInfo.links.map((link: string, index: number) => (
+                                            <div key={index} className="break-all">
+                                              <a 
+                                                href={link} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 underline text-xs md:text-sm"
+                                              >
+                                                {link}
+                                              </a>
+                                            </div>
+                                          ))}
+                                        </div>
                                       </div>
                                     )}
                                     {additionalInfo.files && additionalInfo.files.length > 0 && (
                                       <div className="md:col-span-2">
-                                        <span className="font-medium">첨부 파일:</span> {additionalInfo.files.join(', ')}
+                                        <span className="font-medium">첨부 파일:</span>
+                                        <div className="mt-1 space-y-1">
+                                          {additionalInfo.files.map((file: string, index: number) => (
+                                            <div key={index} className="break-all">
+                                              {file.startsWith('http') ? (
+                                                <a 
+                                                  href={file} 
+                                                  target="_blank" 
+                                                  rel="noopener noreferrer"
+                                                  className="text-blue-600 hover:text-blue-800 underline text-xs md:text-sm"
+                                                >
+                                                  {file.split('/').pop() || '파일 다운로드'}
+                                                </a>
+                                              ) : (
+                                                <span className="text-xs md:text-sm text-gray-600 break-all">{file}</span>
+                                              )}
+                                            </div>
+                                          ))}
+                                        </div>
                                       </div>
                                     )}
                                   </div>
