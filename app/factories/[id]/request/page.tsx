@@ -3,13 +3,48 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Factory } from "@/lib/factories";
-import { useUser } from "@clerk/nextjs";
+// Clerk 미사용: 쿠키/로컬스토리지 기반 로그인 확인으로 전환
 import Image from "next/image";
+
+function isAppLoggedIn() {
+  try {
+    if (typeof document !== 'undefined' && document.cookie.includes('isLoggedIn=true')) return true;
+    if (typeof localStorage !== 'undefined' && (localStorage.getItem('userType') || localStorage.getItem('isLoggedIn') === 'true')) return true;
+  } catch {}
+  return false;
+}
+
+function getAppUserIdentity() {
+  try {
+    const name = localStorage.getItem('userName') || '';
+    const phone = localStorage.getItem('userPhone') || '';
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+      return null;
+    };
+    const kakao = getCookie('kakao_user');
+    if (kakao && !name) {
+      const u = JSON.parse(decodeURIComponent(kakao));
+      return { name: u?.name || '', phone: u?.phoneNumber || phone };
+    }
+    const naver = getCookie('naver_user');
+    if (naver && !name) {
+      const u = JSON.parse(decodeURIComponent(naver));
+      return { name: u?.name || '', phone };
+    }
+    return { name, phone };
+  } catch {
+    return { name: '', phone: '' };
+  }
+}
 
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [factoryId, setFactoryId] = useState<string | null>(null);
@@ -32,7 +67,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
   // 새로운 링크 입력을 위한 상태
   const [newLink, setNewLink] = useState("");
-  const { user } = useUser();
+  // Clerk user 제거
 
   useEffect(() => {
     (async () => {
@@ -61,21 +96,20 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
   // 로그인한 유저의 이름을 자동으로 입력
   useEffect(() => {
-    // URL 파라미터에서 이름을 먼저 확인
+    // 로그인 확인 및 기본 사용자 정보 채우기
+    if (!isAppLoggedIn()) {
+      alert('로그인 후 이용 가능합니다.');
+      if (factoryId) router.replace(`/sign-in?next=/factories/${factoryId}/request`);
+      return;
+    }
     const nameFromUrl = searchParams.get("name");
     if (nameFromUrl) {
-      setFormData(prev => ({
-        ...prev,
-        name: decodeURIComponent(nameFromUrl)
-      }));
-    } else if (user && user.firstName) {
-      // URL에 이름이 없으면 Clerk 유저 정보에서 가져오기
-      setFormData(prev => ({
-        ...prev,
-        name: user.firstName || ''
-      }));
+      setFormData(prev => ({ ...prev, name: decodeURIComponent(nameFromUrl) }));
+    } else {
+      const id = getAppUserIdentity();
+      setFormData(prev => ({ ...prev, name: prev.name || id.name, contact: prev.contact || id.phone }));
     }
-  }, [user, searchParams]);
+  }, [searchParams, factoryId, router]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
@@ -208,8 +242,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       // 서버 API 경유로 의뢰 데이터 저장 (RLS 회피 및 상세 오류 전달)
       try {
         const payload = {
-          user_id: user?.id || `user_${Date.now()}`,
-          user_email: user?.emailAddresses?.[0]?.emailAddress || `${formData.name}@example.com`,
+          user_id: `user_${Date.now()}`,
+          user_email: `${formData.name || 'user'}@example.com`,
           user_name: formData.name,
           factory_id: factoryId,
           factory_name: factoryName,

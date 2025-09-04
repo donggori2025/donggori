@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { useUser } from "@clerk/nextjs";
+// Clerk 제거 운영에 맞춰 로컬/쿠키/Supabase 기반 확인으로 전환
 import { Button } from "@/components/ui/button";
 import { Factory } from "@/lib/factories";
 import { Share, ArrowLeft, ChevronDown, ChevronUp, Check } from "lucide-react";
@@ -11,7 +11,7 @@ import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
 import PricingTable from "@/components/PricingTable";
 
 export default function FactoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { user } = useUser();
+  const user: any = null;
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [factoryId, setFactoryId] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   // 앱 레벨 로그인 감지 (Clerk 또는 커스텀 쿠키/스토리지)
   const isAppLoggedIn = () => {
     try {
-      if (user) return true;
+      // 배포 정책: 쿠키 또는 로컬스토리지 기반 로그인 플래그 인식
       if (typeof document !== 'undefined' && document.cookie.includes('isLoggedIn=true')) return true;
       if (typeof localStorage !== 'undefined' && (localStorage.getItem('userType') || localStorage.getItem('isLoggedIn') === 'true')) return true;
     } catch {}
@@ -31,9 +31,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const getAppUserName = () => {
-    // Clerk 우선, 없으면 로컬 저장된 이름 사용
-    const n = user?.firstName || user?.username || '';
-    if (n) return n;
     try {
       const lsName = localStorage.getItem('userName');
       if (lsName) return lsName;
@@ -170,7 +167,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     }
     const inquiry = {
       id: Date.now(),
-      userId: user?.id || 'custom',
+      userId: 'custom',
       factoryId: factory.id,
       factoryName: factory.company_name,
       date: new Date().toISOString().slice(0, 10),
