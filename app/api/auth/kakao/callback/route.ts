@@ -203,30 +203,44 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 정책: 소셜 신규 또는 기존 사용자라도 약관 동의를 위해 항상 회원가입 폼으로 유도
-    // 단, 폼에서 필요한 동의/부족정보 채운 뒤 최종 가입/로그인 처리
+    // 기존 사용자가 있으면 바로 로그인 처리
     if (existingUser) {
-      const response = NextResponse.redirect(new URL('/sign-up?provider=kakao', request.url));
-        response.cookies.set('temp_kakao_user', JSON.stringify({
-          email: existingUser.email,
-          name: existingUser.name || name,
-          phoneNumber: existingUser.phoneNumber,
-          profileImage,
-          kakaoId: kakaoUser.id,
-          isOAuthUser: true,
-          signupMethod: 'kakao',
-        }), {
-          httpOnly: false,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          maxAge: 60 * 60 * 24,
-        });
+      console.log('기존 카카오 사용자 로그인:', existingUser.email);
+      
+      // 로그인 세션 생성 (초기화 완료 상태)
       try {
         await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: existingUser.email, externalId: kakaoUser.id.toString(), provider: 'kakao', isInitialized: false })
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: existingUser.email, 
+            externalId: kakaoUser.id.toString(), 
+            provider: 'kakao', 
+            isInitialized: true 
+          })
         });
-      } catch {}
+      } catch (sessionError) {
+        console.error('세션 생성 실패:', sessionError);
+      }
+
+      // 사용자 정보를 쿠키에 저장 (로그인 상태)
+      const response = NextResponse.redirect(new URL('/', request.url));
+      response.cookies.set('kakao_user', JSON.stringify({
+        id: existingUser.id,
+        email: existingUser.email,
+        name: existingUser.name || name,
+        phoneNumber: existingUser.phoneNumber,
+        profileImage: existingUser.profileImage || profileImage,
+        kakaoId: kakaoUser.id,
+        isOAuthUser: true,
+        signupMethod: 'kakao',
+      }), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30, // 30일
+      });
+      
       return response;
     }
 
