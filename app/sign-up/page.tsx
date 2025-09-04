@@ -54,7 +54,11 @@ function SignUpForm() {
           setEmail(tempUser.email || "");
           // 이메일이 있는 OAuth의 경우 이메일 인증을 건너뜀, 없는 경우 인증 절차 유지
           const hasEmail = !!tempUser.email;
-          setEmailVerified(hasEmail);
+          // 소셜에서 전화번호가 오면 즉시 인증완료 처리 및 입력 잠금
+          if (tempUser.phoneNumber) {
+            setPhone(tempUser.phoneNumber.replace(/^\+82/, '0').replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3'));
+            setEmailVerified(true);
+          }
           if (hasEmail) {
             setPassword("OAuthUserPassword123!");
             setPasswordConfirm("OAuthUserPassword123!");

@@ -269,7 +269,7 @@ export async function GET(request: NextRequest) {
       response.cookies.set('temp_kakao_user', JSON.stringify({
         email,
         name,
-        phoneNumber: undefined,
+        phoneNumber: phoneNumber || undefined,
         profileImage,
         kakaoId: kakaoUser.id,
         isOAuthUser: true,
