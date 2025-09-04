@@ -168,15 +168,18 @@ function SignInForm() {
       if (factoryAuth) {
         console.log('봉제공장 로그인 성공:', factoryAuth.factoryName);
         
+        // 봉제공장 세션 유지 시간: 14일
+        const factorySessionDuration = 60 * 60 * 24 * 14;
+        
         document.cookie = `factory_user=${JSON.stringify({
           id: cleanId,
           factoryId: factoryAuth.factoryId,
           realName: factoryAuth.factoryName,
           isFactoryUser: true,
-        })}; path=/; max-age=${60 * 60 * 24 * 7}`;
+        })}; path=/; max-age=${factorySessionDuration}`;
 
-        document.cookie = `userType=factory; path=/; max-age=${60 * 60 * 24 * 7}`;
-        document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}`;
+        document.cookie = `userType=factory; path=/; max-age=${factorySessionDuration}`;
+        document.cookie = `isLoggedIn=true; path=/; max-age=${factorySessionDuration}`;
 
         // Header는 localStorage의 userType/factoryAuth를 읽으므로 로컬에도 저장
         try {
@@ -209,13 +212,17 @@ function SignInForm() {
           const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
           const js = await res.json();
           if (!res.ok) throw new Error(js.error || '토큰 발급 실패');
-          document.cookie = `access_token=${js.accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+          // 일반 사용자 세션 유지 시간: 30일
+          const userSessionDuration = 60 * 60 * 24 * 30;
+          document.cookie = `access_token=${js.accessToken}; path=/; max-age=${userSessionDuration}; SameSite=Lax`;
         } catch (e) {
           console.warn('accessToken 발급 실패(계속 진행):', e);
         }
 
-        document.cookie = `userType=user; path=/; max-age=${60 * 60 * 24 * 7}`;
-        document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}`;
+        // 일반 사용자 세션 유지 시간: 30일
+        const userSessionDuration = 60 * 60 * 24 * 30;
+        document.cookie = `userType=user; path=/; max-age=${userSessionDuration}`;
+        document.cookie = `isLoggedIn=true; path=/; max-age=${userSessionDuration}`;
 
         window.location.href = '/';
       } else {
