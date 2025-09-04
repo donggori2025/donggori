@@ -464,7 +464,7 @@ function SignUpForm() {
         </div>
       </div>
       {/* 회원가입 폼 */}
-      <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-xl shadow p-8 flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="w-full max-w-xl bg-white rounded-xl shadow p-8 flex flex-col gap-4">
         {/* Clerk Smart CAPTCHA 위젯 */}
         <div id="clerk-captcha" className="mb-2" />
         
