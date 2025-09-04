@@ -64,7 +64,7 @@ export default function Header() {
         }
       }
 
-      // 네이버 사용자 정보 로드
+      // 쿠키 기반 폴백: userType, factory_user
       const getCookie = (name: string) => {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
@@ -72,6 +72,26 @@ export default function Header() {
         return null;
       };
 
+      if (!storedUserType) {
+        const cookieUserType = getCookie('userType');
+        if (cookieUserType) setUserType(cookieUserType);
+      }
+
+      if (!storedFactoryAuth) {
+        const factoryUserCookie = getCookie('factory_user');
+        if (factoryUserCookie) {
+          try {
+            const fa = JSON.parse(factoryUserCookie);
+            setFactoryAuth(fa);
+            const id = fa?.factoryId || fa?.id;
+            if (id) {
+              getFactoryProfileImage(id).then(setFactoryProfileImage).catch(() => setFactoryProfileImage(null));
+            }
+          } catch {}
+        }
+      }
+
+      // 네이버 사용자 정보 로드
       const naverUserCookie = getCookie('naver_user');
       if (naverUserCookie) {
         try {
