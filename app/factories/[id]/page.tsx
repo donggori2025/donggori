@@ -23,10 +23,56 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   // 앱 레벨 로그인 감지 (Clerk 또는 커스텀 쿠키/스토리지)
   const isAppLoggedIn = () => {
     try {
-      // 배포 정책: 쿠키 또는 로컬스토리지 기반 로그인 플래그 인식
-      if (typeof document !== 'undefined' && document.cookie.includes('isLoggedIn=true')) return true;
+      if (typeof document === 'undefined') return false;
+      
+      // 일반 로그인 확인
+      if (document.cookie.includes('isLoggedIn=true')) return true;
       if (typeof localStorage !== 'undefined' && (localStorage.getItem('userType') || localStorage.getItem('isLoggedIn') === 'true')) return true;
-    } catch {}
+      
+      // 소셜 로그인 쿠키 확인
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+        return null;
+      };
+      
+      // 카카오 로그인 확인
+      const kakaoUser = getCookie('kakao_user');
+      if (kakaoUser) {
+        try {
+          const user = JSON.parse(decodeURIComponent(kakaoUser));
+          if (user && user.id && user.email) return true;
+        } catch (e) {
+          console.error('카카오 사용자 쿠키 파싱 오류:', e);
+        }
+      }
+      
+      // 네이버 로그인 확인
+      const naverUser = getCookie('naver_user');
+      if (naverUser) {
+        try {
+          const user = JSON.parse(decodeURIComponent(naverUser));
+          if (user && user.id && user.email) return true;
+        } catch (e) {
+          console.error('네이버 사용자 쿠키 파싱 오류:', e);
+        }
+      }
+      
+      // 팩토리 로그인 확인
+      const factoryUser = getCookie('factory_user');
+      if (factoryUser) {
+        try {
+          const user = JSON.parse(decodeURIComponent(factoryUser));
+          if (user && user.id) return true;
+        } catch (e) {
+          console.error('팩토리 사용자 쿠키 파싱 오류:', e);
+        }
+      }
+      
+    } catch (error) {
+      console.error('로그인 상태 확인 오류:', error);
+    }
     return false;
   };
 
