@@ -34,4 +34,15 @@ model FactoryAuth {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// 휴대폰 인증을 위한 모델
+model PhoneOtp {
+  id         String    @id @default(cuid())
+  phone      String
+  code       String
+  purpose    String    // signup, login, reset
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
 } 

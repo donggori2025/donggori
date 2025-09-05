@@ -21,6 +21,7 @@ export async function POST(req: Request) {
     const result = await requestPhoneOtp(phoneE164, p);
     return NextResponse.json(result);
   } catch (e: any) {
+    console.error('[ERROR] phone request failed:', e);
     return NextResponse.json({ ok: false, error: e?.message || '인증번호 요청 실패' }, { status: 400 });
   }
 }
