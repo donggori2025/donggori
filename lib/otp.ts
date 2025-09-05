@@ -30,9 +30,15 @@ export async function requestPhoneOtp(phoneE164: string, purpose: OtpPurpose) {
   const { error } = await supabaseServer.from('phone_otps').insert([
     { phone: phoneE164, code, purpose, expires_at: expiresAt, created_at: new Date().toISOString() },
   ]);
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error('[ERROR] Supabase insert failed:', error);
+    throw new Error(error.message);
+  }
 
-  await sendSMS(phoneE164, `[동고리] 인증번호 ${code} (5분 내 유효)`);
+  const smsResult = await sendSMS(phoneE164, `[동고리] 인증번호 ${code} (5분 내 유효)`);
+  if (!smsResult.ok) {
+    throw new Error(smsResult.message || 'SMS 발송 실패');
+  }
   return { ok: true };
 }
 
