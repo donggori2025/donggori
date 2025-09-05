@@ -39,17 +39,97 @@ async function logMessage(params: {
   }
 }
 
+function renderAlimtalkContent(templateCode: string, variables: Record<string, string>) {
+  // 템플릿 별 메시지 구성. 실제 운영에서는 템플릿 승인된 문구와 변수만 사용해야 함
+  if (templateCode === 'DG_REQUEST') {
+    const id = variables.id || '';
+    const name = variables.name || '';
+    const phone = variables.phone || '';
+    const shortUrl = variables.shortUrl || '';
+    return {
+      title: '동고리 의뢰 도착',
+      message: `의뢰가 접수되었습니다.\n의뢰ID: ${id}\n디자이너: ${name} (${phone})\n아래 버튼을 눌러 상세를 확인하세요.`,
+      buttons: shortUrl ? [{ type: 'WL', name: '의뢰 상세보기', linkMobile: shortUrl, linkPc: shortUrl }] : undefined,
+    } as const;
+  }
+  return { title: '알림', message: '새 알림이 도착했습니다.' } as const;
+}
+
+async function sendAlimtalkViaNaverSENS(toE164: string, templateCode: string, variables: Record<string, string>) {
+  const accessKey = process.env.NCP_SENS_ACCESS_KEY;
+  const secretKey = process.env.NCP_SENS_SECRET_KEY;
+  const serviceId = process.env.NCP_BIZMSG_SERVICE_ID || process.env.NCP_SENS_SERVICE_ID;
+  const senderKey = process.env.BIZMSG_SENDER_KEY; // 카카오 채널(발신 프로필) senderKey
+
+  if (!accessKey || !secretKey || !serviceId || !senderKey) {
+    throw new Error('알림톡 환경 변수가 설정되지 않았습니다. (NCP_* / BIZMSG_SENDER_KEY)');
+  }
+
+  const method = 'POST';
+  const host = 'https://sens.apigw.ntruss.com';
+  const urlPath = `/alimtalk/v2/services/${serviceId}/messages`;
+  const timestamp = Date.now().toString();
+
+  // 서명 생성
+  const crypto = await import('crypto');
+  const hmac = crypto.createHmac('sha256', secretKey);
+  const message = `${method} ${urlPath}\n${timestamp}\n${accessKey}`;
+  const signature = hmac.update(message).digest('base64');
+
+  const toLocal = normalizeToLocalKoreanNumber(toE164);
+  const content = renderAlimtalkContent(templateCode, variables);
+
+  const body: any = {
+    templateCode,
+    senderKey,
+    messages: [
+      {
+        to: toLocal,
+        content: {
+          title: content.title,
+          message: content.message,
+          ...(content.buttons ? { buttons: content.buttons } : {}),
+        },
+      },
+    ],
+  };
+
+  const res = await fetch(`${host}${urlPath}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'x-ncp-apigw-timestamp': timestamp,
+      'x-ncp-iam-access-key': accessKey,
+      'x-ncp-apigw-signature-v2': signature,
+    },
+    body: JSON.stringify(body),
+  });
+
+  const payload = { provider: 'ncp_sens_alimtalk', status: res.status, body: await res.clone().text() };
+  if (!res.ok) {
+    await logMessage({ channel: 'ALIMTALK', to: toE164, payload, status: 'FAILED', error: `status ${res.status}` });
+    throw new Error(`SENS 알림톡 응답 오류 (status ${res.status})`);
+  }
+  await logMessage({ channel: 'ALIMTALK', to: toE164, payload, status: 'SENT' });
+  return { ok: true, provider: 'ncp_sens', message: 'queued' } as const;
+}
+
 export async function sendAlimtalk(
   to: string,
   templateCode: string,
   variables: Record<string, string>
 ): Promise<{ ok: boolean; provider?: string; message?: string }> {
-  // 실제 대행사 연동 전까지는 콘솔 로깅 + DB 로깅만 수행
+  const provider = (process.env.BIZMSG_PROVIDER || 'mock').toLowerCase();
   try {
+    if (provider === 'ncp_sens' || provider === 'ncloud' || provider === 'naver') {
+      return await sendAlimtalkViaNaverSENS(to, templateCode, variables);
+    }
+
+    // 기본: 목킹 (로컬/미설정 환경)
     const payload = { templateCode, variables };
-    console.log('[ALIMTALK] to=%s, template=%s, vars=%o', to, templateCode, variables);
+    console.log('[ALIMTALK:mock] to=%s, template=%s, vars=%o', to, templateCode, variables);
     await logMessage({ channel: 'ALIMTALK', to, payload, status: 'SENT' });
-    return { ok: true, provider: process.env.BIZMSG_PROVIDER || 'mock', message: 'queued' };
+    return { ok: true, provider: 'mock', message: 'queued' };
   } catch (error: any) {
     await logMessage({ channel: 'ALIMTALK', to, payload: { templateCode, variables }, status: 'FAILED', error: error?.message });
     return { ok: false, message: error?.message };
