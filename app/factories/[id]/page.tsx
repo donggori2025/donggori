@@ -475,7 +475,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             <div className="mb-8">
               <h2 className="text-lg font-bold mb-3">위치</h2>
               <p className="text-gray-700">
-                (02522) 서울특별시 동대문구 장한로34길 23-2 (장안동) 지층
+                {factory.address || factory.admin_district || "주소 정보가 없습니다."}
               </p>
             </div>
             <div className="border-b border-gray-200 mb-8"></div>
