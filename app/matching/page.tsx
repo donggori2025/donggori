@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import type { Factory } from "@/lib/factories";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
+import { FACTORY_TYPES, MAIN_FABRICS, type FactoryType, type MainFabric } from "@/lib/types";
 
 
 // factories 데이터에서 옵션 추출 유틸(공장 찾기에서 복사)
@@ -112,7 +113,8 @@ type ScoredFactory = Factory & { score: number };
 
   // 동적 질문/옵션 useMemo는 반드시 함수 내부에서 호출
   const QUESTIONS = useMemo(() => [
-    { question: "어떤 공정을 원하시나요?", key: "processes", options: getOptions("processes") },
+    { question: "어떤 공정을 원하시나요?", key: "factory_type", options: FACTORY_TYPES },
+    { question: "주요 원단을 선택하세요", key: "main_fabrics", options: MAIN_FABRICS },
     { question: "지역을 선택하세요", key: "admin_district", options: getOptions("admin_district") },
     { question: "MOQ(최소 주문 수량)을 선택하세요", key: "moq", options: moqRanges.map(r => r.label) },
     { question: "재봉기를 선택하세요", key: "sewing_machines", options: getOptions("sewing_machines") },
@@ -285,25 +287,27 @@ type ScoredFactory = Factory & { score: number };
     // 선택한 옵션 중 1개라도 일치하는 공장만 후보로 삼고, 그 중 최대 3개만(랜덤 또는 상위 3개) 노출
     // 일치하는 공장이 3개 미만이면 나머지는 랜덤으로 채움
     const matched = factories.filter(f => {
-      // 공정
-      if (answers[0] && Array.isArray(f.processes) && f.processes.some(p => answers[0].includes(p))) return true;
+      // 공장 타입 (factory_type)
+      if (answers[0] && typeof f.factory_type === 'string' && answers[0].includes(f.factory_type)) return true;
+      // 주요 원단 (main_fabrics)
+      if (answers[1] && typeof f.main_fabrics === 'string' && answers[1].includes(f.main_fabrics)) return true;
       // 지역
-      if (answers[1] && typeof f.admin_district === 'string' && answers[1].includes(f.admin_district)) return true;
+      if (answers[2] && typeof f.admin_district === 'string' && answers[2].includes(f.admin_district)) return true;
       // MOQ(수량)
-      if (answers[2]) {
+      if (answers[3]) {
         if (
-          (answers[2] === "0-50" && f.minOrder <= 50) ||
-          (answers[2] === "51-100" && f.minOrder <= 100) ||
-          (answers[2] === "101-300" && f.minOrder <= 300) ||
-          (answers[2] === "301+" && f.minOrder > 300)
+          (answers[3] === "0-50" && f.minOrder <= 50) ||
+          (answers[3] === "51-100" && f.minOrder <= 100) ||
+          (answers[3] === "101-300" && f.minOrder <= 300) ||
+          (answers[3] === "301+" && f.minOrder > 300)
         ) return true;
       }
       // 재봉기/패턴기/특수기
-      if (answers[3] && typeof f.sewing_machines === 'string' && answers[3].split(',').some(val => typeof f.sewing_machines === 'string' && f.sewing_machines.includes(val))) return true;
-      if (answers[4] && typeof f.pattern_machines === 'string' && answers[4].split(',').some(val => typeof f.pattern_machines === 'string' && f.pattern_machines.includes(val))) return true;
-      if (answers[5] && typeof f.special_machines === 'string' && answers[5].split(',').some(val => typeof f.special_machines === 'string' && f.special_machines.includes(val))) return true;
+      if (answers[4] && typeof f.sewing_machines === 'string' && answers[4].split(',').some(val => typeof f.sewing_machines === 'string' && f.sewing_machines.includes(val))) return true;
+      if (answers[5] && typeof f.pattern_machines === 'string' && answers[5].split(',').some(val => typeof f.pattern_machines === 'string' && f.pattern_machines.includes(val))) return true;
+      if (answers[6] && typeof f.special_machines === 'string' && answers[6].split(',').some(val => typeof f.special_machines === 'string' && f.special_machines.includes(val))) return true;
       // 품목
-      if (answers[6] && Array.isArray(f.items) && f.items.some(i => answers[6].includes(i))) return true;
+      if (answers[7] && Array.isArray(f.items) && f.items.some(i => answers[7].includes(i))) return true;
       return false;
     });
     // 3개 미만이면 랜덤으로 채움
@@ -417,8 +421,18 @@ type ScoredFactory = Factory & { score: number };
                 <div className="hidden md:block mt-2" />
                 {/* 정보 영역 (패딩 적용) */}
                 <div className="p-3 md:p-4">
-                  {/* 주요 원단 칩 */}
+                  {/* 공장 타입 및 주요 원단 칩 */}
                   <div className="flex flex-wrap gap-2 mb-2">
+                    {f.factory_type && (
+                      <span className="bg-blue-100 text-blue-800 rounded-full px-2 md:px-3 py-1 text-xs font-semibold">
+                        {f.factory_type}
+                      </span>
+                    )}
+                    {f.main_fabrics && (
+                      <span className="bg-green-100 text-green-800 rounded-full px-2 md:px-3 py-1 text-xs font-semibold">
+                        {f.main_fabrics}
+                      </span>
+                    )}
                     {randomFabrics.map((chip) => (
                       <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-2 md:px-3 py-1 text-xs font-semibold">
                         {chip.label}
