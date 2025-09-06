@@ -194,27 +194,55 @@ type ScoredFactory = Factory & { score: number };
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
 
-  // 카드별 칩(공장 id 기준) - 공장 찾기와 동일하게 고정
+  // 카드별 칩을 실제 데이터베이스 데이터 기반으로 생성
   const cardFabricsById = useMemo(() => {
-    const fabricChips = [
-      { label: '봉제', color: '#0ACF83', bg: 'rgba(10, 207, 131, 0.1)' },
-      { label: '샘플', color: '#08B7FF', bg: 'rgba(8, 183, 255, 0.1)' },
-      { label: '패턴', color: '#FF8308', bg: 'rgba(255, 131, 8, 0.1)' },
-      { label: '나염', color: '#A259FF', bg: 'rgba(162, 89, 255, 0.1)' },
-      { label: '전사', color: '#ED6262', bg: 'rgba(237, 98, 98, 0.1)' },
-    ];
+    const chipColors = {
+      '봉제': { color: '#0ACF83', bg: 'rgba(10, 207, 131, 0.1)' },
+      '샘플': { color: '#08B7FF', bg: 'rgba(8, 183, 255, 0.1)' },
+      '패턴': { color: '#FF8308', bg: 'rgba(255, 131, 8, 0.1)' },
+      '나염': { color: '#A259FF', bg: 'rgba(162, 89, 255, 0.1)' },
+      'QC': { color: '#ED6262', bg: 'rgba(237, 98, 98, 0.1)' },
+      '시야게': { color: '#FF6B6B', bg: 'rgba(255, 107, 107, 0.1)' },
+      '다이마루': { color: '#4ECDC4', bg: 'rgba(78, 205, 196, 0.1)' },
+      '직기': { color: '#45B7D1', bg: 'rgba(69, 183, 209, 0.1)' },
+      '토탈': { color: '#96CEB4', bg: 'rgba(150, 206, 180, 0.1)' },
+      '기타': { color: '#FFEAA7', bg: 'rgba(255, 234, 167, 0.1)' },
+    };
+
     return Object.fromEntries(
       recommended.map((f, idx) => {
-        const seed = String(f.id ?? idx);
-        let hash = 0;
-        for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-        const shuffled = [...fabricChips].sort((a, b) => {
-          const h1 = Math.abs(Math.sin(hash + a.label.length)) % 1;
-          const h2 = Math.abs(Math.sin(hash + b.label.length)) % 1;
-          return h1 - h2;
-        });
-        const count = (Math.abs(hash) % 2) + 1;
-        return [f.id ?? idx, shuffled.slice(0, count)];
+        const chips = [];
+        
+        // factory_type 칩 추가
+        if (f.factory_type && f.factory_type.trim() !== '') {
+          const colorInfo = chipColors[f.factory_type as keyof typeof chipColors] || chipColors['기타'];
+          chips.push({
+            label: f.factory_type,
+            color: colorInfo.color,
+            bg: colorInfo.bg
+          });
+        }
+        
+        // main_fabrics 칩 추가
+        if (f.main_fabrics && f.main_fabrics.trim() !== '') {
+          const colorInfo = chipColors[f.main_fabrics as keyof typeof chipColors] || chipColors['기타'];
+          chips.push({
+            label: f.main_fabrics,
+            color: colorInfo.color,
+            bg: colorInfo.bg
+          });
+        }
+        
+        // 데이터가 없으면 기본값으로 '봉제' 표시
+        if (chips.length === 0) {
+          chips.push({
+            label: '봉제',
+            color: chipColors['봉제'].color,
+            bg: chipColors['봉제'].bg
+          });
+        }
+        
+        return [f.id ?? idx, chips];
       })
     );
   }, [recommended]);
@@ -423,16 +451,6 @@ type ScoredFactory = Factory & { score: number };
                 <div className="p-3 md:p-4">
                   {/* 공장 타입 및 주요 원단 칩 */}
                   <div className="flex flex-wrap gap-2 mb-2">
-                    {f.factory_type && (
-                      <span className="bg-blue-100 text-blue-800 rounded-full px-2 md:px-3 py-1 text-xs font-semibold">
-                        {f.factory_type}
-                      </span>
-                    )}
-                    {f.main_fabrics && (
-                      <span className="bg-green-100 text-green-800 rounded-full px-2 md:px-3 py-1 text-xs font-semibold">
-                        {f.main_fabrics}
-                      </span>
-                    )}
                     {randomFabrics.map((chip) => (
                       <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-2 md:px-3 py-1 text-xs font-semibold">
                         {chip.label}
