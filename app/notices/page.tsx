@@ -32,7 +32,11 @@ export default function NoticesPage() {
     if (tab === '전체') return items;
     return items.filter((n:any) => n.category === tab);
   }, [items, tab]);
-  const sorted = useMemo(() => [...filtered].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()), [filtered]);
+  const sorted = useMemo(() => [...filtered].sort((a, b) => {
+    const dateA = new Date(a.start_at || a.created_at).getTime();
+    const dateB = new Date(b.start_at || b.created_at).getTime();
+    return dateB - dateA;
+  }), [filtered]);
 
   return (
     <section className="w-full bg-white py-16 min-h-[600px]">
@@ -77,7 +81,7 @@ export default function NoticesPage() {
                   </Link>
                   <span className="text-gray-400 text-sm truncate block">{(notice.content || '').slice(0, 50)}{(notice.content || '').length > 50 ? '...' : ''}</span>
                 </div>
-                <div className="col-span-2 text-center text-gray-400">{(notice.created_at || '').slice(0,10)}</div>
+                <div className="col-span-2 text-center text-gray-400">{(notice.start_at || notice.created_at || '').slice(0,10)}</div>
               </li>
             ))
           )}

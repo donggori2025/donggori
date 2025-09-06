@@ -6,6 +6,7 @@ interface Notice {
   title: string;
   content: string;
   created_at: string;
+  start_at?: string;
   createdAt?: string;
   category?: string;
 }
@@ -25,7 +26,7 @@ export default function NoticeDetailClient({ notice }: NoticeDetailClientProps) 
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
             {notice.title}
           </h1>
-          <div className="text-lg text-gray-600 mb-8">{(notice.created_at || '').slice(0,10)}</div>
+          <div className="text-lg text-gray-600 mb-8">{(notice.start_at || notice.created_at || '').slice(0,10)}</div>
         </div>
 
         {/* 메인 콘텐츠 */}
