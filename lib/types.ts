@@ -40,8 +40,18 @@ export interface Factory {
   };
   contact_name?: string;
   phone_number?: string;
+  factory_type?: string; // 봉제, 샘플, 패턴, 나염, QC, 시야게
+  main_fabrics?: string; // 다이마루, 직기, 토탈, 기타
   [key: string]: unknown; // 인덱스 시그니처 추가
 }
+
+// 공장 카테고리 타입 정의
+export type FactoryType = '봉제' | '샘플' | '패턴' | '나염' | 'QC' | '시야게';
+export type MainFabric = '다이마루' | '직기' | '토탈' | '기타';
+
+// 카테고리 옵션 정의
+export const FACTORY_TYPES: FactoryType[] = ['봉제', '샘플', '패턴', '나염', 'QC', '시야게'];
+export const MAIN_FABRICS: MainFabric[] = ['다이마루', '직기', '토탈', '기타'];
 
 export interface FactoryAuth {
   factoryId: string;

@@ -488,13 +488,25 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                   <span className="font-semibold text-gray-600">업태:</span>
                   <span className="ml-2">{factory.business_type || "봉제업"}</span>
                 </div>
+                {factory.factory_type && (
+                  <div>
+                    <span className="font-semibold text-gray-600">공장 타입:</span>
+                    <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium">
+                      {factory.factory_type}
+                    </span>
+                  </div>
+                )}
+                {factory.main_fabrics && (
+                  <div>
+                    <span className="font-semibold text-gray-600">주요 원단:</span>
+                    <span className="ml-2 bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-medium">
+                      {factory.main_fabrics}
+                    </span>
+                  </div>
+                )}
                 <div>
                   <span className="font-semibold text-gray-600">주요품목:</span>
                   <span className="ml-2">{factory.top_items_upper || factory.top_items_lower || factory.top_items_outer || "상의, 하의, 아우터"}</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-600">주요원단:</span>
-                  <span className="ml-2">{factory.main_fabrics || "다이마루"}</span>
                 </div>
                 <div>
                   <span className="font-semibold text-gray-600">MOQ(최소 주문 수량):</span>
