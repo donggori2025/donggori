@@ -6,6 +6,7 @@ import { ArrowPathIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { List, Map as MapIcon } from "lucide-react";
 import { factories, fetchFactoriesFromDB, type Factory } from "@/lib/factories";
 import { testSupabaseConnection } from "@/lib/supabaseClient";
+import { FACTORY_TYPES, MAIN_FABRICS } from "@/lib/types";
 // import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
@@ -192,7 +193,7 @@ export default function FactoriesPage() {
 
   // 아코디언 열림/닫힘 상태 관리
   const [openFilter, setOpenFilter] = useState<{ [key: string]: boolean }>({
-    process: true,
+    factory_type: true,
     main_fabrics: true,
     region: true,
     items: false,
@@ -449,30 +450,30 @@ export default function FactoriesPage() {
               </button>
             </div>
             <hr className="my-2 border-gray-200" />
-            {/* 공정 */}
+            {/* 공장 타입 */}
             <div>
-              <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, process: !f.process }))}>
+              <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, factory_type: !f.factory_type }))}>
                 <span className="font-bold text-[16px] flex items-center gap-3">
-                  공정
-                  {selected.processes.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.processes.length}</span>
+                  공장 타입
+                  {selected.factory_type.length > 0 && (
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.factory_type.length}</span>
                   )}
                 </span>
-                <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.process ? '' : 'rotate-180'}`} />
+                <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.factory_type ? '' : 'rotate-180'}`} />
               </button>
-              {openFilter.process && (
+              {openFilter.factory_type && (
                 <div className="flex flex-wrap gap-2 pb-2 mt-3">
-                  {processesOptions.map((opt: string) => (
+                  {FACTORY_TYPES.map((opt: string) => (
                     <Button
                       key={opt}
                       size="sm"
-                      variant={selected.processes?.includes?.(opt) ? "default" : "outline"}
+                      variant={selected.factory_type?.includes?.(opt) ? "default" : "outline"}
                       className="rounded-full border px-4"
                       onClick={() => setSelected(sel => ({
                         ...sel,
-                        processes: sel.processes?.includes?.(opt)
-                          ? sel.processes.filter((v: string) => v !== opt)
-                          : [...(sel.processes || []), opt]
+                        factory_type: sel.factory_type?.includes?.(opt)
+                          ? sel.factory_type.filter((v: string) => v !== opt)
+                          : [...(sel.factory_type || []), opt]
                       }))}
                     >
                       {opt}
@@ -494,7 +495,7 @@ export default function FactoriesPage() {
               </button>
               {openFilter.main_fabrics && (
                 <div className="flex flex-wrap gap-2 pb-2 mt-3">
-                  {mainFabricsOptions.map((opt: string) => (
+                  {MAIN_FABRICS.map((opt: string) => (
                     <Button
                       key={opt}
                       size="sm"
@@ -728,30 +729,30 @@ export default function FactoriesPage() {
               {/* 스크롤 가능한 필터 내용 */}
               <div className="flex-1 overflow-y-auto p-4 sm:p-6 pt-3 sm:pt-4">
               {/* 이하 필터 항목들(공정, 지역, MOQ 등) - aside 내부와 동일하게 복사 */}
-              {/* 공정 */}
+              {/* 공장 타입 */}
               <div>
-                <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, process: !f.process }))}>
+                <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, factory_type: !f.factory_type }))}>
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-2 sm:gap-3">
-                    공정
-                    {selected.processes.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.processes.length}</span>
+                    공장 타입
+                    {selected.factory_type.length > 0 && (
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.factory_type.length}</span>
                     )}
                   </span>
-                  <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.process ? '' : 'rotate-180'}`} />
+                  <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.factory_type ? '' : 'rotate-180'}`} />
                 </button>
-                {openFilter.process && (
+                {openFilter.factory_type && (
                   <div className="flex flex-wrap gap-1 sm:gap-2 pb-2 mt-2 sm:mt-3">
-                    {processesOptions.map((opt: string) => (
+                    {FACTORY_TYPES.map((opt: string) => (
                       <Button
                         key={opt}
                         size="sm"
-                        variant={selected.processes?.includes?.(opt) ? "default" : "outline"}
+                        variant={selected.factory_type?.includes?.(opt) ? "default" : "outline"}
                         className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
                         onClick={() => setSelected(sel => ({
                           ...sel,
-                          processes: sel.processes?.includes?.(opt)
-                            ? sel.processes.filter((v: string) => v !== opt)
-                            : [...(sel.processes || []), opt]
+                          factory_type: sel.factory_type?.includes?.(opt)
+                            ? sel.factory_type.filter((v: string) => v !== opt)
+                            : [...(sel.factory_type || []), opt]
                         }))}
                       >
                         {opt}
@@ -773,7 +774,7 @@ export default function FactoriesPage() {
                 </button>
                 {openFilter.main_fabrics && (
                   <div className="flex flex-wrap gap-1 sm:gap-2 pb-2 mt-2 sm:mt-3">
-                    {mainFabricsOptions.map((opt: string) => (
+                    {MAIN_FABRICS.map((opt: string) => (
                       <Button
                         key={opt}
                         size="sm"
