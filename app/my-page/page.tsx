@@ -8,9 +8,149 @@ import { MatchRequest } from "@/lib/matchRequests";
 import { Factory } from "@/lib/factories";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
 import { validateName } from "@/lib/randomNameGenerator";
+import { Loader } from "lucide-react";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
+
+// 비밀번호 재설정 컴포넌트
+function PasswordResetSection() {
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!currentPassword) {
+      setError("현재 비밀번호를 입력해주세요.");
+      return;
+    }
+    if (!newPassword) {
+      setError("새 비밀번호를 입력해주세요.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError("비밀번호는 6자 이상이어야 합니다.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError("새 비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword
+        })
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "비밀번호 변경에 실패했습니다.");
+      }
+
+      setSuccess("비밀번호가 성공적으로 변경되었습니다.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setShowPasswordForm(false);
+    } catch (err: any) {
+      setError(err.message || "비밀번호 변경에 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!showPasswordForm) {
+    return (
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => setShowPasswordForm(true)}
+          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          비밀번호 변경
+        </button>
+        <span className="text-sm text-gray-500">보안을 위해 정기적으로 비밀번호를 변경해주세요.</span>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">현재 비밀번호</label>
+        <input
+          type="password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+          placeholder="현재 비밀번호를 입력해주세요"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">새 비밀번호</label>
+        <input
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+          placeholder="새 비밀번호를 입력해주세요 (6자 이상)"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">새 비밀번호 확인</label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+          placeholder="새 비밀번호를 다시 입력해주세요"
+        />
+      </div>
+      
+      {error && <div className="text-red-500 text-sm">{error}</div>}
+      {success && <div className="text-green-500 text-sm">{success}</div>}
+      
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={loading}
+          className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          {loading && <Loader className="w-4 h-4 animate-spin" />}
+          비밀번호 변경
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setShowPasswordForm(false);
+            setError("");
+            setSuccess("");
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+          }}
+          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          취소
+        </button>
+      </div>
+    </form>
+  );
+}
 
 export default function MyPage() {
   const { user } = useUser();
@@ -705,6 +845,14 @@ export default function MyPage() {
                    placeholder="전화번호를 입력해주세요 (예: 010-1234-5678)"
                  />
                </div>
+
+              {/* 비밀번호 재설정 (소셜 로그인 사용자가 아닌 경우에만 표시) */}
+              {!naverUser && !kakaoUser && (
+                <div className="mb-8">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">비밀번호 재설정</label>
+                  <PasswordResetSection />
+                </div>
+              )}
 
               {/* 카카오톡 메시지 수신 동의 상태 */}
               <div className="mb-8">
