@@ -47,8 +47,45 @@ function ChatBubble({ text, type, isTyping, showCursor, onEdit }: { text: string
 
 export default function MatchingPage() {
   const { user } = useUser();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   // 공장 데이터 state
   const [factories, setFactories] = useState<Factory[]>([]);
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      // Clerk 사용자 확인
+      if (user) {
+        setIsLoggedIn(true);
+        return;
+      }
+
+      // 쿠키에서 로그인 상태 확인
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        return null;
+      };
+
+      const isLoggedInCookie = getCookie('isLoggedIn');
+      const userType = getCookie('userType');
+      const naverUser = getCookie('naver_user');
+      const kakaoUser = getCookie('kakao_user');
+
+      // localStorage에서도 확인
+      const localStorageUserType = localStorage.getItem('userType');
+      const localStorageFactoryAuth = localStorage.getItem('factoryAuth');
+
+      if (isLoggedInCookie === 'true' || userType || naverUser || kakaoUser || localStorageUserType || localStorageFactoryAuth) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, [user]);
 
   useEffect(() => {
     async function fetchFactories() {
@@ -469,7 +506,7 @@ type ScoredFactory = Factory & { score: number };
                   <button
                     className="w-full mt-3 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition text-sm md:text-base"
                     onClick={() => {
-                      if (!user) {
+                      if (!isLoggedIn) {
                         alert('로그인 후 이용 가능합니다.');
                         return;
                       }
