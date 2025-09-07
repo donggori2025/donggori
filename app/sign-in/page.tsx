@@ -280,7 +280,7 @@ function SignInForm() {
           />
           <label htmlFor="remember" className="text-gray-700">아이디 저장</label>
         </div>
-        <a href="#" className="text-gray-400 hover:text-black">비밀번호를 잊으셨나요?</a>
+        <Link href="/reset-password" className="text-gray-400 hover:text-black">비밀번호를 잊으셨나요?</Link>
       </div>
       {error && <div className="text-red-500 text-sm text-center">{error}</div>}
       <button type="submit" className="w-full bg-black text-white py-3 rounded font-bold text-lg mt-2 hover:bg-gray-900 transition flex items-center justify-center" disabled={loading}>
