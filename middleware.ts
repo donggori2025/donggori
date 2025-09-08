@@ -26,6 +26,8 @@ export default function middleware(req: NextRequest, ev: NextFetchEvent) {
       '/api/admin',
       // 소셜/인증 API는 Clerk 미들웨어 영향 없이 동작하도록 우회
       '/api/auth',
+      // 공장 전용 API도 Clerk 미들웨어 영향 없이 동작하도록 우회
+      '/api/factory',
       // 업장(봉제공장) 전용 페이지는 Clerk 미들웨어에 의존하지 않음
       '/factory-my-page',
       '/factory-my-page/requests',
