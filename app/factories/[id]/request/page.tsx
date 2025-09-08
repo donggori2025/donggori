@@ -316,8 +316,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       // 카카오톡 URL로 이동
       const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
       if (kakaoUrl) {
+        alert('의뢰 내용이 클립보드에 복사되었습니다!\n확인을 누르면 카카오톡으로 이동합니다.');
         window.open(kakaoUrl, '_blank');
-        alert('의뢰 내용이 클립보드에 복사되었습니다!\n카카오톡에서 붙여넣기(Ctrl+V)하여 문의해주세요.');
       } else {
         alert('의뢰 내용이 클립보드에 복사되었습니다!\n공장의 카카오톡 URL이 없어 직접 연락이 어렵습니다.');
       }
