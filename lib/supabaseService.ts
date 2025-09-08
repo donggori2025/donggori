@@ -36,3 +36,11 @@ try {
 }
 
 export { supabaseService };
+
+// Service Role 클라이언트를 반환하는 함수
+export function getServiceSupabase() {
+  if (!supabaseService) {
+    throw new Error('Service Role 클라이언트가 초기화되지 않았습니다.');
+  }
+  return supabaseService;
+}
