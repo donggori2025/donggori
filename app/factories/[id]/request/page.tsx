@@ -260,7 +260,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   };
 
   // 의뢰 내용을 클립보드에 복사할 텍스트 생성
-  const generateRequestText = (requestId?: string) => {
+  const generateRequestText = () => {
     const factoryName = factory?.company_name || factory?.name || '공장';
     const serviceName = currentService.title;
     
@@ -296,19 +296,21 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     text += `📅 의뢰일: ${new Date().toLocaleDateString('ko-KR')}\n`;
     text += `\n동고리를 통해 문의드립니다. 감사합니다! 🙏`;
     
-    // 작업지시서 확인 링크 추가
-    if (requestId && typeof window !== 'undefined') {
-      const workOrderUrl = `${window.location.origin}/work-order/${requestId}`;
-      text += `\n\n📋 작업지시서 확인하기 -> ${workOrderUrl}`;
+    // 첨부 파일 링크 추가
+    if (formData.files.length > 0 && typeof window !== 'undefined') {
+      text += `\n\n📎 첨부 파일:`;
+      formData.files.forEach((file, index) => {
+        text += `\n${index + 1}. ${file.name}`;
+      });
     }
     
     return text;
   };
 
   // 클립보드 복사 및 카카오톡 연결
-  const copyToClipboardAndOpenKakao = async (requestId?: string) => {
+  const copyToClipboardAndOpenKakao = async () => {
     try {
-      const requestText = generateRequestText(requestId);
+      const requestText = generateRequestText();
       
       // 클립보드에 복사
       await navigator.clipboard.writeText(requestText);
@@ -454,7 +456,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         }
 
         // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
-        await copyToClipboardAndOpenKakao(newId);
+        await copyToClipboardAndOpenKakao();
       } catch (dbError: any) {
         console.error('데이터베이스 저장 중 예외 발생:', dbError, {
           message: dbError?.message,
