@@ -260,7 +260,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   };
 
   // 의뢰 내용을 클립보드에 복사할 텍스트 생성
-  const generateRequestText = () => {
+  const generateRequestText = (fileUrls: string[] = []) => {
     const factoryName = factory?.company_name || factory?.name || '공장';
     const serviceName = currentService.title;
     
@@ -296,11 +296,15 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     text += `📅 의뢰일: ${new Date().toLocaleDateString('ko-KR')}\n`;
     text += `\n동고리를 통해 문의드립니다. 감사합니다! 🙏`;
     
-    // 첨부 파일 링크 추가
-    if (formData.files.length > 0 && typeof window !== 'undefined') {
-      text += `\n\n📎 첨부 파일:`;
+    // 첨부 파일 다운로드 링크 추가
+    if (formData.files.length > 0 && fileUrls.length > 0) {
+      text += `\n\n📎 첨부 파일 다운로드:`;
       formData.files.forEach((file, index) => {
-        text += `\n${index + 1}. ${file.name}`;
+        if (fileUrls[index]) {
+          text += `\n${index + 1}. ${file.name} -> ${fileUrls[index]}`;
+        } else {
+          text += `\n${index + 1}. ${file.name}`;
+        }
       });
     }
     
@@ -308,9 +312,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   };
 
   // 클립보드 복사 및 카카오톡 연결
-  const copyToClipboardAndOpenKakao = async () => {
+  const copyToClipboardAndOpenKakao = async (fileUrls: string[] = []) => {
     try {
-      const requestText = generateRequestText();
+      const requestText = generateRequestText(fileUrls);
       
       // 클립보드에 복사
       await navigator.clipboard.writeText(requestText);
@@ -456,7 +460,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         }
 
         // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
-        await copyToClipboardAndOpenKakao();
+        await copyToClipboardAndOpenKakao(uploadedFileUrls);
       } catch (dbError: any) {
         console.error('데이터베이스 저장 중 예외 발생:', dbError, {
           message: dbError?.message,
