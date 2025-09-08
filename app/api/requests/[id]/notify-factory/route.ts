@@ -5,6 +5,8 @@ import { sendAlimtalk, sendSMS } from '@/lib/messaging';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const url = new URL(req.url);
+    const debug = url.searchParams.get('debug') === '1';
     const workOrderId = params.id;
     if (!workOrderId) return NextResponse.json({ ok: false, error: 'id가 필요합니다.' }, { status: 400 });
 
@@ -103,7 +105,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       .update({ status: 'SENT', updated_at: new Date().toISOString() })
       .eq('id', workOrderId);
 
-    return NextResponse.json({ ok: true, channel: a.ok ? 'ALIMTALK' : 'SMS' });
+    return NextResponse.json({ ok: true, channel: a.ok ? 'ALIMTALK' : 'SMS', ...(debug ? { variables, factoryPhone } : {}) });
   } catch (error: any) {
     return NextResponse.json({ ok: false, error: error?.message || 'failed' }, { status: 500 });
   }
