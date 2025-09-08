@@ -111,3 +111,12 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+// CORS/프리플라이트 또는 헬스체크 용도
+export async function OPTIONS() {
+  return NextResponse.json({ ok: true }, { status: 204 });
+}
+
+export async function GET() {
+  return NextResponse.json({ ok: true, route: 'factory/change-password' });
+}
