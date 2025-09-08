@@ -16,21 +16,19 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log('요청 body:', { 
       factoryId: body.factoryId, 
-      currentPassword: body.currentPassword ? body.currentPassword.substring(0, 3) + '***' : '', 
       newPassword: body.newPassword ? body.newPassword.substring(0, 3) + '***' : '' 
     });
 
-    const { factoryId, currentPassword, newPassword } = body;
+    const { factoryId, newPassword } = body;
 
     // 필수 파라미터 검증
-    if (!factoryId || !currentPassword || !newPassword) {
+    if (!factoryId || !newPassword) {
       console.log('필수 파라미터 누락:', { 
         factoryId: !!factoryId, 
-        currentPassword: !!currentPassword, 
         newPassword: !!newPassword 
       });
       return NextResponse.json(
-        { success: false, error: "봉제공장 ID, 현재 비밀번호와 새 비밀번호가 필요합니다." },
+        { success: false, error: "봉제공장 ID와 새 비밀번호가 필요합니다." },
         { status: 400 }
       );
     }
@@ -47,8 +45,8 @@ export async function POST(req: NextRequest) {
     const supabase = getServiceSupabase();
     console.log('Supabase 클라이언트 생성 완료');
 
-    // FactoryAuth 테이블에서 현재 비밀번호 확인
-    console.log('현재 비밀번호 확인 시작...');
+    // FactoryAuth 테이블에서 봉제공장 정보 확인
+    console.log('봉제공장 정보 확인 시작...');
     const { data: authData, error: authError } = await supabase
       .from('FactoryAuth')
       .select('*')
@@ -58,7 +56,7 @@ export async function POST(req: NextRequest) {
     if (authError) {
       console.error('FactoryAuth 조회 오류:', authError);
       return NextResponse.json(
-        { success: false, error: "봉제공장 인증 정보를 찾을 수 없습니다." },
+        { success: false, error: "봉제공장 정보를 찾을 수 없습니다." },
         { status: 404 }
       );
     }
@@ -66,7 +64,7 @@ export async function POST(req: NextRequest) {
     if (!authData) {
       console.log('FactoryAuth 데이터 없음');
       return NextResponse.json(
-        { success: false, error: "봉제공장 인증 정보를 찾을 수 없습니다." },
+        { success: false, error: "봉제공장 정보를 찾을 수 없습니다." },
         { status: 404 }
       );
     }
@@ -77,18 +75,7 @@ export async function POST(req: NextRequest) {
       name: authData.name 
     });
 
-    // 현재 비밀번호 확인
-    if (authData.password !== currentPassword) {
-      console.log('현재 비밀번호 불일치');
-      return NextResponse.json(
-        { success: false, error: "현재 비밀번호가 올바르지 않습니다." },
-        { status: 400 }
-      );
-    }
-
-    console.log('현재 비밀번호 확인 성공');
-
-    // 새 비밀번호로 업데이트
+    // 새 비밀번호로 업데이트 (현재 비밀번호 확인 없이)
     console.log('비밀번호 업데이트 시작...');
     const { error: updateError } = await supabase
       .from('FactoryAuth')
