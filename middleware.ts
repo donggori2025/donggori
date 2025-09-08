@@ -31,9 +31,7 @@ export default function middleware(req: NextRequest, ev: NextFetchEvent) {
       '/api/admin',
       // 소셜/인증 API는 Clerk 미들웨어 영향 없이 동작하도록 우회
       '/api/auth',
-      // 업장(봉제공장) 전용 페이지는 Clerk 미들웨어에 의존하지 않음
-      '/factory-my-page',
-      '/factory-my-page/requests',
+      // (주의) 팩토리 마이페이지는 이제 www 정규화를 위해 우회하지 않음
     ];
     if (bypassPaths.some((p) => pathname.startsWith(p))) {
       return NextResponse.next();
