@@ -46,9 +46,11 @@ function renderAlimtalkContent(templateCode: string, variables: Record<string, s
     const name = variables.name || '';
     const phone = variables.phone || '';
     const shortUrl = variables.shortUrl || '';
+    const desc = variables.desc ? `\n\n상세설명\n- ${variables.desc}` : '';
+    const details = variables.details ? `\n\n상세 요청사항\n- ${variables.details}` : '';
     return {
       title: '동고리 의뢰 도착',
-      message: `의뢰가 접수되었습니다.\n의뢰ID: ${id}\n디자이너: ${name} (${phone})\n아래 버튼을 눌러 상세를 확인하세요.`,
+      message: `의뢰가 접수되었습니다.\n의뢰ID: ${id}\n디자이너: ${name} (${phone})${desc}${details}\n\n아래 버튼을 눌러 상세를 확인하세요.`,
       buttons: shortUrl ? [{ type: 'WL', name: '의뢰 상세보기', linkMobile: shortUrl, linkPc: shortUrl }] : undefined,
     } as const;
   }
