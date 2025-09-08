@@ -179,7 +179,7 @@ export async function getFactoryLocation(factoryId: string): Promise<FactoryLoca
     const { data, error } = await supabase
       .from('donggori')
       .select('id, company_name, address, business_type, image, lat, lng')
-      .eq('id', factoryId)
+      .eq('id', parseInt(factoryId)) // factoryId를 숫자로 변환
       .single();
 
     if (error || !data) {
