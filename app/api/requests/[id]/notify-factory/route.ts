@@ -24,17 +24,33 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     if (!factoryPhone) {
       const { data: factoryRow } = await supabase
         .from('donggori')
-        .select('phone_num, phone_number')
+        .select('phone_num, phone_number, contact')
         .eq('id', orderData.factory_id)
         .maybeSingle();
-      factoryPhone = (factoryRow?.phone_num || factoryRow?.phone_number || orderData.contact || '').toString();
+      factoryPhone = (factoryRow?.phone_num || factoryRow?.phone_number || factoryRow?.contact || orderData.contact || '').toString();
     }
     const designerName = orderData.user_name || '디자이너';
     const designerPhone = orderData.contact || orderData.user_phone || '';
     const shortUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/my-page/requests?id=${workOrderId}`;
 
-    if (!factoryPhone) {
-      return NextResponse.json({ ok: false, error: '공장 연락처가 없습니다.' }, { status: 400 });
+    // 연락처 유효성(숫자 9자리 이상) 확인
+    const digits = String(factoryPhone).replace(/[^0-9]/g, '');
+    if (!digits || digits.length < 9) {
+      // 실패 로그 남김(조회 가능하도록)
+      try {
+        await supabase.from('message_logs').insert([
+          {
+            work_order_id: String(workOrderId),
+            channel: 'ALIMTALK',
+            to: String(factoryPhone || ''),
+            payload: { reason: 'NO_VALID_FACTORY_PHONE' },
+            status: 'FAILED',
+            error: '공장 연락처가 없거나 유효하지 않습니다.',
+            created_at: new Date().toISOString(),
+          },
+        ]);
+      } catch {}
+      return NextResponse.json({ ok: false, error: '공장 연락처가 없거나 유효하지 않습니다.' }, { status: 400 });
     }
 
     // 상세설명/요청사항 추출
