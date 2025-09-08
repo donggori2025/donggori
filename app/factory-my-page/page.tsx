@@ -10,19 +10,25 @@ const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
 
 // 봉제공장 비밀번호 재설정 컴포넌트
-function FactoryPasswordResetSection({ factoryAuth }: { factoryAuth: { factoryId: string; factoryName: string } | null }) {
+function FactoryPasswordResetSection({ companyName }: { companyName?: string }) {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!currentPassword) {
+      setError("현재 비밀번호를 입력해주세요.");
+      return;
+    }
     if (!newPassword) {
       setError("새 비밀번호를 입력해주세요.");
       return;
@@ -35,7 +41,9 @@ function FactoryPasswordResetSection({ factoryAuth }: { factoryAuth: { factoryId
       setError("새 비밀번호가 일치하지 않습니다.");
       return;
     }
-    if (!factoryAuth?.factoryId) {
+
+    // 회사명 확인
+    if (!companyName || !companyName.trim()) {
       setError("봉제공장 정보를 찾을 수 없습니다.");
       return;
     }
@@ -45,12 +53,13 @@ function FactoryPasswordResetSection({ factoryAuth }: { factoryAuth: { factoryId
     setSuccess("");
 
     try {
-      const response = await fetch('/api/auth/change-password', {
+      const response = await fetch('/api/factory/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          factoryId: factoryAuth?.factoryId,
-          newPassword
+          currentPassword,
+          newPassword,
+          companyName
         })
       });
 
@@ -87,6 +96,25 @@ function FactoryPasswordResetSection({ factoryAuth }: { factoryAuth: { factoryId
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">현재 비밀번호</label>
+        <div className="relative">
+          <input
+            type={showCurrentPassword ? "text" : "password"}
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+            placeholder="현재 비밀번호를 입력해주세요"
+          />
+          <button
+            type="button"
+            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          >
+            {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">새 비밀번호</label>
         <div className="relative">
@@ -144,8 +172,10 @@ function FactoryPasswordResetSection({ factoryAuth }: { factoryAuth: { factoryId
             setShowPasswordForm(false);
             setError("");
             setSuccess("");
+            setCurrentPassword("");
             setNewPassword("");
             setConfirmPassword("");
+            setShowCurrentPassword(false);
             setShowNewPassword(false);
             setShowConfirmPassword(false);
           }}
@@ -971,7 +1001,7 @@ export default function FactoryMyPage() {
               <div className="mb-6 md:mb-8">
                 <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">비밀번호 재설정</h3>
                 <div className="space-y-4">
-                  <FactoryPasswordResetSection factoryAuth={factoryAuth} />
+                  <FactoryPasswordResetSection companyName={formData.name || factoryData?.company_name} />
                 </div>
               </div>
 
