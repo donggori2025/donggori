@@ -534,7 +534,7 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
         description: String(item.intro_text || item.intro || item.description || "설명 없음"),
         image: getFactoryMainImage(companyName), // 업장 이름으로 이미지 매칭
         images: getFactoryImages(companyName), // 업장 이름으로 모든 이미지 가져오기
-        contact: String(item.phone_num || item.phone_number || item.contact || "연락처 없음"),
+        contact: String(item.phone_number || item.contact || "연락처 없음"),
         lat: Number(item.lat) || 37.5665,
         lng: Number(item.lng) || 126.9780,
         kakaoUrl: String(item.kakao_url || item.kakaoUrl || ""),
@@ -558,7 +558,7 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
         monthly_capacity: Number(item.monthly_capacity) || undefined,
         admin_district: item.admin_district as string | undefined,
         intro: (item.intro_text || item.intro) as string | undefined,
-        phone_number: (item.phone_num || item.phone_number) as string | undefined,
+        phone_number: item.phone_number as string | undefined,
         factory_type: item.factory_type as string | undefined,
         main_fabrics: item.main_fabrics as string | undefined,
         distribution: item.distribution as string | undefined,
