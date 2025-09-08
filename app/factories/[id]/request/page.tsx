@@ -297,7 +297,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     text += `\n동고리를 통해 문의드립니다. 감사합니다! 🙏`;
     
     // 작업지시서 확인 링크 추가
-    if (requestId) {
+    if (requestId && typeof window !== 'undefined') {
       const workOrderUrl = `${window.location.origin}/work-order/${requestId}`;
       text += `\n\n📋 작업지시서 확인하기 -> ${workOrderUrl}`;
     }
@@ -317,7 +317,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
       if (kakaoUrl) {
         alert('의뢰 내용이 클립보드에 복사되었습니다!\n확인을 누르면 카카오톡으로 이동합니다.');
-        window.open(kakaoUrl, '_blank');
+        window.open(String(kakaoUrl), '_blank');
       } else {
         alert('의뢰 내용이 클립보드에 복사되었습니다!\n공장의 카카오톡 URL이 없어 직접 연락이 어렵습니다.');
       }
@@ -821,7 +821,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
               onClick={() => {
                 const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
                 if (kakaoUrl) {
-                  window.open(kakaoUrl, '_blank');
+                  window.open(String(kakaoUrl), '_blank');
                 } else {
                   alert('공장의 카카오톡 URL이 설정되지 않았습니다.');
                 }
