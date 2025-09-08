@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import Image from 'next/image';
 
 interface MatchRequest {
@@ -42,7 +42,6 @@ export default function WorkOrderDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [additionalInfo, setAdditionalInfo] = useState<any>(null);
 
-  const supabase = createClient();
 
   useEffect(() => {
     if (!requestId) return;
