@@ -10,7 +10,7 @@ const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
 
 // 봉제공장 비밀번호 재설정 컴포넌트
-function FactoryPasswordResetSection() {
+function FactoryPasswordResetSection({ factoryAuth }: { factoryAuth: { factoryId: string; factoryName: string } | null }) {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -41,6 +41,10 @@ function FactoryPasswordResetSection() {
       setError("새 비밀번호가 일치하지 않습니다.");
       return;
     }
+    if (!factoryAuth?.factoryId) {
+      setError("봉제공장 정보를 찾을 수 없습니다.");
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -51,6 +55,7 @@ function FactoryPasswordResetSection() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          factoryId: factoryAuth?.factoryId,
           currentPassword,
           newPassword
         })
@@ -994,7 +999,7 @@ export default function FactoryMyPage() {
               <div className="mb-6 md:mb-8">
                 <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">비밀번호 재설정</h3>
                 <div className="space-y-4">
-                  <FactoryPasswordResetSection />
+                  <FactoryPasswordResetSection factoryAuth={factoryAuth} />
                 </div>
               </div>
 

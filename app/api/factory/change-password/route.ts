@@ -4,11 +4,11 @@ import { validateFactoryLogin } from "@/lib/factoryAuth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { currentPassword, newPassword } = await req.json();
+    const { factoryId, currentPassword, newPassword } = await req.json();
 
-    if (!currentPassword || !newPassword) {
+    if (!factoryId || !currentPassword || !newPassword) {
       return NextResponse.json(
-        { success: false, error: "현재 비밀번호와 새 비밀번호가 필요합니다." },
+        { success: false, error: "봉제공장 ID, 현재 비밀번호와 새 비밀번호가 필요합니다." },
         { status: 400 }
       );
     }
@@ -20,49 +20,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 요청 헤더에서 봉제공장 인증 정보 확인
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { success: false, error: "인증이 필요합니다." },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.substring(7);
     const supabase = getServiceSupabase();
 
-    // 토큰에서 봉제공장 정보 추출 (실제로는 JWT 토큰을 디코딩해야 함)
-    // 여기서는 간단히 쿠키에서 정보를 가져오는 방식으로 구현
-    const factoryAuthCookie = req.headers.get('cookie');
-    if (!factoryAuthCookie) {
-      return NextResponse.json(
-        { success: false, error: "봉제공장 인증 정보가 없습니다." },
-        { status: 401 }
-      );
-    }
-
-    // 쿠키에서 봉제공장 정보 파싱
-    const factoryAuthMatch = factoryAuthCookie.match(/factory_auth=([^;]+)/);
-    if (!factoryAuthMatch) {
-      return NextResponse.json(
-        { success: false, error: "봉제공장 인증 정보를 찾을 수 없습니다." },
-        { status: 401 }
-      );
-    }
-
-    let factoryAuth;
-    try {
-      factoryAuth = JSON.parse(decodeURIComponent(factoryAuthMatch[1]));
-    } catch (error) {
-      return NextResponse.json(
-        { success: false, error: "봉제공장 인증 정보가 올바르지 않습니다." },
-        { status: 401 }
-      );
-    }
-
     // 현재 비밀번호 확인
-    const isValidPassword = validateFactoryLogin(factoryAuth.factoryId, currentPassword);
+    const isValidPassword = validateFactoryLogin(factoryId, currentPassword);
     if (!isValidPassword) {
       return NextResponse.json(
         { success: false, error: "현재 비밀번호가 올바르지 않습니다." },
@@ -74,7 +35,7 @@ export async function POST(req: NextRequest) {
     const { error: updateError } = await supabase
       .from('factories')
       .update({ password: newPassword })
-      .eq('id', factoryAuth.factoryId);
+      .eq('id', factoryId);
 
     if (updateError) {
       console.error('비밀번호 업데이트 오류:', updateError);
