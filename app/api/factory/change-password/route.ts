@@ -1,25 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
-import { validateFactoryLogin } from "@/lib/factoryAuth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { factoryId, currentPassword, newPassword } = await req.json();
+    console.log('=== 비밀번호 변경 API 시작 ===');
     
-    console.log('비밀번호 변경 요청:', { 
-      factoryId, 
-      currentPassword: currentPassword ? currentPassword.substring(0, 3) + '***' : '', 
-      newPassword: newPassword ? newPassword.substring(0, 3) + '***' : '' 
+    const body = await req.json();
+    console.log('요청 body:', { 
+      factoryId: body.factoryId, 
+      currentPassword: body.currentPassword ? body.currentPassword.substring(0, 3) + '***' : '', 
+      newPassword: body.newPassword ? body.newPassword.substring(0, 3) + '***' : '' 
     });
 
+    const { factoryId, currentPassword, newPassword } = body;
+
+    // 필수 파라미터 검증
     if (!factoryId || !currentPassword || !newPassword) {
-      console.log('필수 파라미터 누락:', { factoryId: !!factoryId, currentPassword: !!currentPassword, newPassword: !!newPassword });
+      console.log('필수 파라미터 누락:', { 
+        factoryId: !!factoryId, 
+        currentPassword: !!currentPassword, 
+        newPassword: !!newPassword 
+      });
       return NextResponse.json(
         { success: false, error: "봉제공장 ID, 현재 비밀번호와 새 비밀번호가 필요합니다." },
         { status: 400 }
       );
     }
 
+    // 새 비밀번호 길이 검증
     if (newPassword.length < 6) {
       console.log('비밀번호 길이 부족:', newPassword.length);
       return NextResponse.json(
@@ -29,23 +37,51 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = getServiceSupabase();
+    console.log('Supabase 클라이언트 생성 완료');
+
+    // FactoryAuth 테이블에서 현재 비밀번호 확인
+    console.log('현재 비밀번호 확인 시작...');
+    const { data: authData, error: authError } = await supabase
+      .from('FactoryAuth')
+      .select('*')
+      .eq('factoryId', factoryId)
+      .single();
+
+    if (authError) {
+      console.error('FactoryAuth 조회 오류:', authError);
+      return NextResponse.json(
+        { success: false, error: "봉제공장 인증 정보를 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
+
+    if (!authData) {
+      console.log('FactoryAuth 데이터 없음');
+      return NextResponse.json(
+        { success: false, error: "봉제공장 인증 정보를 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
+
+    console.log('FactoryAuth 데이터 조회 성공:', { 
+      id: authData.id, 
+      factoryId: authData.factoryId, 
+      name: authData.name 
+    });
 
     // 현재 비밀번호 확인
-    // factoryId를 username으로 변환 (factory01 형식)
-    const username = `factory${factoryId.padStart(2, '0')}`;
-    console.log('비밀번호 검증 시작:', { factoryId, username, currentPassword: currentPassword.substring(0, 3) + '***' });
-    const factoryAuth = validateFactoryLogin(username, currentPassword);
-    console.log('비밀번호 검증 결과:', factoryAuth ? '성공' : '실패');
-    
-    if (!factoryAuth) {
+    if (authData.password !== currentPassword) {
+      console.log('현재 비밀번호 불일치');
       return NextResponse.json(
         { success: false, error: "현재 비밀번호가 올바르지 않습니다." },
         { status: 400 }
       );
     }
 
+    console.log('현재 비밀번호 확인 성공');
+
     // 새 비밀번호로 업데이트
-    console.log('데이터베이스 업데이트 시작:', { factoryId, newPassword: newPassword.substring(0, 3) + '***' });
+    console.log('비밀번호 업데이트 시작...');
     const { error: updateError } = await supabase
       .from('FactoryAuth')
       .update({ password: newPassword })
@@ -60,18 +96,20 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('비밀번호 업데이트 성공');
+    console.log('=== 비밀번호 변경 API 완료 ===');
+    
     return NextResponse.json({
       success: true,
       message: "비밀번호가 성공적으로 변경되었습니다."
     });
 
   } catch (error) {
-    console.error('비밀번호 변경 오류:', error);
-    console.error('에러 상세:', {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : undefined
-    });
+    console.error('=== 비밀번호 변경 API 오류 ===');
+    console.error('에러:', error);
+    console.error('에러 타입:', typeof error);
+    console.error('에러 메시지:', error instanceof Error ? error.message : String(error));
+    console.error('에러 스택:', error instanceof Error ? error.stack : undefined);
+    
     return NextResponse.json(
       { success: false, error: "서버 오류가 발생했습니다." },
       { status: 500 }
