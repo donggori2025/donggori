@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import { supabaseService } from "./supabaseService";
 import { getFactoryImages as getPresetImagesByName } from "./factoryImages";
 import { getVercelBlobImageUrl } from "./vercelBlobConfig";
 
@@ -292,7 +293,9 @@ export function getRealFactoryName(factoryId: string): string {
 // 공장 정보 업데이트 (DB에)
 export async function updateFactoryData(factoryId: string, updateData: { [key: string]: unknown }) {
   try {
-    const { data, error } = await supabase
+    // Service Role 클라이언트 사용 (RLS 우회)
+    const client = supabaseService || supabase;
+    const { data, error } = await client
       .from('donggori')
       .update(updateData)
       .eq('id', parseInt(factoryId)) // factoryId를 숫자로 변환
@@ -361,7 +364,9 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
 export async function updateFactoryImages(factoryId: string, images: string[]) {
   try {
     const imageUrl = images.length > 0 ? images[0] : null;
-    const { data, error } = await supabase
+    // Service Role 클라이언트 사용 (RLS 우회)
+    const client = supabaseService || supabase;
+    const { data, error } = await client
       .from('donggori')
       .update({ image: imageUrl })
       .eq('id', parseInt(factoryId)) // factoryId를 숫자로 변환
