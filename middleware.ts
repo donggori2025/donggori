@@ -10,12 +10,7 @@ export default function middleware(req: NextRequest, ev: NextFetchEvent) {
     const pathname = req.nextUrl.pathname;
 
     // 프로덕션에서 non-www를 www로 정규화 (OAuth redirect_uri 안정화)
-    // API 경로에는 적용하지 않도록 제외 처리
-    if (
-      process.env.NODE_ENV === 'production' &&
-      host === 'donggori.com' &&
-      !pathname.startsWith('/api')
-    ) {
+    if (process.env.NODE_ENV === 'production' && host === 'donggori.com') {
       const url = new URL(req.url);
       url.hostname = 'www.donggori.com';
       return NextResponse.redirect(url, 308);
@@ -31,7 +26,11 @@ export default function middleware(req: NextRequest, ev: NextFetchEvent) {
       '/api/admin',
       // 소셜/인증 API는 Clerk 미들웨어 영향 없이 동작하도록 우회
       '/api/auth',
-      // (주의) 팩토리 마이페이지는 이제 www 정규화를 위해 우회하지 않음
+      // 공장 전용 API는 Clerk 인증 미사용
+      '/api/factory',
+      // 업장(봉제공장) 전용 페이지는 Clerk 미들웨어에 의존하지 않음
+      '/factory-my-page',
+      '/factory-my-page/requests',
     ];
     if (bypassPaths.some((p) => pathname.startsWith(p))) {
       return NextResponse.next();
