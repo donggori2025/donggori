@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 
+// GET 메서드 추가 (테스트용)
+export async function GET() {
+  return NextResponse.json({ 
+    message: "Factory change-password API is working",
+    timestamp: new Date().toISOString()
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     console.log('=== 비밀번호 변경 API 시작 ===');
