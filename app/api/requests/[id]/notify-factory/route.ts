@@ -74,12 +74,40 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       details,
     };
 
-    // 1차 알림톡, 실패 시 SMS 폴백
-    const a = await sendAlimtalk(factoryPhone, 'DG_REQUEST', variables);
-    let finalChannel: 'ALIMTALK' | 'SMS' = 'ALIMTALK';
-    if (!a.ok) {
-      await sendSMS(factoryPhone, `[동고리 의뢰] 의뢰ID ${variables.id}, 디자이너 ${variables.name}(${variables.phone}) 확인: ${variables.shortUrl}`);
-      finalChannel = 'SMS';
+    // Make 웹훅으로 전달 (있을 경우 우선)
+    const makeWebhook = process.env.MAKE_WEBHOOK_URL;
+    let finalChannel: 'ALIMTALK' | 'SMS' | 'MAKE' = 'ALIMTALK';
+    let providerOk = false;
+    if (makeWebhook) {
+      try {
+        const res = await fetch(makeWebhook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            workOrderId,
+            factoryPhone,
+            variables,
+            factoryId: orderData.factory_id,
+            factoryName: orderData.factory_name,
+            designerName,
+            designerPhone,
+          }),
+        });
+        providerOk = res.ok;
+        finalChannel = 'MAKE';
+      } catch (e) {
+        providerOk = false;
+      }
+    }
+
+    // Make 미설정/실패 시 기존 채널로 전송
+    if (!providerOk) {
+      const a = await sendAlimtalk(factoryPhone, 'DG_REQUEST', variables);
+      finalChannel = 'ALIMTALK';
+      if (!a.ok) {
+        await sendSMS(factoryPhone, `[동고리 의뢰] 의뢰ID ${variables.id}, 디자이너 ${variables.name}(${variables.phone}) 확인: ${variables.shortUrl}`);
+        finalChannel = 'SMS';
+      }
     }
 
     // 디버깅/조회 편의를 위한 추가 로그 (work_order_id 포함)
@@ -89,7 +117,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
           work_order_id: String(workOrderId),
           channel: finalChannel,
           to: String(factoryPhone),
-          payload: { templateCode: 'DG_REQUEST', variables },
+          payload: { templateCode: 'DG_REQUEST', variables, channelTried: finalChannel },
           status: 'SENT',
           created_at: new Date().toISOString(),
         },
@@ -105,7 +133,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       .update({ status: 'SENT', updated_at: new Date().toISOString() })
       .eq('id', workOrderId);
 
-    return NextResponse.json({ ok: true, channel: a.ok ? 'ALIMTALK' : 'SMS', ...(debug ? { variables, factoryPhone } : {}) });
+    return NextResponse.json({ ok: true, channel: finalChannel, ...(debug ? { variables, factoryPhone } : {}) });
   } catch (error: any) {
     return NextResponse.json({ ok: false, error: error?.message || 'failed' }, { status: 500 });
   }
