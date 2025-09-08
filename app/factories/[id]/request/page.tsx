@@ -135,6 +135,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     qc: "미희망",
     finishing: "미희망",
     packaging: "미희망",
+    // 추가: 상세 설명/요청사항
+    detailDescription: "",
+    detailRequest: "",
     files: [] as File[],
     links: [] as string[],
     agreeToTerms: false
@@ -342,6 +345,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             qc: formData.qc,
             finishing: formData.finishing,
             packaging: formData.packaging,
+            description: formData.detailDescription,
+            request: formData.detailRequest,
             files: uploadedFileUrls,
             links: formData.links,
             selectedService: selectedService,
@@ -399,6 +404,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         qc: "미희망",
         finishing: "미희망",
         packaging: "미희망",
+        detailDescription: "",
+        detailRequest: "",
         files: [],
         links: [],
         agreeToTerms: false
@@ -581,6 +588,26 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h2 className="font-bold text-lg mb-4">작업지시서</h2>
               <div className="space-y-4">
+                {/* 상세 설명 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">상세 설명</label>
+                  <textarea
+                    placeholder="제품, 원단, 수량, 납기 등 상세 설명을 입력해주세요"
+                    value={formData.detailDescription}
+                    onChange={(e) => handleInputChange("detailDescription", e.target.value)}
+                    className="w-full h-28 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                  />
+                </div>
+                {/* 상세 요청사항 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">상세 요청사항</label>
+                  <textarea
+                    placeholder="특이사항, 요청사항, 참고사항을 입력해주세요"
+                    value={formData.detailRequest}
+                    onChange={(e) => handleInputChange("detailRequest", e.target.value)}
+                    className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                  />
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">파일</label>
                   <input

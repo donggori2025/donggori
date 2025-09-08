@@ -116,67 +116,13 @@ async function sendAlimtalkViaNaverSENS(toE164: string, templateCode: string, va
   return { ok: true, provider: 'ncp_sens', message: 'queued' } as const;
 }
 
-// Solapi 연동 (카카오 알림톡)
-async function sendAlimtalkViaSolapi(toE164: string, templateCode: string, variables: Record<string, string>) {
-  const apiKey = process.env.SOLAPI_API_KEY;
-  const apiSecret = process.env.SOLAPI_API_SECRET;
-  const senderKey = process.env.SOLAPI_SENDER_KEY; // 카카오 비즈니스 채널 senderKey
-  const templateId = process.env.SOLAPI_TEMPLATE_ID_DG_REQUEST; // 본 템플릿 ID
-
-  if (!apiKey || !apiSecret || !senderKey || !templateId) {
-    throw new Error('Solapi 환경 변수가 설정되지 않았습니다. (SOLAPI_*)');
-  }
-
-  const content = renderAlimtalkContent(templateCode, variables);
-  const toLocal = normalizeToLocalKoreanNumber(toE164);
-
-  const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
-
-  const body: any = {
-    senderKey,
-    templateId,
-    messages: [
-      {
-        to: toLocal,
-        // 일부 템플릿은 변수 바인딩을 사용함. 변수 이름은 템플릿에 등록된 키를 사용해야 함.
-        // 여기서는 일반적인 키를 그대로 전달. (운영 환경에서는 실제 템플릿 변수명에 맞추어 조정 필요)
-        variables: variables,
-        // 일부 템플릿은 message/title 없이 variables만 요구. 안전하게 함께 전달
-        message: content.message,
-        title: content.title,
-        buttons: content.buttons,
-      },
-    ],
-  };
-
-  const res = await fetch('https://api.solapi.com/kakao/v1/alimtalk/send', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Basic ${auth}`,
-    },
-    body: JSON.stringify(body),
-  });
-
-  const payload = { provider: 'solapi_alimtalk', status: res.status, body: await res.clone().text() };
-  if (!res.ok) {
-    await logMessage({ channel: 'ALIMTALK', to: toE164, payload, status: 'FAILED', error: `status ${res.status}` });
-    throw new Error(`Solapi Alimtalk 응답 오류 (status ${res.status})`);
-  }
-  await logMessage({ channel: 'ALIMTALK', to: toE164, payload, status: 'SENT' });
-  return { ok: true, provider: 'solapi', message: 'queued' } as const;
-}
-
 export async function sendAlimtalk(
   to: string,
   templateCode: string,
   variables: Record<string, string>
 ): Promise<{ ok: boolean; provider?: string; message?: string }> {
-  const provider = (process.env.BIZMSG_PROVIDER || process.env.MESSAGE_PROVIDER || 'mock').toLowerCase();
+  const provider = (process.env.BIZMSG_PROVIDER || 'mock').toLowerCase();
   try {
-    if (provider === 'solapi') {
-      return await sendAlimtalkViaSolapi(to, templateCode, variables);
-    }
     if (provider === 'ncp_sens' || provider === 'ncloud' || provider === 'naver') {
       return await sendAlimtalkViaNaverSENS(to, templateCode, variables);
     }
@@ -252,40 +198,8 @@ async function sendViaNaverSENS(toE164: string, text: string) {
 }
 
 export async function sendSMS(to: string, text: string): Promise<{ ok: boolean; provider?: string; message?: string }> {
-  const provider = (process.env.SMS_PROVIDER || process.env.MESSAGE_PROVIDER || 'mock').toLowerCase();
+  const provider = (process.env.SMS_PROVIDER || 'mock').toLowerCase();
   try {
-    if (provider === 'solapi') {
-      const apiKey = process.env.SOLAPI_API_KEY;
-      const apiSecret = process.env.SOLAPI_API_SECRET;
-      const from = process.env.SOLAPI_SMS_SENDER;
-      if (!apiKey || !apiSecret || !from) throw new Error('Solapi SMS 환경변수 누락');
-      const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
-      const toLocal = normalizeToLocalKoreanNumber(to);
-      const body: any = {
-        messages: [
-          {
-            to: toLocal,
-            from,
-            text,
-          },
-        ],
-      };
-      const res = await fetch('https://api.solapi.com/messages/v4/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${auth}`,
-        },
-        body: JSON.stringify(body),
-      });
-      const payload = { provider: 'solapi_sms', status: res.status, body: await res.clone().text() };
-      if (!res.ok) {
-        await logMessage({ channel: 'SMS', to, payload, status: 'FAILED', error: `status ${res.status}` });
-        throw new Error(`Solapi SMS 응답 오류 (status ${res.status})`);
-      }
-      await logMessage({ channel: 'SMS', to, payload, status: 'SENT' });
-      return { ok: true, provider: 'solapi', message: 'queued' };
-    }
     if (provider === 'ncp_sens' || provider === 'naver' || provider === 'sens') {
       return await sendViaNaverSENS(to, text);
     }
