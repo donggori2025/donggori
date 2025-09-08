@@ -293,21 +293,26 @@ export function getRealFactoryName(factoryId: string): string {
 // 공장 정보 업데이트 (DB에)
 export async function updateFactoryData(factoryId: string, updateData: { [key: string]: unknown }) {
   try {
-    // Service Role 클라이언트 사용 (RLS 우회)
-    const client = supabaseService || supabase;
-    const { data, error } = await client
-      .from('donggori')
-      .update(updateData)
-      .eq('id', parseInt(factoryId)) // factoryId를 숫자로 변환
-      .select()
-      .single();
+    // API 라우트를 통해 Service Role로 업데이트
+    const response = await fetch('/api/factory/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        factoryId,
+        updateData
+      })
+    });
 
-    if (error) {
-      console.error('공장 정보 업데이트 중 오류:', error);
+    const result = await response.json();
+
+    if (!result.success) {
+      console.error('공장 정보 업데이트 중 오류:', result.error);
       return null;
     }
 
-    return data;
+    return result.data;
   } catch (error) {
     console.error('공장 정보 업데이트 중 오류:', error);
     return null;
