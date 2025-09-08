@@ -452,6 +452,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             console.warn('알림톡 전송 호출 실패(무시):', notifyErr);
           }
         }
+
+        // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
+        await copyToClipboardAndOpenKakao(newId);
       } catch (dbError: any) {
         console.error('데이터베이스 저장 중 예외 발생:', dbError, {
           message: dbError?.message,
@@ -460,9 +463,6 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         alert('데이터베이스 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
         return;
       }
-
-      // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
-      await copyToClipboardAndOpenKakao(newId);
       
       // 성공 후 폼 초기화
       setFormData({
