@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getFactoryDataFromDB, updateFactoryData, getRealFactoryName, getFactoryImages, updateFactoryImages, uploadFactoryImage, deleteFactoryImage } from "@/lib/factoryAuth";
 import { getMatchRequestsByFactoryId, updateMatchRequestStatus, MatchRequest } from "@/lib/matchRequests";
+import { Eye, EyeOff } from "lucide-react";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
@@ -246,8 +247,10 @@ export default function FactoryMyPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ currentPassword, newPassword })
         });
-        const js = await res.json();
-        if (!res.ok || !js.success) throw new Error(js.error || '변경 실패');
+        const text = await res.text();
+        let js: any = null;
+        try { js = text ? JSON.parse(text) : null; } catch {}
+        if (!res.ok) throw new Error(js?.error || '변경 실패');
         setSuccess('비밀번호가 변경되었습니다. 다시 로그인해주세요.');
         setCurrentPassword('');
         setNewPassword('');
@@ -284,8 +287,8 @@ export default function FactoryMyPage() {
               onChange={(e) => setCurrentPassword(e.target.value)}
               className="flex-1 outline-none bg-transparent"
             />
-            <button type="button" className="ml-2 text-gray-400 hover:text-black" onClick={() => setShowCurrent(v => !v)}>
-              {showCurrent ? '숨김' : '보기'}
+            <button type="button" className="ml-2 text-gray-400 hover:text-black" onClick={() => setShowCurrent(v => !v)} aria-label={showCurrent ? '비밀번호 숨기기' : '비밀번호 보기'}>
+              {showCurrent ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -299,8 +302,8 @@ export default function FactoryMyPage() {
               className="flex-1 outline-none bg-transparent"
               placeholder="6자 이상"
             />
-            <button type="button" className="ml-2 text-gray-400 hover:text-black" onClick={() => setShowNew(v => !v)}>
-              {showNew ? '숨김' : '보기'}
+            <button type="button" className="ml-2 text-gray-400 hover:text-black" onClick={() => setShowNew(v => !v)} aria-label={showNew ? '비밀번호 숨기기' : '비밀번호 보기'}>
+              {showNew ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -313,8 +316,8 @@ export default function FactoryMyPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="flex-1 outline-none bg-transparent"
             />
-            <button type="button" className="ml-2 text-gray-400 hover:text-black" onClick={() => setShowConfirm(v => !v)}>
-              {showConfirm ? '숨김' : '보기'}
+            <button type="button" className="ml-2 text-gray-400 hover:text-black" onClick={() => setShowConfirm(v => !v)} aria-label={showConfirm ? '비밀번호 숨기기' : '비밀번호 보기'}>
+              {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
         </div>
