@@ -10,7 +10,12 @@ export default function middleware(req: NextRequest, ev: NextFetchEvent) {
     const pathname = req.nextUrl.pathname;
 
     // 프로덕션에서 non-www를 www로 정규화 (OAuth redirect_uri 안정화)
-    if (process.env.NODE_ENV === 'production' && host === 'donggori.com') {
+    // API 경로에는 적용하지 않도록 제외 처리
+    if (
+      process.env.NODE_ENV === 'production' &&
+      host === 'donggori.com' &&
+      !pathname.startsWith('/api')
+    ) {
       const url = new URL(req.url);
       url.hostname = 'www.donggori.com';
       return NextResponse.redirect(url, 308);
