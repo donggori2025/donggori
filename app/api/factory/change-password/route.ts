@@ -4,7 +4,7 @@ import { validateFactoryLogin } from "@/lib/factoryAuth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { currentPassword, newPassword } = await req.json();
+    const { currentPassword, newPassword, companyName } = await req.json();
 
     if (!currentPassword || !newPassword) {
       return NextResponse.json(
@@ -57,6 +57,27 @@ export async function POST(req: NextRequest) {
     if (!isValidPassword) {
       return NextResponse.json(
         { success: false, error: "현재 비밀번호가 올바르지 않습니다." },
+        { status: 400 }
+      );
+    }
+
+    // company_name 일치 확인
+    const { data: factoryRows, error: findError } = await supabase
+      .from('factories')
+      .select('id, company_name')
+      .eq('id', factoryAuth.factoryId)
+      .limit(1);
+    if (findError || !factoryRows || factoryRows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "봉제공장 정보를 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
+    const dbName = (factoryRows[0].company_name || '').trim();
+    const inputName = (companyName || '').trim();
+    if (!inputName || dbName !== inputName) {
+      return NextResponse.json(
+        { success: false, error: "회사명이 일치하지 않습니다." },
         { status: 400 }
       );
     }
