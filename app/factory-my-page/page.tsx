@@ -190,11 +190,37 @@ export default function FactoryMyPage() {
     if (!factoryAuth) return;
     
     try {
-      // company_name 필드에 공장명 저장
-      const updateData = {
-        ...formData,
-        company_name: formData.name // 공장명을 company_name 필드에 저장
+      // donggori 실제 컬럼에 맞게 매핑(존재하지 않는 컬럼은 제거)
+      const updateData: { [key: string]: unknown } = {
+        company_name: formData.name,
+        admin_district: formData.admin_district ?? null,
+        phone_num: formData.phone_number || formData.contact || null,
+        kakao_url: formData.kakaoUrl ?? null,
+        // 소개/설명: description 컬럼이 없으므로 intro 로 저장
+        intro: formData.intro || formData.description || null,
+        business_type: formData.business_type ?? null,
+        factory_type: formData.factory_type ?? null,
+        moq: typeof formData.moq === 'number' ? formData.moq : null,
+        monthly_capacity: typeof formData.monthly_capacity === 'number' ? formData.monthly_capacity : null,
+        top_items_upper: formData.top_items_upper ?? null,
+        top_items_lower: formData.top_items_lower ?? null,
+        top_items_outer: formData.top_items_outer ?? null,
+        top_items_dress_skirt: formData.top_items_dress_skirt ?? null,
+        top_items_bag: formData.top_items_bag ?? null,
+        top_items_fashion_accessory: formData.top_items_fashion_accessory ?? null,
+        top_items_underwear: formData.top_items_underwear ?? null,
+        top_items_sports_leisure: formData.top_items_sports_leisure ?? null,
+        top_items_pet: formData.top_items_pet ?? null,
+        sewing_machines: formData.sewing_machines ?? null,
+        pattern_machines: formData.pattern_machines ?? null,
+        special_machines: formData.special_machines ?? null,
+        main_fabrics: formData.main_fabrics ?? null,
+        processes: formData.processes ?? null,
+        delivery: formData.delivery ?? null,
+        distribution: formData.distribution ?? null,
       };
+      // 불필요키 제거(undefined)
+      Object.keys(updateData).forEach((k) => updateData[k] === undefined && delete updateData[k]);
       
       // DB에 업데이트
       const updatedData = await updateFactoryData(factoryAuth.factoryId, updateData);
