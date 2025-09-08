@@ -91,10 +91,10 @@ export async function getFactoryAuthWithRealName(username: string, password: str
   try {
     console.log('DB에서 공장명 조회 시작, factoryId:', factory.factoryId);
     
-    // DB에서 실제 공장명 가져오기 (company_name만 존재)
+    // DB에서 실제 공장명 가져오기
     const { data, error } = await supabase
       .from('donggori')
-      .select('company_name')
+      .select('company_name, name')
       .eq('id', factory.factoryId)
       .single();
 
@@ -111,10 +111,11 @@ export async function getFactoryAuthWithRealName(username: string, password: str
       };
     }
 
-    // 실제 공장명으로 업데이트 (DB company_name 우선, 매핑 순)
-    const realFactoryName = data?.company_name || getRealFactoryName(factory.factoryId);
+    // 실제 공장명으로 업데이트 (DB company_name 우선, name, 매핑 순)
+    const realFactoryName = data?.company_name || data?.name || getRealFactoryName(factory.factoryId);
     console.log('최종 공장명 결정:', { 
-      dbCompanyName: data?.company_name,
+      dbCompanyName: data?.company_name, 
+      dbName: data?.name, 
       fallbackName: getRealFactoryName(factory.factoryId),
       finalName: realFactoryName 
     });
@@ -193,7 +194,7 @@ export async function getFactoryNameFromDB(factoryId: string): Promise<string | 
   try {
     const { data, error } = await supabase
       .from('donggori')
-      .select('company_name')
+      .select('company_name, name')
       .eq('id', factoryId)
       .single();
 
@@ -202,8 +203,8 @@ export async function getFactoryNameFromDB(factoryId: string): Promise<string | 
       return null;
     }
 
-    // company_name이 있으면 사용
-    return data?.company_name || null;
+    // company_name이 있으면 사용, 없으면 name 사용
+    return data?.company_name || data?.name || null;
   } catch (error) {
     console.error('공장명 조회 중 오류:', error);
     return null;
@@ -317,7 +318,7 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
 
     const { data, error } = await supabase
       .from('donggori')
-      .select('image, company_name')
+      .select('image, company_name, name')
       .eq('id', factoryId)
       .single();
 
@@ -336,11 +337,11 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
     // DB 대표 이미지
     const primary = data?.image ? [data.image as string] : [];
     // 프리셋 이미지(공장명 기반) 병합
-    const factoryName = (data?.company_name || getRealFactoryName(factoryId)) as string;
+    const factoryName = (data?.company_name || data?.name || getRealFactoryName(factoryId)) as string;
     const preset = factoryName ? getPresetImagesByName(factoryName) : [];
     // 중복 제거
-    const merged = Array.from(new Set([
-      ...primary,
+    const merged = Array.from(new Set([...
+      primary,
       ...preset
     ].filter(Boolean)));
 
