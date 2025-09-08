@@ -19,7 +19,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
 
     // 공장 연락처, 디자이너 정보 결정
-    const factoryPhone = orderData.contact || orderData.factory_phone || orderData.factory_contact || null;
+    // 우선순위: match_requests.factory_phone -> donggori.phone_num -> match_requests.contact
+    let factoryPhone = orderData.factory_phone || orderData.factory_contact || null;
+    if (!factoryPhone) {
+      const { data: factoryRow } = await supabase
+        .from('donggori')
+        .select('phone_num, phone_number')
+        .eq('id', orderData.factory_id)
+        .maybeSingle();
+      factoryPhone = (factoryRow?.phone_num || factoryRow?.phone_number || orderData.contact || '').toString();
+    }
     const designerName = orderData.user_name || '디자이너';
     const designerPhone = orderData.contact || orderData.user_phone || '';
     const shortUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/my-page/requests?id=${workOrderId}`;
@@ -28,11 +37,23 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ ok: false, error: '공장 연락처가 없습니다.' }, { status: 400 });
     }
 
+    // 상세설명/요청사항 추출
+    let desc = '';
+    let details = '';
+    try {
+      const add = typeof orderData.additional_info === 'string' ? JSON.parse(orderData.additional_info) : (orderData.additional_info || {});
+      // 기존 description은 기본정보로 사용, 상세설명은 additional_info.description, 상세요청사항은 additional_info.request 혹은 notes 키를 우선 사용
+      desc = (add?.description || orderData.description || '').toString().slice(0, 300);
+      details = (add?.request || add?.requests || add?.notes || '').toString().slice(0, 300);
+    } catch {}
+
     const variables = {
       id: String(workOrderId),
       name: String(designerName),
       phone: String(designerPhone),
       shortUrl,
+      desc,
+      details,
     };
 
     // 1차 알림톡, 실패 시 SMS 폴백
