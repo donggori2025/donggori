@@ -810,7 +810,17 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
               </ul>
             </div>
 
-            <Button className="w-full bg-gray-100 text-black rounded-lg py-3 font-bold hover:bg-gray-200 text-sm lg:text-base flex items-center justify-center gap-2">
+            <Button 
+              className="w-full bg-gray-100 text-black rounded-lg py-3 font-bold hover:bg-gray-200 text-sm lg:text-base flex items-center justify-center gap-2"
+              onClick={() => {
+                const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
+                if (kakaoUrl) {
+                  window.open(kakaoUrl, '_blank');
+                } else {
+                  alert('공장의 카카오톡 URL이 설정되지 않았습니다.');
+                }
+              }}
+            >
               <Image 
                 src="/kakao_lastlast.svg" 
                 alt="카카오톡" 
