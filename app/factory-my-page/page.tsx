@@ -50,6 +50,7 @@ export default function FactoryMyPage() {
         
         const auth = JSON.parse(storedAuth);
         console.log('Parsed auth:', auth);
+        console.log('FactoryId type:', typeof auth.factoryId, 'Value:', auth.factoryId);
         setFactoryAuth(auth);
         
         // 공장 데이터 가져오기 (DB에서)
@@ -188,6 +189,8 @@ export default function FactoryMyPage() {
 
   const handleSaveChanges = async () => {
     if (!factoryAuth) return;
+    
+    console.log('Saving changes for factoryId:', factoryAuth.factoryId, 'Type:', typeof factoryAuth.factoryId);
     
     try {
       // donggori 실제 컬럼에 맞게 매핑(존재하지 않는 컬럼은 제거)
