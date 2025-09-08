@@ -31,8 +31,10 @@ export async function POST(req: NextRequest) {
     const supabase = getServiceSupabase();
 
     // 현재 비밀번호 확인
-    console.log('비밀번호 검증 시작:', { factoryId, currentPassword: currentPassword.substring(0, 3) + '***' });
-    const factoryAuth = validateFactoryLogin(factoryId, currentPassword);
+    // factoryId를 username으로 변환 (factory01 형식)
+    const username = `factory${factoryId.padStart(2, '0')}`;
+    console.log('비밀번호 검증 시작:', { factoryId, username, currentPassword: currentPassword.substring(0, 3) + '***' });
+    const factoryAuth = validateFactoryLogin(username, currentPassword);
     console.log('비밀번호 검증 결과:', factoryAuth ? '성공' : '실패');
     
     if (!factoryAuth) {
@@ -45,9 +47,9 @@ export async function POST(req: NextRequest) {
     // 새 비밀번호로 업데이트
     console.log('데이터베이스 업데이트 시작:', { factoryId, newPassword: newPassword.substring(0, 3) + '***' });
     const { error: updateError } = await supabase
-      .from('donggori')
+      .from('FactoryAuth')
       .update({ password: newPassword })
-      .eq('id', factoryId);
+      .eq('factoryId', factoryId);
 
     if (updateError) {
       console.error('비밀번호 업데이트 오류:', updateError);
@@ -65,6 +67,11 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error('비밀번호 변경 오류:', error);
+    console.error('에러 상세:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined
+    });
     return NextResponse.json(
       { success: false, error: "서버 오류가 발생했습니다." },
       { status: 500 }
