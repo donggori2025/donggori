@@ -4,7 +4,6 @@ import { getServiceSupabase } from "@/lib/supabaseService";
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
     const { currentPassword, newPassword, factoryId } = await req.json();
     
     // 봉제공장 사용자인 경우
@@ -81,6 +80,7 @@ export async function POST(req: NextRequest) {
     }
     
     // 일반 사용자인 경우 (기존 Clerk 로직)
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json(
         { success: false, error: "로그인이 필요합니다." },
@@ -159,7 +159,12 @@ export async function POST(req: NextRequest) {
     }
 
   } catch (error) {
-    console.error('비밀번호 변경 오류:', error);
+    console.error('=== 비밀번호 변경 API 오류 ===');
+    console.error('에러:', error);
+    console.error('에러 타입:', typeof error);
+    console.error('에러 메시지:', error instanceof Error ? error.message : String(error));
+    console.error('에러 스택:', error instanceof Error ? error.stack : undefined);
+    
     return NextResponse.json(
       { success: false, error: "서버 오류가 발생했습니다." },
       { status: 500 }
