@@ -33,9 +33,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 쿠키에서 봉제공장 정보 파싱
-    const factoryAuthMatch = factoryAuthCookie.match(/factory_auth=([^;]+)/);
-    if (!factoryAuthMatch) {
+    // 쿠키에서 봉제공장 정보 파싱 (factory_user 우선, 없으면 factory_auth 호환)
+    const factoryUserMatch = factoryAuthCookie.match(/(?:^|; )factory_user=([^;]+)/);
+    const legacyFactoryAuthMatch = factoryAuthCookie.match(/(?:^|; )factory_auth=([^;]+)/);
+    const rawFactory = factoryUserMatch?.[1] ?? legacyFactoryAuthMatch?.[1];
+    if (!rawFactory) {
       return NextResponse.json(
         { success: false, error: "봉제공장 인증 정보를 찾을 수 없습니다." },
         { status: 401 }
@@ -44,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     let factoryAuth;
     try {
-      factoryAuth = JSON.parse(decodeURIComponent(factoryAuthMatch[1]));
+      factoryAuth = JSON.parse(decodeURIComponent(rawFactory));
     } catch (error) {
       return NextResponse.json(
         { success: false, error: "봉제공장 인증 정보가 올바르지 않습니다." },
