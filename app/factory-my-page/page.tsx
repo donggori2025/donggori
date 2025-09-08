@@ -201,7 +201,7 @@ export default function FactoryMyPage() {
         business_type: formData.business_type ?? null,
         factory_type: formData.factory_type ?? null,
         moq: typeof formData.moq === 'number' ? formData.moq : null,
-        monthly_capacity: typeof formData.monthly_capacity === 'number' ? formData.monthly_capacity : null,
+        monthly_capacity: formData.monthly_capacity ?? null,
         top_items_upper: formData.top_items_upper ?? null,
         top_items_lower: formData.top_items_lower ?? null,
         top_items_outer: formData.top_items_outer ?? null,
@@ -215,7 +215,7 @@ export default function FactoryMyPage() {
         pattern_machines: formData.pattern_machines ?? null,
         special_machines: formData.special_machines ?? null,
         main_fabrics: formData.main_fabrics ?? null,
-        processes: formData.processes ?? null,
+        // processes: formData.processes ?? null, // 컬럼이 존재하지 않음
         delivery: formData.delivery ?? null,
         distribution: formData.distribution ?? null,
       };
