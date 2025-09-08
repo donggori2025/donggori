@@ -259,6 +259,68 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }));
   };
 
+  // 의뢰 내용을 클립보드에 복사할 텍스트 생성
+  const generateRequestText = () => {
+    const factoryName = factory?.company_name || factory?.name || '공장';
+    const serviceName = currentService.title;
+    
+    let text = `🏭 ${factoryName} 의뢰 문의\n\n`;
+    text += `📋 서비스: ${serviceName}\n`;
+    text += `👤 디자이너: ${formData.name}\n`;
+    text += `📞 연락처: ${formData.contact}\n`;
+    text += `🏷️ 브랜드: ${formData.brandName || '미입력'}\n\n`;
+    
+    if (formData.detailDescription) {
+      text += `📝 상세 설명:\n${formData.detailDescription}\n\n`;
+    }
+    
+    if (formData.detailRequest) {
+      text += `📋 상세 요청사항:\n${formData.detailRequest}\n\n`;
+    }
+    
+    text += `📦 샘플/패턴 유무:\n`;
+    text += `• 샘플: ${formData.sample || '미입력'}\n`;
+    text += `• 패턴: ${formData.pattern || '미입력'}\n`;
+    text += `• QC: ${formData.qc || '미입력'}\n`;
+    text += `• 시아게: ${formData.finishing || '미입력'}\n`;
+    text += `• 포장: ${formData.packaging || '미입력'}\n\n`;
+    
+    if (formData.links.length > 0) {
+      text += `🔗 참고 링크:\n`;
+      formData.links.forEach((link, index) => {
+        text += `${index + 1}. ${link}\n`;
+      });
+      text += `\n`;
+    }
+    
+    text += `📅 의뢰일: ${new Date().toLocaleDateString('ko-KR')}\n`;
+    text += `\n동고리를 통해 문의드립니다. 감사합니다! 🙏`;
+    
+    return text;
+  };
+
+  // 클립보드 복사 및 카카오톡 연결
+  const copyToClipboardAndOpenKakao = async () => {
+    try {
+      const requestText = generateRequestText();
+      
+      // 클립보드에 복사
+      await navigator.clipboard.writeText(requestText);
+      
+      // 카카오톡 URL로 이동
+      const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
+      if (kakaoUrl) {
+        window.open(kakaoUrl, '_blank');
+        alert('의뢰 내용이 클립보드에 복사되었습니다!\n카카오톡에서 붙여넣기(Ctrl+V)하여 문의해주세요.');
+      } else {
+        alert('의뢰 내용이 클립보드에 복사되었습니다!\n공장의 카카오톡 URL이 없어 직접 연락이 어렵습니다.');
+      }
+    } catch (error) {
+      console.error('클립보드 복사 오류:', error);
+      alert('클립보드 복사에 실패했습니다. 수동으로 복사해주세요.');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('제출 시점 factory:', factory); // 디버깅용
@@ -393,7 +455,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         return;
       }
 
-      alert('의뢰가 성공적으로 제출되었습니다!');
+      // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
+      await copyToClipboardAndOpenKakao();
+      
       // 성공 후 폼 초기화
       setFormData({
         brandName: "",
