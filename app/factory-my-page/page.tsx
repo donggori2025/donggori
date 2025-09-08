@@ -194,7 +194,7 @@ export default function FactoryMyPage() {
       const updateData: { [key: string]: unknown } = {
         company_name: formData.name,
         admin_district: formData.admin_district ?? null,
-        phone_num: formData.phone_number || formData.contact || null,
+        phone_number: formData.phone_number || formData.contact || null,
         kakao_url: formData.kakaoUrl ?? null,
         // 소개/설명: description 컬럼이 없으므로 intro 로 저장
         intro: formData.intro || formData.description || null,

@@ -21,15 +21,15 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
 
     // 공장 연락처, 디자이너 정보 결정
-    // 우선순위: match_requests.factory_phone -> donggori.phone_num -> match_requests.contact
+    // 우선순위: match_requests.factory_phone -> donggori.phone_number -> match_requests.contact
     let factoryPhone = orderData.factory_phone || orderData.factory_contact || null;
     if (!factoryPhone) {
       const { data: factoryRow } = await supabase
         .from('donggori')
-        .select('phone_num, phone_number, contact')
+        .select('phone_number, contact')
         .eq('id', orderData.factory_id)
         .maybeSingle();
-      factoryPhone = (factoryRow?.phone_num || factoryRow?.phone_number || factoryRow?.contact || orderData.contact || '').toString();
+      factoryPhone = (factoryRow?.phone_number || factoryRow?.contact || orderData.contact || '').toString();
     }
     const designerName = orderData.user_name || '디자이너';
     const designerPhone = orderData.contact || orderData.user_phone || '';
