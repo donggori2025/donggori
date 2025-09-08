@@ -255,30 +255,13 @@ export default function Header() {
             {/* 봉제공장 로그인 후: 공장 프로필 이미지 */}
             {userType === 'factory' && factoryAuth && (
               <Link href="/factory-my-page" className="flex items-center" aria-label="공장 마이페이지로 이동">
-                {factoryProfileImage ? (
-                  <Image
-                    src={factoryProfileImage}
-                    alt="공장 프로필 이미지"
-                    width={40}
-                    height={40}
-                    className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
-                  />
-                ) : (
-                  <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center hover:shadow-md transition-shadow">
-                    <svg
-                      className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                )}
+                <Image
+                  src={factoryProfileImage || "/logo_donggori.png"}
+                  alt="공장 프로필 이미지"
+                  width={40}
+                  height={40}
+                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
+                />
               </Link>
             )}
           </div>
@@ -400,30 +383,13 @@ export default function Header() {
                   {/* 봉제공장 로그인 후 모바일 메뉴 */}
                   {userType === 'factory' && factoryAuth && (
                     <Link href="/factory-my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
-                      {factoryProfileImage ? (
-                        <Image
-                          src={factoryProfileImage}
-                          alt="공장 프로필 이미지"
-                          width={40}
-                          height={40}
-                          className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center">
-                          <svg
-                            className="w-5 h-5 text-gray-500"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                      )}
+                      <Image
+                        src={factoryProfileImage || "/logo_donggori.png"}
+                        alt="공장 프로필 이미지"
+                        width={40}
+                        height={40}
+                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                      />
                       <span className="font-medium">공장 마이페이지</span>
                     </Link>
                   )}

@@ -4,189 +4,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getFactoryDataFromDB, updateFactoryData, getRealFactoryName, getFactoryImages, updateFactoryImages, uploadFactoryImage, deleteFactoryImage } from "@/lib/factoryAuth";
 import { getMatchRequestsByFactoryId, updateMatchRequestStatus, MatchRequest } from "@/lib/matchRequests";
-import { Loader, Eye, EyeOff } from "lucide-react";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
-
-// 봉제공장 비밀번호 재설정 컴포넌트
-function FactoryPasswordResetSection({ companyName }: { companyName?: string }) {
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!currentPassword) {
-      setError("현재 비밀번호를 입력해주세요.");
-      return;
-    }
-    if (!newPassword) {
-      setError("새 비밀번호를 입력해주세요.");
-      return;
-    }
-    if (newPassword.length < 6) {
-      setError("비밀번호는 6자 이상이어야 합니다.");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setError("새 비밀번호가 일치하지 않습니다.");
-      return;
-    }
-
-    // 회사명 확인
-    if (!companyName || !companyName.trim()) {
-      setError("봉제공장 정보를 찾을 수 없습니다.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      const response = await fetch('/api/factory/change-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword,
-          companyName
-        })
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || "비밀번호 변경에 실패했습니다.");
-      }
-
-      setSuccess("비밀번호가 성공적으로 변경되었습니다.");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setShowPasswordForm(false);
-    } catch (err: any) {
-      setError(err.message || "비밀번호 변경에 실패했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!showPasswordForm) {
-    return (
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => setShowPasswordForm(true)}
-          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          비밀번호 변경
-        </button>
-        <span className="text-sm text-gray-500">보안을 위해 정기적으로 비밀번호를 변경해주세요.</span>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">현재 비밀번호</label>
-        <div className="relative">
-          <input
-            type={showCurrentPassword ? "text" : "password"}
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-            placeholder="현재 비밀번호를 입력해주세요"
-          />
-          <button
-            type="button"
-            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-          >
-            {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">새 비밀번호</label>
-        <div className="relative">
-          <input
-            type={showNewPassword ? "text" : "password"}
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-            placeholder="새 비밀번호를 입력해주세요 (6자 이상)"
-          />
-          <button
-            type="button"
-            onClick={() => setShowNewPassword(!showNewPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-          >
-            {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">새 비밀번호 확인</label>
-        <div className="relative">
-          <input
-            type={showConfirmPassword ? "text" : "password"}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-            placeholder="새 비밀번호를 다시 입력해주세요"
-          />
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-          >
-            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
-      
-      {error && <div className="text-red-500 text-sm">{error}</div>}
-      {success && <div className="text-green-500 text-sm">{success}</div>}
-      
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          {loading && <Loader className="w-4 h-4 animate-spin" />}
-          비밀번호 변경
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setShowPasswordForm(false);
-            setError("");
-            setSuccess("");
-            setCurrentPassword("");
-            setNewPassword("");
-            setConfirmPassword("");
-            setShowCurrentPassword(false);
-            setShowNewPassword(false);
-            setShowConfirmPassword(false);
-          }}
-          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          취소
-        </button>
-      </div>
-    </form>
-  );
-}
 
 export default function FactoryMyPage() {
   const router = useRouter();
@@ -399,6 +219,115 @@ export default function FactoryMyPage() {
     window.location.href = '/';
   };
 
+  // 비밀번호 변경 섹션 (공장 사용자 전용)
+  function FactoryPasswordSection() {
+    const [open, setOpen] = useState(false);
+    const [showCurrent, setShowCurrent] = useState(false);
+    const [showNew, setShowNew] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+
+    const submit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError(null);
+      setSuccess(null);
+      if (!currentPassword) return setError('현재 비밀번호를 입력해주세요.');
+      if (!newPassword || newPassword.length < 6) return setError('새 비밀번호는 6자 이상이어야 합니다.');
+      if (newPassword !== confirmPassword) return setError('새 비밀번호가 일치하지 않습니다.');
+      setLoading(true);
+      try {
+        const res = await fetch('/api/factory/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ currentPassword, newPassword })
+        });
+        const js = await res.json();
+        if (!res.ok || !js.success) throw new Error(js.error || '변경 실패');
+        setSuccess('비밀번호가 변경되었습니다. 다시 로그인해주세요.');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } catch (e: any) {
+        setError(e?.message || '변경 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!open) {
+      return (
+        <div className="mb-8">
+          <button
+            onClick={() => setOpen(true)}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            비밀번호 변경
+          </button>
+          <p className="text-sm text-gray-500 mt-2">보안을 위해 정기적으로 비밀번호를 변경해주세요.</p>
+        </div>
+      );
+    }
+
+    return (
+      <form onSubmit={submit} className="mb-8 space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">현재 비밀번호</label>
+          <div className="flex items-center border rounded px-3 py-2 bg-white">
+            <input
+              type={showCurrent ? 'text' : 'password'}
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="flex-1 outline-none bg-transparent"
+            />
+            <button type="button" className="ml-2 text-gray-400 hover:text-black" onClick={() => setShowCurrent(v => !v)}>
+              {showCurrent ? '숨김' : '보기'}
+            </button>
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">새 비밀번호</label>
+          <div className="flex items-center border rounded px-3 py-2 bg-white">
+            <input
+              type={showNew ? 'text' : 'password'}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="flex-1 outline-none bg-transparent"
+              placeholder="6자 이상"
+            />
+            <button type="button" className="ml-2 text-gray-400 hover:text-black" onClick={() => setShowNew(v => !v)}>
+              {showNew ? '숨김' : '보기'}
+            </button>
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">새 비밀번호 확인</label>
+          <div className="flex items-center border rounded px-3 py-2 bg-white">
+            <input
+              type={showConfirm ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="flex-1 outline-none bg-transparent"
+            />
+            <button type="button" className="ml-2 text-gray-400 hover:text-black" onClick={() => setShowConfirm(v => !v)}>
+              {showConfirm ? '숨김' : '보기'}
+            </button>
+          </div>
+        </div>
+        {error && <div className="text-red-500 text-sm">{error}</div>}
+        {success && <div className="text-green-600 text-sm">{success}</div>}
+        <div className="flex gap-2">
+          <button type="submit" disabled={loading} className="px-4 py-2 bg-black text-white rounded-lg disabled:opacity-50">변경하기</button>
+          <button type="button" onClick={() => setOpen(false)} className="px-4 py-2 border border-gray-300 rounded-lg">취소</button>
+        </div>
+      </form>
+    );
+  }
+
   // 이미지 업로드 함수
   const handleImageUpload = async (file: File) => {
     if (!factoryAuth) return;
@@ -568,6 +497,8 @@ export default function FactoryMyPage() {
           {selectedMenu === "프로필" && (
             <div>
               <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8">프로필</h2>
+              {/* 비밀번호 변경 섹션 */}
+              <FactoryPasswordSection />
               
               {/* 기본 정보 섹션 */}
               <div className="mb-6 md:mb-8">
@@ -994,14 +925,6 @@ export default function FactoryMyPage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                     />
                   </div>
-                </div>
-              </div>
-
-              {/* 비밀번호 재설정 섹션 */}
-              <div className="mb-6 md:mb-8">
-                <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4 text-gray-800 border-b pb-2">비밀번호 재설정</h3>
-                <div className="space-y-4">
-                  <FactoryPasswordResetSection companyName={formData.name || factoryData?.company_name} />
                 </div>
               </div>
 
