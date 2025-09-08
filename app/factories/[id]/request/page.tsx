@@ -260,7 +260,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   };
 
   // 의뢰 내용을 클립보드에 복사할 텍스트 생성
-  const generateRequestText = () => {
+  const generateRequestText = (requestId?: string) => {
     const factoryName = factory?.company_name || factory?.name || '공장';
     const serviceName = currentService.title;
     
@@ -296,13 +296,19 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     text += `📅 의뢰일: ${new Date().toLocaleDateString('ko-KR')}\n`;
     text += `\n동고리를 통해 문의드립니다. 감사합니다! 🙏`;
     
+    // 작업지시서 확인 링크 추가
+    if (requestId) {
+      const workOrderUrl = `${window.location.origin}/work-order/${requestId}`;
+      text += `\n\n📋 작업지시서 확인하기 -> ${workOrderUrl}`;
+    }
+    
     return text;
   };
 
   // 클립보드 복사 및 카카오톡 연결
-  const copyToClipboardAndOpenKakao = async () => {
+  const copyToClipboardAndOpenKakao = async (requestId?: string) => {
     try {
-      const requestText = generateRequestText();
+      const requestText = generateRequestText(requestId);
       
       // 클립보드에 복사
       await navigator.clipboard.writeText(requestText);
@@ -456,7 +462,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       }
 
       // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
-      await copyToClipboardAndOpenKakao();
+      await copyToClipboardAndOpenKakao(newId);
       
       // 성공 후 폼 초기화
       setFormData({
