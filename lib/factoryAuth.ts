@@ -95,7 +95,7 @@ export async function getFactoryAuthWithRealName(username: string, password: str
     const { data, error } = await supabase
       .from('donggori')
       .select('company_name, name')
-      .eq('id', factory.factoryId)
+      .eq('id', parseInt(factory.factoryId)) // factoryId를 숫자로 변환
       .single();
 
     console.log('DB 조회 결과:', { data, error });
@@ -153,7 +153,7 @@ export async function getFactoryDataFromDB(factoryId: string) {
     const { data, error } = await supabase
       .from('donggori')
       .select('*')
-      .eq('id', factoryId)
+      .eq('id', parseInt(factoryId)) // factoryId를 숫자로 변환
       .single();
 
     if (error) {
@@ -195,7 +195,7 @@ export async function getFactoryNameFromDB(factoryId: string): Promise<string | 
     const { data, error } = await supabase
       .from('donggori')
       .select('company_name, name')
-      .eq('id', factoryId)
+      .eq('id', parseInt(factoryId)) // factoryId를 숫자로 변환
       .single();
 
     if (error) {
@@ -295,7 +295,7 @@ export async function updateFactoryData(factoryId: string, updateData: { [key: s
     const { data, error } = await supabase
       .from('donggori')
       .update(updateData)
-      .eq('id', factoryId)
+      .eq('id', parseInt(factoryId)) // factoryId를 숫자로 변환
       .select()
       .single();
 
@@ -319,7 +319,7 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
     const { data, error } = await supabase
       .from('donggori')
       .select('image, company_name, name')
-      .eq('id', factoryId)
+      .eq('id', parseInt(factoryId)) // factoryId를 숫자로 변환
       .single();
 
     if (error) {
@@ -364,7 +364,7 @@ export async function updateFactoryImages(factoryId: string, images: string[]) {
     const { data, error } = await supabase
       .from('donggori')
       .update({ image: imageUrl })
-      .eq('id', factoryId)
+      .eq('id', parseInt(factoryId)) // factoryId를 숫자로 변환
       .select()
       .single();
 
