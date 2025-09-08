@@ -58,8 +58,27 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     // 1차 알림톡, 실패 시 SMS 폴백
     const a = await sendAlimtalk(factoryPhone, 'DG_REQUEST', variables);
+    let finalChannel: 'ALIMTALK' | 'SMS' = 'ALIMTALK';
     if (!a.ok) {
       await sendSMS(factoryPhone, `[동고리 의뢰] 의뢰ID ${variables.id}, 디자이너 ${variables.name}(${variables.phone}) 확인: ${variables.shortUrl}`);
+      finalChannel = 'SMS';
+    }
+
+    // 디버깅/조회 편의를 위한 추가 로그 (work_order_id 포함)
+    try {
+      await supabase.from('message_logs').insert([
+        {
+          work_order_id: String(workOrderId),
+          channel: finalChannel,
+          to: String(factoryPhone),
+          payload: { templateCode: 'DG_REQUEST', variables },
+          status: 'SENT',
+          created_at: new Date().toISOString(),
+        },
+      ]);
+    } catch (e) {
+      // 로깅 실패는 기능 흐름에 영향 주지 않음
+      console.warn('message_logs insert failed (non-blocking):', e);
     }
 
     // 상태 업데이트
