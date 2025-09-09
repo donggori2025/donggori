@@ -265,21 +265,21 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     const factoryName = factory?.company_name || factory?.name || '공장';
     const serviceName = currentService.title;
     
-    let text = `🏭 ${factoryName} 의뢰 문의\n\n`;
-    text += `📋 서비스: ${serviceName}\n`;
-    text += `👤 디자이너: ${formData.name}\n`;
-    text += `📞 연락처: ${formData.contact}\n`;
-    text += `🏷️ 브랜드: ${formData.brandName || '미입력'}\n\n`;
+    let text = `[${factoryName} 의뢰 문의]\n\n`;
+    text += `- 서비스: ${serviceName}\n`;
+    text += `- 디자이너: ${formData.name}\n`;
+    text += `- 연락처: ${formData.contact}\n`;
+    text += `- 브랜드: ${formData.brandName || '미입력'}\n\n`;
     
     if (formData.detailDescription) {
-      text += `📝 상세 설명:\n${formData.detailDescription}\n\n`;
+      text += `- 상세 설명:\n${formData.detailDescription}\n\n`;
     }
     
     if (formData.detailRequest) {
-      text += `📋 상세 요청사항:\n${formData.detailRequest}\n\n`;
+      text += `- 상세 요청사항:\n${formData.detailRequest}\n\n`;
     }
     
-    text += `📦 샘플/패턴 유무:\n`;
+    text += `- 샘플/패턴 유무:\n`;
     text += `• 샘플: ${formData.sample || '미입력'}\n`;
     text += `• 패턴: ${formData.pattern || '미입력'}\n`;
     text += `• QC: ${formData.qc || '미입력'}\n`;
@@ -287,24 +287,24 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     text += `• 포장: ${formData.packaging || '미입력'}\n\n`;
     
     if (formData.links.length > 0) {
-      text += `🔗 참고 링크:\n`;
+      text += `- 참고 링크:\n`;
       formData.links.forEach((link, index) => {
         text += `${index + 1}. ${link}\n`;
       });
       text += `\n`;
     }
     
-    text += `📅 의뢰일: ${new Date().toLocaleDateString('ko-KR')}\n`;
-    text += `\n동고리를 통해 문의드립니다. 감사합니다! 🙏`;
+    text += `- 의뢰일: ${new Date().toLocaleDateString('ko-KR')}.\n\n`;
+    text += `동고리를 통해 문의드립니다. 감사합니다! 🙏`;
     
     // 첨부 파일 다운로드 링크 추가
     if (formData.files.length > 0 && fileUrls.length > 0) {
-      text += `\n\n📎 첨부 파일 다운로드:`;
+      text += `\n\n- 첨부 파일 다운로드:\n`;
       formData.files.forEach((file, index) => {
         if (fileUrls[index]) {
-          text += `\n${index + 1}. ${file.name} -> ${fileUrls[index]}`;
+          text += `${index + 1}. ${file.name} -> ${fileUrls[index]}\n`;
         } else {
-          text += `\n${index + 1}. ${file.name}`;
+          text += `${index + 1}. ${file.name}\n`;
         }
       });
     }
