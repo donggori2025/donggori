@@ -7,6 +7,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Factory } from "@/lib/factories";
 // Clerk 미사용: 쿠키/로컬스토리지 기반 로그인 확인으로 전환
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 
 function isAppLoggedIn() {
   try {
@@ -793,12 +794,19 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
               type="submit"
               disabled={loading || !factory || !(factory.company_name || factory.name) || !formData.agreeToTerms}
               className={`w-full py-4 rounded-lg font-bold ${
-                formData.agreeToTerms && factory && (factory.company_name || factory.name)
+                formData.agreeToTerms && factory && (factory.company_name || factory.name) && !loading
                   ? "bg-gray-800 text-white hover:bg-gray-900" 
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
-              공정 의뢰하기
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  의뢰 처리 중...
+                </>
+              ) : (
+                "공정 의뢰하기"
+              )}
             </Button>
           </form>
         </div>
