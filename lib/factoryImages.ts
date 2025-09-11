@@ -2,7 +2,8 @@
 import { getVercelBlobImageUrl } from './vercelBlobConfig';
 
 function getProxyUrl(folderName: string, fileName: string) {
-  return `/api/factory-images/url?folder=${encodeURIComponent(folderName)}&file=${encodeURIComponent(fileName)}`;
+  // public 폴더에 있는 이미지는 직접 경로 사용
+  return `/동고리_사진데이터/${encodeURIComponent(folderName)}/${encodeURIComponent(fileName)}`;
 }
 
 // 업장 이름과 이미지 폴더 매칭
