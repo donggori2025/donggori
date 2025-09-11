@@ -28,7 +28,7 @@ const RecommendSection = () => {
         <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 md:mb-4 text-center">직접 찾아보는 봉제공장 탐색</h2>
         <div className="w-full overflow-hidden mb-4 sm:mb-6 md:mb-8 rounded-xl sm:rounded-2xl lg:rounded-3xl" style={{ maxWidth: 1400 }}>
           <div className="relative w-full h-[150px] sm:h-[200px] md:h-[250px] lg:h-[320px] rounded-xl sm:rounded-2xl lg:rounded-3xl overflow-hidden">
-            <Image src="/bozhin-karaivanov-p1jldJ9tZ6c-unsplash (1).jpg" alt="봉제공장 배너" fill style={{ objectFit: 'cover' }} />
+            <Image src="/bozhin-karaivanov-p1jldJ9tZ6c-unsplash (1).jpg" alt="봉제공장 배너" fill style={{ objectFit: 'cover' }} unoptimized />
           </div>
         </div>
         <div className="flex flex-col items-center">
