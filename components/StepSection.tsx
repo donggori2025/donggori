@@ -61,6 +61,7 @@ const StepSection = () => (
                 width={400}
                 height={300}
                 className="w-full h-full object-contain rounded-lg"
+                unoptimized
               />
               {/* 배경 패턴 */}
               <div className="absolute inset-0 opacity-5">
