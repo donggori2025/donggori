@@ -18,7 +18,7 @@ function SignUpForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [emailVerified, setEmailVerified] = useState(false); // 휴대폰 인증 여부
+  const [emailVerified, setEmailVerified] = useState(false); // 이메일 인증 여부
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   // 약관 동의 상태
@@ -56,9 +56,10 @@ function SignUpForm() {
           if (tempUser.phoneNumber) {
             const normalized = formatPhone(tempUser.phoneNumber);
             setPhone(normalized);
-            setEmailVerified(validatePhone(normalized));
-          } else {
-            setEmailVerified(false);
+          }
+          // 소셜 로그인 사용자는 이메일 인증 완료로 간주
+          if (tempUser.email) {
+            setEmailVerified(true);
           }
           if (hasEmail) {
             setPassword("OAuthUserPassword123!");
@@ -131,15 +132,13 @@ function SignUpForm() {
     return `${n.slice(0, 3)}-${n.slice(3, 7)}-${n.slice(7, 11)}`;
   };
 
-  // 이메일 인증 제거
-  const handleEmailVerify = async () => {};
 
   // 인증번호 재요청
   const handleResend = async () => {
     setError("");
     setLoading(true);
     try {
-      await requestPhoneOtp();
+      await requestEmailOtp();
     } finally {
       setLoading(false);
     }
@@ -148,49 +147,55 @@ function SignUpForm() {
   // 이메일 인증 코드 제출
   const handleVerifyCode = async () => {
     setError("");
+    if (!verificationCode.trim()) return setError("인증 코드를 입력해주세요.");
     setLoading(true);
     try {
-      const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
-      const cleanCode = normalizeInvisible(verificationCode);
-      const res = await signUp?.attemptEmailAddressVerification({ code: cleanCode });
-      if (res?.status === "complete") {
-        setEmailVerified(true);
-        setError("");
-        if (timerRef.current) clearInterval(timerRef.current);
-      } else {
-        setError("인증 코드가 올바르지 않습니다.");
-      }
-    } catch (err: unknown) {
-      setError(handleClerkError(err));
+      const res = await fetch('/api/auth/email/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: verificationCode.trim(), purpose: 'signup' })
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error || '인증 실패');
+      // 이메일 인증 성공
+      setEmailVerified(true);
+      if (timerRef.current) clearInterval(timerRef.current);
+    } catch (e: any) {
+      setError(e?.message || '인증 실패');
     } finally {
       setLoading(false);
     }
   };
 
-  // 휴대폰 OTP 요청
-  const requestPhoneOtp = async () => {
+  // 이메일 OTP 요청
+  const requestEmailOtp = async () => {
     setError("");
-    if (!phone || !validatePhone(phone)) return setError("올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)");
-    // 소셜 회원가입(전화번호 미제공 케이스 포함)에서는 인증 전에 중복 번호 체크
-    if (provider === 'kakao' || provider === 'naver') {
-      try {
-        const exists = await checkPhoneNumberExists(phone);
-        if (exists) {
-          const msg = '이미 등록된 전화번호라 해당 소셜로는 회원가입할 수 없습니다.';
-          setError(msg);
-          if (typeof window !== 'undefined') alert(msg);
-          return;
-        }
-      } catch (e) {
-        // 중복 체크 실패 시에도 인증 요청을 막지는 않음
+    if (!email) return setError("이메일을 입력해주세요.");
+    
+    const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+    const cleanEmail = normalizeInvisible(email).toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) return setError("올바른 이메일 형식이 아닙니다.");
+    
+    // 이메일 중복 체크
+    try {
+      const exists = await checkEmailExists(cleanEmail);
+      if (exists) {
+        const msg = '이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.';
+        setError(msg);
+        if (typeof window !== 'undefined') alert(msg);
+        return;
       }
+    } catch (e) {
+      // 중복 체크 실패 시에도 인증 요청을 막지는 않음
     }
+    
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/phone/request', {
+      const res = await fetch('/api/auth/email/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, purpose: 'signup' })
+        body: JSON.stringify({ email: cleanEmail, purpose: 'signup' })
       });
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json.error || '인증번호 요청 실패');
@@ -204,28 +209,6 @@ function SignUpForm() {
     }
   };
 
-  // 휴대폰 OTP 검증
-  const verifyPhoneOtp = async () => {
-    setError("");
-    if (!verificationCode.trim()) return setError("인증 코드를 입력해주세요.");
-    setLoading(true);
-    try {
-      const res = await fetch('/api/auth/phone/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, code: verificationCode.trim(), purpose: 'signup' })
-      });
-      const json = await res.json();
-      if (!res.ok || !json.ok) throw new Error(json.error || '인증 실패');
-      // 휴대폰 인증 성공 시 이메일 인증과 동일하게 취급
-      setEmailVerified(true);
-      if (timerRef.current) clearInterval(timerRef.current);
-    } catch (e: any) {
-      setError(e?.message || '인증 실패');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // 회원가입 폼 제출
   const handleSubmit = async (e: React.FormEvent) => {
@@ -234,8 +217,6 @@ function SignUpForm() {
     
     // 입력값 검증
     if (!name.trim()) return setError("이름을 입력해주세요.");
-    if (!phone) return setError("전화번호를 입력해주세요.");
-    if (!validatePhone(phone)) return setError("올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)");
     if (!email) return setError("이메일을 입력해주세요.");
     
     const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
@@ -250,7 +231,7 @@ function SignUpForm() {
     //   return;
     // }
     
-    if (!emailVerified) return setError("휴대폰 인증을 완료해주세요.");
+    if (!emailVerified) return setError("이메일 인증을 완료해주세요.");
     if (!agreeTerms || !agreePrivacy) return setError("필수 약관에 동의해주세요.");
     
     setLoading(true);
@@ -266,10 +247,10 @@ function SignUpForm() {
         if (tempUserStr) {
           const tempUser = JSON.parse(decodeURIComponent(tempUserStr));
           
-          // 전화번호 중복 체크
-          const phoneExists = await checkPhoneNumberExists(phone);
-          if (phoneExists) {
-            const msg = '이미 등록된 전화번호라 해당 소셜로는 회원가입이 불가합니다. 메인으로 이동합니다.';
+          // 이메일 중복 체크
+          const emailExists = await checkEmailExists(cleanEmail);
+          if (emailExists) {
+            const msg = '이미 등록된 이메일이라 해당 소셜로는 회원가입이 불가합니다. 메인으로 이동합니다.';
             setError(msg);
             if (typeof window !== 'undefined') alert(msg);
             window.location.href = '/';
@@ -324,13 +305,6 @@ function SignUpForm() {
       if (!password) return setError("비밀번호를 입력해주세요.");
       if (password.length < 6) return setError("비밀번호는 6자 이상이어야 합니다.");
       if (password !== passwordConfirm) return setError("비밀번호가 일치하지 않습니다.");
-      
-      // 전화번호 중복 체크
-      const phoneExists = await checkPhoneNumberExists(phone);
-      if (phoneExists) {
-        setError('이미 등록된 전화번호입니다.');
-        return;
-      }
       
       // 이메일 중복 체크
       const emailExists = await checkEmailExists(cleanEmail);
@@ -475,31 +449,17 @@ function SignUpForm() {
           className="border rounded px-3 py-2"
         />
         
-        {/* 전화번호 입력 */}
-        <label className="text-sm font-semibold">전화번호 <span className="text-red-500">*</span></label>
-        <div className="flex gap-2">
-          <input
-            type="tel"
-            placeholder="전화번호를 입력해주세요. (예: 010-1234-5678)"
-            value={phone}
-            onChange={e => setPhone(formatPhone(e.target.value))}
-            required
-            className="border rounded px-3 py-2 flex-1"
-          />
-          {emailVerified ? (
-            <span className="px-4 py-2 bg-green-100 text-green-700 rounded text-sm font-semibold">인증완료</span>
-          ) : verificationSent ? (
-            <button type="button" className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold" disabled>
-              인증코드 발송됨
-            </button>
-          ) : (
-            <button type="button" onClick={requestPhoneOtp} className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold hover:bg-gray-300" disabled={loading || !validatePhone(phone)}>
-              휴대폰 인증
-            </button>
-          )}
-        </div>
+        {/* 전화번호 입력 (선택사항) */}
+        <label className="text-sm font-semibold">전화번호 (선택사항)</label>
+        <input
+          type="tel"
+          placeholder="전화번호를 입력해주세요. (예: 010-1234-5678)"
+          value={phone}
+          onChange={e => setPhone(formatPhone(e.target.value))}
+          className="border rounded px-3 py-2"
+        />
         
-        <label className="text-sm font-semibold">이메일</label>
+        <label className="text-sm font-semibold">이메일 <span className="text-red-500">*</span></label>
         <div className="flex gap-2">
           <input
             type="email"
@@ -510,7 +470,17 @@ function SignUpForm() {
             className="border rounded px-3 py-2 flex-1"
             disabled={false}
           />
-          {/* 이메일 인증 불필요 표시 제거 */}
+          {emailVerified ? (
+            <span className="px-4 py-2 bg-green-100 text-green-700 rounded text-sm font-semibold">인증완료</span>
+          ) : verificationSent ? (
+            <button type="button" className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold" disabled>
+              인증코드 발송됨
+            </button>
+          ) : (
+            <button type="button" onClick={requestEmailOtp} className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold hover:bg-gray-300" disabled={loading || !email}>
+              이메일 인증
+            </button>
+          )}
         </div>
         {/* 인증코드 입력 및 타이머 */}
         {verificationSent && !emailVerified && (
@@ -639,7 +609,6 @@ function SignUpForm() {
             loading ||
             !name.trim() ||
             !phone ||
-            !validatePhone(phone) ||
             !email ||
             !emailVerified ||
             (!provider && (!password || password.length < 6 || password !== passwordConfirm)) ||

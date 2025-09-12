@@ -71,13 +71,7 @@ export async function checkEmailExists(email: string): Promise<boolean> {
 // 사용자 생성
 export async function createUser(userData: CreateUserData): Promise<User> {
   try {
-    // 전화번호 중복 체크
-    const phoneExists = await checkPhoneNumberExists(userData.phoneNumber);
-    if (phoneExists) {
-      throw new Error('이미 등록된 전화번호입니다. 다른 전화번호를 사용해주세요.');
-    }
-
-    // 이메일 중복 체크
+    // 이메일 중복 체크 (이메일이 주요 식별자)
     const emailExists = await checkEmailExists(userData.email);
     if (emailExists) {
       throw new Error('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
@@ -103,9 +97,7 @@ export async function createUser(userData: CreateUserData): Promise<User> {
       
       // Supabase 제약 조건 오류 처리
       if (error.code === '23505') {
-        if (error.message.includes('phoneNumber')) {
-          throw new Error('이미 등록된 전화번호입니다. 다른 전화번호를 사용해주세요.');
-        } else if (error.message.includes('email')) {
+        if (error.message.includes('email')) {
           throw new Error('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
         }
       }
@@ -123,9 +115,7 @@ export async function createUser(userData: CreateUserData): Promise<User> {
 // 서버 라우트(Edge/Node)에서 RLS를 우회해 확실히 생성하고자 할 때 사용
 export async function createUserWithServiceRole(userData: CreateUserData): Promise<User> {
   const svc = getServiceSupabase();
-  // 중복 체크 (service role로 수행)
-  const { data: byPhone } = await svc.from('users').select('id').eq('phoneNumber', userData.phoneNumber).maybeSingle();
-  if (byPhone) throw new Error('이미 등록된 전화번호입니다. 다른 전화번호를 사용해주세요.');
+  // 이메일 중복 체크 (service role로 수행)
   const { data: byEmail } = await svc.from('users').select('id').eq('email', userData.email).maybeSingle();
   if (byEmail) throw new Error('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
 

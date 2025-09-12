@@ -87,6 +87,130 @@ function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
   const [socialLoading, setSocialLoading] = useState<null | 'kakao' | 'naver'>(null);
+  
+  // 이메일 인증 로그인 관련 상태
+  const [loginMode, setLoginMode] = useState<'password' | 'email'>('password');
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const [canResend, setCanResend] = useState(false);
+  const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // 타이머 시작 함수
+  const startTimer = () => {
+    setTimer(180); // 3분(180초)
+    setCanResend(false);
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!);
+          setCanResend(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  // 타이머 정리
+  React.useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  // 타이머를 mm:ss 형식으로 변환
+  const formatTime = (sec: number) => {
+    const m = Math.floor(sec / 60).toString().padStart(2, "0");
+    const s = (sec % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
+  // 이메일 인증 요청
+  const requestEmailOtp = async () => {
+    setError("");
+    if (!email) return setError("이메일을 입력해주세요.");
+    
+    const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+    const cleanEmail = normalizeInvisible(email).toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) return setError("올바른 이메일 형식이 아닙니다.");
+    
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/email/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, purpose: 'login' })
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error || '인증번호 요청 실패');
+      setVerificationSent(true);
+      setVerificationCode("");
+      startTimer();
+    } catch (e: any) {
+      setError(e?.message || '인증번호 요청 실패');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 이메일 인증 코드 제출
+  const handleVerifyCode = async () => {
+    setError("");
+    if (!verificationCode.trim()) return setError("인증 코드를 입력해주세요.");
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/email/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: verificationCode.trim(), purpose: 'login' })
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error || '인증 실패');
+      // 이메일 인증 성공 - 로그인 처리
+      setEmailVerified(true);
+      if (timerRef.current) clearInterval(timerRef.current);
+      
+      // 이메일 인증 로그인 완료 처리
+      try {
+        const res = await fetch('/api/auth/login', { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify({ email: email.trim().toLowerCase(), loginMethod: 'email_otp' }) 
+        });
+        const js = await res.json();
+        if (!res.ok) throw new Error(js.error || '로그인 실패');
+        
+        // 세션 설정
+        const userSessionDuration = 60 * 60 * 24 * 30;
+        document.cookie = `access_token=${js.accessToken}; path=/; max-age=${userSessionDuration}; SameSite=Lax`;
+        document.cookie = `userType=user; path=/; max-age=${userSessionDuration}`;
+        document.cookie = `isLoggedIn=true; path=/; max-age=${userSessionDuration}`;
+        
+        window.location.href = '/';
+      } catch (e: any) {
+        setError(e?.message || '로그인 처리 실패');
+      }
+    } catch (e: any) {
+      setError(e?.message || '인증 실패');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 인증번호 재요청
+  const handleResend = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      await requestEmailOtp();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 소셜 로그인 핸들러
   const handleSocial = async (provider: 'oauth_kakao' | 'oauth_naver') => {
@@ -152,8 +276,7 @@ function SignInForm() {
   };
 
   // 로그인 폼 제출
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setError("");
     setLoading(true);
     
@@ -238,7 +361,34 @@ function SignInForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-xl shadow p-8 flex flex-col gap-4">
+    <div className="w-full max-w-md bg-white rounded-xl shadow p-8 flex flex-col gap-4">
+      {/* 로그인 방식 선택 */}
+      <div className="flex bg-gray-100 rounded-lg p-1">
+        <button
+          type="button"
+          onClick={() => setLoginMode('password')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
+            loginMode === 'password' 
+              ? 'bg-white text-black shadow-sm' 
+              : 'text-gray-600 hover:text-black'
+          }`}
+        >
+          비밀번호 로그인
+        </button>
+        <button
+          type="button"
+          onClick={() => setLoginMode('email')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
+            loginMode === 'email' 
+              ? 'bg-white text-black shadow-sm' 
+              : 'text-gray-600 hover:text-black'
+          }`}
+        >
+          이메일 인증 로그인
+        </button>
+      </div>
+
+      {/* 이메일 입력 */}
       <label className="text-sm font-semibold">이메일</label>
       <input
         type="text"
@@ -248,44 +398,107 @@ function SignInForm() {
         required
         className="border rounded px-3 py-2"
       />
-      <label className="text-sm font-semibold">비밀번호</label>
-      <div className="flex items-center border rounded px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-black">
-        <input
-          type={showPassword ? "text" : "password"}
-          placeholder="비밀번호를 입력해주세요."
-          value={password}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-          required
-          className="flex-1 outline-none bg-transparent"
-          style={{ minWidth: 0 }}
-        />
-        <button
-          type="button"
-          tabIndex={-1}
-          className="ml-2 text-gray-400 hover:text-black"
-          onClick={() => setShowPassword((v) => !v)}
-          aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
-        >
-          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-        </button>
-      </div>
-      <div className="flex items-center justify-between text-sm mt-2 mb-2">
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={remember}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRemember(e.target.checked)}
-            id="remember"
-            className="w-4 h-4"
-          />
-          <label htmlFor="remember" className="text-gray-700">아이디 저장</label>
-        </div>
-        <Link href="/reset-password" className="text-gray-400 hover:text-black">비밀번호를 잊으셨나요?</Link>
-      </div>
+
+      {/* 비밀번호 로그인 모드 */}
+      {loginMode === 'password' && (
+        <>
+          <label className="text-sm font-semibold">비밀번호</label>
+          <div className="flex items-center border rounded px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-black">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="비밀번호를 입력해주세요."
+              value={password}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+              required
+              className="flex-1 outline-none bg-transparent"
+              style={{ minWidth: 0 }}
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              className="ml-2 text-gray-400 hover:text-black"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+            >
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
+          <div className="flex items-center justify-between text-sm mt-2 mb-2">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRemember(e.target.checked)}
+                id="remember"
+                className="w-4 h-4"
+              />
+              <label htmlFor="remember" className="text-gray-700">아이디 저장</label>
+            </div>
+            <Link href="/reset-password" className="text-gray-400 hover:text-black">비밀번호를 잊으셨나요?</Link>
+          </div>
+          <button 
+            type="button" 
+            onClick={handleSubmit} 
+            className="w-full bg-black text-white py-3 rounded font-bold text-lg mt-2 hover:bg-gray-900 transition flex items-center justify-center" 
+            disabled={loading}
+          >
+            {loading ? <Loader className="w-5 h-5 animate-spin" /> : "로그인"}
+          </button>
+        </>
+      )}
+
+      {/* 이메일 인증 로그인 모드 */}
+      {loginMode === 'email' && (
+        <>
+          <div className="flex gap-2">
+            <input
+              type="email"
+              placeholder="이메일을 입력해주세요."
+              value={email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              required
+              className="border rounded px-3 py-2 flex-1"
+            />
+            {emailVerified ? (
+              <span className="px-4 py-2 bg-green-100 text-green-700 rounded text-sm font-semibold">인증완료</span>
+            ) : verificationSent ? (
+              <button type="button" className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold" disabled>
+                인증코드 발송됨
+              </button>
+            ) : (
+              <button type="button" onClick={requestEmailOtp} className="px-4 py-2 bg-gray-200 rounded text-sm font-semibold hover:bg-gray-300" disabled={loading || !email}>
+                이메일 인증
+              </button>
+            )}
+          </div>
+          
+          {/* 인증코드 입력 및 타이머 */}
+          {verificationSent && !emailVerified && (
+            <div className="flex gap-2 items-center">
+              <input
+                type="text"
+                placeholder="인증코드 입력"
+                value={verificationCode}
+                onChange={e => setVerificationCode(e.target.value)}
+                className="border rounded px-3 py-2 flex-1"
+              />
+              <button type="button" onClick={handleVerifyCode} className="px-4 py-2 bg-blue-500 text-white rounded text-sm font-semibold hover:bg-blue-600" disabled={loading}>
+                인증 확인
+              </button>
+              {/* 타이머/재요청 */}
+              {!canResend ? (
+                <span className="text-xs text-gray-500 w-16 text-center">{formatTime(timer)}</span>
+              ) : (
+                <button type="button" onClick={handleResend} className="text-xs text-blue-500 underline w-16 text-center" disabled={loading}>
+                  인증번호 재요청
+                </button>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
       {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-      <button type="submit" className="w-full bg-black text-white py-3 rounded font-bold text-lg mt-2 hover:bg-gray-900 transition flex items-center justify-center" disabled={loading}>
-        {loading ? <Loader className="w-5 h-5 animate-spin" /> : "로그인"}
-      </button>
       {/* 구분선 */}
       <div className="flex items-center my-4">
         <div className="flex-1 h-px bg-gray-200" />
@@ -328,7 +541,7 @@ function SignInForm() {
           {socialLoading === 'naver' && '네이버로 이동 중입니다...'}
         </div>
       )}
-    </form>
+    </div>
   );
 }
 

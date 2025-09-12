@@ -3,11 +3,11 @@ import { getServiceSupabase } from "@/lib/supabaseService";
 
 export async function POST(req: NextRequest) {
   try {
-    const { phone, newPassword } = await req.json();
+    const { email, newPassword } = await req.json();
 
-    if (!phone || !newPassword) {
+    if (!email || !newPassword) {
       return NextResponse.json(
-        { success: false, error: "전화번호와 새 비밀번호가 필요합니다." },
+        { success: false, error: "이메일과 새 비밀번호가 필요합니다." },
         { status: 400 }
       );
     }
@@ -21,11 +21,11 @@ export async function POST(req: NextRequest) {
 
     const supabase = getServiceSupabase();
 
-    // 전화번호로 사용자 찾기
+    // 이메일로 사용자 찾기
     const { data: users, error: findError } = await supabase
       .from('users')
-      .select('id, email, phone')
-      .eq('phone', phone)
+      .select('id, email, phoneNumber')
+      .eq('email', email)
       .limit(1);
 
     if (findError) {
@@ -38,29 +38,25 @@ export async function POST(req: NextRequest) {
 
     if (!users || users.length === 0) {
       return NextResponse.json(
-        { success: false, error: "해당 전화번호로 가입된 사용자를 찾을 수 없습니다." },
+        { success: false, error: "해당 이메일로 가입된 사용자를 찾을 수 없습니다." },
         { status: 404 }
       );
     }
 
     const user = users[0];
 
-    // Clerk를 통해 비밀번호 업데이트
+    // Supabase를 통해 비밀번호 업데이트
     try {
-      const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${user.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${process.env.CLERK_SECRET_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          password: newPassword,
-        }),
-      });
+      const bcrypt = await import('bcryptjs');
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-      if (!clerkResponse.ok) {
-        const errorData = await clerkResponse.json();
-        console.error('Clerk 비밀번호 업데이트 오류:', errorData);
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ password: hashedPassword })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('비밀번호 업데이트 오류:', updateError);
         return NextResponse.json(
           { success: false, error: "비밀번호 업데이트에 실패했습니다." },
           { status: 500 }
@@ -72,8 +68,8 @@ export async function POST(req: NextRequest) {
         message: "비밀번호가 성공적으로 재설정되었습니다."
       });
 
-    } catch (clerkError) {
-      console.error('Clerk API 호출 오류:', clerkError);
+    } catch (updateError) {
+      console.error('비밀번호 해싱/업데이트 오류:', updateError);
       return NextResponse.json(
         { success: false, error: "비밀번호 업데이트 중 오류가 발생했습니다." },
         { status: 500 }
