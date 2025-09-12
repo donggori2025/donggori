@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { config } from './config';
 
-export type MessageChannel = 'ALIMTALK' | 'SMS';
+export type MessageChannel = 'ALIMTALK' | 'SMS' | 'EMAIL';
 
 export interface SendOptions {
   channel?: MessageChannel;
@@ -210,6 +210,69 @@ export async function sendSMS(to: string, text: string): Promise<{ ok: boolean; 
     return { ok: true, provider: 'mock', message: 'queued' };
   } catch (error: any) {
     await logMessage({ channel: 'SMS', to, payload: { text, provider }, status: 'FAILED', error: error?.message });
+    return { ok: false, message: error?.message };
+  }
+}
+
+async function sendViaSendGrid(to: string, subject: string, text: string) {
+  const apiKey = process.env.SENDGRID_API_KEY;
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@donggori.com';
+  const fromName = process.env.SENDGRID_FROM_NAME || '동고리';
+
+  if (!apiKey) {
+    throw new Error('SendGrid API 키가 설정되지 않았습니다. (SENDGRID_API_KEY)');
+  }
+
+  const body = {
+    personalizations: [
+      {
+        to: [{ email: to }],
+        subject: subject,
+      },
+    ],
+    from: {
+      email: fromEmail,
+      name: fromName,
+    },
+    content: [
+      {
+        type: 'text/plain',
+        value: text,
+      },
+    ],
+  };
+
+  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  const payload = { provider: 'sendgrid', status: res.status, body: await res.clone().text() };
+  if (!res.ok) {
+    await logMessage({ channel: 'EMAIL', to, payload, status: 'FAILED', error: `status ${res.status}` });
+    throw new Error(`SendGrid 응답 오류 (status ${res.status})`);
+  }
+  await logMessage({ channel: 'EMAIL', to, payload, status: 'SENT' });
+  return { ok: true, provider: 'sendgrid', message: 'queued' } as const;
+}
+
+export async function sendEmail(to: string, subject: string, text: string): Promise<{ ok: boolean; provider?: string; message?: string }> {
+  const provider = (process.env.EMAIL_PROVIDER || 'mock').toLowerCase();
+  try {
+    if (provider === 'sendgrid') {
+      return await sendViaSendGrid(to, subject, text);
+    }
+
+    // 기본: 목킹 (로컬/미설정 환경)
+    console.log('[EMAIL:mock] to=%s, subject=%s, text=%s', to, subject, text);
+    await logMessage({ channel: 'EMAIL', to, payload: { subject, text, provider: 'mock' }, status: 'SENT' });
+    return { ok: true, provider: 'mock', message: 'queued' };
+  } catch (error: any) {
+    await logMessage({ channel: 'EMAIL', to, payload: { subject, text, provider }, status: 'FAILED', error: error?.message });
     return { ok: false, message: error?.message };
   }
 }

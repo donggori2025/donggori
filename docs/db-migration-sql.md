@@ -13,6 +13,18 @@ create table if not exists public.phone_otps (
 );
 create index if not exists idx_phone_otps_phone on public.phone_otps(phone);
 
+-- 이메일 OTP 기록 테이블
+create table if not exists public.email_otps (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  code text not null,
+  purpose text not null,
+  expires_at timestamptz not null,
+  consumed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_email_otps_email on public.email_otps(email);
+
 -- 메시지 로그 테이블
 create table if not exists public.message_logs (
   id uuid primary key default gen_random_uuid(),

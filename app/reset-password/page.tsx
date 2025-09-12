@@ -4,12 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
-import { requestPhoneOtp, verifyPhoneOtp } from "@/lib/otp";
+import { requestEmailOtp, verifyEmailOtp } from "@/lib/emailOtp";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const [step, setStep] = useState<'phone' | 'verify' | 'password'>('phone');
-  const [phone, setPhone] = useState("");
+  const [step, setStep] = useState<'email' | 'verify' | 'password'>('email');
+  const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -19,16 +19,10 @@ export default function ResetPasswordPage() {
   const [canResend, setCanResend] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // 전화번호 유효성 검사
-  const validatePhone = (phone: string) => {
-    const phoneRegex = /^010-\d{4}-\d{4}$/;
-    return phoneRegex.test(phone);
-  };
-
-  // 전화번호를 E164 형식으로 변환
-  const formatPhoneToE164 = (phone: string) => {
-    const cleaned = phone.replace(/-/g, '');
-    return `+82${cleaned.substring(1)}`;
+  // 이메일 유효성 검사
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   // 타이머 시작
@@ -55,19 +49,18 @@ export default function ResetPasswordPage() {
     }
   };
 
-  // 전화번호 인증 요청
-  const handlePhoneSubmit = async (e: React.FormEvent) => {
+  // 이메일 인증 요청
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validatePhone(phone)) {
-      setError("올바른 전화번호 형식이 아닙니다. (010-0000-0000)");
+    if (!validateEmail(email)) {
+      setError("올바른 이메일 형식이 아닙니다.");
       return;
     }
 
     setLoading(true);
     setError("");
     try {
-      const phoneE164 = formatPhoneToE164(phone);
-      await requestPhoneOtp(phoneE164, 'reset');
+      await requestEmailOtp(email, 'reset');
       setStep('verify');
       startTimer();
     } catch (err: any) {
@@ -88,8 +81,7 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setError("");
     try {
-      const phoneE164 = formatPhoneToE164(phone);
-      await verifyPhoneOtp(phoneE164, verificationCode, 'reset');
+      await verifyEmailOtp(email, verificationCode, 'reset');
       setStep('password');
       clearTimer();
     } catch (err: any) {
@@ -123,7 +115,7 @@ export default function ResetPasswordPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          phone: formatPhoneToE164(phone),
+          email: email,
           newPassword
         })
       });
@@ -149,8 +141,7 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setError("");
     try {
-      const phoneE164 = formatPhoneToE164(phone);
-      await requestPhoneOtp(phoneE164, 'reset');
+      await requestEmailOtp(email, 'reset');
       startTimer();
       setError("");
     } catch (err: any) {
@@ -180,19 +171,19 @@ export default function ResetPasswordPage() {
       </div>
 
       <div className="w-full max-w-md bg-white rounded-xl shadow p-8 flex flex-col gap-4">
-        {step === 'phone' && (
-          <form onSubmit={handlePhoneSubmit} className="flex flex-col gap-4">
+        {step === 'email' && (
+          <form onSubmit={handleEmailSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="text-sm font-semibold text-gray-700">가입된 전화번호</label>
+              <label className="text-sm font-semibold text-gray-700">가입된 이메일</label>
               <input
-                type="tel"
-                placeholder="010-0000-0000"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                type="email"
+                placeholder="example@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full border rounded px-3 py-2 mt-1"
               />
-              <p className="text-xs text-gray-500 mt-1">가입 시 사용한 전화번호를 입력해주세요.</p>
+              <p className="text-xs text-gray-500 mt-1">가입 시 사용한 이메일을 입력해주세요.</p>
             </div>
             {error && <div className="text-red-500 text-sm text-center">{error}</div>}
             <button
@@ -228,7 +219,7 @@ export default function ResetPasswordPage() {
                 </button>
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                {phone}로 발송된 인증번호를 입력해주세요.
+                {email}로 발송된 인증번호를 입력해주세요.
               </p>
             </div>
             {error && <div className="text-red-500 text-sm text-center">{error}</div>}
