@@ -37,8 +37,24 @@ export async function POST(req: NextRequest) {
     // 비밀번호 로그인인 경우
     if (!password) return NextResponse.json({ error: '비밀번호 필요' }, { status: 400 });
 
-    const { data: user, error } = await supabase.from('users').select('id, email, password').eq('email', email).maybeSingle();
-    if (error || !user?.password) return NextResponse.json({ error: '존재하지 않는 계정' }, { status: 404 });
+    const { data: user, error } = await supabase.from('users').select('id, email, password, signupMethod').eq('email', email).maybeSingle();
+    if (error || !user) return NextResponse.json({ error: '존재하지 않는 계정' }, { status: 404 });
+    
+    // 소셜 로그인 사용자인지 확인
+    if (user.signupMethod && ['kakao', 'naver', 'google'].includes(user.signupMethod)) {
+      const providerName = user.signupMethod === 'kakao' ? '카카오' : user.signupMethod === 'naver' ? '네이버' : '소셜';
+      return NextResponse.json({ 
+        error: `${providerName}로 가입된 계정입니다. 소셜 로그인을 이용해주세요.` 
+      }, { status: 400 });
+    }
+    
+    // 비밀번호가 없는 경우 (소셜 로그인 사용자)
+    if (!user.password) {
+      return NextResponse.json({ 
+        error: '소셜 로그인으로 가입된 계정입니다. 소셜 로그인을 이용해주세요.' 
+      }, { status: 400 });
+    }
+    
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return NextResponse.json({ error: '비밀번호 불일치' }, { status: 401 });
 

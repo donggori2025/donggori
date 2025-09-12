@@ -60,6 +60,22 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setError("");
     try {
+      // 먼저 사용자 정보를 확인하여 소셜 로그인 사용자인지 체크
+      const userCheckRes = await fetch('/api/auth/check-user-type', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      
+      if (userCheckRes.ok) {
+        const userData = await userCheckRes.json();
+        if (userData.isSocialUser) {
+          setError(`${userData.signupMethod === 'kakao' ? '카카오' : userData.signupMethod === 'naver' ? '네이버' : '소셜'}로 가입된 계정입니다. 소셜 로그인을 이용해주세요.`);
+          setLoading(false);
+          return;
+        }
+      }
+
       await requestEmailOtp(email, 'reset');
       setStep('verify');
       startTimer();
