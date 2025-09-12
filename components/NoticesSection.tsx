@@ -8,6 +8,7 @@ interface Notice {
   content: string;
   category: string;
   created_at: string;
+  start_at?: string;
 }
 
 const NoticesSection = () => {
@@ -92,7 +93,7 @@ const NoticesSection = () => {
                     <p className="text-xs sm:text-sm text-gray-500 line-clamp-2">{notice.content}</p>
                   </div>
                   <div className="text-xs sm:text-sm text-gray-400 sm:ml-4 flex-shrink-0">
-                    {notice.created_at ? notice.created_at.slice(0, 10) : ''}
+                    {(notice.start_at || notice.created_at) ? (notice.start_at || notice.created_at).slice(0, 10) : ''}
                   </div>
                 </div>
               </Link>
