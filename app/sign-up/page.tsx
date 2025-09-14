@@ -2,12 +2,9 @@
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSignUp } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader } from "lucide-react";
-import { clerkConfig } from "@/lib/clerkConfig";
-import { handleClerkError } from "@/lib/clerkErrorTranslator";
-import { createUser, checkPhoneNumberExists, checkEmailExists } from '@/lib/userService';
+import { createUser, checkPhoneNumberExists, checkEmailExists, checkSupabaseConnection } from '@/lib/userService';
 import { config, safeValidateOAuthConfig } from "@/lib/config";
 
 function SignUpForm() {
@@ -35,7 +32,6 @@ function SignUpForm() {
   const [canResend, setCanResend] = useState(false); // 재요청 가능 여부
   // NodeJS 타입 경고 제거 (타입 명시)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const { signUp, setActive } = useSignUp();
   const router = useRouter();
 
   // OAuth 사용자 정보 로드
@@ -224,18 +220,16 @@ function SignUpForm() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(cleanEmail)) return setError("올바른 이메일 형식이 아닙니다.");
     
-    // 도메인 제한 확인 (임시로 비활성화)
-    // const domainError = clerkConfig.getDomainError(email);
-    // if (domainError) {
-    //   setError(domainError);
-    //   return;
-    // }
-    
     if (!emailVerified) return setError("이메일 인증을 완료해주세요.");
     if (!agreeTerms || !agreePrivacy) return setError("필수 약관에 동의해주세요.");
     
     setLoading(true);
     try {
+      // Supabase 연결 상태 확인
+      const connectionCheck = await checkSupabaseConnection();
+      if (!connectionCheck.success) {
+        throw new Error(`데이터베이스 연결 오류: ${connectionCheck.error || '알 수 없는 오류'}`);
+      }
       // OAuth 사용자인 경우
       if (provider === 'kakao' || provider === 'naver') {
         const tempUserKey = provider === 'kakao' ? 'temp_kakao_user' : 'temp_naver_user';
@@ -301,7 +295,7 @@ function SignUpForm() {
         }
       }
       
-      // 일반 회원가입 (Clerk 사용)
+      // 일반 회원가입 (Supabase만 사용)
       if (!password) return setError("비밀번호를 입력해주세요.");
       if (password.length < 6) return setError("비밀번호는 6자 이상이어야 합니다.");
       if (password !== passwordConfirm) return setError("비밀번호가 일치하지 않습니다.");
@@ -325,33 +319,23 @@ function SignUpForm() {
       
       console.log('일반 사용자 생성 성공:', newUser.email);
       
-      // 회원가입 완료 처리
-      if (signUp?.status === "complete") {
-        // 사용자 정보를 localStorage에 저장
-        localStorage.setItem('userType', 'user');
-        localStorage.setItem('userName', name.trim());
-        localStorage.setItem('userPhone', phone);
-        localStorage.setItem('kakaoMessageConsent', agreeKakaoMessage.toString());
-        window.location.href = '/';
-        return;
-      }
+      // 회원가입 완료 처리 - 사용자 정보를 localStorage에 저장
+      localStorage.setItem('userType', 'user');
+      localStorage.setItem('userName', name.trim());
+      localStorage.setItem('userPhone', phone);
+      localStorage.setItem('kakaoMessageConsent', agreeKakaoMessage.toString());
+      localStorage.setItem('userEmail', cleanEmail);
       
-      // 세션이 생성된 경우 활성화
-      if (signUp?.createdSessionId) {
-        await setActive({ session: signUp.createdSessionId });
-        // 사용자 정보를 localStorage에 저장
-        localStorage.setItem('userType', 'user');
-        localStorage.setItem('userName', name.trim());
-        localStorage.setItem('userPhone', phone);
-        localStorage.setItem('kakaoMessageConsent', agreeKakaoMessage.toString());
-        window.location.href = '/';
-        return;
-      }
-      
-      setError("회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+      // 성공 메시지 표시 후 메인 페이지로 이동
+      alert('회원가입이 완료되었습니다!');
+      window.location.href = '/';
     } catch (err: unknown) {
-      console.error('Clerk 오류:', err);
-      setError(handleClerkError(err));
+      console.error('회원가입 오류:', err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
     } finally {
       setLoading(false);
     }
@@ -360,7 +344,6 @@ function SignUpForm() {
   // 소셜 로그인 핸들러
   const handleSocial = async (provider: 'oauth_kakao' | 'oauth_naver') => {
     setError("");
-    if (!signUp) return;
     setLoading(true);
     try {
       if (provider === 'oauth_naver') {
@@ -407,9 +390,14 @@ function SignUpForm() {
       }
       
       console.log('OAuth 로그인 시작:', provider);
-      // Kakao/Naver만 지원. Clerk 리다이렉트 사용 안함
+      // Kakao/Naver만 지원
     } catch (err: unknown) {
-      setError(handleClerkError(err));
+      console.error('소셜 로그인 오류:', err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('소셜 로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
     } finally {
       setLoading(false);
     }

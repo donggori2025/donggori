@@ -1,6 +1,26 @@
 import { supabase } from './supabaseClient';
 import { getServiceSupabase } from './supabaseService';
 
+// Supabase 연결 상태 확인
+export async function checkSupabaseConnection(): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id')
+      .limit(1);
+    
+    if (error) {
+      console.error('Supabase 연결 확인 오류:', error);
+      return { success: false, error: error.message };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Supabase 연결 확인 중 오류:', error);
+    return { success: false, error: error instanceof Error ? error.message : '알 수 없는 오류' };
+  }
+}
+
 export interface CreateUserData {
   email: string;
   name: string;
@@ -77,34 +97,56 @@ export async function createUser(userData: CreateUserData): Promise<User> {
       throw new Error('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
     }
 
+    // 사용자 데이터 준비 (필수 필드만 포함)
+    const userInsertData = {
+      email: userData.email,
+      name: userData.name,
+      phoneNumber: userData.phoneNumber || '',
+      password: userData.password || null,
+      profileImage: userData.profileImage || null,
+      signupMethod: userData.signupMethod,
+      externalId: userData.externalId || null,
+      kakaoMessageConsent: userData.kakaoMessageConsent || false,
+    };
+
+    console.log('사용자 생성 시도:', { email: userData.email, signupMethod: userData.signupMethod });
+
     const { data, error } = await supabase
       .from('users')
-      .insert([{
-        email: userData.email,
-        name: userData.name,
-        phoneNumber: userData.phoneNumber,
-        password: userData.password,
-        profileImage: userData.profileImage,
-        signupMethod: userData.signupMethod,
-        externalId: userData.externalId,
-        kakaoMessageConsent: userData.kakaoMessageConsent || false,
-      }])
+      .insert([userInsertData])
       .select()
       .single();
 
     if (error) {
       console.error('사용자 생성 오류:', error);
+      console.error('오류 코드:', error.code);
+      console.error('오류 메시지:', error.message);
+      console.error('오류 세부사항:', error.details);
+      console.error('오류 힌트:', error.hint);
       
       // Supabase 제약 조건 오류 처리
       if (error.code === '23505') {
         if (error.message.includes('email')) {
           throw new Error('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
         }
+        throw new Error('이미 존재하는 정보입니다. 다른 정보를 사용해주세요.');
       }
       
-      throw new Error('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+      // RLS 정책 오류
+      if (error.code === '42501') {
+        throw new Error('권한이 없습니다. 관리자에게 문의해주세요.');
+      }
+      
+      // 테이블이 존재하지 않는 경우
+      if (error.code === '42P01') {
+        throw new Error('데이터베이스 테이블이 존재하지 않습니다. 관리자에게 문의해주세요.');
+      }
+      
+      // 일반적인 오류
+      throw new Error(`회원가입 중 오류가 발생했습니다: ${error.message || '알 수 없는 오류'}`);
     }
 
+    console.log('사용자 생성 성공:', data);
     return data as User;
   } catch (error) {
     console.error('사용자 생성 중 오류:', error);
