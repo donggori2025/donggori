@@ -82,7 +82,6 @@ export const factoryLocationMapping = {
   
   // 이문동 지역
   "에이스": { lat: 37.5742, lng: 127.0540 },
-  "희망사": { lat: 37.5745, lng: 127.0544 },
   
   // 회기동 지역
   "스티치": { lat: 37.5742, lng: 127.0550 },

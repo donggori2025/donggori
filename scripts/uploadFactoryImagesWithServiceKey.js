@@ -22,7 +22,6 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 
 // 공장 이름 매핑 (DB의 공장명과 폴더명 매칭)
 const factoryNameMapping = {
-  '희망사': '희망사',
   '희란패션': '희란패션',
   '화신사': '화신사',
   '혜민사': '혜민사',
