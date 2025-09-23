@@ -55,9 +55,14 @@ export async function getFactoryLocations(filters?: MapFilters): Promise<Factory
       return defaultFactoryLocations;
     }
 
-    // 주소 기반으로 좌표 매핑
+    // 주소 기반으로 좌표 매핑 (희망사 제외)
     const factoriesWithLocation = data
       .filter(factory => {
+        // 희망사 제외
+        if (factory.company_name === "희망사") {
+          return false;
+        }
+        
         const hasAddress = factory.address;
         if (!hasAddress && process.env.NODE_ENV === 'development') {
           console.log(`⚠️ 주소 없음: ${factory.company_name} (ID: ${factory.id})`);
@@ -186,6 +191,11 @@ export async function getFactoryLocation(factoryId: string): Promise<FactoryLoca
       if (process.env.NODE_ENV === 'development') {
         console.log(`❌ 공장 정보 없음: ID ${factoryId}`);
       }
+      return null;
+    }
+
+    // 희망사인 경우 null 반환
+    if (data.company_name === "희망사") {
       return null;
     }
 
