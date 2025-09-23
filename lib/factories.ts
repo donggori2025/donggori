@@ -515,9 +515,20 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
       return [];
     }
 
+    // 전체 공장 목록 디버깅
+    console.log("전체 공장 목록:", data.map((item: Record<string, unknown>) => 
+      String(item.company_name || item.name || "공장명 없음")
+    ));
+
     // 희망사 제외하고 Supabase 데이터를 Factory 인터페이스에 맞게 매핑
     const filteredData = data.filter((item: Record<string, unknown>) => {
       const companyName = String(item.company_name || item.name || "공장명 없음");
+      
+      // 조아스타일 디버깅
+      if (companyName.includes("조아") || companyName.includes("스타일")) {
+        console.log("조아스타일 관련 공장 발견:", companyName, item);
+      }
+      
       return companyName !== "희망사";
     });
     
