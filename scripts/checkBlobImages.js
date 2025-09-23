@@ -53,7 +53,7 @@ async function checkBlobImages() {
       '새가온', '선화사', '스마일', '시즌', '실루엣컴퍼니', '아트패션', '에이스',
       '오르다', '오성섬유', '오스카 디자인', '우정샘플', '우정패션', '우진모피',
       '유화 섬유', '재민상사', '좋은사람', '하늘패션', '혜민사', '화담어패럴',
-      '화신사', '희란패션'
+      '화신사', '희란패션', '조아스타일'
     ];
     
     const missingFactories = expectedFactories.filter(factory => !folders[factory]);

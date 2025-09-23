@@ -54,6 +54,7 @@ const factoryImageMapping: Record<string, string> = {
   '수미어패럴': '수미어패럴',
   '으뜸어패럴': '으뜸어패럴',
   '정인어패럴': '정인어패럴',
+  '조아스타일': '조아스타일',
   '태경패션': '태경패션',
   '태광사': '태광사',
   '태성어패럴': '태성어패럴',
@@ -410,6 +411,9 @@ const factoryImageFiles: Record<string, string[]> = {
     'KakaoTalk_20250902_230256978_05.jpg',
     'KakaoTalk_20250902_230256978_06.jpg',
     'KakaoTalk_20250902_230256978_07.jpg'
+  ],
+  '조아스타일': [
+    '/logo_donggori.png' // 기본 이미지 사용 (실제 이미지 업로드 시 교체)
   ],
   '태경패션': [
     'KakaoTalk_20250902_230457546.jpg',
