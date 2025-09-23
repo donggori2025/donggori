@@ -3,7 +3,6 @@ const path = require('path');
 
 // 기존 매핑에서 정의된 업장들
 const existingMapping = [
-  '희망사',
   '희란패션', 
   '화신사',
   '혜민사',
