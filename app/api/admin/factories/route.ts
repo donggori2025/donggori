@@ -94,10 +94,11 @@ export async function GET() {
       }, { status: 500 });
     }
 
-    // 실제 데이터 조회
+    // 실제 데이터 조회 (희망사 제외)
     const { data, error } = await supabase
       .from("donggori")
       .select("*")
+      .neq("company_name", "희망사")
       .order("id", { ascending: false });
 
     console.log("Supabase 쿼리 결과:", { 

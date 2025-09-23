@@ -515,8 +515,13 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
       return [];
     }
 
-    // Supabase 데이터를 Factory 인터페이스에 맞게 매핑
-    const mappedFactories: Factory[] = data.map((item: Record<string, unknown>) => {
+    // 희망사 제외하고 Supabase 데이터를 Factory 인터페이스에 맞게 매핑
+    const filteredData = data.filter((item: Record<string, unknown>) => {
+      const companyName = String(item.company_name || item.name || "공장명 없음");
+      return companyName !== "희망사";
+    });
+    
+    const mappedFactories: Factory[] = filteredData.map((item: Record<string, unknown>) => {
       const companyName = String(item.company_name || item.name || "공장명 없음");
       
       // 디버깅을 위한 로그 추가
