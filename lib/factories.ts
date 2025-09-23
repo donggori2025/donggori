@@ -534,28 +534,16 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
       return companyName !== "희망사";
     });
 
-    // 조아스타일이 데이터베이스에 없는 경우 임시 테스트 데이터 추가
-    const hasJoastyle = filteredData.some(item => 
+    // 조아스타일 디버깅 - 실제 데이터베이스에서 가져온 데이터 확인
+    const joastyleData = filteredData.find(item => 
       String(item.company_name || item.name || "").includes("조아") || 
       String(item.company_name || item.name || "").includes("스타일")
     );
     
-    if (!hasJoastyle) {
-      console.log("조아스타일이 데이터베이스에 없습니다. 임시 테스트 데이터를 추가합니다.");
-      filteredData.push({
-        id: "test-joastyle",
-        company_name: "조아스타일",
-        owner_user_id: "test",
-        admin_district: "이문동",
-        moq: 50,
-        intro_text: "조아스타일 테스트 공장입니다.",
-        phone_number: "02-1234-5678",
-        lat: 37.5679,
-        lng: 126.9789,
-        kakao_url: "",
-        business_type: "봉제",
-        address: "서울특별시 동대문구 이문동"
-      });
+    if (joastyleData) {
+      console.log("조아스타일 실제 데이터베이스 데이터:", joastyleData);
+    } else {
+      console.log("조아스타일이 데이터베이스에 없습니다.");
     }
     
     const mappedFactories: Factory[] = filteredData.map((item: Record<string, unknown>) => {
@@ -563,8 +551,15 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
       
       // 디버깅을 위한 로그 추가
       console.log("Mapping factory:", companyName);
-      console.log("Main image:", getFactoryMainImage(companyName));
-      console.log("All images:", getFactoryImages(companyName));
+      
+      // 조아스타일의 경우 더 자세한 이미지 디버깅
+      if (companyName.includes("조아") || companyName.includes("스타일")) {
+        const mainImage = getFactoryMainImage(companyName);
+        const allImages = getFactoryImages(companyName);
+        console.log("조아스타일 메인 이미지:", mainImage);
+        console.log("조아스타일 모든 이미지:", allImages);
+        console.log("조아스타일 이미지 개수:", allImages.length);
+      }
       
       return {
         id: String(item.id || Math.random()),
