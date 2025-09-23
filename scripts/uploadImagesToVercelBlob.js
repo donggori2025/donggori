@@ -48,6 +48,7 @@ const factoryImageMapping = {
   '화담어패럴': '화담어패럴',
   '화신사': '화신사',
   '희란패션': '희란패션',
+  '조아스타일': '조아스타일',
 };
 
 async function uploadImageToBlob(filePath, folderName, fileName) {

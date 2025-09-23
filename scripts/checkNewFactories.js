@@ -4,6 +4,7 @@ const path = require('path');
 // 기존 매핑에서 정의된 업장들
 const existingMapping = [
   '희란패션', 
+  '조아스타일',
   '화신사',
   '혜민사',
   '하늘패션',
