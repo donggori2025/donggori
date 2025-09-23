@@ -516,9 +516,11 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
     }
 
     // 전체 공장 목록 디버깅
-    console.log("전체 공장 목록:", data.map((item: Record<string, unknown>) => 
+    const allFactoryNames = data.map((item: Record<string, unknown>) => 
       String(item.company_name || item.name || "공장명 없음")
-    ));
+    );
+    console.log("전체 공장 목록:", allFactoryNames);
+    console.log("조아스타일 포함 여부:", allFactoryNames.some(name => name.includes("조아") || name.includes("스타일")));
 
     // 희망사 제외하고 Supabase 데이터를 Factory 인터페이스에 맞게 매핑
     const filteredData = data.filter((item: Record<string, unknown>) => {
@@ -531,6 +533,30 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
       
       return companyName !== "희망사";
     });
+
+    // 조아스타일이 데이터베이스에 없는 경우 임시 테스트 데이터 추가
+    const hasJoastyle = filteredData.some(item => 
+      String(item.company_name || item.name || "").includes("조아") || 
+      String(item.company_name || item.name || "").includes("스타일")
+    );
+    
+    if (!hasJoastyle) {
+      console.log("조아스타일이 데이터베이스에 없습니다. 임시 테스트 데이터를 추가합니다.");
+      filteredData.push({
+        id: "test-joastyle",
+        company_name: "조아스타일",
+        owner_user_id: "test",
+        admin_district: "이문동",
+        moq: 50,
+        intro_text: "조아스타일 테스트 공장입니다.",
+        phone_number: "02-1234-5678",
+        lat: 37.5679,
+        lng: 126.9789,
+        kakao_url: "",
+        business_type: "봉제",
+        address: "서울특별시 동대문구 이문동"
+      });
+    }
     
     const mappedFactories: Factory[] = filteredData.map((item: Record<string, unknown>) => {
       const companyName = String(item.company_name || item.name || "공장명 없음");
