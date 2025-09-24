@@ -534,16 +534,30 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
       return companyName !== "희망사";
     });
 
-    // 조아스타일 디버깅 - 실제 데이터베이스에서 가져온 데이터 확인
+    // 조아스타일 디버깅 - 원본 데이터에서 조아스타일 찾기
+    const originalJoastyleData = data.find(item => 
+      String(item.company_name || item.name || "").includes("조아") || 
+      String(item.company_name || item.name || "").includes("스타일")
+    );
+    
+    if (originalJoastyleData) {
+      console.log("조아스타일 원본 데이터베이스 데이터:", originalJoastyleData);
+    } else {
+      console.log("조아스타일이 원본 데이터베이스에 없습니다.");
+    }
+    
+    // 조아스타일 디버깅 - 필터링된 데이터에서 조아스타일 찾기
     const joastyleData = filteredData.find(item => 
       String(item.company_name || item.name || "").includes("조아") || 
       String(item.company_name || item.name || "").includes("스타일")
     );
     
     if (joastyleData) {
-      console.log("조아스타일 실제 데이터베이스 데이터:", joastyleData);
+      console.log("조아스타일 필터링된 데이터:", joastyleData);
     } else {
-      console.log("조아스타일이 데이터베이스에 없습니다.");
+      console.log("조아스타일이 필터링된 데이터에 없습니다.");
+      console.log("필터링된 데이터 개수:", filteredData.length);
+      console.log("필터링된 데이터 목록:", filteredData.map(item => String(item.company_name || item.name || "")));
     }
     
     const mappedFactories: Factory[] = filteredData.map((item: Record<string, unknown>) => {
