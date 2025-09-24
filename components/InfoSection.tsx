@@ -150,8 +150,8 @@ const InfoSection = () => {
                   <Link href={`/factories/${f.id}`} key={`${f.id ?? 'noid'}-${idx}`} className="rounded-lg sm:rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer w-[calc(25%-12px)] flex-shrink-0">
                     {/* 이미지 영역 */}
                     <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
-                      {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('동고')) || 
-                       (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('동고') && !f.image.includes('unsplash')) ? (
+                      {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('logo_donggori')) || 
+                       (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('unsplash')) ? (
                         <Image
                           src={f.images && f.images.length > 0 ? f.images[0] : f.image}
                           alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}

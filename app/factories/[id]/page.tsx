@@ -297,13 +297,11 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     ? factory.images.filter(img => 
         img && 
         img !== '/logo_donggori.png' && 
-        !img.includes('동고') && 
         !img.includes('unsplash') &&
         !img.includes('logo_donggori')
       )
     : factory.image && 
       factory.image !== '/logo_donggori.png' && 
-      !factory.image.includes('동고') && 
       !factory.image.includes('unsplash') &&
       !factory.image.includes('logo_donggori')
       ? [factory.image] 
@@ -423,7 +421,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                     {factory && factory.images && factory.images.length > 0 && 
                      factory.images[0] && 
                      factory.images[0] !== '/logo_donggori.png' && 
-                     !factory.images[0].includes('동고') && 
                      !factory.images[0].includes('unsplash') ? (
                       <Image
                         src={factory.images[0]}
@@ -435,7 +432,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                       />
                     ) : factory && factory.image && 
                       factory.image !== '/logo_donggori.png' && 
-                      !factory.image.includes('동고') && 
                       !factory.image.includes('unsplash') ? (
                       <Image
                         src={factory.image}
