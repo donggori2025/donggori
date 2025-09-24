@@ -515,65 +515,19 @@ export async function fetchFactoriesFromDB(): Promise<Factory[]> {
       return [];
     }
 
-    // 전체 공장 목록 디버깅
-    const allFactoryNames = data.map((item: Record<string, unknown>) => 
-      String(item.company_name || item.name || "공장명 없음")
-    );
-    console.log("전체 공장 목록:", allFactoryNames);
-    console.log("조아스타일 포함 여부:", allFactoryNames.some(name => name.includes("조아") || name.includes("스타일")));
-
     // 희망사 제외하고 Supabase 데이터를 Factory 인터페이스에 맞게 매핑
     const filteredData = data.filter((item: Record<string, unknown>) => {
       const companyName = String(item.company_name || item.name || "공장명 없음");
-      
-      // 조아스타일 디버깅
-      if (companyName.includes("조아") || companyName.includes("스타일")) {
-        console.log("조아스타일 관련 공장 발견:", companyName, item);
-      }
-      
       return companyName !== "희망사";
     });
-
-    // 조아스타일 디버깅 - 원본 데이터에서 조아스타일 찾기
-    const originalJoastyleData = data.find(item => 
-      String(item.company_name || item.name || "").includes("조아") || 
-      String(item.company_name || item.name || "").includes("스타일")
-    );
-    
-    if (originalJoastyleData) {
-      console.log("조아스타일 원본 데이터베이스 데이터:", originalJoastyleData);
-    } else {
-      console.log("조아스타일이 원본 데이터베이스에 없습니다.");
-    }
-    
-    // 조아스타일 디버깅 - 필터링된 데이터에서 조아스타일 찾기
-    const joastyleData = filteredData.find(item => 
-      String(item.company_name || item.name || "").includes("조아") || 
-      String(item.company_name || item.name || "").includes("스타일")
-    );
-    
-    if (joastyleData) {
-      console.log("조아스타일 필터링된 데이터:", joastyleData);
-    } else {
-      console.log("조아스타일이 필터링된 데이터에 없습니다.");
-      console.log("필터링된 데이터 개수:", filteredData.length);
-      console.log("필터링된 데이터 목록:", filteredData.map(item => String(item.company_name || item.name || "")));
-    }
     
     const mappedFactories: Factory[] = filteredData.map((item: Record<string, unknown>) => {
       const companyName = String(item.company_name || item.name || "공장명 없음");
       
       // 디버깅을 위한 로그 추가
       console.log("Mapping factory:", companyName);
-      
-      // 조아스타일의 경우 더 자세한 이미지 디버깅
-      if (companyName.includes("조아") || companyName.includes("스타일")) {
-        const mainImage = getFactoryMainImage(companyName);
-        const allImages = getFactoryImages(companyName);
-        console.log("조아스타일 메인 이미지:", mainImage);
-        console.log("조아스타일 모든 이미지:", allImages);
-        console.log("조아스타일 이미지 개수:", allImages.length);
-      }
+      console.log("Main image:", getFactoryMainImage(companyName));
+      console.log("All images:", getFactoryImages(companyName));
       
       return {
         id: String(item.id || Math.random()),
