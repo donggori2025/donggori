@@ -2,7 +2,8 @@
 import { getVercelBlobImageUrl } from './vercelBlobConfig';
 
 function getProxyUrl(folderName: string, fileName: string) {
-  return `/api/factory-images/url?folder=${encodeURIComponent(folderName)}&file=${encodeURIComponent(fileName)}`;
+  // 프록시 대신 정적 경로를 직접 사용하여 404/리라이트 이슈 회피
+  return `/동고리_사진데이터/${encodeURIComponent(folderName)}/${encodeURIComponent(fileName)}`;
 }
 
 // 업장 이름과 이미지 폴더 매칭
