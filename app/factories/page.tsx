@@ -1086,7 +1086,7 @@ export default function FactoriesPage() {
                         {/* 이미지 영역 */}
                         <div className="w-full h-32 sm:h-40 md:h-48 lg:h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
                           {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('logo_donggori')) || 
-                           (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('동고') && !f.image.includes('unsplash')) ? (
+                           (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('unsplash')) ? (
                             <Image
                               src={f.images && f.images.length > 0 ? f.images[0] : f.image}
                               alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
