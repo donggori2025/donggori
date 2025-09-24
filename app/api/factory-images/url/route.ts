@@ -36,27 +36,13 @@ export async function GET(req: Request) {
       console.log('Vercel Blob에서 찾지 못함, public 폴더에서 시도:', blobError);
     }
 
-    // 2. Vercel Blob에서 찾지 못하면 public 폴더에서 찾기
-    const publicPath = path.join(process.cwd(), 'public', '동고리_사진데이터', decodedFolder, decodedFile);
-    console.log('Public 경로:', publicPath);
-    console.log('파일 존재 여부:', fs.existsSync(publicPath));
-    
-    if (fs.existsSync(publicPath)) {
-      // public 폴더의 이미지를 직접 서빙
-      const fileBuffer = fs.readFileSync(publicPath);
-      const contentType = decodedFile.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
-      console.log('이미지 서빙 성공:', decodedFile);
-      
-      return new NextResponse(fileBuffer, {
-        headers: {
-          'Content-Type': contentType,
-          'Cache-Control': 'public, max-age=31536000, immutable',
-        },
-      });
-    }
-
-    console.log('파일을 찾을 수 없음:', publicPath);
-    return NextResponse.json({ ok: false, error: 'not found' }, { status: 404 });
+    // 2. Vercel Blob에서 찾지 못하면 정적 경로로 리다이렉트 (파일시스템 직접 접근 회피)
+    //    정적 경로: /동고리_사진데이터/{folder}/{file}
+    const encodedFolder = encodeURIComponent(decodedFolder);
+    const encodedFile = encodeURIComponent(decodedFile);
+    const publicUrl = new URL(`/동고리_사진데이터/${encodedFolder}/${encodedFile}`, req.url);
+    console.log('Blob 미탐색 → 정적 경로로 리다이렉트:', publicUrl.toString());
+    return NextResponse.redirect(publicUrl.toString(), 302);
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: e?.message || 'failed' }, { status: 400 });
   }
