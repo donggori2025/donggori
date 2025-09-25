@@ -134,8 +134,9 @@ function getPositionFromAddress(address: string): { lat: number; lng: number } {
     '답십리1동': { lat: 37.5668, lng: 126.9785 },
     '답십리2동': { lat: 37.5671, lng: 126.9789 },
     
-    // 용신동
-    '용신동': { lat: 37.5662, lng: 126.9775 },
+    // 신설동/용두동
+    '신설동': { lat: 37.5772, lng: 127.0256 },
+    '용두동': { lat: 37.5730, lng: 127.0370 },
     
     // 제기동
     '제기동': { lat: 37.5669, lng: 126.9772 },

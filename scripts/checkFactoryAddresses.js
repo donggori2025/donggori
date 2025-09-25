@@ -48,7 +48,8 @@ async function checkFactoryAddresses() {
       
       if (address.includes('장안')) district = '장안동';
       else if (address.includes('답십리')) district = '답십리동';
-      else if (address.includes('용신')) district = '용신동';
+      else if (address.includes('신설')) district = '신설동';
+      else if (address.includes('용두')) district = '용두동';
       else if (address.includes('제기')) district = '제기동';
       else if (address.includes('청량리')) district = '청량리동';
       else if (address.includes('회기')) district = '회기동';

@@ -278,7 +278,8 @@ export default function FactoriesPage() {
     const districtGroups: { [key: string]: string[] } = {
       '장안동': [],
       '답십리동': [],
-      '용신동': [],
+      '신설동': [],
+      '용두동': [],
       '제기동': [],
       '청량리동': [],
       '회기동': [],
