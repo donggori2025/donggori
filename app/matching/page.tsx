@@ -129,7 +129,23 @@ export default function MatchingPage() {
   // factories state 기반 옵션 추출 함수 (함수 내부에서 선언)
   const getOptions = useCallback((key: string): string[] => {
     if (key === 'admin_district') {
-      return Array.from(new Set(factories.map((f: Factory) => f.admin_district).filter((v: string | undefined): v is string => typeof v === 'string' && Boolean(v))));
+      const districts = Array.from(new Set(factories.map((f: Factory) => f.admin_district).filter((v: string | undefined): v is string => typeof v === 'string' && Boolean(v))));
+      
+      // 용신동 제거 및 신설동/용두동 확인
+      const filteredDistricts = districts.filter(district => district !== '용신동');
+      
+      // 신설동과 용두동이 있는지 확인
+      const hasSinsel = filteredDistricts.includes('신설동');
+      const hasYongdu = filteredDistricts.includes('용두동');
+      
+      console.log('지역 옵션 생성:', {
+        원본: districts,
+        필터링: filteredDistricts,
+        신설동존재: hasSinsel,
+        용두동존재: hasYongdu
+      });
+      
+      return filteredDistricts;
     }
     if (key === 'processes') {
       return Array.from(new Set(factories.flatMap((f: Factory) => f.processes ? String(f.processes).split(',').map((v: string) => v.trim()) : []).filter((v: string) => typeof v === 'string' && Boolean(v))));
