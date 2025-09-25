@@ -347,53 +347,210 @@ type ScoredFactory = Factory & { score: number };
     }
   };
 
-  // 추천 알고리즘: 답변과 공장 데이터 매칭 점수 계산
+  // 개선된 AI 매칭 알고리즘: 가중치 기반 점수 계산 시스템
   const getRecommendedFactories = useCallback((answers: string[]) => {
-    // 선택한 옵션 중 1개라도 일치하는 공장만 후보로 삼고, 그 중 최대 3개만(랜덤 또는 상위 3개) 노출
-    // 일치하는 공장이 3개 미만이면 나머지는 랜덤으로 채움
-    const matched = factories.filter(f => {
-      // 공장 타입 (factory_type)
-      if (answers[0] && typeof f.factory_type === 'string' && answers[0].includes(f.factory_type)) return true;
-      // 주요 원단 (main_fabrics)
-      if (answers[1] && typeof f.main_fabrics === 'string' && answers[1].includes(f.main_fabrics)) return true;
-      // 지역
-      if (answers[2] && typeof f.admin_district === 'string' && answers[2].includes(f.admin_district)) return true;
-      // MOQ(수량)
-      if (answers[3]) {
-        if (
-          (answers[3] === "0-50" && f.minOrder <= 50) ||
-          (answers[3] === "51-100" && f.minOrder <= 100) ||
-          (answers[3] === "101-300" && f.minOrder <= 300) ||
-          (answers[3] === "301+" && f.minOrder > 300)
-        ) return true;
+    console.log('🔍 AI 매칭 시작 - 사용자 답변:', answers);
+    
+    // 가중치 정의 (중요도 순)
+    const weights = {
+      factory_type: 30,      // 공장 타입 (가장 중요)
+      main_fabrics: 25,      // 주요 원단
+      admin_district: 20,    // 지역
+      moq: 15,               // MOQ
+      equipment: 10,         // 장비 (재봉기, 패턴기, 특수기)
+      items: 10             // 품목
+    };
+
+    // 각 공장에 대해 점수 계산
+    const scoredFactories = factories.map(factory => {
+      let totalScore = 0;
+      let maxPossibleScore = 0;
+      const matchDetails: string[] = [];
+
+      // 1. 공장 타입 매칭 (가중치: 30)
+      if (answers[0] && typeof factory.factory_type === 'string') {
+        maxPossibleScore += weights.factory_type;
+        if (answers[0].includes(factory.factory_type)) {
+          totalScore += weights.factory_type;
+          matchDetails.push(`공장타입: ${factory.factory_type}`);
+        }
       }
-      // 재봉기/패턴기/특수기
-      if (answers[4] && typeof f.sewing_machines === 'string' && answers[4].split(',').some(val => typeof f.sewing_machines === 'string' && f.sewing_machines.includes(val))) return true;
-      if (answers[5] && typeof f.pattern_machines === 'string' && answers[5].split(',').some(val => typeof f.pattern_machines === 'string' && f.pattern_machines.includes(val))) return true;
-      if (answers[6] && typeof f.special_machines === 'string' && answers[6].split(',').some(val => typeof f.special_machines === 'string' && f.special_machines.includes(val))) return true;
-      // 품목
-      if (answers[7] && Array.isArray(f.items) && f.items.some(i => answers[7].includes(i))) return true;
-      return false;
-    });
-    // 3개 미만이면 랜덤으로 채움
-    const result = matched.slice(0, 3).map(f => {
-      // 이미지 정보 로깅
-      console.log(`추천 공장 ${f.company_name || f.name} 이미지 정보:`, {
-        images: f.images,
-        image: f.image,
-        companyName: f.company_name || f.name
+
+      // 2. 주요 원단 매칭 (가중치: 25)
+      if (answers[1] && typeof factory.main_fabrics === 'string') {
+        maxPossibleScore += weights.main_fabrics;
+        if (answers[1].includes(factory.main_fabrics)) {
+          totalScore += weights.main_fabrics;
+          matchDetails.push(`원단: ${factory.main_fabrics}`);
+        }
+      }
+
+      // 3. 지역 매칭 (가중치: 20)
+      if (answers[2] && typeof factory.admin_district === 'string') {
+        maxPossibleScore += weights.admin_district;
+        if (answers[2].includes(factory.admin_district)) {
+          totalScore += weights.admin_district;
+          matchDetails.push(`지역: ${factory.admin_district}`);
+        }
+      }
+
+      // 4. MOQ 매칭 (가중치: 15)
+      if (answers[3] && factory.minOrder !== undefined) {
+        maxPossibleScore += weights.moq;
+        const moqMatch = (
+          (answers[3] === "0-50" && factory.minOrder <= 50) ||
+          (answers[3] === "51-100" && factory.minOrder <= 100) ||
+          (answers[3] === "101-300" && factory.minOrder <= 300) ||
+          (answers[3] === "301+" && factory.minOrder > 300)
+        );
+        if (moqMatch) {
+          totalScore += weights.moq;
+          matchDetails.push(`MOQ: ${factory.minOrder}`);
+        }
+      }
+
+      // 5. 장비 매칭 (가중치: 10)
+      let equipmentScore = 0;
+      if (answers[4] && typeof factory.sewing_machines === 'string') {
+        const sewingMatch = answers[4].split(',').some(val => 
+          factory.sewing_machines.includes(val.trim())
+        );
+        if (sewingMatch) equipmentScore += 3;
+      }
+      if (answers[5] && typeof factory.pattern_machines === 'string') {
+        const patternMatch = answers[5].split(',').some(val => 
+          factory.pattern_machines.includes(val.trim())
+        );
+        if (patternMatch) equipmentScore += 3;
+      }
+      if (answers[6] && typeof factory.special_machines === 'string') {
+        const specialMatch = answers[6].split(',').some(val => 
+          factory.special_machines.includes(val.trim())
+        );
+        if (specialMatch) equipmentScore += 4;
+      }
+      totalScore += Math.min(equipmentScore, weights.equipment);
+      maxPossibleScore += weights.equipment;
+      if (equipmentScore > 0) {
+        matchDetails.push(`장비 매칭: ${equipmentScore}점`);
+      }
+
+      // 6. 품목 매칭 (가중치: 10)
+      if (answers[7] && Array.isArray(factory.items)) {
+        maxPossibleScore += weights.items;
+        const itemMatches = factory.items.filter(item => 
+          answers[7].includes(item)
+        );
+        if (itemMatches.length > 0) {
+          const itemScore = (itemMatches.length / factory.items.length) * weights.items;
+          totalScore += itemScore;
+          matchDetails.push(`품목: ${itemMatches.join(', ')}`);
+        }
+      }
+
+      // 최종 점수 계산 (백분율)
+      const finalScore = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
+      
+      console.log(`🏭 ${factory.company_name || factory.name}: ${finalScore.toFixed(1)}점`, {
+        totalScore,
+        maxPossibleScore,
+        matchDetails,
+        finalScore: finalScore.toFixed(1) + '%'
       });
-      return { ...f, score: 1 };
+
+      return {
+        ...factory,
+        score: finalScore,
+        matchDetails,
+        totalScore,
+        maxPossibleScore
+      };
     });
-    if (result.length < 3) {
-      const others = factories.filter(f => !matched.includes(f));
-      while (result.length < 3 && others.length > 0) {
-        const idx = Math.floor(Math.random() * others.length);
-        result.push({ ...others.splice(idx, 1)[0], score: 1 });
+
+    // 점수순으로 정렬 (높은 점수부터)
+    const sortedFactories = scoredFactories.sort((a, b) => b.score - a.score);
+    
+    // 지능형 필터링 및 보완 로직
+    let result: typeof scoredFactories = [];
+    
+    // 1단계: 고품질 매칭 (70점 이상)
+    const highQualityMatches = sortedFactories.filter(f => f.score >= 70);
+    if (highQualityMatches.length >= 3) {
+      result = highQualityMatches.slice(0, 3);
+      console.log('🌟 고품질 매칭 3개 이상 발견 - 상위 3개 선택');
+    } else {
+      // 2단계: 중품질 매칭 (50점 이상) + 고품질 매칭
+      const mediumQualityMatches = sortedFactories.filter(f => f.score >= 50 && f.score < 70);
+      result = [...highQualityMatches, ...mediumQualityMatches].slice(0, 3);
+      
+      if (result.length < 3) {
+        // 3단계: 저품질 매칭 (30점 이상)으로 보완
+        const lowQualityMatches = sortedFactories.filter(f => 
+          f.score >= 30 && f.score < 50 && !result.includes(f)
+        );
+        result = [...result, ...lowQualityMatches].slice(0, 3);
+        
+        if (result.length < 3) {
+          // 4단계: 최종 보완 (최고 점수들)
+          const remaining = sortedFactories.filter(f => !result.includes(f));
+          result = [...result, ...remaining].slice(0, 3);
+        }
       }
     }
+
+    // 매칭 품질 분석
+    const qualityAnalysis = {
+      high: result.filter(f => f.score >= 70).length,
+      medium: result.filter(f => f.score >= 50 && f.score < 70).length,
+      low: result.filter(f => f.score < 50).length
+    };
+    
+    console.log('📊 매칭 품질 분석:', qualityAnalysis);
+    
+    // 매칭 품질에 따른 사용자 안내 메시지 생성
+    if (qualityAnalysis.high >= 2) {
+      console.log('✅ 우수한 매칭 결과 - 사용자에게 높은 만족도 예상');
+    } else if (qualityAnalysis.medium >= 2) {
+      console.log('⚠️ 보통 매칭 결과 - 추가 필터링 권장');
+    } else {
+      console.log('❌ 낮은 매칭 결과 - 더 많은 옵션 제공 필요');
+    }
+
+    console.log('🎯 최종 추천 결과:', result.map(f => ({
+      name: f.company_name || f.name,
+      score: f.score.toFixed(1) + '%',
+      matches: f.matchDetails
+    })));
+
     return result;
   }, [factories]);
+
+  // 사용자 피드백 상태
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [feedbackRatings, setFeedbackRatings] = useState<{[key: number]: number}>({});
+
+  // 피드백 제출 함수
+  const submitFeedback = async (factoryId: number, rating: number) => {
+    try {
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          factory_id: factoryId,
+          rating: rating,
+          user_answers: answers,
+          timestamp: new Date().toISOString()
+        })
+      });
+      
+      if (response.ok) {
+        setFeedbackRatings(prev => ({ ...prev, [factoryId]: rating }));
+        console.log(`피드백 제출 완료: 공장 ${factoryId}, 평점 ${rating}`);
+      }
+    } catch (error) {
+      console.error('피드백 제출 실패:', error);
+    }
+  };
 
   // 추천 결과 카드 UI (공장 정보 상세)
   function renderResultCards() {
@@ -503,6 +660,11 @@ type ScoredFactory = Factory & { score: number };
                   <div className="text-xs md:text-sm font-bold" style={{ color: '#333333', opacity: 0.6 }}>
                     MOQ(최소 주문 수량) <span className="font-normal">{typeof f.moq === 'number' ? f.moq : (typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? Number(f.moq) : (typeof f.minOrder === 'number' ? f.minOrder : '-'))}</span>
                   </div>
+                  {/* 매칭 점수 표시 */}
+                  <div className="text-xs text-gray-500 mb-2">
+                    매칭도: {f.score ? f.score.toFixed(1) + '%' : 'N/A'}
+                  </div>
+                  
                   <button
                     className="w-full mt-3 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition text-sm md:text-base"
                     onClick={() => {
@@ -515,6 +677,31 @@ type ScoredFactory = Factory & { score: number };
                   >
                     의뢰하기
                   </button>
+                  
+                  {/* 피드백 UI */}
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="text-xs text-gray-600 mb-2">이 추천이 도움이 되었나요?</div>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          className={`text-lg transition-colors ${
+                            feedbackRatings[f.id || 0] >= star 
+                              ? 'text-yellow-400' 
+                              : 'text-gray-300 hover:text-yellow-300'
+                          }`}
+                          onClick={() => submitFeedback(f.id || 0, star)}
+                        >
+                          ★
+                        </button>
+                      ))}
+                    </div>
+                    {feedbackRatings[f.id || 0] && (
+                      <div className="text-xs text-green-600 mt-1">
+                        감사합니다! ({feedbackRatings[f.id || 0]}점)
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );
