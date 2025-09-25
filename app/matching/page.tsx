@@ -532,23 +532,35 @@ type ScoredFactory = Factory & { score: number };
   // 피드백 제출 함수
   const submitFeedback = async (factoryId: number, rating: number) => {
     try {
-      const response = await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          factory_id: factoryId,
-          rating: rating,
-          user_answers: answers,
-          timestamp: new Date().toISOString()
-        })
-      });
+      console.log(`피드백 제출 시도: 공장 ${factoryId}, 평점 ${rating}`);
       
-      if (response.ok) {
-        setFeedbackRatings(prev => ({ ...prev, [factoryId]: rating }));
-        console.log(`피드백 제출 완료: 공장 ${factoryId}, 평점 ${rating}`);
+      // 즉시 UI 업데이트
+      setFeedbackRatings(prev => ({ ...prev, [factoryId]: rating }));
+      
+      // 서버에 피드백 전송 (선택적)
+      try {
+        const response = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            factory_id: factoryId,
+            rating: rating,
+            user_answers: answers,
+            timestamp: new Date().toISOString()
+          })
+        });
+        
+        if (response.ok) {
+          console.log(`피드백 서버 저장 완료: 공장 ${factoryId}, 평점 ${rating}`);
+        } else {
+          console.warn('피드백 서버 저장 실패, 하지만 UI는 업데이트됨');
+        }
+      } catch (serverError) {
+        console.warn('피드백 서버 전송 실패, 하지만 UI는 업데이트됨:', serverError);
       }
+      
     } catch (error) {
-      console.error('피드백 제출 실패:', error);
+      console.error('피드백 처리 중 오류:', error);
     }
   };
 
@@ -660,10 +672,6 @@ type ScoredFactory = Factory & { score: number };
                   <div className="text-xs md:text-sm font-bold" style={{ color: '#333333', opacity: 0.6 }}>
                     MOQ(최소 주문 수량) <span className="font-normal">{typeof f.moq === 'number' ? f.moq : (typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? Number(f.moq) : (typeof f.minOrder === 'number' ? f.minOrder : '-'))}</span>
                   </div>
-                  {/* 매칭 점수 표시 */}
-                  <div className="text-xs text-gray-500 mb-2">
-                    매칭도: {f.score ? f.score.toFixed(1) + '%' : 'N/A'}
-                  </div>
                   
                   <button
                     className="w-full mt-3 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition text-sm md:text-base"
@@ -681,16 +689,22 @@ type ScoredFactory = Factory & { score: number };
                   {/* 피드백 UI */}
                   <div className="mt-3 pt-3 border-t border-gray-200">
                     <div className="text-xs text-gray-600 mb-2">이 추천이 도움이 되었나요?</div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
-                          className={`text-lg transition-colors ${
+                          className={`text-xl transition-all duration-200 hover:scale-110 ${
                             feedbackRatings[f.id || 0] >= star 
                               ? 'text-yellow-400' 
                               : 'text-gray-300 hover:text-yellow-300'
                           }`}
-                          onClick={() => submitFeedback(f.id || 0, star)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log(`별점 클릭: 공장 ${f.id}, 점수 ${star}`);
+                            submitFeedback(f.id || 0, star);
+                          }}
+                          style={{ cursor: 'pointer' }}
                         >
                           ★
                         </button>
@@ -701,6 +715,11 @@ type ScoredFactory = Factory & { score: number };
                         감사합니다! ({feedbackRatings[f.id || 0]}점)
                       </div>
                     )}
+                    
+                    {/* 매칭 점수 표시 - 피드백 아래로 이동 */}
+                    <div className="text-xs text-gray-500 mt-2">
+                      매칭도: {f.score ? f.score.toFixed(1) + '%' : 'N/A'}
+                    </div>
                   </div>
                 </div>
               </div>
