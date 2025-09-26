@@ -1086,22 +1086,27 @@ export default function FactoriesPage() {
                       <Link href={`/factories/${f.id}`} key={f.id ?? idx} className="rounded-lg sm:rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer">
                         {/* 이미지 영역 */}
                         <div className="w-full h-32 sm:h-40 md:h-48 lg:h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
-                          {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('logo_donggori')) || 
-                           (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('unsplash')) ? (
-                            <Image
-                              src={f.images && f.images.length > 0 ? f.images[0] : f.image}
-                              alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
-                              className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
-                              width={400}
-                              height={224}
-                              priority={idx < 6}
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="text-gray-400 text-xs sm:text-sm font-medium">
-                              이미지 준비 중
-                            </div>
-                          )}
+                          {(() => {
+                            const name = String(f.company_name || f.name || '');
+                            // 프록시 기반 대표 이미지 사용
+                            const mainImage = require('@/lib/factoryImages').getFactoryMainImage(name);
+                            if (mainImage && !mainImage.includes('logo_donggori')) {
+                              return (
+                                <Image
+                                  src={mainImage}
+                                  alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
+                                  className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
+                                  width={400}
+                                  height={224}
+                                  priority={idx < 6}
+                                  unoptimized
+                                />
+                              );
+                            }
+                            return (
+                              <div className="text-gray-400 text-xs sm:text-sm font-medium">이미지 준비 중</div>
+                            );
+                          })()}
                         </div>
                         {/* 이미지와 텍스트 사이 gap 줄임 */}
                         <div className="mt-1 sm:mt-2" />
