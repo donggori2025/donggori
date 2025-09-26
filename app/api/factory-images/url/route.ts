@@ -75,6 +75,7 @@ export async function GET(req: Request) {
       // 2-3) 파일명(NFC/NFD) 매칭
       const folderPath = path.join(baseDirPath, actualFolderName);
       try {
+        // 우선 디렉터리 스캔으로 일치 항목 찾기
         const fileEntries = fs.readdirSync(folderPath, { withFileTypes: true });
         const fileHit = fileEntries.find(e => e.isFile() && (
           e.name === decodedFile ||
@@ -82,17 +83,39 @@ export async function GET(req: Request) {
           e.name.normalize('NFD') === decodedFile.normalize('NFD')
         ));
 
+        const candidates: string[] = [];
         if (fileHit) {
-          const resolvedPath = path.join(folderPath, fileHit.name);
-          console.log('서빙 파일 경로:', resolvedPath);
-          const fileBuffer = fs.readFileSync(resolvedPath);
-          const contentType = decodedFile.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
-          return new NextResponse(fileBuffer, {
-            headers: {
-              'Content-Type': contentType,
-              'Cache-Control': 'public, max-age=31536000, immutable',
-            },
-          });
+          candidates.push(path.join(folderPath, fileHit.name));
+        }
+
+        // 스캔에서 못 찾았을 경우를 대비해 모든 조합으로 직접 경로 시도
+        const baseCandidates = [actualBaseDir, baseNameNFC, baseNameNFD];
+        const folderCandidates = [actualFolderName, decodedFolder, decodedFolder.normalize('NFC'), decodedFolder.normalize('NFD')];
+        const fileCandidates = [decodedFile, decodedFile.normalize('NFC'), decodedFile.normalize('NFD')];
+
+        for (const b of baseCandidates) {
+          for (const f of folderCandidates) {
+            for (const fn of fileCandidates) {
+              const p = path.join(publicRoot, b, f, fn);
+              if (!candidates.includes(p)) candidates.push(p);
+            }
+          }
+        }
+
+        for (const resolvedPath of candidates) {
+          try {
+            if (fs.existsSync(resolvedPath)) {
+              console.log('서빙 파일 경로:', resolvedPath);
+              const fileBuffer = fs.readFileSync(resolvedPath);
+              const contentType = resolvedPath.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+              return new NextResponse(fileBuffer, {
+                headers: {
+                  'Content-Type': contentType,
+                  'Cache-Control': 'public, max-age=31536000, immutable',
+                },
+              });
+            }
+          } catch {}
         }
       } catch (err) {
         console.log('파일 스캔 실패:', err);
@@ -100,7 +123,7 @@ export async function GET(req: Request) {
     }
 
     // 2-4) 마지막 폴백: 정적 경로 리다이렉트 (브라우저/서버 조합에 따라 성공 가능)
-    const publicUrl = new URL(`/${actualBaseDir}/${encodeURIComponent(decodedFolder)}/${encodeURIComponent(decodedFile)}`, req.url);
+    const publicUrl = new URL(`/${encodeURIComponent(actualBaseDir)}/${encodeURIComponent(decodedFolder)}/${encodeURIComponent(decodedFile)}` , req.url);
     console.log('모든 매칭 실패 → 정적 경로로 리다이렉트:', publicUrl.toString());
     return NextResponse.redirect(publicUrl.toString(), 302);
   } catch (e: any) {

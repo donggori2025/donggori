@@ -55,21 +55,25 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
         <div className="flex items-start gap-4">
           {/* 이미지 */}
           <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-            {(factory.images && factory.images.length > 0 && factory.images[0] && factory.images[0] !== '/logo_donggori.png') || 
-             (factory.image && factory.image !== '/logo_donggori.png') ? (
-              <Image
-                src={factory.images && factory.images.length > 0 ? factory.images[0] : factory.image}
-                alt={factoryName}
-                width={96}
-                height={96}
-                className="object-cover w-full h-full"
-                unoptimized
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                이미지 없음
-              </div>
-            )}
+            {(() => {
+              const name = String(factory.company_name || factory.name || '');
+              const mainImage = require('@/lib/factoryImages').getFactoryMainImage(name);
+              if (mainImage && !mainImage.includes('logo_donggori')) {
+                return (
+                  <Image
+                    src={mainImage}
+                    alt={factoryName}
+                    width={96}
+                    height={96}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                );
+              }
+              return (
+                <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">이미지 없음</div>
+              );
+            })()}
           </div>
 
           {/* 기본 정보 */}
