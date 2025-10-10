@@ -247,13 +247,30 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     
     setFormData(prev => ({
       ...prev,
-      name: prev.name || (nameFromUrl ? decodeURIComponent(nameFromUrl) : userIdentity.name),
+      // URL 파라미터보다는 실제 로그인한 사용자 정보를 우선 사용
+      name: prev.name || userIdentity.name || (nameFromUrl ? decodeURIComponent(nameFromUrl) : ''),
       contact: prev.contact || userIdentity.phone
     }));
     
     // 전화번호가 없는 경우 사용자에게 알림
     if (!userIdentity.phone && userIdentity.name) {
       console.log('전화번호 정보가 없습니다. 사용자가 직접 입력해야 합니다.');
+    }
+    
+    // 올바른 사용자 정보를 localStorage에 강제로 저장 (캐싱)
+    if (userIdentity.name) {
+      console.log('localStorage에 올바른 사용자 정보 저장:', userIdentity.name);
+      localStorage.setItem('userName', userIdentity.name);
+    }
+    if (userIdentity.phone) {
+      console.log('localStorage에 올바른 연락처 정보 저장:', userIdentity.phone);
+      localStorage.setItem('userPhone', userIdentity.phone);
+    }
+    
+    // 잘못된 정보가 localStorage에 저장되어 있는 경우 강제로 교체
+    if (userIdentity.name && localStorageName && localStorageName !== userIdentity.name) {
+      console.log('잘못된 localStorage 정보 감지, 교체:', localStorageName, '->', userIdentity.name);
+      localStorage.setItem('userName', userIdentity.name);
     }
   }, [searchParams, factoryId, router, clerkLoaded, clerkUser]);
 
