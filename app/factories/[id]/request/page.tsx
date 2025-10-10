@@ -212,16 +212,38 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     const nameFromUrl = searchParams.get("name");
     const userIdentity = getAppUserIdentity(clerkUser);
     
-    console.log('사용자 정보 로드:', {
-      clerkUser: clerkUser ? {
-        id: clerkUser.id,
-        name: clerkUser.firstName || clerkUser.fullName,
-        email: clerkUser.emailAddresses?.[0]?.emailAddress,
-        phone: clerkUser.phoneNumbers?.[0]?.phoneNumber
-      } : null,
-      userIdentity,
-      nameFromUrl
-    });
+    // 더 자세한 디버깅 정보 출력
+    console.log('=== 사용자 정보 디버깅 ===');
+    console.log('clerkLoaded:', clerkLoaded);
+    console.log('clerkUser:', clerkUser ? {
+      id: clerkUser.id,
+      firstName: clerkUser.firstName,
+      fullName: clerkUser.fullName,
+      email: clerkUser.emailAddresses?.[0]?.emailAddress,
+      phone: clerkUser.phoneNumbers?.[0]?.phoneNumber
+    } : null);
+    
+    // 쿠키 정보 확인
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+      return null;
+    };
+    
+    const kakaoCookie = getCookie('kakao_user');
+    const naverCookie = getCookie('naver_user');
+    const localStorageName = localStorage.getItem('userName');
+    const localStoragePhone = localStorage.getItem('userPhone');
+    
+    console.log('쿠키 정보:');
+    console.log('kakao_user:', kakaoCookie ? JSON.parse(decodeURIComponent(kakaoCookie)) : null);
+    console.log('naver_user:', naverCookie ? JSON.parse(decodeURIComponent(naverCookie)) : null);
+    console.log('localStorage userName:', localStorageName);
+    console.log('localStorage userPhone:', localStoragePhone);
+    console.log('nameFromUrl:', nameFromUrl);
+    console.log('최종 userIdentity:', userIdentity);
+    console.log('=== 디버깅 끝 ===');
     
     setFormData(prev => ({
       ...prev,
