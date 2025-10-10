@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Factory } from "@/lib/factories";
-// Clerk 미사용: 쿠키/로컬스토리지 기반 로그인 확인으로 전환
+import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
 
@@ -64,7 +64,7 @@ function isAppLoggedIn() {
   return false;
 }
 
-function getAppUserIdentity() {
+function getAppUserIdentity(clerkUser?: any) {
   try {
     const name = localStorage.getItem('userName') || '';
     const phone = localStorage.getItem('userPhone') || '';
@@ -75,7 +75,30 @@ function getAppUserIdentity() {
       return null;
     };
     
-    // 카카오 사용자 정보 확인
+    // Clerk 사용자 정보 확인 (우선순위 1)
+    if (clerkUser) {
+      return {
+        name: clerkUser.firstName || clerkUser.fullName || name,
+        phone: clerkUser.phoneNumbers?.[0]?.phoneNumber || phone,
+        id: clerkUser.id,
+        email: clerkUser.emailAddresses?.[0]?.emailAddress || ''
+      };
+    }
+    
+    // Clerk window 객체 확인 (fallback)
+    if (typeof window !== 'undefined' && (window as any).Clerk && (window as any).Clerk.user) {
+      const windowClerkUser = (window as any).Clerk.user;
+      if (windowClerkUser) {
+        return {
+          name: windowClerkUser.firstName || windowClerkUser.fullName || name,
+          phone: windowClerkUser.phoneNumbers?.[0]?.phoneNumber || phone,
+          id: windowClerkUser.id,
+          email: windowClerkUser.emailAddresses?.[0]?.emailAddress || ''
+        };
+      }
+    }
+    
+    // 카카오 사용자 정보 확인 (우선순위 2)
     const kakao = getCookie('kakao_user');
     if (kakao) {
       try {
@@ -93,7 +116,7 @@ function getAppUserIdentity() {
       }
     }
     
-    // 네이버 사용자 정보 확인
+    // 네이버 사용자 정보 확인 (우선순위 3)
     const naver = getCookie('naver_user');
     if (naver) {
       try {
@@ -111,6 +134,7 @@ function getAppUserIdentity() {
       }
     }
     
+    // 기본값 반환
     return { name, phone, id: '', email: '' };
   } catch (error) {
     console.error('사용자 정보 가져오기 오류:', error);
@@ -121,6 +145,7 @@ function getAppUserIdentity() {
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user: clerkUser, isLoaded: clerkLoaded } = useUser();
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [factoryId, setFactoryId] = useState<string | null>(null);
@@ -146,7 +171,6 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
   // 새로운 링크 입력을 위한 상태
   const [newLink, setNewLink] = useState("");
-  // Clerk user 제거
 
   useEffect(() => {
     (async () => {
@@ -175,20 +199,41 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
   // 로그인한 유저의 이름을 자동으로 입력
   useEffect(() => {
+    // Clerk가 로드될 때까지 기다림
+    if (!clerkLoaded) return;
+    
     // 로그인 확인 및 기본 사용자 정보 채우기
-    if (!isAppLoggedIn()) {
+    if (!isAppLoggedIn() && !clerkUser) {
       alert('로그인 후 이용 가능합니다.');
       if (factoryId) router.replace(`/sign-in?next=/factories/${factoryId}/request`);
       return;
     }
+    
     const nameFromUrl = searchParams.get("name");
-    const id = getAppUserIdentity();
+    const userIdentity = getAppUserIdentity(clerkUser);
+    
+    console.log('사용자 정보 로드:', {
+      clerkUser: clerkUser ? {
+        id: clerkUser.id,
+        name: clerkUser.firstName || clerkUser.fullName,
+        email: clerkUser.emailAddresses?.[0]?.emailAddress,
+        phone: clerkUser.phoneNumbers?.[0]?.phoneNumber
+      } : null,
+      userIdentity,
+      nameFromUrl
+    });
+    
     setFormData(prev => ({
       ...prev,
-      name: prev.name || (nameFromUrl ? decodeURIComponent(nameFromUrl) : id.name),
-      contact: prev.contact || id.phone
+      name: prev.name || (nameFromUrl ? decodeURIComponent(nameFromUrl) : userIdentity.name),
+      contact: prev.contact || userIdentity.phone
     }));
-  }, [searchParams, factoryId, router]);
+    
+    // 전화번호가 없는 경우 사용자에게 알림
+    if (!userIdentity.phone && userIdentity.name) {
+      console.log('전화번호 정보가 없습니다. 사용자가 직접 입력해야 합니다.');
+    }
+  }, [searchParams, factoryId, router, clerkLoaded, clerkUser]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
@@ -397,7 +442,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
       // 서버 API 경유로 의뢰 데이터 저장 (RLS 회피 및 상세 오류 전달)
       try {
-        const loggedInUser = getAppUserIdentity();
+        const loggedInUser = getAppUserIdentity(clerkUser);
         console.log('의뢰 제출 시 사용자 정보:', loggedInUser);
         
         const payload = {
