@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { fetchFactoriesFromDB, Factory } from "@/lib/factories";
+import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import Link from "next/link";
 
 function getCardFabricsById(factories: Factory[]) {
@@ -30,6 +31,35 @@ function getCardFabricsById(factories: Factory[]) {
 
 const CARD_COUNT = 10;
 const VISIBLE_COUNT = 4;
+
+// 공장 이미지 카드 컴포넌트
+function FactoryImageCard({ factory, idx }: { factory: Factory; idx: number }) {
+  const { images, loading } = useFactoryImages(factory.name || factory.company_name || '');
+  
+  return (
+    <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
+      {loading ? (
+        <div className="text-gray-400 text-sm font-medium">
+          이미지 로딩 중...
+        </div>
+      ) : images.length > 0 && images[0] !== '/logo_donggori.png' ? (
+        <Image
+          src={images[0]}
+          alt={typeof factory.company_name === 'string' ? factory.company_name : '공장 이미지'}
+          className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
+          width={400}
+          height={192}
+          priority={idx < 4}
+          unoptimized
+        />
+      ) : (
+        <div className="text-gray-400 text-sm font-medium">
+          이미지 준비 중
+        </div>
+      )}
+    </div>
+  );
+}
 
 const InfoSection = () => {
   const [factories, setFactories] = useState<Factory[]>([]);
@@ -149,24 +179,7 @@ const InfoSection = () => {
                 return (
                   <Link href={`/factories/${f.id}`} key={`${f.id ?? 'noid'}-${idx}`} className="rounded-lg sm:rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer w-[calc(25%-12px)] flex-shrink-0">
                     {/* 이미지 영역 */}
-                    <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
-                      {(f.images && f.images.length > 0 && f.images[0] && f.images[0] !== '/logo_donggori.png' && !f.images[0].includes('logo_donggori')) || 
-                       (f.image && f.image !== '/logo_donggori.png' && !f.image.includes('unsplash')) ? (
-                        <Image
-                          src={f.images && f.images.length > 0 ? f.images[0] : f.image}
-                          alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
-                          className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
-                          width={400}
-                          height={192}
-                          priority={idx < 4}
-                          unoptimized
-                        />
-                      ) : (
-                        <div className="text-gray-400 text-sm font-medium">
-                          이미지 준비 중
-                        </div>
-                      )}
-                    </div>
+                    <FactoryImageCard factory={f} idx={idx} />
                     {/* 정보 영역 */}
                     <div className="flex-1 flex flex-col px-0 py-4 text-left">
                       {/* 주요 원단 칩 */}

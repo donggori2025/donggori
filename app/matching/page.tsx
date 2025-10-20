@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import type { Factory } from "@/lib/factories";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
+import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import { FACTORY_TYPES, MAIN_FABRICS, type FactoryType, type MainFabric } from "@/lib/types";
 
 
@@ -17,6 +18,53 @@ const moqRanges = [
   { label: "101-300", min: 101, max: 300 },
   { label: "301+", min: 301, max: Infinity },
 ];
+
+// 매칭 페이지용 공장 이미지 컴포넌트
+function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number }) {
+  const { images, loading } = useFactoryImages(factory.name || factory.company_name || '');
+  
+  if (loading) {
+    return (
+      <div className="text-gray-400 text-sm font-medium flex items-center justify-center h-full">
+        <div className="text-center">
+          <div>이미지 로딩 중...</div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (images.length > 0 && images[0] !== '/logo_donggori.png') {
+    return (
+      <Image
+        src={images[0]}
+        alt={typeof factory.company_name === 'string' ? factory.company_name : (typeof factory.name === 'string' ? factory.name : '공장 이미지')}
+        className="object-cover w-full h-full rounded-xl group-hover:scale-110 transition-transform duration-300"
+        width={400}
+        height={160}
+        priority={idx < 3}
+        unoptimized
+        onError={(e) => {
+          console.warn(`이미지 로드 실패: ${images[0]}`);
+          // 이미지 로드 실패 시 대체 UI 표시
+          const imgElement = e.currentTarget;
+          imgElement.style.display = 'none';
+          const fallbackElement = imgElement.nextElementSibling;
+          if (fallbackElement) {
+            fallbackElement.classList.remove('hidden');
+          }
+        }}
+      />
+    );
+  }
+  
+  return (
+    <div className="text-gray-400 text-sm font-medium flex items-center justify-center h-full">
+      <div className="text-center">
+        <div>이미지 준비 중</div>
+      </div>
+    </div>
+  );
+}
 
 // 채팅 말풍선 컴포넌트 (fade-in + 타이핑 효과)
 function ChatBubble({ text, type, isTyping, showCursor, onEdit }: { text: string; type: "question" | "answer"; isTyping?: boolean; showCursor?: boolean; onEdit?: () => void }) {
@@ -612,54 +660,7 @@ type ScoredFactory = Factory & { score: number };
               <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden border border-gray-200">
                 {/* 이미지 영역 - 데스크톱에서만 표시 */}
                 <div className="hidden md:block w-full h-32 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl group">
-                  {(() => {
-                    // 이미지 URL 우선순위: images[0] > image > 기본 이미지
-                    let imageUrl = '';
-                    if (f.images && f.images.length > 0 && f.images[0]) {
-                      imageUrl = f.images[0];
-                    } else if (f.image && f.image.trim() !== '') {
-                      imageUrl = f.image;
-                    }
-                    
-                    console.log(`공장 ${displayName} 이미지 정보:`, {
-                      images: f.images,
-                      image: f.image,
-                      selectedUrl: imageUrl,
-                      companyName: f.company_name || f.name
-                    });
-                    
-                    if (imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== '' && imageUrl !== '/logo_donggori.png') {
-                      return (
-                        <Image
-                          src={imageUrl}
-                          alt={typeof f.company_name === 'string' ? f.company_name : (typeof f.name === 'string' ? f.name : '공장 이미지')}
-                          className="object-cover w-full h-full rounded-xl group-hover:scale-110 transition-transform duration-300"
-                          width={400}
-                          height={160}
-                          priority={idx < 3}
-                          unoptimized
-                          onError={(e) => {
-                            console.warn(`이미지 로드 실패: ${imageUrl}`);
-                            // 이미지 로드 실패 시 대체 UI 표시
-                            const imgElement = e.currentTarget;
-                            imgElement.style.display = 'none';
-                            const fallbackElement = imgElement.nextElementSibling;
-                            if (fallbackElement) {
-                              fallbackElement.classList.remove('hidden');
-                            }
-                          }}
-                        />
-                      );
-                    } else {
-                      return (
-                        <div className="text-gray-400 text-sm font-medium flex items-center justify-center h-full">
-                          <div className="text-center">
-                            <div>이미지 준비 중</div>
-                          </div>
-                        </div>
-                      );
-                    }
-                  })()}
+                  <MatchingFactoryImage factory={f} idx={idx} />
                   {/* 이미지 로드 실패 시 표시할 대체 텍스트 */}
                   <div className="text-gray-400 text-sm font-medium hidden flex items-center justify-center h-full">
                     <div className="text-center">
