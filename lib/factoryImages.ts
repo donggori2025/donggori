@@ -9,7 +9,7 @@ function getProxyUrl(folderName: string, fileName: string) {
 // 업장 이름과 이미지 폴더 매칭
 const factoryImageMapping: Record<string, string> = {
   // 기존 공장들
-  '강훈무역': '강훈(리더밴드)',
+  '강훈무역': '강훈무역',
   '건영실업': '건영실업',
   '경림패션': '경림사',
   '꼬메오패션': '꼬메오',
@@ -86,7 +86,7 @@ export function getFactoryThumbnailImage(factoryName: string): string {
   return images.length > 0 ? images[0] : '/logo_donggori.png';
 }
 
-// 업장 이름으로 모든 이미지 URL 생성 (Vercel Blob 사용)
+// 업장 이름으로 모든 이미지 URL 생성 (배포 환경 호환)
 export function getFactoryImages(factoryName: string): string[] {
   const folderName = getFactoryImageFolder(factoryName);
   
@@ -94,9 +94,11 @@ export function getFactoryImages(factoryName: string): string[] {
     return ['/logo_donggori.png'];
   }
 
-  // 클라이언트에서는 useFactoryImages 훅을 사용하도록 안내
-  // 서버 사이드에서는 기본 이미지만 반환
-  return ['/logo_donggori.png'];
+  // 모든 공장에서 동일한 기본 이미지 파일명 사용 (배포 환경 호환)
+  const defaultImageFile = '20250710_103857.jpg';
+  const imageUrl = `/api/factory-images/url?folder=${encodeURIComponent(folderName)}&file=${encodeURIComponent(defaultImageFile)}`;
+  
+  return [imageUrl];
 }
 
 // 업장 이름으로 대표 이미지 경로 생성 (썸네일용)
