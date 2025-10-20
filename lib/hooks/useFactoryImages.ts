@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { hasFactoryImages as checkFactoryImages } from '@/lib/factoryImages';
+import { hasFactoryImages as checkFactoryImages, getFactoryImageFolder, getFactoryImages } from '@/lib/factoryImages';
 
 export function useFactoryImages(factoryName: string) {
   const [images, setImages] = useState<string[]>([]);
@@ -17,13 +17,12 @@ export function useFactoryImages(factoryName: string) {
       setError(null);
       
       try {
-        const response = await fetch(`/api/factory-images/list?folder=${encodeURIComponent(factoryName)}`);
-        const data = await response.json();
+        // 서버 사이드에서 이미지 목록 가져오기 (배포 환경 호환)
+        const serverImages = getFactoryImages(factoryName);
         
-        if (data.ok && data.images && data.images.length > 0) {
-          setImages(data.images);
+        if (serverImages && serverImages.length > 0 && serverImages[0] !== '/logo_donggori.png') {
+          setImages(serverImages);
         } else {
-          // 이미지가 없으면 기본 이미지 사용
           setImages(['/logo_donggori.png']);
         }
       } catch (err) {
