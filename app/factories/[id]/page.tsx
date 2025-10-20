@@ -8,6 +8,7 @@ import { Share, ArrowLeft, ChevronDown, ChevronUp, Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
+import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import PricingTable from "@/components/PricingTable";
 
 export default function FactoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -18,6 +19,9 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const [selectedPlan, setSelectedPlan] = useState<string | null>('standard');
   const [shareCopied, setShareCopied] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // 공장 이미지 훅 사용
+  const { images: factoryImages, loading: imagesLoading } = useFactoryImages(factory?.name || factory?.company_name || '');
   const thumbnailRef = useRef<HTMLDivElement>(null);
 
   // 앱 레벨 로그인 감지 (Clerk 또는 커스텀 쿠키/스토리지)
@@ -127,7 +131,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           minOrder: Number(data.moq) || 0,
           description: String(data.intro_text || data.intro || data.description || "설명 없음"),
           image: getFactoryMainImage(companyName), // 업장 이름으로 이미지 매칭
-          images: getFactoryImages(companyName), // 업장 이름으로 모든 이미지 가져오기
+          images: [], // 이미지는 훅에서 가져옴
           contact: String(data.phone_num || data.phone_number || data.contact || "연락처 없음"),
           lat: Number(data.lat) || 37.5665,
           lng: Number(data.lng) || 126.9780,
@@ -181,16 +185,21 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
 
   // 현재 이미지가 변경될 때 썸네일 영역을 자동으로 스크롤
   useEffect(() => {
-    if (thumbnailRef.current && factory && factory.images && factory.images.length > 0) {
+    if (thumbnailRef.current && displayImages && displayImages.length > 0) {
       // 화면 크기에 따른 썸네일 크기 계산
       const isMobile = window.innerWidth < 640; // sm breakpoint
       const isTablet = window.innerWidth < 768; // md breakpoint
       
-      let thumbnailWidth = 64; // w-16 (mobile)
+      let thumbnailWidth = 80; // w-20 (mobile)
       if (!isMobile && isTablet) {
-        thumbnailWidth = 80; // w-20 (tablet)
+        thumbnailWidth = 96; // w-24 (tablet)
       } else if (!isTablet) {
-        thumbnailWidth = 96; // w-24 (desktop)
+        thumbnailWidth = 112; // w-28 (desktop)
+      }
+      
+      // lg 브레이크포인트 추가
+      if (window.innerWidth >= 1024) {
+        thumbnailWidth = 128; // w-32 (large desktop)
       }
       
       const gap = 8; // gap-2
@@ -219,7 +228,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       date: new Date().toISOString().slice(0, 10),
       status: "카톡 문의 완료",
       method: "카카오톡",
-      image: factory.images?.[0] || factory.image,
+      image: displayImages?.[0] || factory.image,
     };
     const prev = JSON.parse(localStorage.getItem("inquiries") || "[]");
     localStorage.setItem("inquiries", JSON.stringify([inquiry, ...prev]));
@@ -292,20 +301,15 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     setSelectedPlan(selectedPlan === planKey ? null : planKey);
   };
 
-  // 실제 공장 이미지 배열 (DB에서 가져온 이미지들)
-  const factoryImages = factory.images && factory.images.length > 0 
-    ? factory.images.filter(img => 
+  // 실제 공장 이미지 배열 (훅에서 가져온 이미지들)
+  const displayImages = factoryImages && factoryImages.length > 0 
+    ? factoryImages.filter(img => 
         img && 
         img !== '/logo_donggori.png' && 
         !img.includes('unsplash') &&
         !img.includes('logo_donggori')
       )
-    : factory.image && 
-      factory.image !== '/logo_donggori.png' && 
-      !factory.image.includes('unsplash') &&
-      !factory.image.includes('logo_donggori')
-      ? [factory.image] 
-      : []; // 이미지가 없으면 빈 배열
+    : []; // 이미지가 없으면 빈 배열
 
   return (
     <div className="min-h-screen bg-white">
@@ -315,26 +319,26 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           <div className="bg-white rounded-xl p-6 mb-6">
             {/* 이미지 갤러리 */}
             <div className="mb-8">
-              {factoryImages.length > 0 ? (
+              {displayImages.length > 0 ? (
                 <div className="relative">
                   {/* 메인 이미지 */}
-                  <div className="relative w-full h-80 sm:h-96 md:h-[500px] overflow-hidden rounded-lg">
+                  <div className="relative w-full h-96 sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden rounded-lg">
                     <Image
-                      src={factoryImages[currentImageIndex]}
+                      src={displayImages[currentImageIndex]}
                       alt={`${factory.company_name} 이미지 ${currentImageIndex + 1}`}
                       fill
-                      className="object-cover"
+                      className="object-contain bg-gray-50"
                       unoptimized
                     />
                   </div>
                   
                   {/* 화살표 버튼들 */}
-                  {factoryImages.length > 1 && (
+                  {displayImages.length > 1 && (
                     <>
                       {/* 왼쪽 화살표 */}
                       <button
                         onClick={() => setCurrentImageIndex(prev => 
-                          prev === 0 ? factoryImages.length - 1 : prev - 1
+                          prev === 0 ? displayImages.length - 1 : prev - 1
                         )}
                         className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
                       >
@@ -346,7 +350,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                       {/* 오른쪽 화살표 */}
                       <button
                         onClick={() => setCurrentImageIndex(prev => 
-                          prev === factoryImages.length - 1 ? 0 : prev + 1
+                          prev === displayImages.length - 1 ? 0 : prev + 1
                         )}
                         className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
                       >
@@ -358,17 +362,17 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                   )}
                   
                   {/* 썸네일 이미지들 */}
-                  {factoryImages.length > 1 && (
+                  {displayImages.length > 1 && (
                     <div 
                       ref={thumbnailRef}
                       className="flex gap-2 mt-4 overflow-x-auto scrollbar-hide"
                       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
-                      {factoryImages.map((image: string, index: number) => (
+                      {displayImages.map((image: string, index: number) => (
                         <button
                           key={index}
                           onClick={() => setCurrentImageIndex(index)}
-                          className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
+                          className={`relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
                             index === currentImageIndex 
                               ? 'border-blue-500 scale-105' 
                               : 'border-gray-200 hover:border-gray-300'
@@ -378,7 +382,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                             src={image}
                             alt={`${factory.company_name} 썸네일 ${index + 1}`}
                             fill
-                            className="object-cover"
+                            className="object-contain bg-gray-50"
                             unoptimized
                           />
                         </button>
@@ -387,9 +391,9 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                   )}
                   
                   {/* 이미지 인디케이터 */}
-                  {factoryImages.length > 1 && (
+                  {displayImages.length > 1 && (
                     <div className="flex justify-center gap-2 mt-4">
-                      {factoryImages.map((_: string, index: number) => (
+                      {displayImages.map((_: string, index: number) => (
                         <button
                           key={index}
                           onClick={() => setCurrentImageIndex(index)}
@@ -418,12 +422,12 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 <div className="flex items-center gap-4">
                   {/* 업장 이미지 - 첫 번째 사진 사용 */}
                   <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center">
-                    {factory && factory.images && factory.images.length > 0 && 
-                     factory.images[0] && 
-                     factory.images[0] !== '/logo_donggori.png' && 
-                     !factory.images[0].includes('unsplash') ? (
+                    {factory && displayImages && displayImages.length > 0 && 
+                     displayImages[0] && 
+                     displayImages[0] !== '/logo_donggori.png' && 
+                     !displayImages[0].includes('unsplash') ? (
                       <Image
-                        src={factory.images[0]}
+                        src={displayImages[0]}
                         alt={factory.company_name || "공장 이미지"}
                         width={48}
                         height={48}

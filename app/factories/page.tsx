@@ -16,6 +16,40 @@ import SimpleNaverMap from "@/components/SimpleNaverMap";
 import FactoryInfoPopup from "@/components/FactoryInfoPopup";
 import { getFactoryLocationByName, getDongdaemunCenter } from "@/lib/factoryLocationMapping";
 import { useRouter } from "next/navigation";
+import { useFactoryImages, hasFactoryImages } from "@/lib/hooks/useFactoryImages";
+
+// 공장 목록 페이지용 이미지 컴포넌트
+function FactoriesPageImage({ factory, idx }: { factory: Factory; idx: number }) {
+  const { images, loading } = useFactoryImages(factory.name || factory.company_name || '');
+  
+  if (loading) {
+    return (
+      <div className="text-gray-400 text-xs sm:text-sm font-medium">
+        이미지 로딩 중...
+      </div>
+    );
+  }
+  
+  if (images.length > 0 && images[0] !== '/logo_donggori.png') {
+    return (
+      <Image
+        src={images[0]}
+        alt={typeof factory.company_name === 'string' ? factory.company_name : '공장 이미지'}
+        className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
+        width={400}
+        height={224}
+        priority={idx < 6}
+        unoptimized
+      />
+    );
+  }
+  
+  return (
+    <div className="text-gray-400 text-xs sm:text-sm font-medium">
+      이미지 준비 중
+    </div>
+  );
+}
 
 export default function FactoriesPage() {
   const [factoriesData, setFactoriesData] = useState<Factory[]>([]); // 초기값 빈 배열
@@ -173,14 +207,29 @@ export default function FactoriesPage() {
     const hasActiveFilters = Object.values(selected).some(arr => arr.length > 0) || search;
     
     if (!hasActiveFilters) {
-      return [...filtered].sort((a, b) => {
-        const aHasImages = a.images && a.images.length > 0 && a.images[0] !== '/logo_donggori.png' && !a.images[0].includes('logo_donggori');
-        const bHasImages = b.images && b.images.length > 0 && b.images[0] !== '/logo_donggori.png' && !b.images[0].includes('logo_donggori');
-        
-        if (aHasImages && !bHasImages) return -1; // a가 이미지 있음, b가 없음
-        if (!aHasImages && bHasImages) return 1;  // a가 이미지 없음, b가 있음
-        return 0; // 둘 다 이미지 있거나 둘 다 없음
+      // 이미지가 있는 공장들의 목록 (실제 폴더명 기반)
+      const factoriesWithImages = [
+        '강훈무역', '건영실업', '경림패션', '꼬메오패션', '나인', '뉴에일린', '다엘', '대명어패럴', '더시크컴퍼니',
+        '라이브 어패럴', '라인스', '백산실업', '부연사', '새가온', '선화사', '스마일', '시즌', '실루엣컴퍼니',
+        '아트패션', '에이스', '오르다', '오성섬유', '오스카 디자인', '우정샘플', '우정패션', '우진모피', '유화 섬유',
+        '재민상사', '좋은사람', '하늘패션', '혜민사', '화담어패럴', '화신사', '희란패션',
+        'jk패션', '기훈패션', '나르샤', '다래디자인', '다온패션', '레오실업', '민경패션', '바비패션', '수미어패럴',
+        '으뜸어패럴', '조아스타일', '태경패션', '태광사', '태성어패럴', '미호패션', '박원니트', '희망사'
+      ];
+      
+      // 이미지가 있는 공장들과 없는 공장들을 분리
+      const factoriesWithImagesList = filtered.filter(f => {
+        const name = f.name || f.company_name || '';
+        return factoriesWithImages.includes(name);
       });
+      
+      const factoriesWithoutImagesList = filtered.filter(f => {
+        const name = f.name || f.company_name || '';
+        return !factoriesWithImages.includes(name);
+      });
+      
+      // 이미지가 있는 공장들을 먼저, 그 다음에 없는 공장들을 배치
+      return [...factoriesWithImagesList, ...factoriesWithoutImagesList];
     }
     
     return filtered;
@@ -1086,27 +1135,7 @@ export default function FactoriesPage() {
                       <Link href={`/factories/${f.id}`} key={f.id ?? idx} className="rounded-lg sm:rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer">
                         {/* 이미지 영역 */}
                         <div className="w-full h-32 sm:h-40 md:h-48 lg:h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
-                          {(() => {
-                            const name = String(f.company_name || f.name || '');
-                            // 프록시 기반 대표 이미지 사용
-                            const mainImage = require('@/lib/factoryImages').getFactoryMainImage(name);
-                            if (mainImage && !mainImage.includes('logo_donggori')) {
-                              return (
-                                <Image
-                                  src={mainImage}
-                                  alt={typeof f.company_name === 'string' ? f.company_name : '공장 이미지'}
-                                  className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
-                                  width={400}
-                                  height={224}
-                                  priority={idx < 6}
-                                  unoptimized
-                                />
-                              );
-                            }
-                            return (
-                              <div className="text-gray-400 text-xs sm:text-sm font-medium">이미지 준비 중</div>
-                            );
-                          })()}
+                          <FactoriesPageImage factory={f} idx={idx} />
                         </div>
                         {/* 이미지와 텍스트 사이 gap 줄임 */}
                         <div className="mt-1 sm:mt-2" />
