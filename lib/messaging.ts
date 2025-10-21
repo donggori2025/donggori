@@ -9,7 +9,11 @@ export interface SendOptions {
   variables?: Record<string, string>;
 }
 
-const supabaseServer = config.supabase.url && config.supabase.serviceRoleKey
+const supabaseServer = config.supabase.url && config.supabase.serviceRoleKey && 
+  config.supabase.url !== 'your-supabase-url' && 
+  config.supabase.url !== 'your-supabase-url/' &&
+  config.supabase.url.startsWith('http') &&
+  config.supabase.serviceRoleKey.length > 10
   ? createClient(config.supabase.url, config.supabase.serviceRoleKey, { auth: { persistSession: false } })
   : null;
 

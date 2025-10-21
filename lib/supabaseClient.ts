@@ -5,7 +5,12 @@ import { config } from "./config";
 let supabase: any;
 
 try {
-  if (config.supabase.url && config.supabase.anonKey) {
+  // 환경변수 유효성 검사 강화
+  if (config.supabase.url && config.supabase.anonKey && 
+      config.supabase.url !== 'your-supabase-url' && 
+      config.supabase.url !== 'your-supabase-url/' &&
+      config.supabase.url.startsWith('http') &&
+      config.supabase.anonKey.length > 10) {
     supabase = createClient(
       config.supabase.url,
       config.supabase.anonKey,

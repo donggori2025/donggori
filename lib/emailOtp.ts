@@ -2,7 +2,12 @@ import { createClient } from '@supabase/supabase-js';
 import { config } from './config';
 import { sendEmail } from './messaging';
 
-const supabaseServer = config.supabase.url && config.supabase.serviceRoleKey
+// 환경변수 유효성 검사 강화
+const supabaseServer = config.supabase.url && config.supabase.serviceRoleKey && 
+  config.supabase.url !== 'your-supabase-url' && 
+  config.supabase.url !== 'your-supabase-url/' &&
+  config.supabase.url.startsWith('http') &&
+  config.supabase.serviceRoleKey.length > 10
   ? createClient(config.supabase.url, config.supabase.serviceRoleKey, { auth: { persistSession: false } })
   : null;
 
