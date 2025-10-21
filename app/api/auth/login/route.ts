@@ -10,7 +10,22 @@ export async function POST(req: NextRequest) {
     const { email, password, loginMethod } = await req.json();
     if (!email) return NextResponse.json({ error: '이메일 필요' }, { status: 400 });
 
-    const supabase = createClient(config.supabase.url, config.supabase.serviceRoleKey, { auth: { persistSession: false } });
+    // 환경변수 유효성 검사
+    if (!config.supabase.url || !config.supabase.serviceRoleKey || 
+        config.supabase.url === 'your-supabase-url' || 
+        config.supabase.url === 'your-supabase-url/' ||
+        !config.supabase.url.startsWith('http') ||
+        config.supabase.serviceRoleKey.length <= 10) {
+      return NextResponse.json({ error: '데이터베이스 연결 오류' }, { status: 500 });
+    }
+
+    let supabase;
+    try {
+      supabase = createClient(config.supabase.url, config.supabase.serviceRoleKey, { auth: { persistSession: false } });
+    } catch (error) {
+      console.error('Supabase 클라이언트 생성 실패:', error);
+      return NextResponse.json({ error: '데이터베이스 연결 오류' }, { status: 500 });
+    }
     
     // 이메일 인증 로그인인 경우
     if (loginMethod === 'email_otp') {
