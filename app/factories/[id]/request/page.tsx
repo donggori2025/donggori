@@ -407,7 +407,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       // 카카오톡 URL로 이동
       const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
       if (kakaoUrl) {
-        alert('의뢰 내용이 클립보드에 복사되었습니다!\n확인을 누르면 카카오톡으로 이동합니다.');
+        alert('의뢰 내용이 클립보드에 복사되었습니다!\n카카오톡 채팅창에 붙여넣기 한 뒤 전송해주세요.\n확인을 누르면 카카오톡으로 이동합니다.');
         window.open(String(kakaoUrl), '_blank');
       } else {
         alert('의뢰 내용이 클립보드에 복사되었습니다!\n공장의 카카오톡 URL이 없어 직접 연락이 어렵습니다.');
