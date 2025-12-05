@@ -407,59 +407,81 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     return text;
   };
 
+  // 클립보드 복사 헬퍼 함수 (사용자 인터랙션 후 실행)
+  const copyToClipboard = async (text: string): Promise<boolean> => {
+    try {
+      // 최신 Clipboard API 시도
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } else {
+        // Fallback: 구식 방법 사용
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          const success = document.execCommand('copy');
+          textArea.remove();
+          return success;
+        } catch (err) {
+          textArea.remove();
+          return false;
+        }
+      }
+    } catch (error) {
+      console.error('클립보드 복사 오류:', error);
+      return false;
+    }
+  };
+
   // 클립보드 복사 및 카카오톡 연결
   const copyToClipboardAndOpenKakao = async (fileUrls: string[] = [], fadditPdfUrls: string[] = []) => {
     try {
       const requestText = generateRequestText(fileUrls, fadditPdfUrls);
+      const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
       
-      // 클립보드에 복사 (fallback 포함)
-      try {
-        // 최신 Clipboard API 시도
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(requestText);
-        } else {
-          // Fallback: 구식 방법 사용
-          const textArea = document.createElement('textarea');
-          textArea.value = requestText;
-          textArea.style.position = 'fixed';
-          textArea.style.left = '-999999px';
-          textArea.style.top = '-999999px';
-          document.body.appendChild(textArea);
-          textArea.focus();
-          textArea.select();
-          try {
-            document.execCommand('copy');
-            textArea.remove();
-          } catch (err) {
-            textArea.remove();
-            throw err;
-          }
-        }
-      } catch (clipboardError) {
-        console.error('클립보드 복사 오류:', clipboardError);
-        // 클립보드 복사 실패해도 계속 진행 (텍스트는 alert에 표시)
-        const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
-        if (kakaoUrl) {
-          alert(`의뢰 내용:\n\n${requestText}\n\n위 내용을 복사하여 카카오톡으로 전송해주세요.\n확인을 누르면 카카오톡으로 이동합니다.`);
-          window.open(String(kakaoUrl), '_blank');
-        } else {
-          alert(`의뢰 내용:\n\n${requestText}\n\n위 내용을 복사하여 공장에 전달해주세요.`);
-        }
-        return;
+      // 먼저 alert를 표시하여 사용자 인터랙션 보장
+      if (kakaoUrl) {
+        alert('의뢰가 완료되었습니다!\n확인을 누르면 의뢰 내용이 클립보드에 복사되고 카카오톡으로 이동합니다.');
+      } else {
+        alert('의뢰가 완료되었습니다!\n확인을 누르면 의뢰 내용이 클립보드에 복사됩니다.');
       }
       
-      // 카카오톡 URL로 이동
-      const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
-      if (kakaoUrl) {
-        alert('의뢰 내용이 클립보드에 복사되었습니다!\n카카오톡 채팅창에 붙여넣기 한 뒤 전송해주세요.\n확인을 누르면 카카오톡으로 이동합니다.');
-        window.open(String(kakaoUrl), '_blank');
+      // 사용자가 alert를 확인한 후 클립보드 복사 시도 (사용자 인터랙션 보장)
+      const copySuccess = await copyToClipboard(requestText);
+      
+      if (copySuccess) {
+        if (kakaoUrl) {
+          window.open(String(kakaoUrl), '_blank');
+        }
       } else {
-        alert('의뢰 내용이 클립보드에 복사되었습니다!\n공장의 카카오톡 URL이 없어 직접 연락이 어렵습니다.');
+        // 클립보드 복사 실패 시 텍스트를 alert에 표시
+        const userConfirmed = confirm(
+          '클립보드 복사에 실패했습니다.\n\n' +
+          '아래 내용을 수동으로 복사해주세요:\n\n' +
+          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
+          requestText.substring(0, 500) + (requestText.length > 500 ? '...' : '') +
+          '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+          '전체 내용을 보시겠습니까?'
+        );
+        
+        if (userConfirmed) {
+          alert('의뢰 내용:\n\n' + requestText);
+        }
+        
+        if (kakaoUrl) {
+          window.open(String(kakaoUrl), '_blank');
+        }
       }
     } catch (error) {
       console.error('클립보드 복사 오류:', error);
       const requestText = generateRequestText(fileUrls, fadditPdfUrls);
-      alert(`클립보드 복사에 실패했습니다. 아래 내용을 수동으로 복사해주세요:\n\n${requestText}`);
+      alert(`오류가 발생했습니다. 아래 내용을 수동으로 복사해주세요:\n\n${requestText}`);
     }
   };
 
