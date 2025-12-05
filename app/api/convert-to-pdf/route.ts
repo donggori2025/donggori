@@ -2,9 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
 
-// Vercel serverless 환경에서 Chromium 설정
-chromium.setGraphicsMode(false);
-
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json();
