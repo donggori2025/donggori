@@ -345,7 +345,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   };
 
   // 의뢰 내용을 클립보드에 복사할 텍스트 생성
-  const generateRequestText = (fileUrls: string[] = [], fadditPdfUrls: string[] = [], fadditLinks: string[] = []) => {
+  const generateRequestText = (fileUrls: string[] = []) => {
     const factoryName = factory?.company_name || factory?.name || '공장';
     const serviceName = currentService.title;
     
@@ -370,29 +370,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     text += `• 시아게: ${formData.finishing || '미입력'}\n`;
     text += `• 포장: ${formData.packaging || '미입력'}\n\n`;
     
-    // Faddit 작업지시서 PDF 링크 추가
-    if (fadditPdfUrls.length > 0) {
-      text += `- 작업지시서 PDF:\n`;
-      fadditPdfUrls.forEach((pdfUrl, index) => {
-        text += `${index + 1}. ${pdfUrl}\n`;
-      });
-      text += `\n`;
-    }
-    
-    // Faddit 원본 링크 추가
-    if (fadditLinks.length > 0) {
-      text += `- Faddit 작업지시서 링크:\n`;
-      fadditLinks.forEach((link, index) => {
-        text += `${index + 1}. ${link}\n`;
-      });
-      text += `\n`;
-    }
-    
-    // 일반 참고 링크 (Faddit이 아닌 링크만)
-    const nonFadditLinks = formData.links.filter(link => !link.toLowerCase().includes('faddit'));
-    if (nonFadditLinks.length > 0) {
+    if (formData.links.length > 0) {
       text += `- 참고 링크:\n`;
-      nonFadditLinks.forEach((link, index) => {
+      formData.links.forEach((link, index) => {
         text += `${index + 1}. ${link}\n`;
       });
       text += `\n`;
@@ -416,107 +396,25 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     return text;
   };
 
-  // 클립보드 복사 헬퍼 함수 (사용자 인터랙션 후 실행)
-  const copyToClipboard = async (text: string): Promise<boolean> => {
-    try {
-      // Fallback 방법 먼저 시도 (더 안정적)
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      textArea.style.opacity = '0';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
-      try {
-        const success = document.execCommand('copy');
-        textArea.remove();
-        if (success) {
-          return true;
-        }
-      } catch (err) {
-        textArea.remove();
-        // execCommand 실패 시 Clipboard API 시도
-      }
-      
-      // 최신 Clipboard API 시도 (fallback)
-      if (navigator.clipboard && window.isSecureContext) {
-        try {
-          await navigator.clipboard.writeText(text);
-          return true;
-        } catch (clipboardError) {
-          console.error('Clipboard API 오류:', clipboardError);
-          return false;
-        }
-      }
-      
-      return false;
-    } catch (error) {
-      console.error('클립보드 복사 오류:', error);
-      return false;
-    }
-  };
-
   // 클립보드 복사 및 카카오톡 연결
-  const copyToClipboardAndOpenKakao = async (fileUrls: string[] = [], fadditPdfUrls: string[] = [], fadditLinks: string[] = []) => {
+  const copyToClipboardAndOpenKakao = async (fileUrls: string[] = []) => {
     try {
-      const requestText = generateRequestText(fileUrls, fadditPdfUrls, fadditLinks);
+      const requestText = generateRequestText(fileUrls);
+      
+      // 클립보드에 복사
+      await navigator.clipboard.writeText(requestText);
+      
+      // 카카오톡 URL로 이동
       const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
-      
-      // confirm을 사용하여 사용자 인터랙션 보장 (확인 버튼 클릭 시 포커스 확실히 복원)
-      const userConfirmed = confirm(
-        '의뢰가 완료되었습니다!\n\n' +
-        (kakaoUrl 
-          ? '확인을 누르면 의뢰 내용이 클립보드에 복사되고 카카오톡으로 이동합니다.'
-          : '확인을 누르면 의뢰 내용이 클립보드에 복사됩니다.')
-      );
-      
-      if (!userConfirmed) {
-        return; // 사용자가 취소한 경우
-      }
-      
-      // 사용자가 확인을 누른 후 약간의 지연을 두고 클립보드 복사 (포커스 복원 대기)
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // 문서에 포커스 주기
-      window.focus();
-      document.body.focus();
-      
-      // 클립보드 복사 시도
-      const copySuccess = await copyToClipboard(requestText);
-      
-      if (copySuccess) {
-        if (kakaoUrl) {
-          alert('의뢰 내용이 클립보드에 복사되었습니다!\n카카오톡 채팅창에 붙여넣기 한 뒤 전송해주세요.');
-          window.open(String(kakaoUrl), '_blank');
-        } else {
-          alert('의뢰 내용이 클립보드에 복사되었습니다!');
-        }
+      if (kakaoUrl) {
+        alert('의뢰 내용이 클립보드에 복사되었습니다!\n카카오톡 채팅창에 붙여넣기 한 뒤 전송해주세요.\n확인을 누르면 카카오톡으로 이동합니다.');
+        window.open(String(kakaoUrl), '_blank');
       } else {
-        // 클립보드 복사 실패 시 텍스트를 alert에 표시
-        const showFullText = confirm(
-          '클립보드 복사에 실패했습니다.\n\n' +
-          '아래 내용을 수동으로 복사해주세요:\n\n' +
-          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
-          requestText.substring(0, 500) + (requestText.length > 500 ? '...' : '') +
-          '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-          '전체 내용을 보시겠습니까?'
-        );
-        
-        if (showFullText) {
-          alert('의뢰 내용:\n\n' + requestText);
-        }
-        
-        if (kakaoUrl) {
-          window.open(String(kakaoUrl), '_blank');
-        }
+        alert('의뢰 내용이 클립보드에 복사되었습니다!\n공장의 카카오톡 URL이 없어 직접 연락이 어렵습니다.');
       }
     } catch (error) {
       console.error('클립보드 복사 오류:', error);
-      const requestText = generateRequestText(fileUrls, fadditPdfUrls, fadditLinks);
-      alert(`오류가 발생했습니다. 아래 내용을 수동으로 복사해주세요:\n\n${requestText}`);
+      alert('클립보드 복사에 실패했습니다. 수동으로 복사해주세요.');
     }
   };
 
@@ -553,77 +451,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         return;
       }
       
-      // 1. Faddit 작업지시서 링크를 PDF로 변환
-      const fadditPdfUrls: string[] = [];
-      const fadditLinks: string[] = []; // Faddit 원본 링크 저장
-      if (formData.links.length > 0) {
-        try {
-          for (const link of formData.links) {
-            // Faddit 링크인지 확인 (링크에 "faddit"가 포함된 경우)
-            if (link.toLowerCase().includes('faddit')) {
-              // Faddit 원본 링크 저장
-              fadditLinks.push(link);
-              try {
-                console.log('Faddit 링크를 PDF로 변환 중:', link);
-                
-                // PDF 변환 API 호출
-                const pdfResponse = await fetch('/api/convert-to-pdf', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ url: link }),
-                });
-
-                if (!pdfResponse.ok) {
-                  const error = await pdfResponse.json().catch(() => ({}));
-                  console.error('PDF 변환 오류:', error);
-                  // PDF 변환 실패해도 계속 진행 (원본 링크는 유지)
-                  continue;
-                }
-
-                const { pdf: base64Pdf } = await pdfResponse.json();
-                
-                // Base64를 Blob으로 변환
-                const binaryString = atob(base64Pdf);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                  bytes[i] = binaryString.charCodeAt(i);
-                }
-                const pdfBlob = new Blob([bytes], { type: 'application/pdf' });
-                
-                // PDF 파일 생성
-                const pdfFileName = `faddit_작업지시서_${Date.now()}.pdf`;
-                const pdfFile = new File([pdfBlob], pdfFileName, { type: 'application/pdf' });
-                
-                // Supabase Storage에 업로드
-                const safeName = pdfFileName.replace(/[^a-zA-Z0-9_.-]/g, "_");
-                const filePath = `${Date.now()}_${safeName}`;
-                const { error: uploadError } = await supabase.storage.from('match-request-files').upload(filePath, pdfFile);
-                
-                if (uploadError) {
-                  console.error('PDF 업로드 오류:', uploadError);
-                  // PDF 업로드 실패해도 계속 진행
-                  continue;
-                }
-                
-                // publicUrl 생성
-                const { data: publicUrlData } = supabase.storage.from('match-request-files').getPublicUrl(filePath);
-                if (publicUrlData?.publicUrl) {
-                  fadditPdfUrls.push(publicUrlData.publicUrl);
-                  console.log('Faddit PDF 업로드 완료:', publicUrlData.publicUrl);
-                }
-              } catch (pdfError) {
-                console.error('Faddit PDF 변환 중 예외 발생:', pdfError);
-                // PDF 변환 실패해도 계속 진행
-              }
-            }
-          }
-        } catch (linkError) {
-          console.error('Faddit 링크 처리 중 예외 발생:', linkError);
-          // Faddit 링크 처리 실패해도 계속 진행
-        }
-      }
-
-      // 2. 첨부파일 Supabase Storage 업로드
+      // 1. 첨부파일 Supabase Storage 업로드
       const uploadedFileUrls: string[] = [];
       if (formData.files.length > 0) {
         try {
@@ -665,23 +493,22 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           status: 'pending',
           items: [],
           quantity: 0,
-            description: `브랜드: ${formData.brandName || '미입력'}\n연락처: ${formData.contact}`,
-            contact: formData.contact,
-            deadline: '',
-            budget: '',
-            additional_info: JSON.stringify({
-              brandName: formData.brandName,
-              sample: formData.sample,
-              pattern: formData.pattern,
-              qc: formData.qc,
-              finishing: formData.finishing,
-              packaging: formData.packaging,
-              description: formData.detailDescription,
-              request: formData.detailRequest,
-              files: uploadedFileUrls,
-              links: formData.links,
-              fadditPdfUrls: fadditPdfUrls,
-              selectedService: selectedService,
+          description: `브랜드: ${formData.brandName || '미입력'}\n연락처: ${formData.contact}`,
+          contact: formData.contact,
+          deadline: '',
+          budget: '',
+          additional_info: JSON.stringify({
+            brandName: formData.brandName,
+            sample: formData.sample,
+            pattern: formData.pattern,
+            qc: formData.qc,
+            finishing: formData.finishing,
+            packaging: formData.packaging,
+            description: formData.detailDescription,
+            request: formData.detailRequest,
+            files: uploadedFileUrls,
+            links: formData.links,
+            selectedService: selectedService,
             serviceDetails: {
               standard: { title: 'Standard', subtitle: '봉제공정' },
               deluxe: { title: 'Deluxe', subtitle: '패턴/샘플 + 공장' },
@@ -718,7 +545,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         }
 
         // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
-        await copyToClipboardAndOpenKakao(uploadedFileUrls, fadditPdfUrls);
+        await copyToClipboardAndOpenKakao(uploadedFileUrls);
       } catch (dbError: any) {
         console.error('데이터베이스 저장 중 예외 발생:', dbError, {
           message: dbError?.message,
