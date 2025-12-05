@@ -47,7 +47,8 @@ export async function POST(req: NextRequest) {
       });
 
       // 추가 대기 (동적 콘텐츠 로딩을 위해)
-      await page.waitForTimeout(2000);
+      // waitForTimeout이 제거되었으므로 Promise와 setTimeout 사용
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // PDF 생성
       const pdf = await page.pdf({

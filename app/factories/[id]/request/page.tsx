@@ -412,8 +412,41 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     try {
       const requestText = generateRequestText(fileUrls, fadditPdfUrls);
       
-      // 클립보드에 복사
-      await navigator.clipboard.writeText(requestText);
+      // 클립보드에 복사 (fallback 포함)
+      try {
+        // 최신 Clipboard API 시도
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(requestText);
+        } else {
+          // Fallback: 구식 방법 사용
+          const textArea = document.createElement('textarea');
+          textArea.value = requestText;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          try {
+            document.execCommand('copy');
+            textArea.remove();
+          } catch (err) {
+            textArea.remove();
+            throw err;
+          }
+        }
+      } catch (clipboardError) {
+        console.error('클립보드 복사 오류:', clipboardError);
+        // 클립보드 복사 실패해도 계속 진행 (텍스트는 alert에 표시)
+        const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
+        if (kakaoUrl) {
+          alert(`의뢰 내용:\n\n${requestText}\n\n위 내용을 복사하여 카카오톡으로 전송해주세요.\n확인을 누르면 카카오톡으로 이동합니다.`);
+          window.open(String(kakaoUrl), '_blank');
+        } else {
+          alert(`의뢰 내용:\n\n${requestText}\n\n위 내용을 복사하여 공장에 전달해주세요.`);
+        }
+        return;
+      }
       
       // 카카오톡 URL로 이동
       const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
@@ -425,7 +458,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       }
     } catch (error) {
       console.error('클립보드 복사 오류:', error);
-      alert('클립보드 복사에 실패했습니다. 수동으로 복사해주세요.');
+      const requestText = generateRequestText(fileUrls, fadditPdfUrls);
+      alert(`클립보드 복사에 실패했습니다. 아래 내용을 수동으로 복사해주세요:\n\n${requestText}`);
     }
   };
 
