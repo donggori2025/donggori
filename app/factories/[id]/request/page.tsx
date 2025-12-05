@@ -445,23 +445,38 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       const requestText = generateRequestText(fileUrls, fadditPdfUrls);
       const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
       
-      // 먼저 alert를 표시하여 사용자 인터랙션 보장
-      if (kakaoUrl) {
-        alert('의뢰가 완료되었습니다!\n확인을 누르면 의뢰 내용이 클립보드에 복사되고 카카오톡으로 이동합니다.');
-      } else {
-        alert('의뢰가 완료되었습니다!\n확인을 누르면 의뢰 내용이 클립보드에 복사됩니다.');
+      // confirm을 사용하여 사용자 인터랙션 보장 (확인 버튼 클릭 시 포커스 확실히 복원)
+      const userConfirmed = confirm(
+        '의뢰가 완료되었습니다!\n\n' +
+        (kakaoUrl 
+          ? '확인을 누르면 의뢰 내용이 클립보드에 복사되고 카카오톡으로 이동합니다.'
+          : '확인을 누르면 의뢰 내용이 클립보드에 복사됩니다.')
+      );
+      
+      if (!userConfirmed) {
+        return; // 사용자가 취소한 경우
       }
       
-      // 사용자가 alert를 확인한 후 클립보드 복사 시도 (사용자 인터랙션 보장)
+      // 사용자가 확인을 누른 후 약간의 지연을 두고 클립보드 복사 (포커스 복원 대기)
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // 문서에 포커스 주기
+      window.focus();
+      document.body.focus();
+      
+      // 클립보드 복사 시도
       const copySuccess = await copyToClipboard(requestText);
       
       if (copySuccess) {
         if (kakaoUrl) {
+          alert('의뢰 내용이 클립보드에 복사되었습니다!\n카카오톡 채팅창에 붙여넣기 한 뒤 전송해주세요.');
           window.open(String(kakaoUrl), '_blank');
+        } else {
+          alert('의뢰 내용이 클립보드에 복사되었습니다!');
         }
       } else {
         // 클립보드 복사 실패 시 텍스트를 alert에 표시
-        const userConfirmed = confirm(
+        const showFullText = confirm(
           '클립보드 복사에 실패했습니다.\n\n' +
           '아래 내용을 수동으로 복사해주세요:\n\n' +
           '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
@@ -470,7 +485,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           '전체 내용을 보시겠습니까?'
         );
         
-        if (userConfirmed) {
+        if (showFullText) {
           alert('의뢰 내용:\n\n' + requestText);
         }
         
