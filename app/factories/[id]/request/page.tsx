@@ -345,7 +345,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   };
 
   // 의뢰 내용을 클립보드에 복사할 텍스트 생성
-  const generateRequestText = (fileUrls: string[] = [], fadditPdfUrls: string[] = []) => {
+  const generateRequestText = (fileUrls: string[] = [], fadditPdfUrls: string[] = [], fadditLinks: string[] = []) => {
     const factoryName = factory?.company_name || factory?.name || '공장';
     const serviceName = currentService.title;
     
@@ -375,6 +375,15 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       text += `- 작업지시서 PDF:\n`;
       fadditPdfUrls.forEach((pdfUrl, index) => {
         text += `${index + 1}. ${pdfUrl}\n`;
+      });
+      text += `\n`;
+    }
+    
+    // Faddit 원본 링크 추가
+    if (fadditLinks.length > 0) {
+      text += `- Faddit 작업지시서 링크:\n`;
+      fadditLinks.forEach((link, index) => {
+        text += `${index + 1}. ${link}\n`;
       });
       text += `\n`;
     }
@@ -410,29 +419,40 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   // 클립보드 복사 헬퍼 함수 (사용자 인터랙션 후 실행)
   const copyToClipboard = async (text: string): Promise<boolean> => {
     try {
-      // 최신 Clipboard API 시도
+      // Fallback 방법 먼저 시도 (더 안정적)
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const success = document.execCommand('copy');
+        textArea.remove();
+        if (success) {
+          return true;
+        }
+      } catch (err) {
+        textArea.remove();
+        // execCommand 실패 시 Clipboard API 시도
+      }
+      
+      // 최신 Clipboard API 시도 (fallback)
       if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-        return true;
-      } else {
-        // Fallback: 구식 방법 사용
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
         try {
-          const success = document.execCommand('copy');
-          textArea.remove();
-          return success;
-        } catch (err) {
-          textArea.remove();
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (clipboardError) {
+          console.error('Clipboard API 오류:', clipboardError);
           return false;
         }
       }
+      
+      return false;
     } catch (error) {
       console.error('클립보드 복사 오류:', error);
       return false;
@@ -440,9 +460,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   };
 
   // 클립보드 복사 및 카카오톡 연결
-  const copyToClipboardAndOpenKakao = async (fileUrls: string[] = [], fadditPdfUrls: string[] = []) => {
+  const copyToClipboardAndOpenKakao = async (fileUrls: string[] = [], fadditPdfUrls: string[] = [], fadditLinks: string[] = []) => {
     try {
-      const requestText = generateRequestText(fileUrls, fadditPdfUrls);
+      const requestText = generateRequestText(fileUrls, fadditPdfUrls, fadditLinks);
       const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
       
       // confirm을 사용하여 사용자 인터랙션 보장 (확인 버튼 클릭 시 포커스 확실히 복원)
@@ -495,7 +515,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       }
     } catch (error) {
       console.error('클립보드 복사 오류:', error);
-      const requestText = generateRequestText(fileUrls, fadditPdfUrls);
+      const requestText = generateRequestText(fileUrls, fadditPdfUrls, fadditLinks);
       alert(`오류가 발생했습니다. 아래 내용을 수동으로 복사해주세요:\n\n${requestText}`);
     }
   };
@@ -535,11 +555,14 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       
       // 1. Faddit 작업지시서 링크를 PDF로 변환
       const fadditPdfUrls: string[] = [];
+      const fadditLinks: string[] = []; // Faddit 원본 링크 저장
       if (formData.links.length > 0) {
         try {
           for (const link of formData.links) {
             // Faddit 링크인지 확인 (링크에 "faddit"가 포함된 경우)
             if (link.toLowerCase().includes('faddit')) {
+              // Faddit 원본 링크 저장
+              fadditLinks.push(link);
               try {
                 console.log('Faddit 링크를 PDF로 변환 중:', link);
                 
