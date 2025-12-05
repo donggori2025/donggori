@@ -50,9 +50,10 @@ export async function POST(req: NextRequest) {
       // waitForTimeout이 제거되었으므로 Promise와 setTimeout 사용
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // PDF 생성
+      // PDF 생성 (가로 방향)
       const pdf = await page.pdf({
         format: 'A4',
+        landscape: true, // 가로 방향
         printBackground: true,
         margin: {
           top: '10mm',
