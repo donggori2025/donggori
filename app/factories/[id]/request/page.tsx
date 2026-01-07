@@ -17,6 +17,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   const { user: clerkUser, isLoaded: clerkLoaded } = useUser();
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [factoryId, setFactoryId] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string>("standard");
   
@@ -284,8 +285,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       return;
     }
 
-    // 버튼 클릭 시 즉시 로딩 상태로 변경
-    setLoading(true);
+    // 버튼 클릭 시 즉시 제출 중 상태로 변경
+    setSubmitting(true);
 
     try {
       // 공장명 누락 방지: company_name 또는 name이 반드시 있어야 함
@@ -309,7 +310,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
               if (process.env.NODE_ENV === 'development') {
                 console.error('파일 업로드 오류:', uploadError);
               }
-              setLoading(false);
+              setSubmitting(false);
               alert(`파일 업로드 중 오류가 발생했습니다: ${file.name}\n오류: ${uploadError.message}`);
               return;
             }
@@ -323,7 +324,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           if (process.env.NODE_ENV === 'development') {
             console.error('파일 업로드 중 예외 발생:', fileError);
           }
-          setLoading(false);
+          setSubmitting(false);
           alert('파일 업로드 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
           return;
         }
@@ -387,7 +388,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           if (process.env.NODE_ENV === 'development') {
             console.error('의뢰 제출 중 오류(서버):', err);
           }
-          setLoading(false);
+          setSubmitting(false);
           alert(`의뢰 제출 중 오류가 발생했습니다.\n${err?.error || res.statusText}`);
           return;
         }
@@ -407,8 +408,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
         await copyToClipboardAndOpenKakao(uploadedFileUrls);
         
-        // 팝업이 뜬 후 로딩 상태 해제
-        setLoading(false);
+        // 팝업이 뜬 후 제출 상태 해제
+        setSubmitting(false);
       } catch (dbError: unknown) {
         const error = dbError as Error;
         if (process.env.NODE_ENV === 'development') {
@@ -417,7 +418,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             stack: error?.stack,
           });
         }
-        setLoading(false);
+        setSubmitting(false);
         alert('데이터베이스 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
         return;
       }
@@ -447,7 +448,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           stack: err?.stack,
         });
       }
-      setLoading(false);
+      setSubmitting(false);
       alert('의뢰 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
@@ -747,14 +748,14 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             {/* 제출 버튼 */}
             <Button
               type="submit"
-              disabled={loading || !factory || !(factory.company_name || factory.name) || !formData.agreeToTerms}
+              disabled={submitting || loading || !factory || !(factory.company_name || factory.name) || !formData.agreeToTerms}
               className={`w-full py-4 rounded-lg font-bold ${
-                formData.agreeToTerms && factory && (factory.company_name || factory.name) && !loading
+                formData.agreeToTerms && factory && (factory.company_name || factory.name) && !loading && !submitting
                   ? "bg-gray-800 text-white hover:bg-gray-900" 
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
-              {loading ? (
+              {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   의뢰 처리 중...
