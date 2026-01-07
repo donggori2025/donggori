@@ -111,3 +111,183 @@ export function logNaverMapConfig() {
 
   return validation;
 }
+
+/**
+ * 쿠키 관련 유틸리티 함수
+ */
+export const cookies = {
+  /**
+   * 쿠키에서 값을 가져옵니다
+   */
+  get: (name: string): string | null => {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+  },
+
+  /**
+   * 쿠키에 값을 설정합니다
+   */
+  set: (name: string, value: string, options?: { maxAge?: number; path?: string }): void => {
+    if (typeof document === 'undefined') return;
+    const { maxAge = 60 * 60 * 24 * 7, path = '/' } = options || {};
+    document.cookie = `${name}=${value}; path=${path}; max-age=${maxAge}`;
+  },
+
+  /**
+   * 쿠키를 삭제합니다
+   */
+  remove: (name: string, path = '/'): void => {
+    if (typeof document === 'undefined') return;
+    document.cookie = `${name}=; path=${path}; max-age=0`;
+  }
+};
+
+/**
+ * 사용자 인증 관련 유틸리티
+ */
+export interface UserIdentity {
+  name: string;
+  phone: string;
+  id: string;
+  email: string;
+}
+
+/**
+ * 로그인 상태 확인
+ */
+export function isAppLoggedIn(): boolean {
+  try {
+    if (typeof document === 'undefined') return false;
+    
+    // 일반 로그인 확인
+    if (document.cookie.includes('isLoggedIn=true')) return true;
+    if (typeof localStorage !== 'undefined' && (localStorage.getItem('userType') || localStorage.getItem('isLoggedIn') === 'true')) return true;
+    
+    // 소셜 로그인 쿠키 확인
+    const kakaoUser = cookies.get('kakao_user');
+    if (kakaoUser) {
+      try {
+        const user = JSON.parse(decodeURIComponent(kakaoUser));
+        if (user && user.id && user.email) return true;
+      } catch (e) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('카카오 사용자 쿠키 파싱 오류:', e);
+        }
+      }
+    }
+    
+    const naverUser = cookies.get('naver_user');
+    if (naverUser) {
+      try {
+        const user = JSON.parse(decodeURIComponent(naverUser));
+        if (user && user.id && user.email) return true;
+      } catch (e) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('네이버 사용자 쿠키 파싱 오류:', e);
+        }
+      }
+    }
+    
+    const factoryUser = cookies.get('factory_user');
+    if (factoryUser) {
+      try {
+        const user = JSON.parse(decodeURIComponent(factoryUser));
+        if (user && user.id) return true;
+      } catch (e) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('팩토리 사용자 쿠키 파싱 오류:', e);
+        }
+      }
+    }
+    
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('로그인 상태 확인 오류:', error);
+    }
+  }
+  return false;
+}
+
+/**
+ * 사용자 정보 가져오기 (Clerk 우선, 소셜 로그인 fallback)
+ */
+export function getAppUserIdentity(clerkUser?: any): UserIdentity {
+  try {
+    const name = localStorage.getItem('userName') || '';
+    const phone = localStorage.getItem('userPhone') || '';
+    
+    // Clerk 사용자 정보 확인 (우선순위 1)
+    if (clerkUser) {
+      return {
+        name: clerkUser.firstName || clerkUser.fullName || name,
+        phone: clerkUser.phoneNumbers?.[0]?.phoneNumber || phone,
+        id: clerkUser.id,
+        email: clerkUser.emailAddresses?.[0]?.emailAddress || ''
+      };
+    }
+    
+    // Clerk window 객체 확인 (fallback)
+    if (typeof window !== 'undefined' && (window as any).Clerk && (window as any).Clerk.user) {
+      const windowClerkUser = (window as any).Clerk.user;
+      if (windowClerkUser) {
+        return {
+          name: windowClerkUser.firstName || windowClerkUser.fullName || name,
+          phone: windowClerkUser.phoneNumbers?.[0]?.phoneNumber || phone,
+          id: windowClerkUser.id,
+          email: windowClerkUser.emailAddresses?.[0]?.emailAddress || ''
+        };
+      }
+    }
+    
+    // 카카오 사용자 정보 확인 (우선순위 2)
+    const kakao = cookies.get('kakao_user');
+    if (kakao) {
+      try {
+        const u = JSON.parse(decodeURIComponent(kakao));
+        if (u && u.id && u.email) {
+          return { 
+            name: u.name || name, 
+            phone: u.phoneNumber || phone,
+            id: u.id,
+            email: u.email
+          };
+        }
+      } catch (e) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('카카오 사용자 정보 파싱 오류:', e);
+        }
+      }
+    }
+    
+    // 네이버 사용자 정보 확인 (우선순위 3)
+    const naver = cookies.get('naver_user');
+    if (naver) {
+      try {
+        const u = JSON.parse(decodeURIComponent(naver));
+        if (u && u.id && u.email) {
+          return { 
+            name: u.name || name, 
+            phone: u.phoneNumber || phone,
+            id: u.id,
+            email: u.email
+          };
+        }
+      } catch (e) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('네이버 사용자 정보 파싱 오류:', e);
+        }
+      }
+    }
+    
+    // 기본값 반환
+    return { name, phone, id: '', email: '' };
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('사용자 정보 가져오기 오류:', error);
+    }
+    return { name: '', phone: '', id: '', email: '' };
+  }
+}

@@ -115,6 +115,8 @@ export interface RequestFormData {
   qc: '희망' | '미희망';
   finishing: '희망' | '미희망';
   packaging: '희망' | '미희망';
+  detailDescription: string;
+  detailRequest: string;
   files: File[];
   links: string[];
   agreeToTerms: boolean;

@@ -8,139 +8,8 @@ import { Factory } from "@/lib/factories";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
-
-function isAppLoggedIn() {
-  try {
-    if (typeof document === 'undefined') return false;
-    
-    // 일반 로그인 확인
-    if (document.cookie.includes('isLoggedIn=true')) return true;
-    if (typeof localStorage !== 'undefined' && (localStorage.getItem('userType') || localStorage.getItem('isLoggedIn') === 'true')) return true;
-    
-    // 소셜 로그인 쿠키 확인
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-      return null;
-    };
-    
-    // 카카오 로그인 확인
-    const kakaoUser = getCookie('kakao_user');
-    if (kakaoUser) {
-      try {
-        const user = JSON.parse(decodeURIComponent(kakaoUser));
-        if (user && user.id && user.email) return true;
-      } catch (e) {
-        console.error('카카오 사용자 쿠키 파싱 오류:', e);
-      }
-    }
-    
-    // 네이버 로그인 확인
-    const naverUser = getCookie('naver_user');
-    if (naverUser) {
-      try {
-        const user = JSON.parse(decodeURIComponent(naverUser));
-        if (user && user.id && user.email) return true;
-      } catch (e) {
-        console.error('네이버 사용자 쿠키 파싱 오류:', e);
-      }
-    }
-    
-    // 팩토리 로그인 확인
-    const factoryUser = getCookie('factory_user');
-    if (factoryUser) {
-      try {
-        const user = JSON.parse(decodeURIComponent(factoryUser));
-        if (user && user.id) return true;
-      } catch (e) {
-        console.error('팩토리 사용자 쿠키 파싱 오류:', e);
-      }
-    }
-    
-  } catch (error) {
-    console.error('로그인 상태 확인 오류:', error);
-  }
-  return false;
-}
-
-function getAppUserIdentity(clerkUser?: any) {
-  try {
-    const name = localStorage.getItem('userName') || '';
-    const phone = localStorage.getItem('userPhone') || '';
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-      return null;
-    };
-    
-    // Clerk 사용자 정보 확인 (우선순위 1)
-    if (clerkUser) {
-      return {
-        name: clerkUser.firstName || clerkUser.fullName || name,
-        phone: clerkUser.phoneNumbers?.[0]?.phoneNumber || phone,
-        id: clerkUser.id,
-        email: clerkUser.emailAddresses?.[0]?.emailAddress || ''
-      };
-    }
-    
-    // Clerk window 객체 확인 (fallback)
-    if (typeof window !== 'undefined' && (window as any).Clerk && (window as any).Clerk.user) {
-      const windowClerkUser = (window as any).Clerk.user;
-      if (windowClerkUser) {
-        return {
-          name: windowClerkUser.firstName || windowClerkUser.fullName || name,
-          phone: windowClerkUser.phoneNumbers?.[0]?.phoneNumber || phone,
-          id: windowClerkUser.id,
-          email: windowClerkUser.emailAddresses?.[0]?.emailAddress || ''
-        };
-      }
-    }
-    
-    // 카카오 사용자 정보 확인 (우선순위 2)
-    const kakao = getCookie('kakao_user');
-    if (kakao) {
-      try {
-        const u = JSON.parse(decodeURIComponent(kakao));
-        if (u && u.id && u.email) {
-          return { 
-            name: u.name || name, 
-            phone: u.phoneNumber || phone,
-            id: u.id,
-            email: u.email
-          };
-        }
-      } catch (e) {
-        console.error('카카오 사용자 정보 파싱 오류:', e);
-      }
-    }
-    
-    // 네이버 사용자 정보 확인 (우선순위 3)
-    const naver = getCookie('naver_user');
-    if (naver) {
-      try {
-        const u = JSON.parse(decodeURIComponent(naver));
-        if (u && u.id && u.email) {
-          return { 
-            name: u.name || name, 
-            phone: u.phoneNumber || phone,
-            id: u.id,
-            email: u.email
-          };
-        }
-      } catch (e) {
-        console.error('네이버 사용자 정보 파싱 오류:', e);
-      }
-    }
-    
-    // 기본값 반환
-    return { name, phone, id: '', email: '' };
-  } catch (error) {
-    console.error('사용자 정보 가져오기 오류:', error);
-    return { name: '', phone: '', id: '', email: '' };
-  }
-}
+import { isAppLoggedIn, getAppUserIdentity, storage } from "@/lib/utils";
+import type { RequestFormData } from "@/lib/types";
 
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
@@ -152,7 +21,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   const [selectedService, setSelectedService] = useState<string>("standard");
   
   // 폼 상태
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RequestFormData>({
     brandName: "",
     name: "",
     contact: "",
@@ -161,11 +30,10 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     qc: "미희망",
     finishing: "미희망",
     packaging: "미희망",
-    // 추가: 상세 설명/요청사항
     detailDescription: "",
     detailRequest: "",
-    files: [] as File[],
-    links: [] as string[],
+    files: [],
+    links: [],
     agreeToTerms: false
   });
 
@@ -212,38 +80,21 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     const nameFromUrl = searchParams.get("name");
     const userIdentity = getAppUserIdentity(clerkUser);
     
-    // 더 자세한 디버깅 정보 출력
-    console.log('=== 사용자 정보 디버깅 ===');
-    console.log('clerkLoaded:', clerkLoaded);
-    console.log('clerkUser:', clerkUser ? {
-      id: clerkUser.id,
-      firstName: clerkUser.firstName,
-      fullName: clerkUser.fullName,
-      email: clerkUser.emailAddresses?.[0]?.emailAddress,
-      phone: clerkUser.phoneNumbers?.[0]?.phoneNumber
-    } : null);
-    
-    // 쿠키 정보 확인
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-      return null;
-    };
-    
-    const kakaoCookie = getCookie('kakao_user');
-    const naverCookie = getCookie('naver_user');
-    const localStorageName = localStorage.getItem('userName');
-    const localStoragePhone = localStorage.getItem('userPhone');
-    
-    console.log('쿠키 정보:');
-    console.log('kakao_user:', kakaoCookie ? JSON.parse(decodeURIComponent(kakaoCookie)) : null);
-    console.log('naver_user:', naverCookie ? JSON.parse(decodeURIComponent(naverCookie)) : null);
-    console.log('localStorage userName:', localStorageName);
-    console.log('localStorage userPhone:', localStoragePhone);
-    console.log('nameFromUrl:', nameFromUrl);
-    console.log('최종 userIdentity:', userIdentity);
-    console.log('=== 디버깅 끝 ===');
+    // 개발 환경에서만 디버깅 정보 출력
+    if (process.env.NODE_ENV === 'development') {
+      console.log('사용자 정보:', {
+        clerkLoaded,
+        clerkUser: clerkUser ? {
+          id: clerkUser.id,
+          firstName: clerkUser.firstName,
+          fullName: clerkUser.fullName,
+          email: clerkUser.emailAddresses?.[0]?.emailAddress,
+          phone: clerkUser.phoneNumbers?.[0]?.phoneNumber
+        } : null,
+        userIdentity,
+        nameFromUrl
+      });
+    }
     
     setFormData(prev => ({
       ...prev,
@@ -252,25 +103,12 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       contact: prev.contact || userIdentity.phone
     }));
     
-    // 전화번호가 없는 경우 사용자에게 알림
-    if (!userIdentity.phone && userIdentity.name) {
-      console.log('전화번호 정보가 없습니다. 사용자가 직접 입력해야 합니다.');
-    }
-    
-    // 올바른 사용자 정보를 localStorage에 강제로 저장 (캐싱)
+    // 올바른 사용자 정보를 localStorage에 저장 (캐싱)
     if (userIdentity.name) {
-      console.log('localStorage에 올바른 사용자 정보 저장:', userIdentity.name);
-      localStorage.setItem('userName', userIdentity.name);
+      storage.set('userName', userIdentity.name);
     }
     if (userIdentity.phone) {
-      console.log('localStorage에 올바른 연락처 정보 저장:', userIdentity.phone);
-      localStorage.setItem('userPhone', userIdentity.phone);
-    }
-    
-    // 잘못된 정보가 localStorage에 저장되어 있는 경우 강제로 교체
-    if (userIdentity.name && localStorageName && localStorageName !== userIdentity.name) {
-      console.log('잘못된 localStorage 정보 감지, 교체:', localStorageName, '->', userIdentity.name);
-      localStorage.setItem('userName', userIdentity.name);
+      storage.set('userPhone', userIdentity.phone);
     }
   }, [searchParams, factoryId, router, clerkLoaded, clerkUser]);
 
@@ -413,20 +251,23 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         alert('의뢰 내용이 클립보드에 복사되었습니다!\n공장의 카카오톡 URL이 없어 직접 연락이 어렵습니다.');
       }
     } catch (error) {
-      console.error('클립보드 복사 오류:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('클립보드 복사 오류:', error);
+      }
       alert('클립보드 복사에 실패했습니다. 수동으로 복사해주세요.');
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('제출 시점 factory:', factory); // 디버깅용
     if (!factory) {
       alert("공장 정보가 로딩되지 않았습니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
     if (!factoryId) {
-      console.error('의뢰 제출 중 오류: factoryId 누락');
+      if (process.env.NODE_ENV === 'development') {
+        console.error('의뢰 제출 중 오류: factoryId 누락');
+      }
       alert('공장 정보(ID)가 확인되지 않았습니다. 잠시 후 다시 시도해 주세요.');
       return;
     }
@@ -462,7 +303,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             const filePath = `${Date.now()}_${safeName}`;
             const { error: uploadError } = await supabase.storage.from('match-request-files').upload(filePath, file);
             if (uploadError) {
-              console.error('파일 업로드 오류:', uploadError);
+              if (process.env.NODE_ENV === 'development') {
+                console.error('파일 업로드 오류:', uploadError);
+              }
               alert(`파일 업로드 중 오류가 발생했습니다: ${file.name}\n오류: ${uploadError.message}`);
               return;
             }
@@ -473,7 +316,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             }
           }
         } catch (fileError) {
-          console.error('파일 업로드 중 예외 발생:', fileError);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('파일 업로드 중 예외 발생:', fileError);
+          }
           alert('파일 업로드 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
           return;
         }
@@ -482,7 +327,10 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       // 서버 API 경유로 의뢰 데이터 저장 (RLS 회피 및 상세 오류 전달)
       try {
         const loggedInUser = getAppUserIdentity(clerkUser);
-        console.log('의뢰 제출 시 사용자 정보:', loggedInUser);
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('의뢰 제출 시 사용자 정보:', loggedInUser);
+        }
         
         const payload = {
           user_id: loggedInUser.id || `user_${Date.now()}`,
@@ -519,7 +367,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           updated_at: new Date().toISOString()
         } as const;
         
-        console.log('의뢰 제출 payload:', payload);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('의뢰 제출 payload:', payload);
+        }
 
         const res = await fetch('/api/match-requests', {
           method: 'POST',
@@ -529,7 +379,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
-          console.error('의뢰 제출 중 오류(서버):', err);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('의뢰 제출 중 오류(서버):', err);
+          }
           alert(`의뢰 제출 중 오류가 발생했습니다.\n${err?.error || res.statusText}`);
           return;
         }
@@ -540,17 +392,22 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           try {
             await fetch(`/api/requests/${newId}/notify-factory`, { method: 'POST' });
           } catch (notifyErr) {
-            console.warn('알림톡 전송 호출 실패(무시):', notifyErr);
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('알림톡 전송 호출 실패(무시):', notifyErr);
+            }
           }
         }
 
         // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
         await copyToClipboardAndOpenKakao(uploadedFileUrls);
-      } catch (dbError: any) {
-        console.error('데이터베이스 저장 중 예외 발생:', dbError, {
-          message: dbError?.message,
-          stack: dbError?.stack,
-        });
+      } catch (dbError: unknown) {
+        const error = dbError as Error;
+        if (process.env.NODE_ENV === 'development') {
+          console.error('데이터베이스 저장 중 예외 발생:', dbError, {
+            message: error?.message,
+            stack: error?.stack,
+          });
+        }
         alert('데이터베이스 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
         return;
       }
@@ -572,11 +429,14 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         agreeToTerms: false
       });
       
-    } catch (error: any) {
-      console.error('의뢰 제출 중 오류:', error, {
-        message: error?.message,
-        stack: error?.stack,
-      });
+    } catch (error: unknown) {
+      const err = error as Error;
+      if (process.env.NODE_ENV === 'development') {
+        console.error('의뢰 제출 중 오류:', error, {
+          message: err?.message,
+          stack: err?.stack,
+        });
+      }
       alert('의뢰 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
