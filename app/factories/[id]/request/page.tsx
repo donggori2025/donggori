@@ -284,6 +284,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       return;
     }
 
+    // 버튼 클릭 시 즉시 로딩 상태로 변경
+    setLoading(true);
+
     try {
       // 공장명 누락 방지: company_name 또는 name이 반드시 있어야 함
       const factoryName = factory.company_name || factory.name;
@@ -306,6 +309,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
               if (process.env.NODE_ENV === 'development') {
                 console.error('파일 업로드 오류:', uploadError);
               }
+              setLoading(false);
               alert(`파일 업로드 중 오류가 발생했습니다: ${file.name}\n오류: ${uploadError.message}`);
               return;
             }
@@ -319,6 +323,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           if (process.env.NODE_ENV === 'development') {
             console.error('파일 업로드 중 예외 발생:', fileError);
           }
+          setLoading(false);
           alert('파일 업로드 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
           return;
         }
@@ -382,6 +387,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           if (process.env.NODE_ENV === 'development') {
             console.error('의뢰 제출 중 오류(서버):', err);
           }
+          setLoading(false);
           alert(`의뢰 제출 중 오류가 발생했습니다.\n${err?.error || res.statusText}`);
           return;
         }
@@ -400,6 +406,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
         // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
         await copyToClipboardAndOpenKakao(uploadedFileUrls);
+        
+        // 팝업이 뜬 후 로딩 상태 해제
+        setLoading(false);
       } catch (dbError: unknown) {
         const error = dbError as Error;
         if (process.env.NODE_ENV === 'development') {
@@ -408,6 +417,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             stack: error?.stack,
           });
         }
+        setLoading(false);
         alert('데이터베이스 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
         return;
       }
@@ -437,6 +447,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           stack: err?.stack,
         });
       }
+      setLoading(false);
       alert('의뢰 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
