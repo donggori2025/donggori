@@ -75,12 +75,13 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, id: inserted?.id });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as Error;
     return NextResponse.json(
       {
         success: false,
-        error: err?.message || '알 수 없는 오류',
-        stack: err?.stack,
+        error: error?.message || '알 수 없는 오류',
+        ...(process.env.NODE_ENV === 'development' && { stack: error?.stack }),
       },
       { status: 500 }
     );
@@ -139,7 +140,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const queries: any[] = [];
+    const queries: Array<ReturnType<typeof supabase.from>> = [];
     if (userId) queries.push(supabase.from('match_requests').select('*').eq('user_id', userId));
     if (userEmail) queries.push(supabase.from('match_requests').select('*').eq('user_email', userEmail));
     if (factoryId) queries.push(supabase.from('match_requests').select('*').eq('factory_id', factoryId));
@@ -147,14 +148,14 @@ export async function GET(req: Request) {
 
     const results = await Promise.all(queries);
     const anyError = results.find(r => r.error);
-    if (anyError) {
+    if (anyError && anyError.error) {
       return NextResponse.json(
         { success: false, error: anyError.error.message, code: anyError.error.code, details: anyError.error.details, hint: anyError.error.hint },
         { status: 500 }
       );
     }
 
-    const mergedMap = new Map<string, any>();
+    const mergedMap = new Map<string, unknown>();
     for (const r of results) {
       for (const row of r.data || []) {
         mergedMap.set(row.id, row);
@@ -167,9 +168,14 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json({ success: true, data: merged });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as Error;
     return NextResponse.json(
-      { success: false, error: err?.message || '알 수 없는 오류', stack: err?.stack },
+      { 
+        success: false, 
+        error: error?.message || '알 수 없는 오류',
+        ...(process.env.NODE_ENV === 'development' && { stack: error?.stack })
+      },
       { status: 500 }
     );
   }
@@ -215,9 +221,14 @@ export async function PUT(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as Error;
     return NextResponse.json(
-      { success: false, error: err?.message || '알 수 없는 오류', stack: err?.stack },
+      { 
+        success: false, 
+        error: error?.message || '알 수 없는 오류',
+        ...(process.env.NODE_ENV === 'development' && { stack: error?.stack })
+      },
       { status: 500 }
     );
   }
