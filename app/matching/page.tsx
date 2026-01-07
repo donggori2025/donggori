@@ -42,9 +42,12 @@ function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number 
         width={400}
         height={160}
         priority={idx < 3}
-        unoptimized
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        quality={80}
         onError={(e) => {
-          console.warn(`이미지 로드 실패: ${images[0]}`);
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`이미지 로드 실패: ${images[0]}`);
+          }
           // 이미지 로드 실패 시 대체 UI 표시
           const imgElement = e.currentTarget;
           imgElement.style.display = 'none';

@@ -328,7 +328,9 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                       alt={`${factory.company_name} 이미지 ${currentImageIndex + 1}`}
                       fill
                       className="object-contain bg-gray-50"
-                      unoptimized
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority={currentImageIndex === 0}
+                      quality={85}
                     />
                   </div>
                   
@@ -383,7 +385,9 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                             alt={`${factory.company_name} 썸네일 ${index + 1}`}
                             fill
                             className="object-contain bg-gray-50"
-                            unoptimized
+                            sizes="(max-width: 128px) 128px, 128px"
+                            loading="lazy"
+                            quality={75}
                           />
                         </button>
                       ))}

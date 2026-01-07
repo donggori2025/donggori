@@ -66,7 +66,9 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
                     width={96}
                     height={96}
                     className="object-cover w-full h-full"
-                    unoptimized
+                    sizes="96px"
+                    loading="lazy"
+                    quality={75}
                   />
                 );
               }
