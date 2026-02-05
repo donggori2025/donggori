@@ -182,8 +182,12 @@ function SignUpForm() {
         if (typeof window !== 'undefined') alert(msg);
         return;
       }
-    } catch (e) {
+    } catch (e: any) {
       // 중복 체크 실패 시에도 인증 요청을 막지는 않음
+      // 단, 명확한 오류 메시지가 있으면 표시
+      if (e?.message && !e.message.includes('PGRST116')) {
+        console.warn('이메일 중복 체크 실패:', e.message);
+      }
     }
     
     setLoading(true);
@@ -596,7 +600,6 @@ function SignUpForm() {
           disabled={
             loading ||
             !name.trim() ||
-            !phone ||
             !email ||
             !emailVerified ||
             (!provider && (!password || password.length < 6 || password !== passwordConfirm)) ||

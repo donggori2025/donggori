@@ -9,6 +9,8 @@ export default function AdminNoticesPage() {
   const [items, setItems] = useState<NoticeItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Partial<NoticeItem>>({ category: "일반" });
+  const [addToPopup, setAddToPopup] = useState(false);
+  const [editingAddToPopup, setEditingAddToPopup] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<NoticeItem | null>(null);
 
@@ -40,7 +42,27 @@ export default function AdminNoticesPage() {
       });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "등록 실패");
+
+      if (addToPopup) {
+        const popupRes = await fetch("/api/admin/popups", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: form.title ?? "",
+            content: form.content ?? null,
+            image_url: form.image_urls?.[0] ?? null,
+            start_at: form.start_at ?? null,
+            end_at: form.end_at ?? null,
+          }),
+        });
+        const popupJson = await popupRes.json();
+        if (!popupRes.ok || !popupJson.success) {
+          setError("공지는 등록되었으나 팝업 추가에 실패했습니다: " + (popupJson.error || popupRes.statusText));
+        }
+      }
+
       setForm({ category: "일반" });
+      setAddToPopup(false);
       await load();
     } catch (e: any) {
       setError(e?.message || "등록 실패");
@@ -88,10 +110,12 @@ export default function AdminNoticesPage() {
 
   const startEdit = (item: NoticeItem) => {
     setEditingItem(item);
+    setEditingAddToPopup(false);
   };
 
   const cancelEdit = () => {
     setEditingItem(null);
+    setEditingAddToPopup(false);
   };
 
   const saveEdit = async () => {
@@ -107,6 +131,29 @@ export default function AdminNoticesPage() {
     };
     
     await update(editingItem.id, updatedData);
+
+    if (editingAddToPopup) {
+      try {
+        const popupRes = await fetch("/api/admin/popups", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: editingItem.title ?? "",
+            content: editingItem.content ?? null,
+            image_url: editingItem.image_urls?.[0] ?? null,
+            start_at: editingItem.start_at ?? null,
+            end_at: editingItem.end_at ?? null,
+          }),
+        });
+        const popupJson = await popupRes.json();
+        if (!popupRes.ok || !popupJson.success) {
+          setError("공지 수정은 완료되었으나 팝업 추가에 실패했습니다: " + (popupJson.error || popupRes.statusText));
+        }
+      } catch {
+        setError("공지 수정은 완료되었으나 팝업 추가에 실패했습니다.");
+      }
+    }
+    setEditingAddToPopup(false);
   };
 
   const handleFormImagesChange = (images: string[]) => {
@@ -145,8 +192,31 @@ export default function AdminNoticesPage() {
             multiple={true}
           />
         </div>
+
+        {/* 팝업에도 추가 토글 */}
+        <div className="flex items-center gap-3 mt-4">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={addToPopup}
+            onClick={() => setAddToPopup((v) => !v)}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 ${
+              addToPopup ? "bg-black" : "bg-gray-200"
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
+                addToPopup ? "translate-x-5" : "translate-x-1"
+              }`}
+              style={{ marginTop: 2 }}
+            />
+          </button>
+          <label className="text-sm font-medium text-gray-700 cursor-pointer" onClick={() => setAddToPopup((v) => !v)}>
+            팝업에도 추가
+          </label>
+        </div>
         
-        <button disabled={loading} onClick={submit} className="bg-black text-white rounded px-4 py-2 disabled:opacity-50">{loading ? "처리 중..." : "등록"}</button>
+        <button disabled={loading} onClick={submit} className="mt-3 bg-black text-white rounded px-4 py-2 disabled:opacity-50">{loading ? "처리 중..." : "등록"}</button>
       </div>
 
       {/* 공지 목록 */}
@@ -199,6 +269,29 @@ export default function AdminNoticesPage() {
                     currentImages={editingItem.image_urls || []}
                     multiple={true}
                   />
+                </div>
+
+                {/* 수정 시 팝업에도 추가 토글 */}
+                <div className="flex items-center gap-3 mt-4">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={editingAddToPopup}
+                    onClick={() => setEditingAddToPopup((v) => !v)}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 ${
+                      editingAddToPopup ? "bg-black" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
+                        editingAddToPopup ? "translate-x-5" : "translate-x-1"
+                      }`}
+                      style={{ marginTop: 2 }}
+                    />
+                  </button>
+                  <label className="text-sm font-medium text-gray-700 cursor-pointer" onClick={() => setEditingAddToPopup((v) => !v)}>
+                    팝업에도 추가
+                  </label>
                 </div>
                 
                 <div className="flex gap-2">

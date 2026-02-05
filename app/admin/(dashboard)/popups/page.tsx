@@ -2,11 +2,14 @@
 import { useEffect, useState } from "react";
 import type { PopupItem } from "@/lib/types";
 import ImageUpload from "@/components/ImageUpload";
+import { POPUP_IMAGE_SPEC, POPUP_IMAGE_SPEC_LABEL } from "@/lib/popupSpec";
 
 export default function AdminPopupsPage() {
   const [items, setItems] = useState<PopupItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Partial<PopupItem>>({});
+  const [addToNotice, setAddToNotice] = useState(false);
+  const [editingAddToNotice, setEditingAddToNotice] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<PopupItem | null>(null);
 
@@ -38,7 +41,28 @@ export default function AdminPopupsPage() {
       });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "등록 실패");
+
+      if (addToNotice) {
+        const noticeRes = await fetch("/api/admin/notices", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: form.title ?? "",
+            content: form.content ?? "",
+            category: "일반",
+            start_at: form.start_at ?? null,
+            end_at: form.end_at ?? null,
+            image_urls: form.image_url ? [form.image_url] : undefined,
+          }),
+        });
+        const noticeJson = await noticeRes.json();
+        if (!noticeRes.ok || !noticeJson.success) {
+          setError("팝업은 등록되었으나 공지사항 추가에 실패했습니다: " + (noticeJson.error || noticeRes.statusText));
+        }
+      }
+
       setForm({});
+      setAddToNotice(false);
       await load();
     } catch (e: any) {
       setError(e?.message || "등록 실패");
@@ -86,10 +110,12 @@ export default function AdminPopupsPage() {
 
   const startEdit = (item: PopupItem) => {
     setEditingItem(item);
+    setEditingAddToNotice(false);
   };
 
   const cancelEdit = () => {
     setEditingItem(null);
+    setEditingAddToNotice(false);
   };
 
   const saveEdit = async () => {
@@ -104,6 +130,30 @@ export default function AdminPopupsPage() {
     };
     
     await update(editingItem.id, updatedData);
+
+    if (editingAddToNotice) {
+      try {
+        const noticeRes = await fetch("/api/admin/notices", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: editingItem.title ?? "",
+            content: editingItem.content ?? "",
+            category: "일반",
+            start_at: editingItem.start_at ?? null,
+            end_at: editingItem.end_at ?? null,
+            image_urls: editingItem.image_url ? [editingItem.image_url] : undefined,
+          }),
+        });
+        const noticeJson = await noticeRes.json();
+        if (!noticeRes.ok || !noticeJson.success) {
+          setError("팝업 수정은 완료되었으나 공지사항 추가에 실패했습니다: " + (noticeJson.error || noticeRes.statusText));
+        }
+      } catch {
+        setError("팝업 수정은 완료되었으나 공지사항 추가에 실패했습니다.");
+      }
+    }
+    setEditingAddToNotice(false);
   };
 
   const handleFormImagesChange = (images: string[]) => {
@@ -133,11 +183,35 @@ export default function AdminPopupsPage() {
         
         {/* 이미지 업로드 */}
         <div className="mt-4">
+          <p className="text-sm text-gray-600 mb-2">{POPUP_IMAGE_SPEC_LABEL}</p>
           <ImageUpload
             onImagesChange={handleFormImagesChange}
             currentImages={form.image_url ? [form.image_url] : []}
             multiple={false}
           />
+        </div>
+
+        {/* 공지사항에도 추가 토글 */}
+        <div className="flex items-center gap-3 mt-4">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={addToNotice}
+            onClick={() => setAddToNotice((v) => !v)}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 ${
+              addToNotice ? "bg-black" : "bg-gray-200"
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
+                addToNotice ? "translate-x-5" : "translate-x-1"
+              }`}
+              style={{ marginTop: 2 }}
+            />
+          </button>
+          <label className="text-sm font-medium text-gray-700 cursor-pointer" onClick={() => setAddToNotice((v) => !v)}>
+            공지사항에도 추가
+          </label>
         </div>
         
         <div className="mt-3">
@@ -183,11 +257,35 @@ export default function AdminPopupsPage() {
                 
                 {/* 이미지 업로드 (수정 모드) */}
                 <div className="mt-4">
+                  <p className="text-sm text-gray-600 mb-2">{POPUP_IMAGE_SPEC_LABEL}</p>
                   <ImageUpload
                     onImagesChange={handleEditImagesChange}
                     currentImages={editingItem.image_url ? [editingItem.image_url] : []}
                     multiple={false}
                   />
+                </div>
+
+                {/* 수정 시 공지사항에도 추가 토글 */}
+                <div className="flex items-center gap-3 mt-4">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={editingAddToNotice}
+                    onClick={() => setEditingAddToNotice((v) => !v)}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 ${
+                      editingAddToNotice ? "bg-black" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
+                        editingAddToNotice ? "translate-x-5" : "translate-x-1"
+                      }`}
+                      style={{ marginTop: 2 }}
+                    />
+                  </button>
+                  <label className="text-sm font-medium text-gray-700 cursor-pointer" onClick={() => setEditingAddToNotice((v) => !v)}>
+                    공지사항에도 추가
+                  </label>
                 </div>
                 
                 <div className="flex gap-2">
