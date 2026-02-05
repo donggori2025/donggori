@@ -53,7 +53,7 @@ export async function checkPhoneNumberExists(phoneNumber: string): Promise<boole
       .from('users')
       .select('id')
       .eq('phoneNumber', phoneNumber)
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') { // PGRST116는 결과가 없을 때의 오류
       console.error('전화번호 중복 체크 오류:', error);
@@ -74,8 +74,9 @@ export async function checkEmailExists(email: string): Promise<boolean> {
       .from('users')
       .select('id')
       .eq('email', email)
-      .single();
+      .maybeSingle();
 
+    // PGRST116은 결과가 없을 때의 코드이므로 무시
     if (error && error.code !== 'PGRST116') {
       console.error('이메일 중복 체크 오류:', error);
       throw error;
@@ -189,7 +190,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
       .from('users')
       .select('*')
       .eq('email', email)
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') {
       console.error('사용자 조회 오류:', error);
@@ -210,7 +211,7 @@ export async function getUserByPhoneNumber(phoneNumber: string): Promise<User | 
       .from('users')
       .select('*')
       .eq('phoneNumber', phoneNumber)
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') {
       console.error('사용자 조회 오류:', error);
@@ -232,7 +233,7 @@ export async function getUserByExternalId(externalId: string, signupMethod: stri
       .select('*')
       .eq('externalId', externalId)
       .eq('signupMethod', signupMethod)
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') {
       console.error('사용자 조회 오류:', error);

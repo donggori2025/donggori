@@ -32,11 +32,17 @@ try {
       }
     );
   } else {
-    console.warn('⚠️ Service Role Key가 설정되지 않았거나 유효하지 않습니다.');
+    // 클라이언트 사이드에서는 경고를 출력하지 않음 (서버 사이드에서만)
+    if (typeof window === 'undefined') {
+      console.warn('⚠️ Service Role Key가 설정되지 않았거나 유효하지 않습니다.');
+    }
     supabaseService = null;
   }
 } catch (error) {
-  console.warn('⚠️ Service Role 클라이언트 생성 실패:', error);
+  // 클라이언트 사이드에서는 경고를 출력하지 않음 (서버 사이드에서만)
+  if (typeof window === 'undefined') {
+    console.warn('⚠️ Service Role 클라이언트 생성 실패:', error);
+  }
   supabaseService = null;
 }
 
@@ -45,12 +51,16 @@ export { supabaseService };
 // Service Role 클라이언트를 반환하는 함수
 export function getServiceSupabase() {
   if (!supabaseService) {
-    console.warn('⚠️ Service Role 클라이언트가 초기화되지 않았습니다. 더미 클라이언트를 반환합니다.');
+    // 서버 사이드에서만 경고 출력
+    if (typeof window === 'undefined') {
+      console.warn('⚠️ Service Role 클라이언트가 초기화되지 않았습니다. 더미 클라이언트를 반환합니다.');
+    }
     // 더미 클라이언트 반환 (빌드 시 오류 방지)
     return {
       from: () => ({
         select: () => ({
           eq: () => ({
+            maybeSingle: () => Promise.resolve({ data: null, error: { message: 'Service Role 클라이언트가 초기화되지 않았습니다.' } }),
             single: () => Promise.resolve({ data: null, error: { message: 'Service Role 클라이언트가 초기화되지 않았습니다.' } })
           }),
           insert: () => Promise.resolve({ data: null, error: { message: 'Service Role 클라이언트가 초기화되지 않았습니다.' } }),

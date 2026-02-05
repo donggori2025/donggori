@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { POPUP_IMAGE_SPEC } from "@/lib/popupSpec";
 
 interface PopupItem {
   id: string;
@@ -77,8 +78,12 @@ export default function GlobalPopups() {
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40" onClick={(e) => e.stopPropagation()}>
-      {/* 가로를 이미지에 맞추기: inline-block + w-auto, 상한은 90vw */}
-      <div className="inline-block w-auto max-w-[90vw] max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden relative align-middle" onClick={(e) => e.stopPropagation()}>
+      {/* 규격에 맞춘 고정 크기 컨테이너 (이미지 크기에 따라 변하지 않음) */}
+      <div 
+        className="inline-block w-full max-w-[90vw] max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden relative align-middle flex flex-col"
+        style={{ width: POPUP_IMAGE_SPEC.width, maxWidth: 'min(700px, 90vw)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* X 닫기 버튼 */}
         <button 
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-black/20 hover:bg-black/30 text-white rounded-full transition-colors z-10"
@@ -99,20 +104,23 @@ export default function GlobalPopups() {
           </svg>
         </button>
         
-        {/* 이미지 영역: 남는 공간을 모두 사용하도록 */}
+        {/* 이미지 영역: 700×700 정사각형, 이미지는 영역을 여백 없이 채움 */}
         {current.image_url && (
-          <div className="grid place-items-center bg-white">
+          <div 
+            className="shrink-0 w-full overflow-hidden bg-gray-100"
+            style={{ aspectRatio: '1', maxHeight: 'min(700px, 85vh)' }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src={current.image_url} 
               alt={current.title || ''} 
-              className="w-auto h-auto max-w-[90vw] max-h-[75vh] object-contain"
+              className="w-full h-full object-cover"
             />
           </div>
         )}
 
         {/* 내용/네비게이션 영역 */}
-        <div className="p-6 space-y-3 border-t border-gray-100 max-h-[35vh] overflow-y-auto">
+        <div className="p-6 space-y-3 border-t border-gray-100 overflow-y-auto max-h-[40vh]">
           {current.title && <div className="text-xl font-bold text-gray-900">{current.title}</div>}
           {current.content && <div className="text-base text-gray-700 whitespace-pre-wrap leading-relaxed">{current.content}</div>}
           
