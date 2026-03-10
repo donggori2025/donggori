@@ -184,24 +184,28 @@ export default function DesignRequestPage() {
             <div className="border border-gray-200 rounded-xl p-5 bg-white">
               <div className="font-extrabold text-lg mb-3">01</div>
               <p className="text-sm text-gray-700 leading-6">
-                의뢰하신 상품 목적과 타깃에 맞춰 디자인 방향을 함께 정리합니다.
-                원하는 무드, 레퍼런스, 예산, 일정 정보를 바탕으로 실무 가능한
-                디자인 기준을 설정해드립니다.
+                의뢰 내용을 바탕으로 상품 유형, 제작 방식, 예산·일정에 맞는
+                디자인 진행 방향을 안내해드립니다.
               </p>
             </div>
             <div className="border border-gray-200 rounded-xl p-5 bg-white">
               <div className="font-extrabold text-lg mb-3">02</div>
               <p className="text-sm text-gray-700 leading-6">
-                확정된 디자인을 바탕으로 자체 패턴 작업을 진행하고,
-                자체 샘플실에서 샘플 제작까지 연결합니다.
-                디자인 의도를 실제 제작물로 구현할 수 있도록 단계별로 안내드립니다.
+                디자인 및 제작 관련 상담도 가능합니다.
+                <br />
+                <span className="text-gray-500">
+                  (소재 선택, 샘플 제작 가능 여부, 제작 프로세스 문의 등)
+                </span>
               </p>
             </div>
             <div className="border border-gray-200 rounded-xl p-5 bg-white">
               <div className="font-extrabold text-lg mb-3">03</div>
               <p className="text-sm text-gray-700 leading-6">
-                샘플 확인 후 핏/디테일/원단 보완 사항을 반영해 수정안을 제공합니다.
-                필요 시 본생산 연계까지 이어질 수 있도록 다음 단계도 함께 제안드립니다.
+                안내 후 실제 제작 및 거래 진행 여부는 의뢰자 판단으로 결정됩니다.
+                이후 세부 진행은 당사자 간 협의를 통해 진행되며, 서비스는 의뢰 접수와
+                연결 지원 단계까지 제공됩니다.
+                <br />
+                원활한 후속 지원을 위해 진행 결과 공유에 협조 부탁드립니다.
               </p>
             </div>
           </div>
@@ -211,10 +215,10 @@ export default function DesignRequestPage() {
         <div className="mb-10 bg-gray-50 border border-gray-100 rounded-2xl p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: "디자인 상담 접수", icon: CalendarDays },
-              { label: "디자인 방향 제안", icon: MessageCircleMore },
-              { label: "자체 패턴 설계", icon: ClipboardCheck },
-              { label: "자체 샘플실 샘플 제작", icon: Shirt },
+              { label: "상담예약", icon: CalendarDays },
+              { label: "상담접수", icon: ClipboardCheck },
+              { label: "방문상담진행", icon: MessageCircleMore },
+              { label: "샘플, 패턴실 연계", icon: Shirt },
             ].map((step, index) => {
               const Icon = step.icon;
               return (
