@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { supabase } from "@/lib/supabaseClient";
 import { getAppUserIdentity, isAppLoggedIn } from "@/lib/utils";
+import { CalendarDays, ClipboardCheck, MessageCircleMore, Shirt } from "lucide-react";
 
 type RequesterType = "기업" | "개인" | "관공서";
 type ProductType = "의류" | "유니폼" | "굿즈" | "기타";
@@ -174,6 +175,61 @@ export default function DesignRequestPage() {
         <h2 className="text-[40px] font-extrabold text-gray-900 mb-2">디자인 의뢰하기</h2>
         <div className="text-gray-500 mb-8">
           원하시는 상품 정보를 남겨주시면 디자인 가능 여부와 진행 방안을 안내드립니다.
+        </div>
+
+        {/* 디자인 의뢰 이용 안내 */}
+        <div className="mb-8">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">디자인 의뢰 이용안내</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="border border-gray-200 rounded-xl p-5 bg-white">
+              <div className="font-extrabold text-lg mb-3">01</div>
+              <p className="text-sm text-gray-700 leading-6">
+                의뢰하신 상품 목적과 타깃에 맞춰 디자인 방향을 함께 정리합니다.
+                원하는 무드, 레퍼런스, 예산, 일정 정보를 바탕으로 실무 가능한
+                디자인 기준을 설정해드립니다.
+              </p>
+            </div>
+            <div className="border border-gray-200 rounded-xl p-5 bg-white">
+              <div className="font-extrabold text-lg mb-3">02</div>
+              <p className="text-sm text-gray-700 leading-6">
+                확정된 디자인을 바탕으로 자체 패턴 작업을 진행하고,
+                자체 샘플실에서 샘플 제작까지 연결합니다.
+                디자인 의도를 실제 제작물로 구현할 수 있도록 단계별로 안내드립니다.
+              </p>
+            </div>
+            <div className="border border-gray-200 rounded-xl p-5 bg-white">
+              <div className="font-extrabold text-lg mb-3">03</div>
+              <p className="text-sm text-gray-700 leading-6">
+                샘플 확인 후 핏/디테일/원단 보완 사항을 반영해 수정안을 제공합니다.
+                필요 시 본생산 연계까지 이어질 수 있도록 다음 단계도 함께 제안드립니다.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 진행 플로우 */}
+        <div className="mb-10 bg-gray-50 border border-gray-100 rounded-2xl p-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: "디자인 상담 접수", icon: CalendarDays },
+              { label: "디자인 방향 제안", icon: MessageCircleMore },
+              { label: "자체 패턴 설계", icon: ClipboardCheck },
+              { label: "자체 샘플실 샘플 제작", icon: Shirt },
+            ].map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <div key={step.label} className="relative flex flex-col items-center text-center">
+                  {index < 3 && (
+                    <div className="hidden md:flex absolute top-8 -right-6 text-gray-400 text-xl">→</div>
+                  )}
+                  <div className="w-20 h-20 rounded-full bg-white border border-gray-200 flex items-center justify-center mb-3 shadow-sm">
+                    <Icon className="w-8 h-8 text-gray-800" />
+                  </div>
+                  <div className="text-sm font-semibold text-gray-800">{step.label}</div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
       <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 space-y-6">
