@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader } from "lucide-react";
-import { createUser, checkPhoneNumberExists, checkEmailExists, checkSupabaseConnection } from '@/lib/userService';
+import { checkEmailExists, checkSupabaseConnection } from '@/lib/userService';
 import { config, safeValidateOAuthConfig } from "@/lib/config";
 
 function SignUpForm() {
@@ -255,16 +255,25 @@ function SignUpForm() {
             return;
           }
           
-          // Supabase에 사용자 저장
-          const newUser = await createUser({
-            email: tempUser.email || cleanEmail,
-            name: tempUser.name,
-            phoneNumber: phone,
-            profileImage: tempUser.profileImage,
-            signupMethod: provider,
-            externalId: tempUser.kakaoId || tempUser.naverId,
-            kakaoMessageConsent: agreeKakaoMessage,
+          // 서버 API를 통해 사용자 저장 (개인정보/비밀번호 처리 서버 전용)
+          const signupRes = await fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: tempUser.email || cleanEmail,
+              name: tempUser.name,
+              phoneNumber: phone,
+              profileImage: tempUser.profileImage,
+              signupMethod: provider,
+              externalId: tempUser.kakaoId || tempUser.naverId,
+              kakaoMessageConsent: agreeKakaoMessage,
+            }),
           });
+          const signupJson = await signupRes.json().catch(() => ({}));
+          if (!signupRes.ok) {
+            throw new Error(signupJson?.error || '회원가입 중 오류가 발생했습니다.');
+          }
+          const newUser = signupJson.user;
           
           console.log('OAuth 사용자 생성 성공:', newUser.email);
           
@@ -311,15 +320,24 @@ function SignUpForm() {
         return;
       }
       
-      // Supabase에 사용자 저장
-      const newUser = await createUser({
-        email: cleanEmail,
-        name: name.trim(),
-        phoneNumber: phone,
-        password: password,
-        signupMethod: 'email',
-        kakaoMessageConsent: agreeKakaoMessage,
+      // 서버 API를 통해 사용자 저장 (비밀번호 해시는 서버에서 처리)
+      const signupRes = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: cleanEmail,
+          name: name.trim(),
+          phoneNumber: phone,
+          password,
+          signupMethod: 'email',
+          kakaoMessageConsent: agreeKakaoMessage,
+        }),
       });
+      const signupJson = await signupRes.json().catch(() => ({}));
+      if (!signupRes.ok) {
+        throw new Error(signupJson?.error || '회원가입 중 오류가 발생했습니다.');
+      }
+      const newUser = signupJson.user;
       
       console.log('일반 사용자 생성 성공:', newUser.email);
       

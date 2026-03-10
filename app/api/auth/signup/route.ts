@@ -1,79 +1,85 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-
-const prisma = new PrismaClient();
+import { getServiceSupabase } from "@/lib/supabaseService";
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name } = await request.json();
+    const {
+      email,
+      password,
+      name,
+      phoneNumber,
+      profileImage,
+      signupMethod = "email",
+      externalId,
+      kakaoMessageConsent = false,
+    } = await request.json();
 
-    // 입력값 검증
-    if (!email || !password || !name) {
-      return NextResponse.json(
-        { error: "이메일, 비밀번호, 이름을 모두 입력해주세요." },
-        { status: 400 }
-      );
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const normalizedName = String(name || "").trim();
+
+    if (!normalizedEmail || !normalizedName) {
+      return NextResponse.json({ error: "이메일과 이름은 필수입니다." }, { status: 400 });
     }
 
-    // 이메일 형식 검증
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "올바른 이메일 형식을 입력해주세요." },
-        { status: 400 }
-      );
+    if (!emailRegex.test(normalizedEmail)) {
+      return NextResponse.json({ error: "올바른 이메일 형식을 입력해주세요." }, { status: 400 });
     }
 
-    // 비밀번호 길이 검증
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: "비밀번호는 6자 이상이어야 합니다." },
-        { status: 400 }
-      );
+    if (signupMethod === "email") {
+      if (!password || String(password).length < 6) {
+        return NextResponse.json({ error: "비밀번호는 6자 이상이어야 합니다." }, { status: 400 });
+      }
     }
 
-    // 기존 사용자 확인
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+    const supabase = getServiceSupabase();
+    const { data: existing, error: findError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", normalizedEmail)
+      .maybeSingle();
 
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "이미 가입된 이메일입니다." },
-        { status: 409 }
-      );
+    if (findError) {
+      return NextResponse.json({ error: "회원 정보 조회 중 오류가 발생했습니다." }, { status: 500 });
+    }
+    if (existing) {
+      return NextResponse.json({ error: "이미 가입된 이메일입니다." }, { status: 409 });
     }
 
-    // 비밀번호 해시화
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword =
+      signupMethod === "email" && password ? await bcrypt.hash(String(password), 12) : null;
 
-    // 사용자 생성
-    const user = await prisma.user.create({
-      data: {
-        email,
-        name,
-        password: hashedPassword, // 비밀번호 필드에 저장
-      },
-    });
+    const { data: created, error: insertError } = await supabase
+      .from("users")
+      .insert([
+        {
+          email: normalizedEmail,
+          name: normalizedName,
+          phoneNumber: String(phoneNumber || ""),
+          password: hashedPassword,
+          profileImage: profileImage || null,
+          signupMethod,
+          externalId: externalId || null,
+          kakaoMessageConsent: Boolean(kakaoMessageConsent),
+        },
+      ])
+      .select("id,email,name")
+      .single();
+
+    if (insertError) {
+      return NextResponse.json({ error: "회원가입 중 오류가 발생했습니다." }, { status: 500 });
+    }
 
     return NextResponse.json(
-      { 
+      {
         message: "회원가입이 완료되었습니다.",
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        }
+        user: created,
       },
       { status: 201 }
     );
-
   } catch (error) {
     console.error("회원가입 오류:", error);
-    return NextResponse.json(
-      { error: "회원가입 중 오류가 발생했습니다." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "회원가입 중 오류가 발생했습니다." }, { status: 500 });
   }
-} 
+}
