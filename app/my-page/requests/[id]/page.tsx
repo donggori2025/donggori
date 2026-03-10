@@ -35,6 +35,18 @@ export default function MyRequestDetailPage() {
     return <div className="max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center">의뢰내역을 찾을 수 없습니다.</div>;
   }
 
+  const additionalInfo = (() => {
+    try {
+      return JSON.parse(request.additional_info || request.additionalInfo || "{}");
+    } catch {
+      return {};
+    }
+  }) as Record<string, any>;
+  const isDesignRequest =
+    additionalInfo.requestType === "design" ||
+    request.factory_id === "design-request" ||
+    request.factoryId === "design-request";
+
   return (
     <div className="max-w-[1200px] mx-auto py-16 px-4">
       <div className="mb-8">
@@ -70,32 +82,71 @@ export default function MyRequestDetailPage() {
           </div>
         </div>
 
-        {/* 공장 정보 */}
-        <div className="bg-gray-50 rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">공장 정보</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm font-medium text-gray-700">공장명</p>
-              <p className="text-lg text-gray-900">{request.factoryName || request.factory_name || '공장명 없음'}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-700">연락처</p>
-              <p className="text-lg text-gray-900">{request.contact}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-700">의뢰일</p>
-              <p className="text-lg text-gray-900">
-                {request.created_at ? new Date(request.created_at).toLocaleDateString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                }) : request.requestDate || '날짜 없음'}
-              </p>
+        {isDesignRequest ? (
+          <div className="bg-gray-50 rounded-lg p-6 mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">디자인 의뢰 정보</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-700">의뢰자 구분</p>
+                <p className="text-lg text-gray-900">{additionalInfo.requesterType || "-"}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700">연락처</p>
+                <p className="text-lg text-gray-900">{request.contact || "-"}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700">원하는 상품 유형</p>
+                <p className="text-lg text-gray-900">{additionalInfo.productType || "-"}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700">상품 유형 상세</p>
+                <p className="text-lg text-gray-900">{additionalInfo.productTypeDetail || "-"}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-sm font-medium text-gray-700">상품명/프로젝트명</p>
+                <p className="text-lg text-gray-900">{additionalInfo.productName || "-"}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-sm font-medium text-gray-700">의뢰일</p>
+                <p className="text-lg text-gray-900">
+                  {request.created_at ? new Date(request.created_at).toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) : request.requestDate || '날짜 없음'}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-gray-50 rounded-lg p-6 mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">공장 정보</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-700">공장명</p>
+                <p className="text-lg text-gray-900">{request.factoryName || request.factory_name || '공장명 없음'}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700">연락처</p>
+                <p className="text-lg text-gray-900">{request.contact}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700">의뢰일</p>
+                <p className="text-lg text-gray-900">
+                  {request.created_at ? new Date(request.created_at).toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) : request.requestDate || '날짜 없음'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 상세 설명 */}
         <div className="mb-8">
@@ -110,9 +161,27 @@ export default function MyRequestDetailPage() {
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">상세 요청사항</h2>
             <div className="bg-gray-50 rounded-lg p-6">
-              {(() => {
+              {isDesignRequest ? (
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">요청 내용</p>
+                    <p className="text-gray-900 whitespace-pre-wrap">{request.description || "-"}</p>
+                  </div>
+                  {additionalInfo.referenceImages && additionalInfo.referenceImages.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-2">레퍼런스 이미지</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {additionalInfo.referenceImages.map((url: string, index: number) => (
+                          <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="block border rounded overflow-hidden">
+                            <img src={url} alt={`reference-${index}`} className="w-full h-28 object-cover" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (() => {
                 try {
-                  const additionalInfo = JSON.parse(request.additional_info || request.additionalInfo || '{}');
                   return (
                     <div className="space-y-6">
                       {/* 브랜드 정보 */}

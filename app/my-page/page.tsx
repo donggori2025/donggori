@@ -516,9 +516,24 @@ export default function MyPage() {
   function FactoryRequestCard({ req }: { req: MatchRequest }) {
     const [factory, setFactory] = useState<Factory | null>(null);
     const [loading, setLoading] = useState(true);
+    const parsedAdditionalInfo = (() => {
+      try {
+        return JSON.parse(req.additional_info || req.additionalInfo || "{}");
+      } catch {
+        return {};
+      }
+    })() as Record<string, unknown>;
+    const isDesignRequest =
+      (parsedAdditionalInfo.requestType as string | undefined) === "design" ||
+      req.factory_id === "design-request" ||
+      req.factoryId === "design-request";
 
     useEffect(() => {
       async function fetchFactory() {
+        if (isDesignRequest) {
+          setLoading(false);
+          return;
+        }
         setLoading(true);
         const factoryId = req.factory_id || req.factoryId;
         if (!factoryId) {
@@ -585,7 +600,7 @@ export default function MyPage() {
         setLoading(false);
       }
       fetchFactory();
-    }, [req.factory_id, req.factoryId]);
+    }, [req.factory_id, req.factoryId, isDesignRequest]);
 
     // 상태 뱃지
     const statusBadge = (
@@ -601,6 +616,39 @@ export default function MyPage() {
          '완료됨'}
       </span>
     );
+
+    if (isDesignRequest) {
+      const requesterType = String(parsedAdditionalInfo.requesterType || "-");
+      const productType = String(parsedAdditionalInfo.productType || "-");
+      const productTypeDetail = String(parsedAdditionalInfo.productTypeDetail || "-");
+      const productName = String(parsedAdditionalInfo.productName || req.description || "-");
+      return (
+        <div className="border border-gray-200 rounded-xl p-4 md:p-6 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-2">
+            <div className="text-lg font-bold text-gray-900">디자인 의뢰</div>
+            {statusBadge}
+          </div>
+          <div className="text-xs text-gray-400 mb-2">의뢰번호: {req.id}</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
+            <div><b>의뢰자 구분</b>: {requesterType}</div>
+            <div><b>상품 유형</b>: {productType}</div>
+            <div className="md:col-span-2"><b>상품 유형 상세</b>: {productTypeDetail}</div>
+            <div className="md:col-span-2"><b>상품명/프로젝트명</b>: {productName}</div>
+          </div>
+          <div className="text-xs text-gray-400 mt-2">
+            문의일 {req.created_at ? new Date(req.created_at).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }) : "날짜 없음"}
+          </div>
+          <div className="mt-4">
+            <button
+              className="w-full md:w-auto px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900 transition-colors duration-200"
+              onClick={() => { window.location.href = `/my-page/requests/${req.id}`; }}
+            >
+              상세보기
+            </button>
+          </div>
+        </div>
+      );
+    }
 
     if (loading) {
       return (

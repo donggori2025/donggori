@@ -9,6 +9,7 @@ const Footer = () => {
   // 메뉴 항목(왼쪽/오른쪽 메뉴)
   const leftMenu = [
     { href: "/factories", label: "봉제공장 찾기" },
+    { href: "/design-request", label: "디자인 의뢰하기" },
     { href: "/matching", label: "AI 매칭" },
     { href: "/notices", label: "공지사항" },
   ];
