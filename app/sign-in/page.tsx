@@ -87,6 +87,7 @@ function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, isLoaded } = useSignIn();
   const [socialLoading, setSocialLoading] = useState<null | 'kakao' | 'naver'>(null);
+  const cookieSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
   
   // 이메일 인증 로그인 관련 상태 (제거)
 
@@ -178,10 +179,10 @@ function SignInForm() {
           factoryId: factoryAuth.factoryId,
           realName: factoryAuth.factoryName,
           isFactoryUser: true,
-        })}; path=/; max-age=${factorySessionDuration}`;
+        })}; path=/; max-age=${factorySessionDuration}; SameSite=Lax${cookieSecure}`;
 
-        document.cookie = `userType=factory; path=/; max-age=${factorySessionDuration}`;
-        document.cookie = `isLoggedIn=true; path=/; max-age=${factorySessionDuration}`;
+        document.cookie = `userType=factory; path=/; max-age=${factorySessionDuration}; SameSite=Lax${cookieSecure}`;
+        document.cookie = `isLoggedIn=true; path=/; max-age=${factorySessionDuration}; SameSite=Lax${cookieSecure}`;
 
         // Header는 localStorage의 userType/factoryAuth를 읽으므로 로컬에도 저장
         try {
@@ -209,22 +210,19 @@ function SignInForm() {
       if (result.status === 'complete') {
         console.log('일반 사용자 로그인 성공');
         
-        // accessToken 발급
+        // 서버에서 HttpOnly access_token 쿠키 발급
         try {
           const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
           const js = await res.json();
           if (!res.ok) throw new Error(js.error || '토큰 발급 실패');
-          // 일반 사용자 세션 유지 시간: 30일
-          const userSessionDuration = 60 * 60 * 24 * 30;
-          document.cookie = `access_token=${js.accessToken}; path=/; max-age=${userSessionDuration}; SameSite=Lax`;
         } catch (e) {
           console.warn('accessToken 발급 실패(계속 진행):', e);
         }
 
         // 일반 사용자 세션 유지 시간: 30일
         const userSessionDuration = 60 * 60 * 24 * 30;
-        document.cookie = `userType=user; path=/; max-age=${userSessionDuration}`;
-        document.cookie = `isLoggedIn=true; path=/; max-age=${userSessionDuration}`;
+        document.cookie = `userType=user; path=/; max-age=${userSessionDuration}; SameSite=Lax${cookieSecure}`;
+        document.cookie = `isLoggedIn=true; path=/; max-age=${userSessionDuration}; SameSite=Lax${cookieSecure}`;
 
         window.location.href = '/';
       } else {
