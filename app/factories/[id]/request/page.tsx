@@ -11,6 +11,8 @@ import { Loader2 } from "lucide-react";
 import { isAppLoggedIn, getAppUserIdentity, storage } from "@/lib/utils";
 import type { RequestFormData } from "@/lib/types";
 
+const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
+
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -243,14 +245,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       // 클립보드에 복사
       await navigator.clipboard.writeText(requestText);
       
-      // 카카오톡 URL로 이동
-      const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
-      if (kakaoUrl) {
-        alert('의뢰 내용이 클립보드에 복사되었습니다!\n카카오톡 채팅창에 붙여넣기 한 뒤 전송해주세요.\n확인을 누르면 카카오톡으로 이동합니다.');
-        window.open(String(kakaoUrl), '_blank');
-      } else {
-        alert('의뢰 내용이 클립보드에 복사되었습니다!\n공장의 카카오톡 URL이 없어 직접 연락이 어렵습니다.');
-      }
+      // 고정 오픈카카오톡 URL로 이동
+      alert('의뢰 내용이 클립보드에 복사되었습니다!\n카카오톡 채팅창에 붙여넣기 한 뒤 전송해주세요.\n확인을 누르면 카카오톡으로 이동합니다.');
+      window.open(OPEN_KAKAO_CHAT_URL, '_blank');
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('클립보드 복사 오류:', error);
@@ -789,12 +786,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             <Button 
               className="w-full bg-gray-100 text-black rounded-lg py-3 font-bold hover:bg-gray-200 text-sm lg:text-base flex items-center justify-center gap-2"
               onClick={() => {
-                const kakaoUrl = factory?.kakaoUrl || factory?.kakao_url;
-                if (kakaoUrl) {
-                  window.open(String(kakaoUrl), '_blank');
-                } else {
-                  alert('공장의 카카오톡 URL이 설정되지 않았습니다.');
-                }
+                window.open(OPEN_KAKAO_CHAT_URL, '_blank');
               }}
             >
               <Image 
