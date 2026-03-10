@@ -134,8 +134,8 @@ export default function Header() {
           </Link>
 
           {/* 데스크탑 메뉴 */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-8">
-            <nav className="flex gap-4 lg:gap-6 text-sm lg:text-base font-medium text-[#222222]">
+          <div className="hidden md:flex items-center gap-8 lg:gap-10">
+            <nav className="flex gap-6 lg:gap-8 text-sm lg:text-base font-medium text-[#222222]">
               {navMenu.map((item) => (
                 <Link 
                   key={item.href} 
@@ -190,8 +190,8 @@ export default function Header() {
         </Link>
 
         {/* 데스크탑 메뉴 */}
-        <div className="hidden md:flex items-center gap-6 lg:gap-8">
-          <nav className="flex gap-4 lg:gap-6 text-sm lg:text-base font-medium text-[#222222]">
+        <div className="hidden md:flex items-center gap-8 lg:gap-10">
+          <nav className="flex gap-6 lg:gap-8 text-sm lg:text-base font-medium text-[#222222]">
             {navMenu.map((item) => (
               <Link 
                 key={item.href} 

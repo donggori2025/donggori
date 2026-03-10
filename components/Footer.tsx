@@ -26,13 +26,13 @@ const Footer = () => {
         {/* nav: md 이상에서만 flex, md 미만에서는 hidden */}
         <nav className="hidden md:flex w-full justify-between items-center mb-3 sm:mb-4 text-sm text-gray-700">
           {/* 왼쪽 메뉴 그룹 */}
-          <div className="flex gap-6 lg:gap-8">
+          <div className="flex gap-8 lg:gap-10">
             {leftMenu.map((item) => (
               <a key={item.label} href={item.href} className="hover:underline">{item.label}</a>
             ))}
           </div>
           {/* 오른쪽 메뉴 그룹 */}
-          <div className="flex gap-6 lg:gap-8">
+          <div className="flex gap-8 lg:gap-10">
             {rightMenu.map((item) => (
               <a key={item.label} href={item.href} className="hover:underline">{item.label}</a>
             ))}
