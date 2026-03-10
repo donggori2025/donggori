@@ -169,11 +169,12 @@ export default function DesignRequestPage() {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto py-10 px-2 md:px-6">
-      <h1 className="text-2xl md:text-3xl font-extrabold mb-2">디자인 의뢰하기</h1>
-      <p className="text-gray-600 mb-8">
-        원하시는 상품 정보를 남겨주시면 디자인 가능 여부와 진행 방안을 안내드립니다.
-      </p>
+    <section className="w-full bg-white py-16 min-h-[600px]">
+      <div className="max-w-[1400px] mx-auto px-6">
+        <h2 className="text-[40px] font-extrabold text-gray-900 mb-2">디자인 의뢰하기</h2>
+        <div className="text-gray-500 mb-8">
+          원하시는 상품 정보를 남겨주시면 디자인 가능 여부와 진행 방안을 안내드립니다.
+        </div>
 
       <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -337,6 +338,7 @@ export default function DesignRequestPage() {
           {submitting ? "의뢰 접수 중..." : "디자인 의뢰하기"}
         </button>
       </form>
-    </div>
+      </div>
+    </section>
   );
 }
