@@ -11,6 +11,8 @@ import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import PricingTable from "@/components/PricingTable";
 
+const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
+
 export default function FactoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const user: any = null;
   const [factory, setFactory] = useState<Factory | null>(null);
@@ -232,7 +234,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     };
     const prev = JSON.parse(localStorage.getItem("inquiries") || "[]");
     localStorage.setItem("inquiries", JSON.stringify([inquiry, ...prev]));
-    window.open(factory.kakaoUrl || "https://open.kakao.com/o/some-link", "_blank");
+    window.open(OPEN_KAKAO_CHAT_URL, "_blank");
   };
 
   const handleShare = async () => {
