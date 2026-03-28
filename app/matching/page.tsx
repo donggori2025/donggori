@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import type { Factory } from "@/lib/factories";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
@@ -290,7 +290,6 @@ type ScoredFactory = Factory & { score: number };
   const [answers, setAnswers] = useState<string[][]>([]);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recommended, setRecommended] = useState<ScoredFactory[]>([]);
@@ -694,12 +693,13 @@ type ScoredFactory = Factory & { score: number };
   }, [getRecommendedFactoriesFromPrompt]);
 
   useEffect(() => {
-    const promptFromQuery = String(searchParams.get("prompt") || "").trim();
+    if (typeof window === "undefined") return;
+    const promptFromQuery = String(new URLSearchParams(window.location.search).get("prompt") || "").trim();
     if (!promptFromQuery || factories.length === 0) return;
     if (processedPromptRef.current === promptFromQuery) return;
     processedPromptRef.current = promptFromQuery;
     startTextMatching(promptFromQuery);
-  }, [searchParams, factories.length, startTextMatching]);
+  }, [factories.length, startTextMatching]);
 
   // 사용자 피드백 상태
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
