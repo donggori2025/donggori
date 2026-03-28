@@ -93,7 +93,7 @@ export default function HeroSection() {
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     >
-                      분석
+                      AI 분석
                     </button>
                   </div>
                 </div>
