@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import type { Factory } from "@/lib/factories";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
@@ -241,6 +241,7 @@ type ScoredFactory = Factory & { score: number };
   const [introStep, setIntroStep] = useState(0); // 0: 타이핑, 1: ... 표시, 2: 다음 메시지
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [introRestartKey, setIntroRestartKey] = useState(0); // 인트로 재시작을 위한 키
+  const suspendIntroRef = useRef(false);
 
   useEffect(() => {
     // 인트로 타이핑 효과
@@ -252,6 +253,7 @@ type ScoredFactory = Factory & { score: number };
     let currentMsgIdx = 0;
     let currentCharIdx = 0;
     function typeNextChar() {
+      if (suspendIntroRef.current) return;
       const msg = introMessages[currentMsgIdx];
       if (currentCharIdx < msg.length) {
         setTypingText(msg.slice(0, currentCharIdx + 1));
@@ -287,15 +289,21 @@ type ScoredFactory = Factory & { score: number };
   // 사용자가 선택한 답변들
   const [answers, setAnswers] = useState<string[][]>([]);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  // user 변수 제거 (사용하지 않음)
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recommended, setRecommended] = useState<ScoredFactory[]>([]);
+  const [quickInput, setQuickInput] = useState("");
+  const [textPrompt, setTextPrompt] = useState("");
+  const [textMatchMode, setTextMatchMode] = useState(false);
   // 추천 결과 로딩 상태 추가
   const [resultLoading, setResultLoading] = useState(false);
+  const [showResultMsg1, setShowResultMsg1] = useState(false);
+  const [showResultMsg2, setShowResultMsg2] = useState(false);
   // 채팅 스크롤 ref
   const chatScrollRef = useRef<HTMLDivElement>(null);
+  const processedPromptRef = useRef<string>("");
 
 
   // 카드별 칩을 실제 데이터베이스 데이터 기반으로 생성
@@ -592,6 +600,107 @@ type ScoredFactory = Factory & { score: number };
     return result;
   }, [factories]);
 
+  const getRecommendedFactoriesFromPrompt = useCallback((prompt: string) => {
+    const normalizedPrompt = String(prompt || "").toLowerCase();
+    const tokens = normalizedPrompt
+      .split(/[\s,./()]+/)
+      .map((v) => v.trim())
+      .filter((v) => v.length >= 2);
+
+    const scoredFactories = factories.map((factory) => {
+      const searchable = [
+        factory.factory_type,
+        factory.main_fabrics,
+        factory.admin_district,
+        factory.processes,
+        factory.sewing_machines,
+        factory.pattern_machines,
+        factory.special_machines,
+        factory.top_items_upper,
+        factory.top_items_lower,
+        factory.top_items_outer,
+        factory.top_items_dress_skirt,
+        factory.top_items_sports_leisure,
+        factory.top_items_underwear,
+      ]
+        .map((v) => String(v || "").toLowerCase())
+        .join(" ");
+
+      let score = 0;
+      const hitKeywords: string[] = [];
+
+      for (const token of tokens) {
+        if (searchable.includes(token)) {
+          score += 10;
+          hitKeywords.push(token);
+        }
+      }
+
+      // 의도 키워드 보정
+      if ((normalizedPrompt.includes("샘플") || normalizedPrompt.includes("소량")) && typeof factory.minOrder === "number" && factory.minOrder <= 100) {
+        score += 18;
+      }
+      if ((normalizedPrompt.includes("대량") || normalizedPrompt.includes("양산")) && typeof factory.minOrder === "number" && factory.minOrder >= 300) {
+        score += 18;
+      }
+      if (normalizedPrompt.includes("스포츠") && String(factory.main_fabrics || "").includes("다이마루")) {
+        score += 8;
+      }
+      if (normalizedPrompt.includes("자켓") && String(factory.top_items_outer || "").length > 0) {
+        score += 10;
+      }
+
+      return {
+        ...factory,
+        score: Math.min(100, score),
+        hitKeywords,
+      };
+    });
+
+    return scoredFactories
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+  }, [factories]);
+
+  const startTextMatching = useCallback((prompt: string) => {
+    const trimmed = String(prompt || "").trim();
+    if (!trimmed) return;
+
+    suspendIntroRef.current = true;
+    setTextPrompt(trimmed);
+    setQuickInput(trimmed);
+    setTextMatchMode(true);
+    setIntroDone(true);
+    setStep(0);
+    setAnswers([]);
+    setSelectedOptions([]);
+    setRecommended([]);
+    setResultLoading(true);
+    setShowResultMsg1(false);
+    setShowResultMsg2(false);
+    setChat([]);
+
+    if (typingTimer.current) {
+      clearTimeout(typingTimer.current);
+      typingTimer.current = null;
+    }
+
+    window.setTimeout(() => {
+      const rec = getRecommendedFactoriesFromPrompt(trimmed);
+      setRecommended(rec);
+      setResultLoading(false);
+      setChat([{ type: "question", text: "분석이 완료되었어요. 추천 결과를 확인해주세요." }]);
+    }, 1800);
+  }, [getRecommendedFactoriesFromPrompt]);
+
+  useEffect(() => {
+    const promptFromQuery = String(searchParams.get("prompt") || "").trim();
+    if (!promptFromQuery || factories.length === 0) return;
+    if (processedPromptRef.current === promptFromQuery) return;
+    processedPromptRef.current = promptFromQuery;
+    startTextMatching(promptFromQuery);
+  }, [searchParams, factories.length, startTextMatching]);
+
   // 사용자 피드백 상태
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [feedbackRatings, setFeedbackRatings] = useState<{[key: number]: number}>({});
@@ -782,6 +891,11 @@ type ScoredFactory = Factory & { score: number };
     setResultLoading(false);
     setShowResultMsg1(false);
     setShowResultMsg2(false);
+    setTextMatchMode(false);
+    setTextPrompt("");
+    setQuickInput("");
+    processedPromptRef.current = "";
+    suspendIntroRef.current = false;
     setTypingText("");
     setIntroStep(0);
     
@@ -793,10 +907,12 @@ type ScoredFactory = Factory & { score: number };
     
     // 인트로 재시작을 위한 키 변경
     setIntroRestartKey(prev => prev + 1);
+    router.replace("/matching");
   };
 
   // 답변이 모두 끝나면 분석 로딩 후 결과 노출
   useEffect(() => {
+    if (textMatchMode) return;
     if (answers.length === QUESTIONS.length) {
       setResultLoading(true);
       const timer = setTimeout(() => {
@@ -808,7 +924,7 @@ type ScoredFactory = Factory & { score: number };
     } else {
       setResultLoading(false);
     }
-  }, [answers.length, QUESTIONS.length, getRecommendedFactories, answers]);
+  }, [answers.length, QUESTIONS.length, getRecommendedFactories, answers, textMatchMode]);
 
   // 채팅 자동 스크롤 useEffect
   useEffect(() => {
@@ -817,21 +933,19 @@ type ScoredFactory = Factory & { score: number };
     }
   }, [chat, recommended, resultLoading]);
 
-  // --- [추가: 결과 안내 메시지 상태] ---
-  const [showResultMsg1, setShowResultMsg1] = useState(false);
-  const [showResultMsg2, setShowResultMsg2] = useState(false);
-
   // --- [결과 안내 메시지 타이밍 제어 useEffect 수정] ---
   useEffect(() => {
     if (
-      answers.length === QUESTIONS.length &&
+      (answers.length === QUESTIONS.length || textMatchMode) &&
       recommended.length > 0 &&
       !resultLoading
     ) {
       setShowResultMsg1(false);
       setShowResultMsg2(false);
       const t1 = setTimeout(() => setShowResultMsg1(true), 500); // 0.5초 후 첫 메시지
-      const t2 = setTimeout(() => setShowResultMsg2(true), 1500); // 1.5초 후 두 번째 메시지
+      const t2 = setTimeout(() => {
+        if (!textMatchMode) setShowResultMsg2(true);
+      }, 1500); // 1.5초 후 두 번째 메시지(텍스트 모드 제외)
       return () => {
         clearTimeout(t1);
         clearTimeout(t2);
@@ -840,7 +954,7 @@ type ScoredFactory = Factory & { score: number };
       setShowResultMsg1(false);
       setShowResultMsg2(false);
     }
-  }, [answers.length, recommended, resultLoading, QUESTIONS.length]);
+  }, [answers.length, recommended, resultLoading, QUESTIONS.length, textMatchMode]);
 
   // 결과 안내 메시지 등장 시 채팅창 자동 스크롤
   useEffect(() => {
@@ -849,21 +963,28 @@ type ScoredFactory = Factory & { score: number };
     }
   }, [showResultMsg1, showResultMsg2]);
 
+  const isResultStage = textMatchMode || answers.length === QUESTIONS.length;
+
   // 왼쪽: 질문/선택지 or 결과 카드 or 로딩
   return (
     <div className="w-full min-h-screen bg-[#F4F5F7] flex flex-col items-center justify-start overflow-x-hidden py-8 md:py-16 px-4 md:px-6">
       <div className="w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-4 items-start justify-center flex-1 transition-opacity duration-700 px-1 overflow-hidden bg-[#F4F5F7] pb-0 mb-0" style={{ minHeight: '84vh' }}>
         {/* 왼쪽: 질문/선택지 or 결과 카드 or 로딩 */}
         <div className="w-full lg:flex-[2] bg-white rounded-2xl shadow border p-4 md:p-6 flex flex-col h-[70vh] lg:h-[100vh] max-h-[70vh] lg:max-h-[80vh]">
-          {answers.length === QUESTIONS.length ? (
+          {isResultStage ? (
             resultLoading ? (
               <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] animate-fade-in">
                 <div className="w-16 h-16 border-4 border-gray-300 border-t-[#222222] rounded-full animate-spin mb-6"></div>
-                <div className="text-lg font-semibold">추천 결과를 분석 중입니다...</div>
+                <div className="text-lg font-semibold">분석 중입니다...</div>
               </div>
             ) : (
               <div className="flex flex-col h-full">
                 <div className="flex-1 flex flex-col items-center justify-center py-6">
+                  {textMatchMode && textPrompt && (
+                    <div className="mb-4 text-sm text-gray-500 text-center px-4">
+                      입력한 요청: <span className="font-semibold text-gray-800">{textPrompt}</span>
+                    </div>
+                  )}
                   {renderResultCards()}
                 </div>
                 {/* 하단 버튼 영역 */}
@@ -894,6 +1015,36 @@ type ScoredFactory = Factory & { score: number };
                 <div className="text-sm md:text-base text-gray-500 mb-4">
                   몇 가지 정보를 알려주시면,<br />
                   <span className="font-bold">가장 적합한 3개의 봉제공장을 추천</span>해드립니다.
+                </div>
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 md:p-4">
+                  <div className="text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    텍스트로 바로 매칭하기
+                  </div>
+                  <div className="flex flex-col md:flex-row gap-2">
+                    <input
+                      value={quickInput}
+                      onChange={(e) => setQuickInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && quickInput.trim()) {
+                          startTextMatching(quickInput);
+                        }
+                      }}
+                      placeholder="예: 여성 니트 상의 소량 생산 가능한 공장을 찾고 싶어요"
+                      className="w-full h-10 md:h-11 rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-[#333333]/20 focus:border-[#333333]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => startTextMatching(quickInput)}
+                      disabled={!quickInput.trim()}
+                      className={`h-10 md:h-11 px-4 rounded-lg text-sm font-bold transition ${
+                        quickInput.trim()
+                          ? "bg-[#222222] text-white hover:bg-[#111111]"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      }`}
+                    >
+                      분석 시작
+                    </button>
+                  </div>
                 </div>
                 <hr className="my-4 border-gray-200" />
                 <div className="flex gap-2 mb-6">

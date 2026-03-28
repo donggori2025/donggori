@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { SignedIn, useUser } from "@clerk/nextjs";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { getFactoryProfileImage } from "@/lib/factoryAuth";
 import { storage } from "@/lib/utils";
 import type { FactoryAuth } from "@/lib/types";
@@ -12,12 +12,14 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, isSignedIn, isLoaded } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
   const [userType, setUserType] = useState<string | null>(null);
   const [factoryAuth, setFactoryAuth] = useState<FactoryAuth | null>(null);
   const [factoryProfileImage, setFactoryProfileImage] = useState<string | null>(null);
   const [naverUser, setNaverUser] = useState<any>(null);
   const [kakaoUser, setKakaoUser] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // 네비게이션 메뉴 항목을 메모이제이션
   const navMenu = useMemo(() => [
@@ -30,6 +32,13 @@ export default function Header() {
   // 컴포넌트 마운트 확인
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   // 사용자 타입과 공장 인증 정보 로드
@@ -116,9 +125,27 @@ export default function Header() {
   }, []);
 
   // 서버 사이드 렌더링 시 기본 UI만 표시
+  const isHome = pathname === "/";
+  const isTransparentMode = isHome && !isScrolled && !menuOpen;
+  const positionClass = isHome ? "fixed top-0 left-0 right-0" : "sticky top-0";
+  const headerClass = isTransparentMode
+    ? `w-full bg-transparent border-b border-transparent px-4 sm:px-6 ${positionClass} z-[9999] transition-colors duration-300`
+    : `w-full bg-white border-b px-4 sm:px-6 ${positionClass} z-[9999] transition-colors duration-300`;
+  const navTextClass = isTransparentMode ? "text-white" : "text-[#222222]";
+  const navHoverClass = isTransparentMode ? "hover:text-white/90" : "hover:text-[#222222]";
+  const logoClass = isTransparentMode
+    ? "w-24 sm:w-28 md:w-[113px] h-auto min-h-[32px] brightness-0 invert"
+    : "w-24 sm:w-28 md:w-[113px] h-auto min-h-[32px]";
+  const signInButtonClass = isTransparentMode
+    ? "text-sm lg:text-base font-semibold text-[#111111] border border-white/70 bg-white px-2 lg:px-3 py-1 rounded hover:bg-white/90 transition-colors"
+    : "text-sm lg:text-base font-semibold text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors";
+  const mobileMenuButtonClass = isTransparentMode
+    ? "p-2 rounded hover:bg-white/10 focus:outline-none text-white"
+    : "p-2 rounded hover:bg-gray-100 focus:outline-none";
+
   if (!mounted) {
     return (
-      <header className="w-full bg-white border-b px-4 sm:px-6 sticky top-0 z-[9999]">
+      <header className={headerClass}>
         <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-3 sm:py-4">
           {/* 로고 */}
           <Link href="/" className="select-none flex-shrink-0" aria-label="동고리 홈">
@@ -128,19 +155,19 @@ export default function Header() {
               width={113}
               height={47}
               priority
-              className="w-24 sm:w-28 md:w-[113px] h-auto min-h-[32px]"
+              className={logoClass}
               style={{ height: 'auto', minHeight: '32px' }}
             />
           </Link>
 
           {/* 데스크탑 메뉴 */}
           <div className="hidden md:flex items-center gap-8 lg:gap-10">
-            <nav className="flex gap-6 lg:gap-8 text-sm lg:text-base font-medium text-[#222222]">
+            <nav className={`flex gap-6 lg:gap-8 text-sm lg:text-base font-semibold ${navTextClass}`}>
               {navMenu.map((item) => (
                 <Link 
                   key={item.href} 
                   href={item.href} 
-                  className={`hover:text-[#222222] hover:font-bold transition-colors ${
+                  className={`${navHoverClass} hover:font-bold transition-colors ${
                     item.label === "AI 매칭" ? "ai-matching-glow" : ""
                   }`}
                 >
@@ -151,7 +178,7 @@ export default function Header() {
             {/* SSR 초기 렌더에서도 로그인 버튼 노출 (하이드레이션 후 상태에 따라 교체됨) */}
             <Link
               href="/sign-in"
-              className="text-sm lg:text-base font-medium text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors"
+              className={signInButtonClass}
             >
               로그인/회원가입
             </Link>
@@ -161,7 +188,7 @@ export default function Header() {
           <div className="md:hidden flex items-center">
             <button
               aria-label="메뉴 열기"
-              className="p-2 rounded hover:bg-gray-100 focus:outline-none"
+              className={mobileMenuButtonClass}
             >
               <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -174,7 +201,7 @@ export default function Header() {
   }
 
   return (
-    <header className="w-full bg-white border-b px-4 sm:px-6 sticky top-0 z-[9999]">
+    <header className={headerClass}>
       <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-3 sm:py-4">
         {/* 로고 */}
         <Link href="/" className="select-none flex-shrink-0" aria-label="동고리 홈">
@@ -184,19 +211,19 @@ export default function Header() {
             width={113}
             height={47}
             priority
-            className="w-24 sm:w-28 md:w-[113px] h-auto min-h-[32px]"
+            className={logoClass}
             style={{ height: 'auto', minHeight: '32px' }}
           />
         </Link>
 
         {/* 데스크탑 메뉴 */}
         <div className="hidden md:flex items-center gap-8 lg:gap-10">
-          <nav className="flex gap-6 lg:gap-8 text-sm lg:text-base font-medium text-[#222222]">
+          <nav className={`flex gap-6 lg:gap-8 text-sm lg:text-base font-semibold ${navTextClass}`}>
             {navMenu.map((item) => (
               <Link 
                 key={item.href} 
                 href={item.href} 
-                className={`hover:text-[#222222] hover:font-bold transition-colors ${
+                className={`${navHoverClass} hover:font-bold transition-colors ${
                   item.label === "AI 매칭" ? "ai-matching-glow" : ""
                 }`}
               >
@@ -209,7 +236,7 @@ export default function Header() {
             {/* 로그인 전: 로그인/회원가입 버튼 */}
             {(!isLoaded || (!isSignedIn && !factoryAuth && !naverUser && !kakaoUser)) && (
               <button
-                className="text-sm lg:text-base font-medium text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors"
+                className={signInButtonClass}
                 onClick={handleSignInClick}
               >
                 로그인/회원가입
@@ -272,7 +299,7 @@ export default function Header() {
         <div className="md:hidden flex items-center">
           <button
             aria-label="메뉴 열기"
-            className="p-2 rounded hover:bg-gray-100 focus:outline-none"
+            className={mobileMenuButtonClass}
             onClick={toggleMenu}
           >
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -334,7 +361,7 @@ export default function Header() {
                 <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-gray-200">
                   {(!isLoaded || (!isSignedIn && !factoryAuth && !naverUser && !kakaoUser)) && (
                     <button
-                      className="w-full py-3 px-4 rounded-lg bg-[#222222] hover:bg-[#444] text-white font-medium transition-colors"
+                      className="w-full py-3 px-4 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-[#111111] font-semibold transition-colors"
                       onClick={handleSignInClick}
                     >
                       로그인/회원가입
