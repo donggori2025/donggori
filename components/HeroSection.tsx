@@ -12,15 +12,26 @@ const EXAMPLES = [
 const ROLE_FACES = [
   { label: "디자이너", colorClass: "text-[#7DD3FC]" },
   { label: "대표", colorClass: "text-[#F9A8D4]" },
-  { label: "김봉제", colorClass: "text-[#FDE68A]" },
+  { label: "MD", colorClass: "text-[#FDE68A]" },
+  { label: "메이커", colorClass: "text-[#86EFAC]" },
+  { label: "크리에이터", colorClass: "text-[#FCA5A5]" },
   { label: "브랜드", colorClass: "text-[#C4B5FD]" },
 ] as const;
 
 export default function HeroSection() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
+  const [roleIndex, setRoleIndex] = useState(0);
 
   const trimmedPrompt = useMemo(() => prompt.trim(), [prompt]);
+  const faceAngle = 360 / ROLE_FACES.length;
+
+  React.useEffect(() => {
+    const timer = window.setInterval(() => {
+      setRoleIndex((prev) => (prev + 1) % ROLE_FACES.length);
+    }, 2600);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const goToMatchingWithPrompt = (text: string) => {
     const value = text.trim();
@@ -33,28 +44,31 @@ export default function HeroSection() {
       className="w-screen bg-white py-0 relative left-1/2 right-1/2 -mx-[50vw]"
       style={{ left: "50%", right: "50%", marginLeft: "-50vw", marginRight: "-50vw" }}
     >
-      <div className="w-full mx-auto flex flex-col items-stretch h-[100svh] min-h-[100svh] gap-0 px-0">
-        <div className="flex-1 min-w-0 flex items-center justify-center relative overflow-hidden bg-white h-full">
+      <div className="w-full mx-auto flex flex-col items-stretch min-h-[100svh] gap-0 px-0">
+        <div className="relative min-w-0 w-full min-h-[100svh] flex items-start md:items-center justify-center overflow-hidden bg-white py-24 md:py-0">
           <img
             src="https://res.cloudinary.com/dvvqaywkd/image/upload/v1774682297/image_4_ykback.png"
             alt="동고리 메인 이미지"
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/45 pointer-events-none" />
 
-          <div className="absolute inset-0 z-10 flex items-center justify-center px-4">
+          <div className="relative z-10 w-full flex items-start md:items-center justify-center px-4 py-8 md:py-0">
             <div className="w-full max-w-[980px] p-2 md:p-4">
               <p className="text-center text-sm md:text-lg font-semibold text-white/90 mb-4">
                 의류 봉제·생산 연결 플랫폼, 동고리 입니다.
               </p>
               <h2 className="text-2xl md:text-5xl font-extrabold text-white text-center leading-tight">
                 <span className="role-cube-wrap inline-flex items-center justify-center align-baseline">
-                  <span className="role-cube">
+                  <span
+                    className="role-cube"
+                    style={{ transform: `rotateX(${roleIndex * faceAngle}deg)` }}
+                  >
                     {ROLE_FACES.map((role, idx) => (
                       <span
                         key={role.label}
                         className={`role-face ${role.colorClass}`}
-                        style={{ transform: `rotateX(${-idx * 90}deg) translateZ(0.62em)` }}
+                        style={{ transform: `rotateX(${-idx * faceAngle}deg) translateZ(0.78em)` }}
                       >
                         {role.label}
                       </span>
@@ -70,7 +84,7 @@ export default function HeroSection() {
               <div className="mt-5 md:mt-6">
                 <div className="hero-input-border rounded-2xl p-[2.5px] shadow-sm">
                   <div className="rounded-2xl bg-white p-3 md:p-4">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                     <input
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
@@ -87,7 +101,7 @@ export default function HeroSection() {
                       type="button"
                       onClick={() => goToMatchingWithPrompt(prompt)}
                       disabled={!trimmedPrompt}
-                      className={`h-10 md:h-11 px-4 md:px-5 rounded-lg text-sm font-bold transition shrink-0 ${
+                      className={`h-10 md:h-11 px-4 md:px-5 rounded-lg text-sm font-bold transition shrink-0 w-full sm:w-auto ${
                         trimmedPrompt
                           ? "bg-[#111111] text-white hover:bg-black"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -135,7 +149,8 @@ export default function HeroSection() {
           width: 100%;
           height: 100%;
           transform-style: preserve-3d;
-          animation: role-cube-spin 10.4s infinite cubic-bezier(0.55, 0.08, 0.2, 1);
+          transition: transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
+          will-change: transform;
         }
 
         .role-face {
@@ -147,28 +162,6 @@ export default function HeroSection() {
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
           line-height: 1;
-        }
-
-        @keyframes role-cube-spin {
-          0%,
-          20% {
-            transform: rotateX(0deg);
-          }
-          25%,
-          45% {
-            transform: rotateX(90deg);
-          }
-          50%,
-          70% {
-            transform: rotateX(180deg);
-          }
-          75%,
-          95% {
-            transform: rotateX(270deg);
-          }
-          100% {
-            transform: rotateX(360deg);
-          }
         }
 
         .hero-input-border {
