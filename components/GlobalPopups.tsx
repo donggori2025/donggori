@@ -104,17 +104,17 @@ export default function GlobalPopups() {
           </svg>
         </button>
         
-        {/* 이미지 영역: 700×700 정사각형, 이미지는 영역을 여백 없이 채움 */}
+        {/* 이미지 영역: 다양한 비율 이미지를 잘림 없이 표시 */}
         {current.image_url && (
           <div 
-            className="shrink-0 w-full overflow-hidden bg-gray-100"
-            style={{ aspectRatio: '1', maxHeight: 'min(700px, 85vh)' }}
+            className="shrink-0 w-full overflow-hidden bg-gray-100 flex items-center justify-center"
+            style={{ maxHeight: 'min(72vh, 900px)' }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src={current.image_url} 
               alt={current.title || ''} 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </div>
         )}
