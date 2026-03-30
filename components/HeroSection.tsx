@@ -14,21 +14,22 @@ const ROLE_FACES = [
   { label: "대표", colorClass: "text-[#F9A8D4]" },
   { label: "MD", colorClass: "text-[#FDE68A]" },
   { label: "메이커", colorClass: "text-[#86EFAC]" },
-  { label: "크리에이터", colorClass: "text-[#FCA5A5]" },
   { label: "브랜드", colorClass: "text-[#C4B5FD]" },
 ] as const;
 
 export default function HeroSection() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
-  const [roleIndex, setRoleIndex] = useState(0);
+  const [spinStep, setSpinStep] = useState(0);
 
   const trimmedPrompt = useMemo(() => prompt.trim(), [prompt]);
   const faceAngle = 360 / ROLE_FACES.length;
+  const activeRoleIndex = ((spinStep % ROLE_FACES.length) + ROLE_FACES.length) % ROLE_FACES.length;
 
   React.useEffect(() => {
     const timer = window.setInterval(() => {
-      setRoleIndex((prev) => (prev + 1) % ROLE_FACES.length);
+      // modulo로 되돌리지 않고 누적 회전시켜 항상 같은 방향(밑→위)으로 전환
+      setSpinStep((prev) => prev + 1);
     }, 2600);
     return () => window.clearInterval(timer);
   }, []);
@@ -62,19 +63,19 @@ export default function HeroSection() {
                 <span className="role-cube-wrap inline-flex items-center justify-center align-baseline">
                   <span
                     className="role-cube"
-                    style={{ transform: `rotateX(${roleIndex * faceAngle}deg)` }}
+                    style={{ transform: `rotateX(${spinStep * faceAngle}deg)` }}
                   >
                     {ROLE_FACES.map((role, idx) => (
                       <span
                         key={role.label}
-                        className={`role-face ${role.colorClass}`}
-                        style={{ transform: `rotateX(${-idx * faceAngle}deg) translateZ(0.78em)` }}
+                        className={`role-face ${role.colorClass} ${idx === activeRoleIndex ? "role-face-active" : "role-face-hidden"}`}
+                        style={{ transform: `rotateX(${-idx * faceAngle}deg) translateZ(0.62em)` }}
                       >
                         {role.label}
                       </span>
                     ))}
                   </span>
-                </span>{" "}
+                </span>
                 님, 어떤 옷을 만들고 싶으신가요?
               </h2>
               <p className="mt-3 text-sm md:text-base text-white/90 text-center">
@@ -137,11 +138,12 @@ export default function HeroSection() {
       </div>
       <style jsx>{`
         .role-cube-wrap {
-          perspective: 900px;
-          width: 6.2ch;
-          height: 1.05em;
+          perspective: 760px;
+          width: 5.8ch;
+          height: 1.15em;
           vertical-align: baseline;
-          transform: translateY(0.13em);
+          transform: translateY(0.24em);
+          overflow: hidden;
         }
 
         .role-cube {
@@ -157,11 +159,24 @@ export default function HeroSection() {
           position: absolute;
           inset: 0;
           display: flex;
-          align-items: flex-end;
+          align-items: center;
           justify-content: center;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
-          line-height: 1;
+          line-height: 1.05;
+          white-space: nowrap;
+        }
+
+        .role-face-active {
+          opacity: 1;
+          visibility: visible;
+          transition: opacity 220ms ease;
+        }
+
+        .role-face-hidden {
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 220ms ease;
         }
 
         .hero-input-border {
