@@ -1036,7 +1036,7 @@ type ScoredFactory = Factory & { score: number };
                       type="button"
                       onClick={() => startTextMatching(quickInput)}
                       disabled={!quickInput.trim()}
-                      className={`h-10 md:h-11 px-4 rounded-lg text-sm font-bold transition ${
+                      className={`h-10 md:h-11 px-4 rounded-lg text-sm font-bold whitespace-nowrap transition ${
                         quickInput.trim()
                           ? "bg-[#222222] text-white hover:bg-[#111111]"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
