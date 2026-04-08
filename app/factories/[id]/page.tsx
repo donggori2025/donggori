@@ -237,6 +237,16 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     window.open(OPEN_KAKAO_CHAT_URL, "_blank");
   };
 
+  const goToRequestAfterSignIn = (service: "standard" | "deluxe" | "premium") => {
+    const resolvedFactoryId = factoryId || String(factory?.id || "");
+    if (!resolvedFactoryId) {
+      alert("공장 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+    const nextPath = `/factories/${resolvedFactoryId}/request?service=${service}`;
+    window.location.href = `/sign-in?next=${encodeURIComponent(nextPath)}`;
+  };
+
   const handleShare = async () => {
     const currentUrl = window.location.href;
     try {
@@ -737,7 +747,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                     className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
                     onClick={() => {
                       if (!isAppLoggedIn()) {
-                        alert('로그인 후 이용 가능합니다.');
+                        goToRequestAfterSignIn('standard');
                         return;
                       }
                       const userName = getAppUserName();
@@ -770,7 +780,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                     className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
                     onClick={() => {
                       if (!isAppLoggedIn()) {
-                        alert('로그인 후 이용 가능합니다.');
+                        goToRequestAfterSignIn('deluxe');
                         return;
                       }
                       const userName = getAppUserName();
@@ -804,7 +814,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                     className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
                     onClick={() => {
                       if (!isAppLoggedIn()) {
-                        alert('로그인 후 이용 가능합니다.');
+                        goToRequestAfterSignIn('premium');
                         return;
                       }
                       const userName = getAppUserName();
