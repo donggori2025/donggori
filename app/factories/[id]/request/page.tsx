@@ -16,12 +16,14 @@ const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user: clerkUser, isLoaded: clerkLoaded } = useUser();
+  const { user: clerkUser } = useUser();
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [factoryId, setFactoryId] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string>("standard");
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
   
   // 폼 상태
   const [formData, setFormData] = useState<RequestFormData>({
@@ -68,25 +70,36 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }
   }, [searchParams]);
 
-  // 로그인한 유저의 이름을 자동으로 입력
+  // 진입 시 로그인 강제 체크 (직접 URL 접근 포함)
   useEffect(() => {
-    // Clerk가 로드될 때까지 기다림
-    if (!clerkLoaded) return;
-    
-    // 로그인 확인 및 기본 사용자 정보 채우기
-    if (!isAppLoggedIn() && !clerkUser) {
-      alert('로그인 후 이용 가능합니다.');
-      if (factoryId) router.replace(`/sign-in?next=/factories/${factoryId}/request`);
+    const loggedIn = Boolean(clerkUser?.id) || isAppLoggedIn();
+    setAuthorized(loggedIn);
+    setAuthChecked(true);
+
+    if (!loggedIn) {
+      alert("로그인/회원가입 후 이용 가능합니다.");
+      if (typeof window !== "undefined") {
+        const nextPath = `${window.location.pathname}${window.location.search || ""}`;
+        router.replace(`/sign-in?next=${encodeURIComponent(nextPath)}`);
+      } else if (factoryId) {
+        router.replace(`/sign-in?next=${encodeURIComponent(`/factories/${factoryId}/request`)}`);
+      } else {
+        router.replace("/sign-in");
+      }
       return;
     }
-    
+  }, [clerkUser, factoryId, router]);
+
+  // 로그인한 유저의 이름을 자동으로 입력
+  useEffect(() => {
+    if (!authorized) return;
+
     const nameFromUrl = searchParams.get("name");
     const userIdentity = getAppUserIdentity(clerkUser);
     
     // 개발 환경에서만 디버깅 정보 출력
     if (process.env.NODE_ENV === 'development') {
       console.log('사용자 정보:', {
-        clerkLoaded,
         clerkUser: clerkUser ? {
           id: clerkUser.id,
           firstName: clerkUser.firstName,
@@ -113,7 +126,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     if (userIdentity.phone) {
       storage.set('userPhone', userIdentity.phone);
     }
-  }, [searchParams, factoryId, router, clerkLoaded, clerkUser]);
+  }, [searchParams, authorized, clerkUser]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
@@ -479,6 +492,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     setShowExitConfirm(false);
   };
 
+  if (!authChecked || !authorized) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">로그인 확인 중...</div>;
   if (loading) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">로딩 중...</div>;
   if (!factory) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 공장입니다.</div>;
 
