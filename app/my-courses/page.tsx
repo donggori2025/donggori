@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useAppAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { courses } from "@/lib/courses";
 import Link from "next/link";
@@ -14,7 +14,7 @@ type CourseLike = {
 };
 
 export default function MyCoursesPage() {
-  const { user } = useUser();
+  const { user, isSignedIn } = useAppAuth();
   const [myCourses, setMyCourses] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 

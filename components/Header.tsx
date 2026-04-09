@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { SignedIn, useUser } from "@clerk/nextjs";
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { useAppAuth } from "@/contexts/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
 import { getFactoryProfileImage } from "@/lib/factoryAuth";
 import { storage } from "@/lib/utils";
@@ -10,7 +10,7 @@ import type { FactoryAuth } from "@/lib/types";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user, isSignedIn, isLoaded } = useUser();
+  const { user: authUser, isSignedIn, isLoaded } = useAppAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [userType, setUserType] = useState<string | null>(null);
@@ -107,7 +107,7 @@ export default function Header() {
     } catch (error) {
       console.error('Header initialization error:', error);
     }
-  }, [mounted, isSignedIn]); // isSignedIn 상태 변화도 감지
+  }, [mounted, isSignedIn]);
 
   // 로그인 버튼 클릭 핸들러
   const handleSignInClick = useCallback(() => {
@@ -243,11 +243,11 @@ export default function Header() {
               </button>
             )}
 
-            {/* Clerk 로그인 후: 프로필 이미지 */}
-            {isSignedIn && user && (
+            {/* 일반 로그인 후: 마이페이지 링크 */}
+            {isSignedIn && authUser && !naverUser && !kakaoUser && userType !== "factory" && (
               <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
                 <Image
-                  src={user.imageUrl}
+                  src={authUser.profileImage || "/logo_donggori.png"}
                   alt="프로필 이미지"
                   width={40}
                   height={40}
@@ -368,11 +368,11 @@ export default function Header() {
                     </button>
                   )}
 
-                  {/* Clerk 로그인 후: 프로필 이미지 */}
-                  {isSignedIn && user && (
+                  {/* 일반 로그인 후 모바일 메뉴 */}
+                  {isSignedIn && authUser && !naverUser && !kakaoUser && userType !== "factory" && (
                     <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
                       <Image
-                        src={user.imageUrl}
+                        src={authUser.profileImage || "/logo_donggori.png"}
                         alt="프로필 이미지"
                         width={40}
                         height={40}

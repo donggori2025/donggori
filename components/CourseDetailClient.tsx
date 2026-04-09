@@ -1,5 +1,5 @@
 "use client";
-import { useUser } from "@clerk/nextjs";
+import { useAppAuth } from "@/contexts/AuthContext";
 import LikeButton from "./LikeButton";
 import CourseImage from "./CourseImage";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ export interface Course {
 }
 
 export default function CourseDetailClient({ course }: { course: Course }) {
-  const { user } = useUser();
+  const { user, isSignedIn } = useAppAuth();
   return (
     <main className="max-w-xl mx-auto py-10 px-4">
       <div className="bg-white rounded-xl shadow-md p-6">

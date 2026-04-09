@@ -7,13 +7,6 @@ export const config = {
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   },
 
-  // Clerk 설정
-  clerk: {
-    publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
-    secretKey: process.env.CLERK_SECRET_KEY || '',
-    frontendApi: process.env.NEXT_PUBLIC_CLERK_FRONTEND_API,
-  },
-
   // 이미지 서비스 설정
   imageService: process.env.IMAGE_SERVICE || 'vercel-blob',
 
@@ -126,8 +119,6 @@ export function validateConfig() {
     'NEXT_PUBLIC_SUPABASE_URL',
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     'SUPABASE_SERVICE_ROLE_KEY',
-    'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
-    'CLERK_SECRET_KEY',
     'BLOB_READ_WRITE_TOKEN',
     'NEXT_PUBLIC_NAVER_MAP_CLIENT_ID',
     'NEXT_PUBLIC_NAVER_CLIENT_ID',

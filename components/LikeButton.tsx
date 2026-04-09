@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useAppAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
@@ -11,7 +11,7 @@ interface LikeButtonProps {
 }
 
 export default function LikeButton({ courseId }: LikeButtonProps) {
-  const { user } = useUser();
+  const { user } = useAppAuth();
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isPending, startTransition] = useTransition();

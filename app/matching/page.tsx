@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useAppAuth } from "@/contexts/AuthContext";
 import type { Factory } from "@/lib/factories";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
@@ -97,7 +97,7 @@ function ChatBubble({ text, type, isTyping, showCursor, onEdit }: { text: string
 }
 
 export default function MatchingPage() {
-  const { user } = useUser();
+  const { user } = useAppAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // 공장 데이터 state
   const [factories, setFactories] = useState<Factory[]>([]);

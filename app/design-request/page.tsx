@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useAppAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { getAppUserIdentity, isAppLoggedIn } from "@/lib/utils";
 import { CalendarDays, ClipboardCheck, MessageCircleMore, Shirt } from "lucide-react";
@@ -13,7 +13,7 @@ const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
 
 export default function DesignRequestPage() {
   const router = useRouter();
-  const { user: clerkUser } = useUser();
+  const { user: clerkUser } = useAppAuth();
   const [requesterType, setRequesterType] = useState<RequesterType>("기업");
   const [productType, setProductType] = useState<ProductType | "">("");
   const [productTypeDetail, setProductTypeDetail] = useState("");
