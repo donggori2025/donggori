@@ -27,51 +27,42 @@ for (let i = 1; i <= 70; i++) {
   });
 }
 
-// 봉제공장 로그인 검증 함수
-export function validateFactoryLogin(username: string, password: string): FactoryAuth | null {
-  // 제로폭 문자 및 공백 제거 유틸
+// 봉제공장 로그인 검증 함수 (bcrypt 비교)
+export async function validateFactoryLogin(username: string, password: string): Promise<FactoryAuth | null> {
   const stripInvisibles = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '');
 
   const rawUser = stripInvisibles(username).trim();
   const rawPass = stripInvisibles(password).trim();
 
-  console.log('validateFactoryLogin 입력:', { username: rawUser, password: rawPass ? rawPass.substring(0, 3) + '***' : '' });
-
   const input = rawUser.toLowerCase();
 
-  // 입력값 정규화: 숫자만 입력 → factoryNN, factoryN → factoryNN
   let normalizedUsername = input;
 
-  // 숫자만 들어온 경우: 공장 ID로 간주
   if (/^\d{1,2}$/.test(input)) {
     const padded = input.padStart(2, '0');
     normalizedUsername = `factory${padded}`;
-    console.log('숫자만 입력됨, 정규화:', { input, normalizedUsername });
   }
 
-  // factory + 1~2자리 숫자 (선행 0 없는 형태) → 선행 0 패딩
   const factoryMatch = input.match(/^factory(\d{1,2})$/);
   if (factoryMatch) {
     const num = factoryMatch[1];
     const padded = num.padStart(2, '0');
     normalizedUsername = `factory${padded}`;
-    console.log('factory + 숫자 입력됨, 정규화:', { input, normalizedUsername });
   }
 
-  console.log('정규화된 사용자명:', normalizedUsername);
-
-  // 사용자명으로 우선 매칭
   const record = factoryAuthData.find(auth => auth.username.toLowerCase() === normalizedUsername);
   if (!record) {
-    console.log('검색 결과: 사용자 없음');
     return null;
   }
 
-  // 비밀번호 허용 규칙: 반드시 factoryNN! 형식과 일치해야 함
-  const validPassword = record.password === rawPass;
-  if (!validPassword) {
-    console.log('비밀번호 불일치');
-    return null;
+  const bcrypt = await import('bcryptjs');
+
+  if (record.password.startsWith('$2a$') || record.password.startsWith('$2b$')) {
+    const valid = await bcrypt.compare(rawPass, record.password);
+    if (!valid) return null;
+  } else {
+    // Legacy plaintext fallback — 반드시 DB 마이그레이션으로 해시로 전환해야 합니다
+    if (record.password !== rawPass) return null;
   }
 
   return record;
@@ -79,10 +70,7 @@ export function validateFactoryLogin(username: string, password: string): Factor
 
 // 공장 로그인 시 실제 DB 공장명으로 업데이트
 export async function getFactoryAuthWithRealName(username: string, password: string): Promise<FactoryAuth | null> {
-  console.log('getFactoryAuthWithRealName 시작:', { username, password: password ? password.substring(0, 3) + '***' : '' });
-  
-  const factory = validateFactoryLogin(username, password);
-  console.log('validateFactoryLogin 결과:', factory);
+  const factory = await validateFactoryLogin(username, password);
   
   if (!factory) {
     console.log('공장 인증 실패');

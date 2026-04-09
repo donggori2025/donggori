@@ -1,16 +1,7 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { deleteImageFromBlob } from "@/lib/vercelBlobConfig";
-
-async function requireAdmin() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
-  if (!session) {
-    return NextResponse.json({ success: false, error: "관리자 인증 필요" }, { status: 401 });
-  }
-  return null;
-}
+import { requireAdmin } from "@/lib/adminSession";
 
 export async function POST(req: Request) {
   const auth = await requireAdmin();

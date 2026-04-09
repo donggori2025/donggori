@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { getServiceSupabase } from "@/lib/supabaseService";
+import { requireAdmin } from "@/lib/adminSession";
 
 export async function GET() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
-  if (!session) return NextResponse.json({ success: false, error: "관리자 인증 필요" }, { status: 401 });
+  const auth = await requireAdmin();
+  if (auth) return auth;
 
   const supabase = getServiceSupabase();
   
