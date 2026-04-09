@@ -180,7 +180,7 @@ export async function GET(request: NextRequest) {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 30, // 30일
+        maxAge: 60 * 60 * 24 * 30,
       });
       
       return response;
@@ -204,7 +204,7 @@ export async function GET(request: NextRequest) {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24, // 24시간 (임시)
+      maxAge: 60 * 60 * 24,
     });
 
     // snsAccessToken 발급 (초기화되지 않음)
