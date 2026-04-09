@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Factory } from "@/lib/factories";
-import { useUser } from "@clerk/nextjs";
+import { useAppAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { isAppLoggedIn, getAppUserIdentity, storage } from "@/lib/utils";
@@ -16,7 +16,7 @@ const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user: clerkUser } = useUser();
+  const { user: clerkUser } = useAppAuth();
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -102,10 +102,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       console.log('사용자 정보:', {
         clerkUser: clerkUser ? {
           id: clerkUser.id,
-          firstName: clerkUser.firstName,
-          fullName: clerkUser.fullName,
-          email: clerkUser.emailAddresses?.[0]?.emailAddress,
-          phone: clerkUser.phoneNumbers?.[0]?.phoneNumber
+          name: clerkUser.name,
+          email: clerkUser.email,
+          phone: clerkUser.phoneNumber
         } : null,
         userIdentity,
         nameFromUrl

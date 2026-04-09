@@ -2,34 +2,10 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSignIn } from "@clerk/nextjs";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { getFactoryAuthWithRealName } from "@/lib/factoryAuth";
-import { clerkConfig } from "@/lib/clerkConfig";
-import { handleClerkError } from "@/lib/clerkErrorTranslator";
-import { config, safeValidateOAuthConfig } from "@/lib/config";
-
-// Clerk 설정 검증
-function validateClerkSetup() {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-  
-  if (!publishableKey) {
-    return {
-      isValid: false,
-      message: '인증 서비스 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.'
-    };
-  }
-  
-  if (!publishableKey.startsWith('pk_')) {
-    return {
-      isValid: false,
-      message: '인증 서비스 설정이 올바르지 않습니다. 관리자에게 문의해주세요.'
-    };
-  }
-  
-  return { isValid: true, message: '' };
-}
+import { config } from "@/lib/config";
 
 // 오류 메시지 처리를 위한 컴포넌트
 function ErrorHandler({ onError }: { onError: (error: string) => void }) {
@@ -85,7 +61,6 @@ function SignInForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { signIn, isLoaded } = useSignIn();
   const [socialLoading, setSocialLoading] = useState<null | 'kakao' | 'naver'>(null);
   const cookieSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
   
@@ -95,7 +70,6 @@ function SignInForm() {
   // 소셜 로그인 핸들러
   const handleSocial = async (provider: 'oauth_kakao' | 'oauth_naver') => {
     setError("");
-    if (!isLoaded) return;
     setLoading(true);
     setSocialLoading(provider === 'oauth_kakao' ? 'kakao' : 'naver');
     
@@ -149,7 +123,7 @@ function SignInForm() {
       // Kakao/Naver만 지원: 방어적 코드 (여기 도달하지 않음)
     } catch (err: unknown) {
       console.error('OAuth 로그인 오류:', err);
-      setError(handleClerkError(err));
+      setError(err instanceof Error ? err.message : '소셜 로그인 중 오류가 발생했습니다.');
       setLoading(false);
       setSocialLoading(null);
     }
@@ -195,43 +169,35 @@ function SignInForm() {
       }
 
       // 봉제공장 로그인 실패 시 일반 사용자 로그인 시도
-      console.log('봉제공장 로그인 실패, 일반 사용자 로그인 시도');
-      
-      if (!isLoaded || !signIn) {
-        setError('로그인 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
-        return;
-      }
-
-      const result = await signIn.create({
-        identifier: email,
-        password,
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
+      const js = await res.json();
 
-      if (result.status === 'complete') {
-        console.log('일반 사용자 로그인 성공');
-        
-        // 서버에서 HttpOnly access_token 쿠키 발급
-        try {
-          const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-          const js = await res.json();
-          if (!res.ok) throw new Error(js.error || '토큰 발급 실패');
-        } catch (e) {
-          console.warn('accessToken 발급 실패(계속 진행):', e);
-        }
-
-        // 일반 사용자 세션 유지 시간: 30일
+      if (res.ok && js.success) {
         const userSessionDuration = 60 * 60 * 24 * 30;
         document.cookie = `userType=user; path=/; max-age=${userSessionDuration}; SameSite=Lax${cookieSecure}`;
         document.cookie = `isLoggedIn=true; path=/; max-age=${userSessionDuration}; SameSite=Lax${cookieSecure}`;
 
+        if (js.user) {
+          try {
+            localStorage.setItem('userId', js.user.id || '');
+            localStorage.setItem('userEmail', js.user.email || '');
+            localStorage.setItem('userName', js.user.name || '');
+            localStorage.setItem('userPhone', js.user.phoneNumber || '');
+            localStorage.setItem('isLoggedIn', 'true');
+          } catch {}
+        }
+
         window.location.href = '/';
       } else {
-        console.log('로그인 상태:', result.status);
-        setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+        setError(js.error || '이메일 또는 비밀번호가 올바르지 않습니다.');
       }
     } catch (err: unknown) {
       console.error('로그인 오류:', err);
-      setError(handleClerkError(err));
+      setError(err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }

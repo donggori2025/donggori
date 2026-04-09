@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useAppAuth } from '@/contexts/AuthContext';
 import { useSearchParams } from 'next/navigation';
 
 function OAuthCallbackHandler() {
-  const { user, isSignedIn, isLoaded } = useUser();
+  const { user, isSignedIn, isLoaded } = useAppAuth();
   const searchParams = useSearchParams();
 
   useEffect(() => {

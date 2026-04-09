@@ -10,10 +10,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'img.clerk.com',
-      },
-      {
-        protocol: 'https',
         hostname: 'ulrlltcrqvyutfmhcqyj.supabase.co',
       },
       {
@@ -36,7 +32,7 @@ const nextConfig: NextConfig = {
 
   // 실험적 기능 활성화
   experimental: {
-    optimizePackageImports: ['@clerk/nextjs', '@heroicons/react', 'lucide-react'],
+    optimizePackageImports: ['@heroicons/react', 'lucide-react'],
   },
 
   // Turbopack 설정

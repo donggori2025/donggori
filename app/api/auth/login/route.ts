@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     // 비밀번호 로그인인 경우
     if (!password) return NextResponse.json({ error: '비밀번호 필요' }, { status: 400 });
 
-    const { data: user, error } = await supabase.from('users').select('id, email, password, signupMethod').eq('email', normalizedEmail).maybeSingle();
+    const { data: user, error } = await supabase.from('users').select('id, email, password, signupMethod, name, phoneNumber, profileImage').eq('email', normalizedEmail).maybeSingle();
     if (error || !user) return NextResponse.json({ error: '이메일 또는 비밀번호가 올바르지 않습니다.' }, { status: 401 });
     
     // 소셜 로그인 사용자인지 확인
@@ -82,7 +82,10 @@ export async function POST(req: NextRequest) {
       isInitialized: true,
       ttlSec: SESSION_DURATIONS.USER
     });
-    const res = NextResponse.json({ success: true });
+    const res = NextResponse.json({ 
+      success: true,
+      user: { id: user.id, email: user.email, name: user.name || '', phoneNumber: user.phoneNumber || '' }
+    });
     res.cookies.set('access_token', token, { 
       httpOnly: true, 
       sameSite: 'lax', 

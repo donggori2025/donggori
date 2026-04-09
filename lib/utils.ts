@@ -212,37 +212,23 @@ export function isAppLoggedIn(): boolean {
 }
 
 /**
- * 사용자 정보 가져오기 (Clerk 우선, 소셜 로그인 fallback)
+ * 사용자 정보 가져오기 (쿠키/localStorage 기반)
  */
-export function getAppUserIdentity(clerkUser?: any): UserIdentity {
+export function getAppUserIdentity(appUser?: any): UserIdentity {
   try {
     const name = localStorage.getItem('userName') || '';
     const phone = localStorage.getItem('userPhone') || '';
     
-    // Clerk 사용자 정보 확인 (우선순위 1)
-    if (clerkUser) {
+    if (appUser) {
       return {
-        name: clerkUser.firstName || clerkUser.fullName || name,
-        phone: clerkUser.phoneNumbers?.[0]?.phoneNumber || phone,
-        id: clerkUser.id,
-        email: clerkUser.emailAddresses?.[0]?.emailAddress || ''
+        name: appUser.name || name,
+        phone: appUser.phoneNumber || phone,
+        id: appUser.id || '',
+        email: appUser.email || ''
       };
     }
     
-    // Clerk window 객체 확인 (fallback)
-    if (typeof window !== 'undefined' && (window as any).Clerk && (window as any).Clerk.user) {
-      const windowClerkUser = (window as any).Clerk.user;
-      if (windowClerkUser) {
-        return {
-          name: windowClerkUser.firstName || windowClerkUser.fullName || name,
-          phone: windowClerkUser.phoneNumbers?.[0]?.phoneNumber || phone,
-          id: windowClerkUser.id,
-          email: windowClerkUser.emailAddresses?.[0]?.emailAddress || ''
-        };
-      }
-    }
-    
-    // 카카오 사용자 정보 확인 (우선순위 2)
+    // 카카오 사용자 정보 확인
     const kakao = cookies.get('kakao_user');
     if (kakao) {
       try {
