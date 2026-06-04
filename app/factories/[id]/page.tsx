@@ -222,11 +222,30 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       alert('로그인 후 이용 가능합니다.');
       return;
     }
+    const inquiryCode = `INQ-${Date.now().toString().slice(-8)}`;
+    const factoryName = factory.company_name || factory.name || "공장";
+    const userName = getAppUserName() || "미입력";
+    const inquiryDate = new Date().toLocaleDateString("ko-KR");
+
+    const inquiryText = [
+      `[${factoryName} 문의]`,
+      "",
+      "- 요청 구분: 문의하기",
+      `- 문의번호: ${inquiryCode}`,
+      `- 업장명: ${factoryName}`,
+      `- 문의자: ${userName}`,
+      `- 문의일: ${inquiryDate}`,
+      "",
+      "동고리를 통해 문의드립니다.",
+    ].join("\n");
+
     const inquiry = {
       id: Date.now(),
+      inquiryCode,
       userId: 'custom',
       factoryId: factory.id,
-      factoryName: factory.company_name,
+      factoryName,
+      userName,
       date: new Date().toISOString().slice(0, 10),
       status: "카톡 문의 완료",
       method: "카카오톡",
@@ -234,7 +253,15 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     };
     const prev = JSON.parse(localStorage.getItem("inquiries") || "[]");
     localStorage.setItem("inquiries", JSON.stringify([inquiry, ...prev]));
-    window.open(OPEN_KAKAO_CHAT_URL, "_blank");
+    navigator.clipboard.writeText(inquiryText)
+      .then(() => {
+        alert("문의 내용이 클립보드에 복사되었습니다.\n카카오톡 채팅창에 붙여넣기 후 전송해주세요.\n(문의번호 포함)");
+        window.open(OPEN_KAKAO_CHAT_URL, "_blank");
+      })
+      .catch(() => {
+        alert("클립보드 복사에 실패하여 카카오톡만 이동합니다.\n문의번호: " + inquiryCode);
+        window.open(OPEN_KAKAO_CHAT_URL, "_blank");
+      });
   };
 
   const goToRequestAfterSignIn = (service: "standard" | "deluxe" | "premium") => {
