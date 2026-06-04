@@ -197,12 +197,15 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }));
   };
 
+  const getServiceLabel = () => `${currentService.title} (${currentService.subtitle})`;
+
   // 의뢰 내용을 클립보드에 복사할 텍스트 생성
   const generateRequestText = (fileUrls: string[] = []) => {
     const factoryName = factory?.company_name || factory?.name || '공장';
-    const serviceName = currentService.title;
+    const serviceName = getServiceLabel();
     
     let text = `[${factoryName} 의뢰 문의]\n\n`;
+    text += `- 요청 구분: 의뢰하기\n`;
     text += `- 서비스: ${serviceName}\n`;
     text += `- 디자이너: ${formData.name}\n`;
     text += `- 연락처: ${formData.contact}\n`;
@@ -249,6 +252,21 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     return text;
   };
 
+  // 문의하기 버튼용 간단 문의 텍스트 생성
+  const generateInquiryText = () => {
+    const factoryName = factory?.company_name || factory?.name || '공장';
+    const serviceName = getServiceLabel();
+
+    let text = `[${factoryName} 문의]\n\n`;
+    text += `- 요청 구분: 문의하기\n`;
+    text += `- 서비스: ${serviceName}\n`;
+    text += `- 이름: ${formData.name || "미입력"}\n`;
+    text += `- 연락처: ${formData.contact || "미입력"}\n`;
+    text += `- 문의일: ${new Date().toLocaleDateString('ko-KR')}\n\n`;
+    text += `동고리를 통해 문의드립니다.`;
+    return text;
+  };
+
   // 클립보드 복사 및 카카오톡 연결
   const copyToClipboardAndOpenKakao = async (fileUrls: string[] = []) => {
     try {
@@ -265,6 +283,21 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         console.error('클립보드 복사 오류:', error);
       }
       alert('클립보드 복사에 실패했습니다. 수동으로 복사해주세요.');
+    }
+  };
+
+  // 문의하기 버튼 전용: 문의 텍스트 복사 후 카카오톡 이동
+  const copyInquiryAndOpenKakao = async () => {
+    try {
+      const inquiryText = generateInquiryText();
+      await navigator.clipboard.writeText(inquiryText);
+      alert('문의 내용이 클립보드에 복사되었습니다!\n카카오톡 채팅창에 붙여넣기 한 뒤 전송해주세요.\n확인을 누르면 카카오톡으로 이동합니다.');
+      window.open(OPEN_KAKAO_CHAT_URL, '_blank');
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('문의 클립보드 복사 오류:', error);
+      }
+      window.open(OPEN_KAKAO_CHAT_URL, '_blank');
     }
   };
 
@@ -799,7 +832,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             <Button 
               className="w-full bg-gray-100 text-black rounded-lg py-3 font-bold hover:bg-gray-200 text-sm lg:text-base flex items-center justify-center gap-2"
               onClick={() => {
-                window.open(OPEN_KAKAO_CHAT_URL, '_blank');
+                copyInquiryAndOpenKakao();
               }}
             >
               <Image 

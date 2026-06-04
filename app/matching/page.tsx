@@ -421,6 +421,81 @@ type ScoredFactory = Factory & { score: number };
     }
   };
 
+  const normalizeToken = (value: string) => String(value || "").toLowerCase().replace(/\s+/g, "");
+
+  const splitMultiValues = (value: unknown): string[] => {
+    if (Array.isArray(value)) {
+      return value.map((v) => String(v).trim()).filter(Boolean);
+    }
+    if (typeof value === "string") {
+      return value
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+    }
+    return [];
+  };
+
+  // 도메인 동의어를 하나의 표준 토큰으로 정규화
+  const canonicalize = (raw: string): string => {
+    const n = normalizeToken(raw);
+    const aliasGroups: Record<string, string[]> = {
+      봉제: ["봉제", "임가공", "cmt", "완성업", "시아게"],
+      샘플: ["샘플", "샘플업"],
+      패턴: ["패턴", "패턴업", "수패턴", "캐드패턴"],
+      나염: ["나염", "전사", "자수", "나염/전사/자수업"],
+      qc: ["qc", "포장업(qc)", "포장업"],
+      다이마루: ["다이마루", "니트", "편물", "니트/편물"],
+      직기: ["직기", "직물/우븐", "우븐"],
+      토탈: ["토탈"],
+      기타: ["기타"],
+      양산: ["양산", "대량"],
+      소량: ["소량", "샘플"],
+    };
+
+    for (const [canonical, aliases] of Object.entries(aliasGroups)) {
+      const matched = aliases.some((alias) => {
+        const a = normalizeToken(alias);
+        return n === a || n.includes(a) || a.includes(n);
+      });
+      if (matched) return canonical;
+    }
+    return n;
+  };
+
+  const toCanonicalSet = (values: string[]): string[] => {
+    return Array.from(new Set(values.map(canonicalize).filter(Boolean)));
+  };
+
+  const matchRatio = (selected: string[], candidates: string[]) => {
+    if (selected.length === 0 || candidates.length === 0) {
+      return { ratio: 0, matched: [] as string[] };
+    }
+    const selectedCanonical = toCanonicalSet(selected);
+    const candidateCanonical = new Set(toCanonicalSet(candidates));
+    const matched = selectedCanonical.filter((token) => candidateCanonical.has(token));
+    return {
+      ratio: matched.length / selectedCanonical.length,
+      matched,
+    };
+  };
+
+  const getMoqValue = (factory: Factory): number | null => {
+    const fromMoq = typeof factory.moq === "number" ? factory.moq : Number(factory.moq);
+    if (!Number.isNaN(fromMoq) && fromMoq > 0) return fromMoq;
+    const fromMinOrder = typeof factory.minOrder === "number" ? factory.minOrder : Number(factory.minOrder);
+    if (!Number.isNaN(fromMinOrder) && fromMinOrder > 0) return fromMinOrder;
+    return null;
+  };
+
+  const isMoqRangeMatch = (range: string, moq: number) => {
+    if (range === "0-50") return moq >= 0 && moq <= 50;
+    if (range === "51-100") return moq >= 51 && moq <= 100;
+    if (range === "101-300") return moq >= 101 && moq <= 300;
+    if (range === "301+") return moq >= 301;
+    return false;
+  };
+
   // 개선된 AI 매칭 알고리즘: 가중치 기반 점수 계산 시스템
   const getRecommendedFactories = useCallback((answers: string[]) => {
     console.log('🔍 AI 매칭 시작 - 사용자 답변:', answers);
@@ -441,84 +516,110 @@ type ScoredFactory = Factory & { score: number };
       let maxPossibleScore = 0;
       const matchDetails: string[] = [];
 
+      const selectedFactoryTypes = splitMultiValues(answers[0]);
+      const selectedFabrics = splitMultiValues(answers[1]);
+      const selectedDistricts = splitMultiValues(answers[2]);
+      const selectedMoqRange = splitMultiValues(answers[3])[0];
+      const selectedSewing = splitMultiValues(answers[4]);
+      const selectedPattern = splitMultiValues(answers[5]);
+      const selectedSpecial = splitMultiValues(answers[6]);
+      const selectedItems = splitMultiValues(answers[7]);
+
+      const factoryTypeCandidates = [
+        ...splitMultiValues(factory.factory_type),
+        ...splitMultiValues(factory.business_type),
+      ];
+      const fabricCandidates = splitMultiValues(factory.main_fabrics);
+      const districtCandidates = splitMultiValues(factory.admin_district);
+      const itemCandidates = [
+        ...splitMultiValues(factory.top_items_upper),
+        ...splitMultiValues(factory.top_items_lower),
+        ...splitMultiValues(factory.top_items_outer),
+        ...splitMultiValues(factory.top_items_dress_skirt),
+        ...splitMultiValues(factory.top_items_bag),
+        ...splitMultiValues(factory.top_items_fashion_accessory),
+        ...splitMultiValues(factory.top_items_underwear),
+        ...splitMultiValues(factory.top_items_sports_leisure),
+        ...splitMultiValues(factory.top_items_pet),
+        ...splitMultiValues(factory.items),
+      ];
+
       // 1. 공장 타입 매칭 (가중치: 30)
-      if (answers[0] && typeof factory.factory_type === 'string') {
+      if (selectedFactoryTypes.length > 0 && factoryTypeCandidates.length > 0) {
         maxPossibleScore += weights.factory_type;
-        if (answers[0].includes(factory.factory_type)) {
-          totalScore += weights.factory_type;
-          matchDetails.push(`공장타입: ${factory.factory_type}`);
+        const { ratio, matched } = matchRatio(selectedFactoryTypes, factoryTypeCandidates);
+        if (ratio > 0) {
+          totalScore += weights.factory_type * ratio;
+          matchDetails.push(`공장타입: ${matched.join(", ")}`);
         }
       }
 
       // 2. 주요 원단 매칭 (가중치: 25)
-      if (answers[1] && typeof factory.main_fabrics === 'string') {
+      if (selectedFabrics.length > 0 && fabricCandidates.length > 0) {
         maxPossibleScore += weights.main_fabrics;
-        if (answers[1].includes(factory.main_fabrics)) {
-          totalScore += weights.main_fabrics;
-          matchDetails.push(`원단: ${factory.main_fabrics}`);
+        const { ratio, matched } = matchRatio(selectedFabrics, fabricCandidates);
+        if (ratio > 0) {
+          totalScore += weights.main_fabrics * ratio;
+          matchDetails.push(`원단: ${matched.join(", ")}`);
         }
       }
 
       // 3. 지역 매칭 (가중치: 20)
-      if (answers[2] && typeof factory.admin_district === 'string') {
+      if (selectedDistricts.length > 0 && districtCandidates.length > 0) {
         maxPossibleScore += weights.admin_district;
-        if (answers[2].includes(factory.admin_district)) {
-          totalScore += weights.admin_district;
-          matchDetails.push(`지역: ${factory.admin_district}`);
+        const { ratio, matched } = matchRatio(selectedDistricts, districtCandidates);
+        if (ratio > 0) {
+          totalScore += weights.admin_district * ratio;
+          matchDetails.push(`지역: ${matched.join(", ")}`);
         }
       }
 
       // 4. MOQ 매칭 (가중치: 15)
-      if (answers[3] && factory.minOrder !== undefined) {
+      const moqValue = getMoqValue(factory);
+      if (selectedMoqRange && moqValue !== null) {
         maxPossibleScore += weights.moq;
-        const moqMatch = (
-          (answers[3] === "0-50" && factory.minOrder <= 50) ||
-          (answers[3] === "51-100" && factory.minOrder <= 100) ||
-          (answers[3] === "101-300" && factory.minOrder <= 300) ||
-          (answers[3] === "301+" && factory.minOrder > 300)
-        );
+        const moqMatch = isMoqRangeMatch(selectedMoqRange, moqValue);
         if (moqMatch) {
           totalScore += weights.moq;
-          matchDetails.push(`MOQ: ${factory.minOrder}`);
+          matchDetails.push(`MOQ: ${moqValue}`);
         }
       }
 
       // 5. 장비 매칭 (가중치: 10)
-      let equipmentScore = 0;
-      if (answers[4] && typeof factory.sewing_machines === 'string') {
-        const sewingMatch = answers[4].split(',').some(val => 
-          factory.sewing_machines.includes(val.trim())
-        );
-        if (sewingMatch) equipmentScore += 3;
+      let equipmentRawScore = 0;
+      let equipmentRawMax = 0;
+      if (selectedSewing.length > 0) {
+        equipmentRawMax += 3;
+        const { ratio } = matchRatio(selectedSewing, splitMultiValues(factory.sewing_machines));
+        equipmentRawScore += ratio * 3;
       }
-      if (answers[5] && typeof factory.pattern_machines === 'string') {
-        const patternMatch = answers[5].split(',').some(val => 
-          factory.pattern_machines.includes(val.trim())
-        );
-        if (patternMatch) equipmentScore += 3;
+      if (selectedPattern.length > 0) {
+        equipmentRawMax += 3;
+        const { ratio } = matchRatio(selectedPattern, splitMultiValues(factory.pattern_machines));
+        equipmentRawScore += ratio * 3;
       }
-      if (answers[6] && typeof factory.special_machines === 'string') {
-        const specialMatch = answers[6].split(',').some(val => 
-          factory.special_machines.includes(val.trim())
-        );
-        if (specialMatch) equipmentScore += 4;
+      if (selectedSpecial.length > 0) {
+        equipmentRawMax += 4;
+        const { ratio } = matchRatio(selectedSpecial, splitMultiValues(factory.special_machines));
+        equipmentRawScore += ratio * 4;
       }
-      totalScore += Math.min(equipmentScore, weights.equipment);
-      maxPossibleScore += weights.equipment;
-      if (equipmentScore > 0) {
-        matchDetails.push(`장비 매칭: ${equipmentScore}점`);
+      if (equipmentRawMax > 0) {
+        maxPossibleScore += weights.equipment;
+        const normalizedEquipmentScore = (equipmentRawScore / equipmentRawMax) * weights.equipment;
+        totalScore += normalizedEquipmentScore;
+        if (normalizedEquipmentScore > 0) {
+          matchDetails.push(`장비 매칭: ${normalizedEquipmentScore.toFixed(1)}점`);
+        }
       }
 
       // 6. 품목 매칭 (가중치: 10)
-      if (answers[7] && Array.isArray(factory.items)) {
+      if (selectedItems.length > 0 && itemCandidates.length > 0) {
         maxPossibleScore += weights.items;
-        const itemMatches = factory.items.filter(item => 
-          answers[7].includes(item)
-        );
-        if (itemMatches.length > 0) {
-          const itemScore = (itemMatches.length / factory.items.length) * weights.items;
+        const { ratio, matched } = matchRatio(selectedItems, itemCandidates);
+        if (ratio > 0) {
+          const itemScore = ratio * weights.items;
           totalScore += itemScore;
-          matchDetails.push(`품목: ${itemMatches.join(', ')}`);
+          matchDetails.push(`품목: ${matched.join(', ')}`);
         }
       }
 
@@ -609,6 +710,7 @@ type ScoredFactory = Factory & { score: number };
     const scoredFactories = factories.map((factory) => {
       const searchable = [
         factory.factory_type,
+        factory.business_type,
         factory.main_fabrics,
         factory.admin_district,
         factory.processes,
@@ -635,17 +737,25 @@ type ScoredFactory = Factory & { score: number };
         }
       }
 
+      const moqValue = getMoqValue(factory);
+
       // 의도 키워드 보정
-      if ((normalizedPrompt.includes("샘플") || normalizedPrompt.includes("소량")) && typeof factory.minOrder === "number" && factory.minOrder <= 100) {
+      if ((normalizedPrompt.includes("샘플") || normalizedPrompt.includes("소량")) && moqValue !== null && moqValue <= 100) {
         score += 18;
       }
-      if ((normalizedPrompt.includes("대량") || normalizedPrompt.includes("양산")) && typeof factory.minOrder === "number" && factory.minOrder >= 300) {
+      if ((normalizedPrompt.includes("대량") || normalizedPrompt.includes("양산")) && moqValue !== null && moqValue >= 300) {
         score += 18;
       }
-      if (normalizedPrompt.includes("스포츠") && String(factory.main_fabrics || "").includes("다이마루")) {
+      if (
+        (normalizedPrompt.includes("스포츠") || normalizedPrompt.includes("기능성")) &&
+        toCanonicalSet(splitMultiValues(factory.main_fabrics)).includes("다이마루")
+      ) {
         score += 8;
       }
-      if (normalizedPrompt.includes("자켓") && String(factory.top_items_outer || "").length > 0) {
+      if (
+        (normalizedPrompt.includes("자켓") || normalizedPrompt.includes("아우터")) &&
+        splitMultiValues(factory.top_items_outer).length > 0
+      ) {
         score += 10;
       }
 
