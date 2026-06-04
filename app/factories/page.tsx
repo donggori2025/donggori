@@ -203,34 +203,31 @@ export default function FactoriesPage() {
   });
 
   // 필터가 걸려있지 않을 때 이미지가 있는 업장들을 상단에 배치
+  // (하드코딩 목록 대신 실제 이미지 보유 여부로 정렬)
   const sortedFiltered = useMemo(() => {
     // 필터가 걸려있지 않은 경우에만 정렬 적용
     const hasActiveFilters = Object.values(selected).some(arr => arr.length > 0) || search;
     
     if (!hasActiveFilters) {
-      // 이미지가 있는 공장들의 목록 (실제 폴더명 기반)
-      const factoriesWithImages = [
-        '강훈무역', '건영실업', '경림패션', '꼬메오패션', '나인', '뉴에일린', '다엘', '대명어패럴', '더시크컴퍼니',
-        '라이브 어패럴', '라인스', '백산실업', '부연사', '새가온', '선화사', '스마일', '시즌', '실루엣컴퍼니',
-        '아트패션', '에이스', '오르다', '오성섬유', '오스카 디자인', '우정샘플', '우정패션', '우진모피', '유화 섬유',
-        '재민상사', '좋은사람', '하늘패션', '혜민사', '화담어패럴', '화신사', '희란패션',
-        'jk패션', '기훈패션', '나르샤', '다래디자인', '다온패션', '레오실업', '민경패션', '바비패션', '수미어패럴',
-        '으뜸어패럴', '조아스타일', '태경패션', '태광사', '태성어패럴', '미호패션', '박원니트', '희망사'
-      ];
-      
-      // 이미지가 있는 공장들과 없는 공장들을 분리
-      const factoriesWithImagesList = filtered.filter(f => {
-        const name = f.name || f.company_name || '';
-        return factoriesWithImages.includes(name);
+      return [...filtered].sort((a, b) => {
+        const aName = a.name || a.company_name || "";
+        const bName = b.name || b.company_name || "";
+        const aHasImage = hasFactoryImages(aName);
+        const bHasImage = hasFactoryImages(bName);
+
+        // 1) 이미지 보유 업장 우선
+        if (aHasImage !== bHasImage) return aHasImage ? -1 : 1;
+
+        // 2) 같은 그룹이면 최신 ID 우선 (신규 업장 상단 노출)
+        const aId = Number(a.id);
+        const bId = Number(b.id);
+        if (!Number.isNaN(aId) && !Number.isNaN(bId) && aId !== bId) {
+          return bId - aId;
+        }
+
+        // 3) 보조 정렬: 이름순
+        return String(aName).localeCompare(String(bName), "ko");
       });
-      
-      const factoriesWithoutImagesList = filtered.filter(f => {
-        const name = f.name || f.company_name || '';
-        return !factoriesWithImages.includes(name);
-      });
-      
-      // 이미지가 있는 공장들을 먼저, 그 다음에 없는 공장들을 배치
-      return [...factoriesWithImagesList, ...factoriesWithoutImagesList];
     }
     
     return filtered;
