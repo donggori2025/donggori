@@ -19,10 +19,13 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const [factoryId, setFactoryId] = useState<string | null>(null);
   const [shareCopied, setShareCopied] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showMajorItemsModal, setShowMajorItemsModal] = useState(false);
+  const [majorItemsOverflow, setMajorItemsOverflow] = useState(false);
   
   // 공장 이미지 훅 사용
   const { images: factoryImages, loading: imagesLoading } = useFactoryImages(factory?.name || factory?.company_name || '');
   const thumbnailRef = useRef<HTMLDivElement>(null);
+  const majorItemsRef = useRef<HTMLParagraphElement | null>(null);
 
   // 앱 레벨 로그인 감지 (Clerk 또는 커스텀 쿠키/스토리지)
   const isAppLoggedIn = () => {
@@ -344,6 +347,22 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       ? String(factory.established_year)
       : "-";
 
+  useEffect(() => {
+    const element = majorItemsRef.current;
+    if (!element) {
+      setMajorItemsOverflow(false);
+      return;
+    }
+
+    const checkOverflow = () => {
+      setMajorItemsOverflow(element.scrollHeight > element.clientHeight + 1);
+    };
+
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [majorItems]);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-[1250px] mx-auto px-4 lg:px-6 py-8">
@@ -437,7 +456,30 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
               <div><span className="font-semibold">• 한 줄 소개</span><p className="mt-0.5">{factory.intro || "-"}</p></div>
               <div><span className="font-semibold">• 위치</span><p className="mt-0.5">{factory.address || factory.admin_district || "-"}</p></div>
               <div><span className="font-semibold">• 작업 가능 원단</span><p className="mt-0.5">{factory.main_fabrics || "-"}</p></div>
-              <div><span className="font-semibold">• 주요 생산품목</span><p className="mt-0.5">{majorItems || "-"}</p></div>
+              <div>
+                <span className="font-semibold">• 주요 생산품목</span>
+                <p
+                  ref={majorItemsRef}
+                  className="mt-0.5"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {majorItems || "-"}
+                </p>
+                {majorItemsOverflow && (
+                  <button
+                    type="button"
+                    onClick={() => setShowMajorItemsModal(true)}
+                    className="mt-1 text-xs text-gray-500 underline underline-offset-2 hover:text-gray-700"
+                  >
+                    더보기
+                  </button>
+                )}
+              </div>
               <div>
                 <span className="font-semibold">• 최소 발주수량</span>
                 <p className="mt-0.5">최소수량: {minOrderText} &nbsp;|&nbsp; 최대수량: {maxCapaText}</p>
@@ -494,6 +536,31 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           </section>
         </div>
       </div>
+      {showMajorItemsModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4"
+          onClick={() => setShowMajorItemsModal(false)}
+        >
+          <div
+            className="w-full max-w-2xl rounded-xl bg-white p-5 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-bold text-[#111]">주요 생산품목</h3>
+              <button
+                type="button"
+                onClick={() => setShowMajorItemsModal(false)}
+                className="text-gray-500 hover:text-gray-700 text-sm"
+              >
+                닫기
+              </button>
+            </div>
+            <p className="text-sm text-[#222] leading-relaxed whitespace-pre-wrap">
+              {majorItems || "-"}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
