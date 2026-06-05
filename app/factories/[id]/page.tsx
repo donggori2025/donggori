@@ -215,6 +215,37 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     }
   }, [currentImageIndex, factory]);
 
+  const majorItems = [
+    factory?.top_items_upper,
+    factory?.top_items_lower,
+    factory?.top_items_outer,
+    factory?.top_items_dress_skirt,
+    factory?.top_items_bag,
+    factory?.top_items_fashion_accessory,
+    factory?.top_items_underwear,
+    factory?.top_items_sports_leisure,
+    factory?.top_items_pet,
+  ]
+    .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+    .join(", ");
+
+  // 훅 순서 고정: 조건부 return 이전에 배치
+  useEffect(() => {
+    const element = majorItemsRef.current;
+    if (!element) {
+      setMajorItemsOverflow(false);
+      return;
+    }
+
+    const checkOverflow = () => {
+      setMajorItemsOverflow(element.scrollHeight > element.clientHeight + 1);
+    };
+
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [majorItems]);
+
   if (loading) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">로딩 중...</div>;
   if (!factory) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 공장입니다.</div>;
 
@@ -324,19 +355,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const factoryName = factory.company_name || "공장";
   const primaryBadge = factory.admin_district ? `${factory.admin_district} TOP 100` : "동대문구 TOP 100";
   const secondaryBadge = factory.factory_type ? `${factory.factory_type} 전문` : "샘플 전문";
-  const majorItems = [
-    factory.top_items_upper,
-    factory.top_items_lower,
-    factory.top_items_outer,
-    factory.top_items_dress_skirt,
-    factory.top_items_bag,
-    factory.top_items_fashion_accessory,
-    factory.top_items_underwear,
-    factory.top_items_sports_leisure,
-    factory.top_items_pet,
-  ]
-    .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
-    .join(", ");
 
   const minOrderText = factory.moq || factory.minOrder ? `${factory.moq || factory.minOrder}pcs` : "-";
   const maxCapaText = factory.monthly_capacity ? `${factory.monthly_capacity}pcs` : "-";
@@ -346,22 +364,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     : factory.established_year
       ? String(factory.established_year)
       : "-";
-
-  useEffect(() => {
-    const element = majorItemsRef.current;
-    if (!element) {
-      setMajorItemsOverflow(false);
-      return;
-    }
-
-    const checkOverflow = () => {
-      setMajorItemsOverflow(element.scrollHeight > element.clientHeight + 1);
-    };
-
-    checkOverflow();
-    window.addEventListener("resize", checkOverflow);
-    return () => window.removeEventListener("resize", checkOverflow);
-  }, [majorItems]);
 
   return (
     <div className="min-h-screen bg-white">
