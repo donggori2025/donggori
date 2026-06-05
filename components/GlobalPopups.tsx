@@ -117,12 +117,12 @@ export default function GlobalPopups() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full cursor-pointer"
-                aria-label={`${current.title || "프로모션"} 바로가기`}
+                aria-label="faddit 바로가기"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={current.image_url}
-                  alt={current.title || ""}
+                  alt={current.title || "faddit 프로모션"}
                   className="w-full h-full object-contain"
                 />
               </a>
@@ -130,20 +130,19 @@ export default function GlobalPopups() {
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={current.image_url}
-                alt={current.title || ""}
+                alt={current.title || "faddit 프로모션"}
                 className="w-full h-full object-contain"
               />
             )}
           </div>
         )}
 
-        {/* 내용/네비게이션 영역 */}
-        <div className="p-6 space-y-3 border-t border-gray-100 overflow-y-auto max-h-[40vh]">
+        {/* 하단 컨트롤 */}
+        <div className={`px-6 py-4 border-t border-gray-100 ${current.title || current.content ? "space-y-3" : ""}`}>
           {current.title && <div className="text-xl font-bold text-gray-900">{current.title}</div>}
           {current.content && <div className="text-base text-gray-700 whitespace-pre-wrap leading-relaxed">{current.content}</div>}
-          
-          {/* 하단 컨트롤 영역 */}
-          <div className="flex items-center justify-between pt-2">
+
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <input id="remember-today" type="checkbox" className="h-4 w-4 rounded" onChange={()=>{}} />
               <label htmlFor="remember-today">오늘 하루 보지 않기</label>
