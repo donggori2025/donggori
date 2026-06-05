@@ -1,13 +1,28 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { STATIC_PROMO_POPUPS } from "@/lib/promoPopups";
+import { getPromoLinkUrl, STATIC_PROMO_POPUPS } from "@/lib/promoPopups";
 import type { PopupItem } from "@/lib/types";
+
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(`(max-width: ${breakpoint}px)`);
+    const update = () => setIsMobile(mediaQuery.matches);
+    update();
+    mediaQuery.addEventListener("change", update);
+    return () => mediaQuery.removeEventListener("change", update);
+  }, [breakpoint]);
+
+  return isMobile;
+}
 
 export default function GlobalPopups() {
   const [items, setItems] = useState<PopupItem[]>([]);
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(true);
   const [loading, setLoading] = useState(false);
+  const isMobile = useIsMobile();
 
   const cookieKey = useMemo(() => {
     const d = new Date();
@@ -68,6 +83,7 @@ export default function GlobalPopups() {
   if (!open || loading || items.length === 0) return null;
 
   const current = items[Math.max(0, Math.min(index, items.length - 1))];
+  const currentLinkUrl = getPromoLinkUrl(current.id, isMobile) ?? current.link_url;
   const imageMaxHeight = current.title || current.content
     ? "calc(90vh - 12rem)"
     : "calc(90vh - 5.5rem)";
@@ -108,9 +124,9 @@ export default function GlobalPopups() {
         {/* 이미지 영역: 비율 유지, 뷰포트 내 전체 표시 */}
         {current.image_url && (
           <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto bg-gray-100">
-            {current.link_url ? (
+            {currentLinkUrl ? (
               <a
-                href={current.link_url}
+                href={currentLinkUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex cursor-pointer items-center justify-center"
