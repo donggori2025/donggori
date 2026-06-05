@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { POPUP_IMAGE_SPEC } from "@/lib/popupSpec";
 import { STATIC_PROMO_POPUPS } from "@/lib/promoPopups";
 import type { PopupItem } from "@/lib/types";
 
@@ -69,6 +68,9 @@ export default function GlobalPopups() {
   if (!open || loading || items.length === 0) return null;
 
   const current = items[Math.max(0, Math.min(index, items.length - 1))];
+  const imageMaxHeight = current.title || current.content
+    ? "calc(90vh - 12rem)"
+    : "calc(90vh - 5.5rem)";
 
   const closeForToday = (remember: boolean) => {
     if (remember && typeof window !== 'undefined') {
@@ -78,16 +80,14 @@ export default function GlobalPopups() {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40" onClick={(e) => e.stopPropagation()}>
-      {/* 규격에 맞춘 고정 크기 컨테이너 (이미지 크기에 따라 변하지 않음) */}
-      <div 
-        className="inline-block w-full max-w-[90vw] max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden relative align-middle flex flex-col"
-        style={{ width: POPUP_IMAGE_SPEC.width, maxWidth: 'min(700px, 90vw)' }}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="relative flex w-full max-w-[min(700px,90vw)] max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* X 닫기 버튼 */}
         <button 
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-black/20 hover:bg-black/30 text-white rounded-full transition-colors z-10"
+          className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/20 text-white transition-colors hover:bg-black/30"
           onClick={()=>{
             const cb = (document.getElementById('remember-today') as HTMLInputElement | null)?.checked;
             closeForToday(Boolean(cb));
@@ -104,26 +104,24 @@ export default function GlobalPopups() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        
-        {/* 이미지 영역: 다양한 비율 이미지를 잘림 없이 표시 */}
+
+        {/* 이미지 영역: 비율 유지, 뷰포트 내 전체 표시 */}
         {current.image_url && (
-          <div 
-            className="shrink-0 w-full overflow-hidden bg-gray-100 flex items-center justify-center"
-            style={{ maxHeight: 'min(72vh, 900px)' }}
-          >
+          <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto bg-gray-100">
             {current.link_url ? (
               <a
                 href={current.link_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full cursor-pointer"
+                className="flex cursor-pointer items-center justify-center"
                 aria-label="faddit 바로가기"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={current.image_url}
                   alt={current.title || "faddit 프로모션"}
-                  className="w-full h-full object-contain"
+                  className="block h-auto w-auto max-w-[min(700px,calc(90vw-2rem))] object-contain"
+                  style={{ maxHeight: imageMaxHeight }}
                 />
               </a>
             ) : (
@@ -131,14 +129,15 @@ export default function GlobalPopups() {
               <img
                 src={current.image_url}
                 alt={current.title || "faddit 프로모션"}
-                className="w-full h-full object-contain"
+                className="block h-auto w-auto max-w-[min(700px,calc(90vw-2rem))] object-contain"
+                style={{ maxHeight: imageMaxHeight }}
               />
             )}
           </div>
         )}
 
         {/* 하단 컨트롤 */}
-        <div className={`px-6 py-4 border-t border-gray-100 ${current.title || current.content ? "space-y-3" : ""}`}>
+        <div className={`shrink-0 border-t border-gray-100 px-6 py-4 ${current.title || current.content ? "space-y-3" : ""}`}>
           {current.title && <div className="text-xl font-bold text-gray-900">{current.title}</div>}
           {current.content && <div className="text-base text-gray-700 whitespace-pre-wrap leading-relaxed">{current.content}</div>}
 
