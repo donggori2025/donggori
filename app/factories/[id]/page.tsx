@@ -4,12 +4,11 @@ import { supabase } from "@/lib/supabaseClient";
 // Clerk 제거 운영에 맞춰 로컬/쿠키/Supabase 기반 확인으로 전환
 import { Button } from "@/components/ui/button";
 import { Factory } from "@/lib/factories";
-import { Share, ArrowLeft, ChevronDown, ChevronUp, Check } from "lucide-react";
+import { Share, ArrowLeft, Check, MessageCircle, FileText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
+import { getFactoryMainImage } from "@/lib/factoryImages";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
-import PricingTable from "@/components/PricingTable";
 
 const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
 
@@ -18,7 +17,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [factoryId, setFactoryId] = useState<string | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>('standard');
   const [shareCopied, setShareCopied] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
@@ -300,46 +298,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       ? val.split(/,|\|| /).map((v) => v.trim()).filter(Boolean)
       : [];
 
-  // 서비스 플랜 데이터
-  const servicePlans = {
-    standard: {
-      title: "Standard",
-      subtitle: "봉제공정",
-      price: "39,000원 (VAT 포함)",
-      features: [
-        "봉제공장 매칭",
-        "작업지시서 전달"
-      ],
-      sampleFee: "샘플비 10,000원",
-      unitPrice: "장단 단가 16,800원"
-    },
-    deluxe: {
-      title: "Deluxe", 
-      subtitle: "패턴/샘플 + 공정",
-      price: "89,000원 (VAT 포함)",
-      features: [
-        "샘플/패턴실 매칭",
-        "봉제공장 매칭",
-        "작업지시서 전달"
-      ]
-    },
-    premium: {
-      title: "Premium",
-      subtitle: "올인원(기획/디자인~)",
-      price: "159,000원 (VAT 포함)", 
-      features: [
-        "디자인(도식화, 패턴) 기획 컨설팅",
-        "샘플/패턴실 매칭",
-        "봉제공장 매칭",
-        "작업지시서 전달"
-      ]
-    }
-  };
-
-  const togglePlan = (planKey: string) => {
-    setSelectedPlan(selectedPlan === planKey ? null : planKey);
-  };
-
   // 실제 공장 이미지 배열 (훅에서 가져온 이미지들)
   const displayImages = factoryImages && factoryImages.length > 0 
     ? factoryImages.filter(img => 
@@ -350,527 +308,190 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       )
     : []; // 이미지가 없으면 빈 배열
 
+  const handleConsultRequest = () => {
+    if (!isAppLoggedIn()) {
+      goToRequestAfterSignIn("standard");
+      return;
+    }
+    const userName = getAppUserName();
+    const resolvedFactoryId = factoryId || String(factory.id || "");
+    window.location.href = `/factories/${resolvedFactoryId}/request?service=standard&name=${encodeURIComponent(userName)}`;
+  };
+
+  const factoryName = factory.company_name || "공장";
+  const primaryBadge = factory.admin_district ? `${factory.admin_district} TOP 100` : "동대문구 TOP 100";
+  const secondaryBadge = factory.factory_type ? `${factory.factory_type} 전문` : "샘플 전문";
+  const majorItems = [
+    factory.top_items_upper,
+    factory.top_items_lower,
+    factory.top_items_outer,
+    factory.top_items_dress_skirt,
+    factory.top_items_bag,
+    factory.top_items_fashion_accessory,
+    factory.top_items_underwear,
+    factory.top_items_sports_leisure,
+    factory.top_items_pet,
+  ]
+    .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+    .join(", ");
+
+  const minOrderText = factory.moq || factory.minOrder ? `${factory.moq || factory.minOrder}pcs` : "-";
+  const maxCapaText = factory.monthly_capacity ? `${factory.monthly_capacity}pcs` : "-";
+  const currentYear = new Date().getFullYear();
+  const experienceText = factory.established_year && factory.established_year > 1900 && factory.established_year <= currentYear
+    ? `${currentYear - factory.established_year + 1}년차`
+    : factory.established_year
+      ? String(factory.established_year)
+      : "-";
+
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row px-4 lg:px-6 pt-8 lg:pt-12">
-        {/* 왼쪽: 스크롤 가능한 상세 정보 */}
-        <div className="flex-1 min-w-0 p-4 lg:p-6 order-2 lg:order-1">
-          <div className="bg-white rounded-xl p-6 mb-6">
-            {/* 이미지 갤러리 */}
-            <div className="mb-8">
-              {displayImages.length > 0 ? (
-                <div className="relative">
-                  {/* 메인 이미지 */}
-                  <div className="relative w-full h-96 sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden rounded-lg">
-                    <Image
-                      src={displayImages[currentImageIndex]}
-                      alt={`${factory.company_name} 이미지 ${currentImageIndex + 1}`}
-                      fill
-                      className="object-contain bg-gray-50"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      priority={currentImageIndex === 0}
-                      quality={85}
-                    />
-                  </div>
-                  
-                  {/* 화살표 버튼들 */}
+      <div className="max-w-[1250px] mx-auto px-4 lg:px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[640px_1fr] gap-8 xl:gap-9 items-start">
+          <section>
+            {displayImages.length > 0 ? (
+              <div className="relative">
+                <div className="relative w-full h-[560px] md:h-[620px] lg:h-[640px] xl:h-[660px] bg-[#f7f7f8] rounded-xl overflow-hidden">
+                  <Image
+                    src={displayImages[currentImageIndex]}
+                    alt={`${factoryName} 이미지 ${currentImageIndex + 1}`}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 1024px) 100vw, 48vw"
+                    priority={currentImageIndex === 0}
+                    quality={85}
+                  />
                   {displayImages.length > 1 && (
                     <>
-                      {/* 왼쪽 화살표 */}
                       <button
-                        onClick={() => setCurrentImageIndex(prev => 
-                          prev === 0 ? displayImages.length - 1 : prev - 1
-                        )}
-                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                        onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? displayImages.length - 1 : prev - 1))}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/75 text-white flex items-center justify-center"
                       >
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
+                        ‹
                       </button>
-                      
-                      {/* 오른쪽 화살표 */}
                       <button
-                        onClick={() => setCurrentImageIndex(prev => 
-                          prev === displayImages.length - 1 ? 0 : prev + 1
-                        )}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                        onClick={() => setCurrentImageIndex((prev) => (prev === displayImages.length - 1 ? 0 : prev + 1))}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/75 text-white flex items-center justify-center"
                       >
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
+                        ›
                       </button>
                     </>
                   )}
-                  
-                  {/* 썸네일 이미지들 */}
-                  {displayImages.length > 1 && (
-                    <div 
+                </div>
+                {displayImages.length > 1 && (
+                  <>
+                    <div
                       ref={thumbnailRef}
-                      className="flex gap-2 mt-4 overflow-x-auto scrollbar-hide"
-                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                      className="mt-3 flex gap-2 overflow-x-auto"
+                      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                     >
-                      {displayImages.map((image: string, index: number) => (
+                      {displayImages.map((image, index) => (
                         <button
                           key={index}
                           onClick={() => setCurrentImageIndex(index)}
-                          className={`relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
-                            index === currentImageIndex 
-                              ? 'border-blue-500 scale-105' 
-                              : 'border-gray-200 hover:border-gray-300'
+                          className={`relative w-[66px] h-[66px] rounded-md overflow-hidden border ${
+                            index === currentImageIndex ? "border-black" : "border-gray-200"
                           }`}
                         >
-                          <Image
-                            src={image}
-                            alt={`${factory.company_name} 썸네일 ${index + 1}`}
-                            fill
-                            className="object-contain bg-gray-50"
-                            sizes="(max-width: 128px) 128px, 128px"
-                            loading="lazy"
-                            quality={75}
-                          />
+                          <Image src={image} alt={`${factoryName} 썸네일 ${index + 1}`} fill className="object-cover" />
                         </button>
                       ))}
                     </div>
-                  )}
-                  
-                  {/* 이미지 인디케이터 */}
-                  {displayImages.length > 1 && (
-                    <div className="flex justify-center gap-2 mt-4">
-                      {displayImages.map((_: string, index: number) => (
-                        <button
+                    <div className="flex justify-center gap-1.5 mt-2">
+                      {displayImages.map((_, index) => (
+                        <span
                           key={index}
-                          onClick={() => setCurrentImageIndex(index)}
-                          className={`w-2 h-2 rounded-full transition-all ${
-                            index === currentImageIndex 
-                              ? 'bg-blue-500' 
-                              : 'bg-gray-300 hover:bg-gray-400'
-                          }`}
+                          className={`w-1.5 h-1.5 rounded-full ${index === currentImageIndex ? "bg-black" : "bg-gray-300"}`}
                         />
                       ))}
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className="w-full h-80 sm:h-96 md:h-[500px] bg-gray-100 flex items-center justify-center rounded-lg">
-                  <div className="text-gray-400 text-lg font-medium">
-                    이미지 준비 중
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 상단 헤더 */}
-            <div className="bg-gray-50 rounded-lg p-4 lg:p-6 mb-8">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  {/* 업장 이미지 - 첫 번째 사진 사용 */}
-                  <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center">
-                    {factory && displayImages && displayImages.length > 0 && 
-                     displayImages[0] && 
-                     displayImages[0] !== '/logo_donggori.png' && 
-                     !displayImages[0].includes('unsplash') ? (
-                      <Image
-                        src={displayImages[0]}
-                        alt={factory.company_name || "공장 이미지"}
-                        width={48}
-                        height={48}
-                        className="object-cover w-full h-full"
-                        unoptimized
-                      />
-                    ) : factory && factory.image && 
-                      factory.image !== '/logo_donggori.png' && 
-                      !factory.image.includes('unsplash') ? (
-                      <Image
-                        src={factory.image}
-                        alt={factory.company_name || "공장 이미지"}
-                        width={48}
-                        height={48}
-                        className="object-cover w-full h-full"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-orange-500 flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">
-                          {factory && factory.company_name ? factory.company_name.charAt(0) : "재"}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <h1 className="text-xl lg:text-2xl font-bold">{factory.company_name || "재민상사"}</h1>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 mt-2">
-                      <span>연락 가능 시간 : 연중무휴</span>
-                      <span>응답 시간: 1시간 이내</span>
-                      <span>세금계산서 발행 가능</span>
-                    </div>
-                  </div>
-                </div>
-                <Button 
-                  onClick={handleKakaoInquiry}
-                  className="bg-gray-800 text-white px-4 lg:px-6 py-2 rounded-lg hover:bg-gray-700 w-full sm:w-auto"
-                >
-                  문의하기
-                </Button>
-              </div>
-            </div>
-
-            {/* 위치 */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold mb-3">위치</h2>
-              <p className="text-gray-700">
-                {factory.address || factory.admin_district || "주소 정보가 없습니다."}
-              </p>
-            </div>
-            <div className="border-b border-gray-200 mb-8"></div>
-
-            {/* 주요 정보 */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold mb-3">주요 정보</h2>
-              <div className="space-y-4">
-                <div>
-                  <span className="font-semibold text-gray-600">업태:</span>
-                  <span className="ml-2">{factory.business_type || "봉제업"}</span>
-                </div>
-                {factory.factory_type && (
-                  <div>
-                    <span className="font-semibold text-gray-600">공장 타입:</span>
-                    <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium">
-                      {factory.factory_type}
-                    </span>
-                  </div>
-                )}
-                {factory.main_fabrics && (
-                  <div>
-                    <span className="font-semibold text-gray-600">주요 원단:</span>
-                    <span className="ml-2 bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-medium">
-                      {factory.main_fabrics}
-                    </span>
-                  </div>
-                )}
-                <div>
-                  <span className="font-semibold text-gray-600">주요품목:</span>
-                  <span className="ml-2">{factory.top_items_upper || factory.top_items_lower || factory.top_items_outer || "상의, 하의, 아우터"}</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-600">MOQ(최소 주문 수량):</span>
-                  <span className="ml-2">{factory.moq || factory.minOrder || "100"}</span>
-                </div>
-              </div>
-            </div>
-            <div className="border-b border-gray-200 mb-8"></div>
-
-            {/* 보유 장비 */}
-            {splitChips(factory.sewing_machines).length > 0 && (
-              <>
-                <div className="mb-8">
-                  <h2 className="text-lg font-bold mb-3">보유 장비</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {splitChips(factory.sewing_machines).map((item, i) => (
-                      <span key={i} className="bg-gray-50 px-3 py-1 rounded text-sm">{item}</span>
-                    ))}
-                  </div>
-                </div>
-                <div className="border-b border-gray-200 mb-8"></div>
-              </>
-            )}
-
-            {/* 패턴 장비 */}
-            {splitChips(factory.pattern_machines).length > 0 && (
-              <>
-                <div className="mb-8">
-                  <h2 className="text-lg font-bold mb-3">패턴 장비</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {splitChips(factory.pattern_machines).map((item, i) => (
-                      <span key={i} className="bg-gray-50 px-3 py-1 rounded text-sm">{item}</span>
-                    ))}
-                  </div>
-                </div>
-                <div className="border-b border-gray-200 mb-8"></div>
-              </>
-            )}
-
-            {/* 특수 장비 */}
-            {splitChips(factory.special_machines).length > 0 && (
-              <>
-                <div className="mb-8">
-                  <h2 className="text-lg font-bold mb-3">특수 장비</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {splitChips(factory.special_machines).map((item, i) => (
-                      <span key={i} className="bg-gray-50 px-3 py-1 rounded text-sm">{item}</span>
-                    ))}
-                  </div>
-                </div>
-                <div className="border-b border-gray-200 mb-8"></div>
-              </>
-            )}
-
-            {/* 플랜 */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold mb-6">플랜</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Object.entries(servicePlans).map(([key, plan]) => (
-                  <div key={key} className="bg-white p-6">
-                    <div className="text-center mb-4 bg-gray-50 rounded-lg p-4">
-                      <h3 className="font-bold text-xl mb-2">{plan.title}</h3>
-                      <p className="text-sm text-gray-600">{plan.subtitle}</p>
-                    </div>
-                    <ul className="text-sm text-gray-700 space-y-2">
-                      {plan.features.map((feature, i) => (
-                        <li key={i} className="flex items-start">
-                          <span className="text-gray-400 mr-2">•</span>
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="border-b border-gray-200 mb-8"></div>
-
-            {/* 플랜 정보 */}
-            <div className="mb-8">
-              <div className="mb-4">
-                <h2 className="text-lg font-bold">패키지별 정보를 확인해보세요</h2>
-              </div>
-              
-              <div className="space-y-6">
-                {/* 공통점 */}
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">공통점</h4>
-                  <p className="text-base text-gray-600">모든 패키지는 의류 생산을 위한 기본 지원을 제공하며, 작업지시서 전달을 통해 의뢰자가 요청한 사양이 정확히 생산 공장에 전달되도록 보장합니다.</p>
-                  <p className="text-base text-gray-600 mt-2">또한, 기본적인 생산 A/S를 지원하여 초도 생산 시 발생할 수 있는 문제를 최소화합니다.</p>
-                </div>
-                
-                {/* 주요 특징 */}
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3">주요 특징</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">• Standard :</p>
-                      <p className="text-base text-gray-600">봉제공장 매칭을 통해 바로 생산에 착수할 수 있으며, 작업지시서를 기반으로 최소한의 의류 생산 지원을 제공합니다. 단순한 의뢰나 소량 생산에 적합한 패키지입니다.</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">• Deluxe :</p>
-                      <p className="text-base text-gray-600">샘플/패턴실 매칭까지 지원하여 사전 검증과 품질 확인이 가능하며, 봉제공장 매칭과 작업지시서 전달까지 일괄 지원합니다. 소량 샘플 제작이나 본생산 이전 검증 단계에 적합합니다.</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">• Premium :</p>
-                      <p className="text-base text-gray-600">디자인(도식화·패턴) 기획 단계부터 컨설팅을 지원하며, 샘플/패턴실 매칭과 봉제공장 매칭, 작업지시서 전달까지 풀 패키지를 제공합니다. 브랜드 기획·개발 단계나 정식 런칭 준비에 최적화된 패키지입니다.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="border-b border-gray-200 mb-8"></div>
-
-            {/* 공정 단가표 */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold mb-3">공정 단가표</h2>
-              <PricingTable />
-            </div>
-            <div className="border-b border-gray-200 mb-8"></div>
-
-            {/* 전문가 정보 */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold mb-3">전문가 정보</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                <div className="bg-gray-50 rounded-lg px-4 py-4 text-center">
-                  <div className="font-semibold text-gray-600 mb-1">행정동</div>
-                  <div className="text-base">{factory.admin_district || "장안동 제2동"}</div>
-                </div>
-                <div className="bg-gray-50 rounded-lg px-4 py-4 text-center">
-                  <div className="font-semibold text-gray-600 mb-1">월 CAPA</div>
-                  <div className="text-base">{factory.monthly_capacity || "2000"}</div>
-                </div>
-                <div className="bg-gray-50 rounded-lg px-4 py-4 text-center">
-                  <div className="font-semibold text-gray-600 mb-1">배송</div>
-                  <div className="text-base">{factory.delivery || "업체 배달 서비스"}</div>
-                </div>
-              </div>
-              <div className="mt-6">
-                <h4 className="font-semibold mb-3">소개</h4>
-                <p className="text-base text-gray-600 mb-6">
-                  {factory.intro || "동대문구장한로34길23~2 지층에 위치하고있읍니다"}
-                </p>
-                {factory.special_machines && factory.special_machines.trim() !== '' && (
-                  <>
-                    <h4 className="font-semibold mb-3">특수 장비</h4>
-                    <p className="text-base text-gray-600 mb-6">
-                      {factory.special_machines}
-                    </p>
-                  </>
-                )}
-                {factory.brands_supplied && factory.brands_supplied.trim() !== '' && (
-                  <>
-                    <h4 className="font-semibold mb-3">주요 거래처</h4>
-                    <p className="text-base text-gray-600">
-                      {factory.brands_supplied}
-                    </p>
                   </>
                 )}
               </div>
+            ) : (
+              <div className="w-full h-[560px] md:h-[620px] lg:h-[640px] xl:h-[660px] bg-[#f3f4f6] rounded-xl flex items-center justify-center text-gray-400">
+                이미지 준비 중
+              </div>
+            )}
+          </section>
+
+          <section className="pt-1 lg:pt-0.5">
+            <div className="flex items-start justify-between gap-3 mb-5">
+              <div>
+                <h1 className="text-[44px] leading-[1.08] font-extrabold tracking-[-0.02em] text-[#111111]">{factoryName}</h1>
+                <div className="flex items-center gap-2 mt-3">
+                  <span className="px-3 py-1 rounded-full bg-[#f1f2f4] text-[12px] font-semibold text-[#555]">{primaryBadge}</span>
+                  <span className="px-3 py-1 rounded-full bg-[#fdf0f2] text-[12px] font-semibold text-[#8f5b62]">{secondaryBadge}</span>
+                </div>
+              </div>
+              <button
+                onClick={handleShare}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors relative mt-1"
+                title="링크 복사"
+              >
+                {shareCopied ? <Check className="w-4 h-4 text-green-600" /> : <Share className="w-4 h-4 text-gray-600" />}
+              </button>
             </div>
 
-            {/* 하단 네비게이션 */}
-            <div className="mt-12 mb-8">
-              <Link 
-                href="/factories" 
-                className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer bg-gray-50 hover:bg-gray-100 px-4 py-3 rounded-lg"
+            <div className="space-y-4 text-[15px] text-[#222] leading-[1.62]">
+              <div><span className="font-semibold">• 한 줄 소개</span><p className="mt-0.5">{factory.intro || "-"}</p></div>
+              <div><span className="font-semibold">• 위치</span><p className="mt-0.5">{factory.address || factory.admin_district || "-"}</p></div>
+              <div><span className="font-semibold">• 작업 가능 원단</span><p className="mt-0.5">{factory.main_fabrics || "-"}</p></div>
+              <div><span className="font-semibold">• 주요 생산품목</span><p className="mt-0.5">{majorItems || "-"}</p></div>
+              <div>
+                <span className="font-semibold">• 최소 발주수량</span>
+                <p className="mt-0.5">최소수량: {minOrderText} &nbsp;|&nbsp; 최대수량: {maxCapaText}</p>
+              </div>
+              <div><span className="font-semibold">• 개발 의뢰 방식</span><p className="mt-0.5">작업지시서 기반 상담/의뢰</p></div>
+              <div><span className="font-semibold">• 주요 거래처</span><p className="mt-0.5">{factory.distribution || "-"}</p></div>
+              <div><span className="font-semibold">• 주요 브랜드</span><p className="mt-0.5">{factory.brands_supplied || "-"}</p></div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 mt-7">
+              <div className="rounded-lg bg-[#f5f6f8] py-4 px-3 text-center min-h-[84px] flex flex-col justify-center">
+                <div className="text-xs text-gray-500 mb-1">행정동</div>
+                <div className="text-sm font-semibold">{factory.admin_district || "-"}</div>
+              </div>
+              <div className="rounded-lg bg-[#f5f6f8] py-4 px-3 text-center min-h-[84px] flex flex-col justify-center">
+                <div className="text-xs text-gray-500 mb-1">대표자</div>
+                <div className="text-sm font-semibold">{factory.contact_name || "-"}</div>
+              </div>
+              <div className="rounded-lg bg-[#f5f6f8] py-4 px-3 text-center min-h-[84px] flex flex-col justify-center">
+                <div className="text-xs text-gray-500 mb-1">업력</div>
+                <div className="text-sm font-semibold">{experienceText}</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+              <Button
+                onClick={handleConsultRequest}
+                className="h-[50px] rounded-md bg-[#111111] hover:bg-[#000000] text-white font-semibold text-[15px] flex items-center justify-between px-4"
+              >
+                <span className="flex items-center gap-2"><FileText className="w-4 h-4" />작업지시서 상담 예약</span>
+                <span>→</span>
+              </Button>
+              <Button
+                onClick={handleKakaoInquiry}
+                className="h-[50px] rounded-md bg-[#111111] hover:bg-[#000000] text-white font-semibold text-[15px] flex items-center justify-between px-4"
+              >
+                <span className="flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4" />
+                  봉제공장 문의하기
+                </span>
+                <span>→</span>
+              </Button>
+            </div>
+
+            <div className="mt-6">
+              <Link
+                href="/factories"
+                className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm font-medium">목록으로 돌아가기</span>
+                목록으로 돌아가기
               </Link>
             </div>
-          </div>
-        </div>
-
-        {/* 오른쪽: 고정 사이드바 (sticky) */}
-        <div className="w-full lg:w-80 flex-shrink-0 bg-white border border-gray-200 rounded-lg p-4 lg:p-6 mb-4 lg:mb-6 h-fit order-1 lg:order-2 lg:mt-4 lg:sticky lg:top-24 lg:self-start">
-          {/* 상단 헤더 */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div>
-                <h3 className="font-bold text-sm lg:text-base">{factory.company_name || "재민상사"}</h3>
-                <p className="text-xs text-gray-500">봉제공장</p>
-              </div>
-            </div>
-            <button 
-              onClick={handleShare}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
-              title="링크 복사"
-            >
-              {shareCopied ? (
-                <Check className="w-4 h-4 text-green-600" />
-              ) : (
-                <Share className="w-4 h-4" />
-              )}
-              {shareCopied && (
-                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
-                  링크가 복사되었습니다!
-                </div>
-              )}
-            </button>
-          </div>
-
-          {/* 서비스 플랜 */}
-          <div className="space-y-4">
-            {/* Standard */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <button 
-                onClick={() => togglePlan('standard')}
-                className="w-full flex items-center justify-between font-bold text-base lg:text-lg mb-2"
-              >
-                Standard
-                {selectedPlan === 'standard' ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-              </button>
-              {selectedPlan === 'standard' && (
-                <div className="mt-3">
-                  <ul className="text-xs lg:text-sm text-gray-600 space-y-1 mb-4">
-                    <li>• 봉제공장 매칭</li>
-                    <li>• 작업지시서 전달</li>
-                  </ul>
-                  <Button 
-                    className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
-                    onClick={() => {
-                      if (!isAppLoggedIn()) {
-                        goToRequestAfterSignIn('standard');
-                        return;
-                      }
-                      const userName = getAppUserName();
-                      window.location.href = `/factories/${factoryId}/request?service=standard&name=${encodeURIComponent(userName)}`;
-                    }}
-                  >
-                    공정 의뢰하기
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Deluxe */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <button 
-                onClick={() => togglePlan('deluxe')}
-                className="w-full flex items-center justify-between font-bold text-base lg:text-lg mb-2"
-              >
-                Deluxe
-                {selectedPlan === 'deluxe' ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-              </button>
-              {selectedPlan === 'deluxe' && (
-                <div className="mt-3">
-                  <ul className="text-xs lg:text-sm text-gray-600 space-y-1 mb-4">
-                    <li>• 샘플/패턴실 매칭</li>
-                    <li>• 봉제공장 매칭</li>
-                    <li>• 작업지시서 전달</li>
-                  </ul>
-                  <Button 
-                    className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
-                    onClick={() => {
-                      if (!isAppLoggedIn()) {
-                        goToRequestAfterSignIn('deluxe');
-                        return;
-                      }
-                      const userName = getAppUserName();
-                      window.location.href = `/factories/${factoryId}/request?service=deluxe&name=${encodeURIComponent(userName)}`;
-                    }}
-                  >
-                    패턴/샘플 의뢰하기
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Premium */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <button 
-                onClick={() => togglePlan('premium')}
-                className="w-full flex items-center justify-between font-bold text-base lg:text-lg mb-2"
-              >
-                Premium
-                {selectedPlan === 'premium' ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-              </button>
-              {selectedPlan === 'premium' && (
-                <div className="mt-3">
-                  <ul className="text-xs lg:text-sm text-gray-600 space-y-1 mb-4">
-                    <li>• 디자인(도식화, 패턴) 기획 컨설팅</li>
-                    <li>• 샘플/패턴실 매칭</li>
-                    <li>• 봉제공장 매칭</li>
-                    <li>• 작업지시서 전달</li>
-                  </ul>
-                  <Button 
-                    className="w-full bg-gray-800 text-white rounded-lg py-2 text-sm"
-                    onClick={() => {
-                      if (!isAppLoggedIn()) {
-                        goToRequestAfterSignIn('premium');
-                        return;
-                      }
-                      const userName = getAppUserName();
-                      window.location.href = `/factories/${factoryId}/request?service=premium&name=${encodeURIComponent(userName)}`;
-                    }}
-                  >
-                    올인원 의뢰하기
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* 하단 문의 버튼 */}
-          <div className="mt-6">
-            <Button 
-              onClick={handleKakaoInquiry}
-              className="w-full bg-gray-100 text-black rounded-lg py-3 font-bold hover:bg-gray-200 text-sm lg:text-base flex items-center justify-center gap-2"
-            >
-              <Image 
-                src="/kakao_lastlast.svg" 
-                alt="카카오톡" 
-                width={20} 
-                height={20}
-                className="w-5 h-5"
-              />
-              문의하기
-            </Button>
-          </div>
+          </section>
         </div>
       </div>
     </div>
