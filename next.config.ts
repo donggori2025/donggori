@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // 이미지 최적화 설정
   images: {
+    localPatterns: [
+      {
+        pathname: '/api/factory-images/url',
+      },
+    ],
     remotePatterns: [
       {
         protocol: 'https',

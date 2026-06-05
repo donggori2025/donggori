@@ -1,9 +1,9 @@
 // Vercel Blob Storage 사용
 import { getVercelBlobImageUrl } from './vercelBlobConfig';
 
-function getProxyUrl(folderName: string, fileName: string) {
-  // API 프록시 사용: 서버가 NFC/NFD, 실제 디렉터리명 스캔 후 안전하게 서빙
-  return `/api/factory-images/url?folder=${encodeURIComponent(folderName)}&file=${encodeURIComponent(fileName)}`;
+function getProxyUrl(factoryName: string, fileName: string) {
+  // Blob/스토리지는 업체명 기준으로 저장되므로 company name을 folder로 전달
+  return `/api/factory-images/url?folder=${encodeURIComponent(factoryName)}&file=${encodeURIComponent(fileName)}`;
 }
 
 // 업장 이름과 이미지 폴더 매칭
@@ -62,6 +62,7 @@ const factoryImageMapping: Record<string, string> = {
   '미호패션': '미호패션',
   '박원니트': '박원니트',
   '희망사': '희망사',
+  '정인어패럴': '정인어패럴',
 };
 
 // 업장별 실제 업로드된 이미지 파일명들 (동적으로 생성)
@@ -70,6 +71,16 @@ const factoryImageFiles: Record<string, string[]> = {};
 // 업장 이름으로 이미지 폴더 찾기
 export function getFactoryImageFolder(factoryName: string): string | null {
   return factoryImageMapping[factoryName] || null;
+}
+
+// API 조회 시 업체명/매핑 폴더명 모두 시도
+export function getFactoryImageFolderCandidates(factoryName: string): string[] {
+  const mappedFolder = getFactoryImageFolder(factoryName);
+  const reverseMappedNames = Object.entries(factoryImageMapping)
+    .filter(([, folder]) => folder === factoryName)
+    .map(([companyName]) => companyName);
+
+  return [...new Set([factoryName, mappedFolder, ...reverseMappedNames].filter((name): name is string => Boolean(name)))];
 }
 
 // 업장 이름으로 썸네일 이미지 URL 생성 (Vercel Blob 사용)
@@ -152,9 +163,7 @@ export function getFactoryImages(factoryName: string): string[] {
   };
 
   const imageFiles = allImageFiles[folderName] || ['20250710_103857.jpg'];
-  const imageUrls = imageFiles.map(fileName => 
-    `/api/factory-images/url?folder=${encodeURIComponent(folderName)}&file=${encodeURIComponent(fileName)}`
-  );
+  const imageUrls = imageFiles.map((fileName) => getProxyUrl(factoryName, fileName));
   
   return imageUrls;
 }
