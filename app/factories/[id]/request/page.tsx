@@ -21,7 +21,6 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [factoryId, setFactoryId] = useState<string | null>(null);
-  const [selectedService, setSelectedService] = useState<string>("standard");
   const [authChecked, setAuthChecked] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   
@@ -62,13 +61,6 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }
     fetchFactory();
   }, [factoryId]);
-
-  useEffect(() => {
-    const service = searchParams.get("service");
-    if (service) {
-      setSelectedService(service);
-    }
-  }, [searchParams]);
 
   // 진입 시 로그인 강제 체크 (직접 URL 접근 포함)
   useEffect(() => {
@@ -197,16 +189,12 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }));
   };
 
-  const getServiceLabel = () => `${currentService.title} (${currentService.subtitle})`;
-
   // 의뢰 내용을 클립보드에 복사할 텍스트 생성
   const generateRequestText = (fileUrls: string[] = []) => {
     const factoryName = factory?.company_name || factory?.name || '공장';
-    const serviceName = getServiceLabel();
     
     let text = `[${factoryName} 의뢰 문의]\n\n`;
     text += `- 요청 구분: 의뢰하기\n`;
-    text += `- 서비스: ${serviceName}\n`;
     text += `- 디자이너: ${formData.name}\n`;
     text += `- 연락처: ${formData.contact}\n`;
     text += `- 브랜드: ${formData.brandName || '미입력'}\n\n`;
@@ -255,11 +243,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   // 문의하기 버튼용 간단 문의 텍스트 생성
   const generateInquiryText = () => {
     const factoryName = factory?.company_name || factory?.name || '공장';
-    const serviceName = getServiceLabel();
 
     let text = `[${factoryName} 문의]\n\n`;
     text += `- 요청 구분: 문의하기\n`;
-    text += `- 서비스: ${serviceName}\n`;
     text += `- 이름: ${formData.name || "미입력"}\n`;
     text += `- 연락처: ${formData.contact || "미입력"}\n`;
     text += `- 문의일: ${new Date().toLocaleDateString('ko-KR')}\n\n`;
@@ -404,12 +390,6 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             request: formData.detailRequest,
             files: uploadedFileUrls,
             links: formData.links,
-            selectedService: selectedService,
-            serviceDetails: {
-              standard: { title: 'Standard', subtitle: '봉제공정' },
-              deluxe: { title: 'Deluxe', subtitle: '패턴/샘플 + 공장' },
-              premium: { title: 'Premium', subtitle: '올인원(기획/디자인~)' }
-            }
           }),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -528,39 +508,19 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   if (loading) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">로딩 중...</div>;
   if (!factory) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 공장입니다.</div>;
 
-  const serviceData = {
-    standard: {
-      title: "Standard",
-      subtitle: "봉제공정",
-      features: [
-        "봉제공장 매칭",
-        "작업지시서 전달"
-      ],
-      sampleFee: "샘플비 10,000원",
-      unitPrice: "장단 단가 16,800원"
-    },
-    deluxe: {
-      title: "Deluxe", 
-      subtitle: "패턴/샘플 + 공정",
-      features: [
-        "샘플/패턴실 매칭",
-        "봉제공장 매칭",
-        "작업지시서 전달"
-      ]
-    },
-    premium: {
-      title: "Premium",
-      subtitle: "올인원(기획/디자인~)",
-      features: [
-        "디자인(도식화, 패턴) 기획 컨설팅",
-        "샘플/패턴실 매칭",
-        "봉제공장 매칭",
-        "작업지시서 전달"
-      ]
-    }
-  };
+  const factoryName = factory.company_name || factory.name || "공장";
+  const factoryType = factory.factory_type || factory.business_type || "봉제공장";
+  const factoryIntro = factory.intro || factory.intro_text || factory.description;
+  const factoryLocation = factory.address || factory.admin_district || factory.region;
+  const factoryFabrics = factory.main_fabrics;
+  const factoryMoq = factory.moq || factory.minOrder;
 
-  const currentService = serviceData[selectedService as keyof typeof serviceData];
+  const summaryItems = [
+    factoryIntro ? { label: "한 줄 소개", value: factoryIntro } : null,
+    factoryLocation ? { label: "위치", value: factoryLocation } : null,
+    factoryFabrics ? { label: "작업 가능 원단", value: factoryFabrics } : null,
+    factoryMoq ? { label: "최소 발주수량", value: `${factoryMoq}pcs` } : null,
+  ].filter((item): item is { label: string; value: string } => Boolean(item));
 
   return (
     <div className="max-w-[1400px] mx-auto py-10 px-2 md:px-6">
@@ -810,23 +770,23 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           </form>
         </div>
 
-        {/* 오른쪽: 선택된 서비스 정보 */}
+        {/* 오른쪽: 업장 요약 */}
         <div className="w-full lg:w-[380px] flex-shrink-0">
-          <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <div className="font-bold text-lg mb-2">{factory.company_name}</div>
-            <div className="text-xs text-gray-500 mb-2">봉제공장</div>
-            
-            {/* 선택된 서비스 표시 */}
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <div className="mb-2">
-                <div className="font-semibold">{currentService.title}</div>
-                <div className="text-xs text-gray-500">{currentService.subtitle}</div>
-              </div>
-              <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
-                {currentService.features.map((feature, index) => (
-                  <li key={index}>{feature}</li>
-                ))}
-              </ul>
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 lg:sticky lg:top-8">
+            <div className="font-bold text-lg mb-1">{factoryName}</div>
+            <div className="text-xs text-gray-500 mb-4">{factoryType}</div>
+
+            <div className="bg-gray-50 rounded-lg p-4 mb-4 space-y-3">
+              {summaryItems.length > 0 ? (
+                summaryItems.map((item) => (
+                  <div key={item.label}>
+                    <div className="text-xs font-semibold text-gray-500">{item.label}</div>
+                    <p className="text-sm text-gray-800 mt-0.5 leading-relaxed line-clamp-3">{item.value}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">업장 정보를 준비 중입니다.</p>
+              )}
             </div>
 
             <Button 
