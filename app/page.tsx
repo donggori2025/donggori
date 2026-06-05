@@ -5,7 +5,6 @@ import InfoSection from "@/components/InfoSection";
 import StepSection from "@/components/StepSection";
 import RecommendSection from "@/components/RecommendSection";
 import NoticesSection from "@/components/NoticesSection";
-import GlobalPopups from "@/components/GlobalPopups";
 import OAuthCallbackHandler from "@/components/OAuthCallbackHandler";
 
 
@@ -23,7 +22,6 @@ export default function HomePage() {
         <OAuthCallbackHandler />
       </Suspense>
 
-      <GlobalPopups />
       <section className="sr-only">
         <h1>동고리, 디자이너와 봉제공장을 잇다</h1>
         <p>

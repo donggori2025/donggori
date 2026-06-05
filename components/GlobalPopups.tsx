@@ -1,13 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { POPUP_IMAGE_SPEC } from "@/lib/popupSpec";
-
-interface PopupItem {
-  id: string;
-  title?: string;
-  content?: string;
-  image_url?: string;
-}
+import { STATIC_PROMO_POPUPS } from "@/lib/promoPopups";
+import type { PopupItem } from "@/lib/types";
 
 export default function GlobalPopups() {
   const [items, setItems] = useState<PopupItem[]>([]);
@@ -40,10 +35,16 @@ export default function GlobalPopups() {
       try {
         const res = await fetch('/api/popups');
         const json = await res.json();
-        if (res.ok && json.success) {
-          setItems(json.data || []);
-          setOpen((json.data || []).length > 0);
-        }
+        const apiItems = res.ok && json.success ? ((json.data || []) as PopupItem[]) : [];
+        const mergedItems = [
+          ...STATIC_PROMO_POPUPS,
+          ...apiItems.filter((item) => !STATIC_PROMO_POPUPS.some((promo) => promo.id === item.id)),
+        ];
+        setItems(mergedItems);
+        setOpen(mergedItems.length > 0);
+      } catch {
+        setItems(STATIC_PROMO_POPUPS);
+        setOpen(STATIC_PROMO_POPUPS.length > 0);
       } finally {
         setLoading(false);
       }
@@ -110,12 +111,29 @@ export default function GlobalPopups() {
             className="shrink-0 w-full overflow-hidden bg-gray-100 flex items-center justify-center"
             style={{ maxHeight: 'min(72vh, 900px)' }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img 
-              src={current.image_url} 
-              alt={current.title || ''} 
-              className="w-full h-full object-contain"
-            />
+            {current.link_url ? (
+              <a
+                href={current.link_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full cursor-pointer"
+                aria-label={`${current.title || "프로모션"} 바로가기`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={current.image_url}
+                  alt={current.title || ""}
+                  className="w-full h-full object-contain"
+                />
+              </a>
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={current.image_url}
+                alt={current.title || ""}
+                className="w-full h-full object-contain"
+              />
+            )}
           </div>
         )}
 

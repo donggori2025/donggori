@@ -147,6 +147,7 @@ export interface PopupItem {
   title?: string;
   content?: string;
   image_url?: string;
+  link_url?: string;
   start_at?: string; // ISO string
   end_at?: string;   // ISO string
   created_at?: string;
