@@ -19,6 +19,19 @@ const moqRanges = [
   { label: "301+", min: 301, max: Infinity },
 ];
 
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function pickRandomItems<T>(array: T[], count: number): T[] {
+  return shuffleArray(array).slice(0, Math.min(count, array.length));
+}
+
 // 매칭 페이지용 공장 이미지 컴포넌트
 function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number }) {
   const { images, loading } = useFactoryImages(factory.name || factory.company_name || '');
@@ -697,6 +710,10 @@ type ScoredFactory = Factory & { score: number };
       matches: f.matchDetails
     })));
 
+    if (result.every((f) => f.score === 0)) {
+      return pickRandomItems(scoredFactories, 3);
+    }
+
     return result;
   }, [factories]);
 
@@ -766,9 +783,11 @@ type ScoredFactory = Factory & { score: number };
       };
     });
 
-    return scoredFactories
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
+    const sorted = scoredFactories.sort((a, b) => b.score - a.score);
+    if ((sorted[0]?.score ?? 0) === 0) {
+      return pickRandomItems(scoredFactories, 3);
+    }
+    return sorted.slice(0, 3);
   }, [factories]);
 
   const startTextMatching = useCallback((prompt: string) => {
@@ -954,11 +973,6 @@ type ScoredFactory = Factory & { score: number };
                         감사합니다! ({feedbackRatings[f.id || 0]}점)
                       </div>
                     )}
-                    
-                    {/* 매칭 점수 표시 - 피드백 아래로 이동 */}
-                    <div className="text-xs text-gray-500 mt-2">
-                      매칭도: {f.score ? f.score.toFixed(1) + '%' : 'N/A'}
-                    </div>
                   </div>
                 </div>
               </div>
