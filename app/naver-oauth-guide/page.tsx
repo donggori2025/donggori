@@ -29,12 +29,12 @@ export default function NaverOAuthGuidePage() {
               
               <div>
                 <h3 className="font-semibold">2. API 설정 탭으로 이동</h3>
-                <p>상단 탭에서 "API 설정" 클릭</p>
+                <p>상단 탭에서 &quot;API 설정&quot; 클릭</p>
               </div>
               
               <div>
                 <h3 className="font-semibold">3. 네이버 로그인 권한 설정</h3>
-                <p>"네이버 로그인" 섹션에서 다음 권한들을 추가:</p>
+                <p>&quot;네이버 로그인&quot; 섹션에서 다음 권한들을 추가:</p>
                 <ul className="list-disc list-inside ml-4 mt-2 space-y-1">
                   <li><code>이메일 주소</code> (email)</li>
                   <li><code>이름</code> (name)</li>
@@ -59,8 +59,8 @@ export default function NaverOAuthGuidePage() {
               <div>
                 <h3 className="font-semibold">방법 1: 네이버 계정에서 권한 해제</h3>
                 <p>1. <a href="https://nid.naver.com/user2/help/myInfo.naver" target="_blank" rel="noopener noreferrer" className="underline">네이버 개인정보 관리</a> 접속</p>
-                <p>2. "연결된 서비스 관리" → "donggori" 찾기</p>
-                <p>3. "연결 해제" 클릭</p>
+                <p>2. &quot;연결된 서비스 관리&quot; → &quot;donggori&quot; 찾기</p>
+                <p>3. &quot;연결 해제&quot; 클릭</p>
               </div>
               
               <div>
@@ -84,7 +84,7 @@ export default function NaverOAuthGuidePage() {
             <div className="space-y-3 text-yellow-700">
               <div>
                 <h3 className="font-semibold">1. 멤버관리 탭으로 이동</h3>
-                <p>네이버 개발자센터 → donggori → "멤버관리" 탭</p>
+                <p>네이버 개발자센터 → donggori → &quot;멤버관리&quot; 탭</p>
               </div>
               
               <div>

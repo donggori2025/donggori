@@ -52,7 +52,7 @@ export default function DebugNaverPage() {
           <ul className="list-disc list-inside space-y-1 text-sm">
             <li>Client ID가 정확히 등록되어 있는지 확인</li>
             <li>Redirect URI가 <code>http://localhost:3000/api/auth/naver/callback</code>로 정확히 등록되어 있는지 확인</li>
-            <li>애플리케이션 상태가 "개발 중"인지 확인</li>
+            <li>애플리케이션 상태가 &quot;개발 중&quot;인지 확인</li>
             <li>테스트 사용자로 등록되어 있는지 확인</li>
           </ul>
         </div>
