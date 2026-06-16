@@ -4,6 +4,13 @@ export default function middleware(req: NextRequest) {
   const host = (req.headers.get("host") || "").toLowerCase();
   const pathname = req.nextUrl.pathname;
 
+  // 운영 보안: 프로덕션에서 디버그 페이지/API 차단
+  if (process.env.NODE_ENV === "production") {
+    if (pathname.startsWith("/debug-") || pathname.startsWith("/api/debug")) {
+      return NextResponse.rewrite(new URL("/_not-found", req.url));
+    }
+  }
+
   if (process.env.NODE_ENV === "production" && host === "donggori.com") {
     const url = new URL(req.url);
     url.hostname = "www.donggori.com";
