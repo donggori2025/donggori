@@ -1,9 +1,10 @@
 import Image from 'next/image';
 
-import { Factory } from '@/lib/types';
+import { Factory, FactoryLocation } from '@/lib/types';
+import { getFactoryMainImage } from '@/lib/factoryImages';
 
 interface FactoryInfoPopupProps {
-  factory: Factory;
+  factory: Factory | FactoryLocation;
   onClose?: () => void;
   onDetailClick?: () => void;
 }
@@ -12,15 +13,27 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
   if (!factory) return null;
 
   // 주요 품목 정보 구성
-  const mainItems = [
-    factory.top_items_upper,
-    factory.top_items_lower,
-    factory.top_items_outer,
-    factory.top_items_dress_skirt
-  ].filter(Boolean).join(', ') || '-';
+  const isFullFactory = (v: Factory | FactoryLocation): v is Factory => {
+    return (
+      typeof (v as any).top_items_upper !== "undefined" ||
+      typeof (v as any).main_fabrics !== "undefined" ||
+      typeof (v as any).moq !== "undefined"
+    );
+  };
 
-  const mainFabrics = factory.main_fabrics || '-';
-  const moq = factory.moq || factory.minOrder || '-';
+  const mainItems = isFullFactory(factory)
+    ? [
+        factory.top_items_upper,
+        factory.top_items_lower,
+        factory.top_items_outer,
+        (factory as any).top_items_dress_skirt,
+      ]
+        .filter(Boolean)
+        .join(", ") || "-"
+    : "-";
+
+  const mainFabrics = isFullFactory(factory) ? factory.main_fabrics || "-" : "-";
+  const moq = isFullFactory(factory) ? (factory.moq || (factory as any).minOrder || "-") : "-";
 
   // 태그 색상 정의
   const tagColors = [
@@ -47,7 +60,7 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
   const count = (Math.abs(hash) % 2) + 1;
   const selectedTags = shuffled.slice(0, count);
 
-  const factoryName = factory.company_name || factory.name || '공장명 없음';
+  const factoryName = factory.company_name || '공장명 없음';
 
   return (
     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-96 bg-white rounded-xl shadow-xl border border-gray-200 z-10">
@@ -56,8 +69,8 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
           {/* 이미지 */}
           <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
             {(() => {
-              const name = String(factory.company_name || factory.name || '');
-              const mainImage = require('@/lib/factoryImages').getFactoryMainImage(name);
+              const name = String(factory.company_name || '');
+              const mainImage = getFactoryMainImage(name);
               if (mainImage && !mainImage.includes('logo_donggori')) {
                 return (
                   <Image

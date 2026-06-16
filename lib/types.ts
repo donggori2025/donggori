@@ -178,7 +178,7 @@ export interface MapMarker {
   id: string;
   position: { lat: number; lng: number };
   title?: string;
-  factory?: Factory;
+  factory?: Factory | FactoryLocation;
 }
 
 export interface MapEvent {
