@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { config } from '@/lib/config';
-import { Factory, MapEvent } from '@/lib/types';
+import { Factory, FactoryLocation, MapEvent } from '@/lib/types';
 
 // 네이버 맵 타입 정의
 interface NaverMaps {
@@ -22,19 +22,13 @@ interface NaverMapInstance {
   getZoom: () => number;
 }
 
-declare global {
-  interface Window {
-    naver: {
-      maps: NaverMaps;
-    };
-  }
-}
-
 interface MarkerData {
   id: string;
   position: { lat: number; lng: number };
   title: string;
-  factory?: Factory;
+  // 호출측에서 Factory 타입들이 여러 파일에 분산되어 있어(legacy),
+  // 지도 마커 payload는 우선 unknown으로 받고 선택 시 그대로 전달합니다.
+  factory?: unknown;
   onClick?: () => void;
 }
 
@@ -44,7 +38,7 @@ interface NaverMapProps {
   markers?: MarkerData[];
   selectedMarkerId?: string;
   onMapLoad?: (map: NaverMapInstance) => void;
-  onMarkerSelect?: (factory: Factory) => void;
+  onMarkerSelect?: (factory: unknown) => void;
   onLoadError?: () => void;
   className?: string;
   isPopupOpen?: boolean;
@@ -68,7 +62,7 @@ export default function NaverMap({
   const [isInitialized, setIsInitialized] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorDetails, setErrorDetails] = useState<string>('');
-  const [markerElements, setMarkerElements] = useState<unknown[]>([]);
+  const [markerElements, setMarkerElements] = useState<any[]>([]);
 
   // 환경 변수 검증
   const clientId = useMemo(() => {
@@ -187,13 +181,11 @@ export default function NaverMap({
     if (!map || !isInitialized) return;
 
     // 기존 마커들 제거
-    markerElements.forEach(marker => {
-      if (marker && marker.setMap) {
-        marker.setMap(null);
-      }
+    markerElements.forEach((marker) => {
+      marker?.setMap?.(null);
     });
 
-    const newMarkers: unknown[] = [];
+    const newMarkers: any[] = [];
 
     markers.forEach(markerData => {
       try {

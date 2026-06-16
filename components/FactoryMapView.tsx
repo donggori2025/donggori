@@ -48,8 +48,10 @@ export default function FactoryMapView({ className = "" }: FactoryMapViewProps) 
     setFilters(prev => ({ ...prev, region: searchTerm }));
   };
 
-  const handleMarkerSelect = (factory: FactoryLocation) => {
-    setSelectedFactory(factory);
+  const handleMarkerSelect = (factory: unknown) => {
+    // NaverMap에서 unknown으로 전달되는 payload를 FactoryLocation으로 간주합니다.
+    // (markers 생성 시 FactoryLocation을 주입하고 있음)
+    setSelectedFactory(factory as FactoryLocation);
   };
 
   const handlePopupClose = () => {
