@@ -403,14 +403,14 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                   <>
                     <div
                       ref={thumbnailRef}
-                      className="mt-3 flex gap-2 overflow-x-auto"
+                      className="mt-3 flex flex-nowrap gap-2 overflow-x-auto snap-x snap-mandatory"
                       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                     >
                       {displayImages.map((image, index) => (
                         <button
                           key={index}
                           onClick={() => setCurrentImageIndex(index)}
-                          className={`relative w-[66px] h-[66px] rounded-md overflow-hidden border ${
+                          className={`relative w-[66px] h-[66px] shrink-0 snap-start rounded-md overflow-hidden border ${
                             index === currentImageIndex ? "border-black" : "border-gray-200"
                           }`}
                         >
