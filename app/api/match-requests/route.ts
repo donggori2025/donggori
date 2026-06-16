@@ -117,31 +117,19 @@ export async function GET(req: Request) {
       }
     }
 
-    const queries: Array<ReturnType<typeof supabase.from>> = [];
-    if (userId) queries.push(supabase.from("match_requests").select("*").eq("user_id", userId));
-    if (userEmail) queries.push(supabase.from("match_requests").select("*").eq("user_email", userEmail));
-    if (factoryId) queries.push(supabase.from("match_requests").select("*").eq("factory_id", factoryId));
-    if (factoryName) queries.push(supabase.from("match_requests").select("*").eq("factory_name", factoryName));
+    // 조건을 하나의 쿼리로 합쳐 Supabase 타입 이슈를 피하고, 결과를 예측 가능하게 만듭니다.
+    let query = supabase.from("match_requests").select("*");
+    if (userId) query = query.eq("user_id", userId);
+    if (userEmail) query = query.eq("user_email", userEmail);
+    if (factoryId) query = query.eq("factory_id", factoryId);
+    if (factoryName) query = query.eq("factory_name", factoryName);
 
-    const results = await Promise.all(queries);
-    const anyError = results.find((r) => r.error);
-    if (anyError && anyError.error) {
-      return NextResponse.json({ success: false, error: anyError.error.message }, { status: 500 });
+    const { data, error } = await query.order("created_at", { ascending: false });
+    if (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    const mergedMap = new Map<string, unknown>();
-    for (const r of results) {
-      for (const row of (r.data || []) as any[]) {
-        mergedMap.set(row.id, row);
-      }
-    }
-    const merged = Array.from(mergedMap.values()).sort((a: any, b: any) => {
-      const ta = a.created_at ? Date.parse(a.created_at) : 0;
-      const tb = b.created_at ? Date.parse(b.created_at) : 0;
-      return tb - ta;
-    });
-
-    return NextResponse.json({ success: true, data: merged });
+    return NextResponse.json({ success: true, data: data ?? [] });
   } catch (err: unknown) {
     const error = err as Error;
     return NextResponse.json(
