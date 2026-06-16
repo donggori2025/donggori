@@ -93,7 +93,7 @@ export default function NaverTestGuidePage() {
             <div className="space-y-2 text-purple-700">
               <div>✅ Client ID: <code>i7SHra722KMphfUUcPJX</code></div>
               <div>✅ Callback URL: <code>http://localhost:3000/api/auth/naver/callback</code></div>
-              <div>✅ 애플리케이션 상태: "개발 중"</div>
+              <div>✅ 애플리케이션 상태: &quot;개발 중&quot;</div>
               <div>✅ 테스트 사용자 등록 필요</div>
             </div>
           </div>
