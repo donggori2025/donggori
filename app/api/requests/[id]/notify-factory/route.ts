@@ -4,14 +4,17 @@ import { config } from "@/lib/config";
 import { sendAlimtalk, sendSMS } from "@/lib/messaging";
 import { getRequestAuth, unauthorized } from "@/lib/authHelpers";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const auth = await getRequestAuth();
     if (!auth.authenticated) {
       return unauthorized("인증이 필요합니다.");
     }
 
-    const workOrderId = params.id;
+    const { id: workOrderId } = await params;
     if (!workOrderId) {
       return NextResponse.json({ ok: false, error: "id가 필요합니다." }, { status: 400 });
     }
