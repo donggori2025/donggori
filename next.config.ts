@@ -128,8 +128,8 @@ const nextConfig: NextConfig = {
 
   // TypeScript 설정
   typescript: {
-    // 빌드 시 타입 체크 무시 (배포 차질 방지)
-    ignoreBuildErrors: true,
+    // 타입 오류는 빌드에서 잡도록 합니다.
+    ignoreBuildErrors: false,
   },
 
   // ESLint 설정
