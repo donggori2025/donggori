@@ -26,7 +26,7 @@ export default function MyCoursesPage() {
         .from("purchases")
         .select("course_id")
         .eq("user_id", user.id);
-      setMyCourses(data?.map((row) => row.course_id) || []);
+      setMyCourses(data?.map((row: { course_id: string | number }) => row.course_id) || []);
       setLoading(false);
     };
     fetchPurchases();

@@ -952,7 +952,7 @@ type ScoredFactory = Factory & { score: number };
                         <button
                           key={star}
                           className={`text-xl transition-all duration-200 hover:scale-110 ${
-                            feedbackRatings[f.id || 0] >= star 
+                            feedbackRatings[Number(f.id ?? 0)] >= star 
                               ? 'text-yellow-400' 
                               : 'text-gray-300 hover:text-yellow-300'
                           }`}
@@ -960,7 +960,7 @@ type ScoredFactory = Factory & { score: number };
                             e.preventDefault();
                             e.stopPropagation();
                             console.log(`별점 클릭: 공장 ${f.id}, 점수 ${star}`);
-                            submitFeedback(f.id || 0, star);
+                            submitFeedback(Number(f.id ?? 0), star);
                           }}
                           style={{ cursor: 'pointer' }}
                         >
@@ -968,9 +968,9 @@ type ScoredFactory = Factory & { score: number };
                         </button>
                       ))}
                     </div>
-                    {feedbackRatings[f.id || 0] && (
+                    {feedbackRatings[Number(f.id ?? 0)] && (
                       <div className="text-xs text-green-600 mt-1">
-                        감사합니다! ({feedbackRatings[f.id || 0]}점)
+                        감사합니다! ({feedbackRatings[Number(f.id ?? 0)]}점)
                       </div>
                     )}
                   </div>
