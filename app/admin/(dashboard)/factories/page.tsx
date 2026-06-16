@@ -219,7 +219,7 @@ export default function AdminFactoriesPage() {
       const formData = Object.fromEntries(
         Object.entries(selected).filter(([k]) => !k.startsWith("__"))
       );
-      update(selected.id, formData);
+      update(selected.id, formData as FactoryForm);
     }
   };
 
@@ -266,7 +266,7 @@ export default function AdminFactoriesPage() {
                     <div key={c.column_name} className="md:col-span-2 lg:col-span-3">
                       <ImageUpload
                         onImagesChange={handleImageChange}
-                        currentImages={form.images || []}
+                        currentImages={Array.isArray(form.images) ? form.images : []}
                         multiple={true}
                       />
                     </div>
@@ -371,14 +371,14 @@ export default function AdminFactoriesPage() {
 
                   {(() => {
                     const images = item.images || [];
-                    const hasImage = item.image;
-                    const totalImages = images.length + (hasImage && !images.includes(item.image) ? 1 : 0);
+                    const hasImage = typeof item.image === "string" ? item.image : "";
+                    const totalImages = images.length + (hasImage && !images.includes(hasImage) ? 1 : 0);
                     
                     if (totalImages === 0) return null;
                     
                     const displayImages = [...images];
-                    if (hasImage && !displayImages.includes(item.image)) {
-                      displayImages.unshift(item.image);
+                    if (hasImage && !displayImages.includes(hasImage)) {
+                      displayImages.unshift(hasImage);
                     }
                     
                     return (
@@ -480,14 +480,14 @@ export default function AdminFactoriesPage() {
 
                         {(() => {
                           const images = selected.images || [];
-                          const hasImage = selected.image;
-                          const totalImages = images.length + (hasImage && !images.includes(selected.image) ? 1 : 0);
+                          const hasImage = typeof selected.image === "string" ? selected.image : "";
+                          const totalImages = images.length + (hasImage && !images.includes(hasImage) ? 1 : 0);
                           
                           if (totalImages === 0) return null;
                           
                           const displayImages = [...images];
-                          if (hasImage && !displayImages.includes(selected.image)) {
-                            displayImages.unshift(selected.image);
+                          if (hasImage && !displayImages.includes(hasImage)) {
+                            displayImages.unshift(hasImage);
                           }
                           
                           return (
@@ -523,7 +523,7 @@ export default function AdminFactoriesPage() {
                     ) : (
                       <input 
                         className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                        value={(selected as Factory)[c.column_name] ?? ""} 
+                        value={String((selected as any)[c.column_name] ?? "")} 
                         onChange={(e)=>handleFieldChange(c.column_name, e.target.value)} 
                       />
                     )}

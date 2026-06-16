@@ -1206,10 +1206,6 @@ export default function FactoriesPage() {
                           setShowPopup(true);
                         }
                       }))}
-                      onMarkerSelect={(factory) => {
-                        setSelectedFactory(factory);
-                        setShowPopup(true);
-                      }}
                       onLoadError={handleMapLoadError}
                       className="w-full h-full rounded-lg sm:rounded-xl"
                       isPopupOpen={showPopup}
@@ -1218,7 +1214,7 @@ export default function FactoriesPage() {
                     {/* 팝업 */}
                     {showPopup && selectedFactory && (
                       <FactoryInfoPopup
-                        factory={selectedFactory}
+                        factory={selectedFactory as any}
                         onDetailClick={() => {
                           if (selectedFactory) {
                             router.push(`/factories/${selectedFactory.id}`);
