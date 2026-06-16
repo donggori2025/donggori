@@ -111,9 +111,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     removeCookie("naver_user");
     removeCookie("isLoggedIn");
     removeCookie("userType");
-    removeCookie("accessToken");
     removeCookie("access_token");
-    removeCookie("snsAccessToken");
+    removeCookie("sns_access_token");
     removeCookie("factory_user");
     try {
       localStorage.removeItem("userType");

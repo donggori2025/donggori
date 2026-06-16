@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminSession } from "./adminSession";
+import { verifySessionToken } from "./session";
 
 export interface AuthResult {
   authenticated: boolean;
@@ -18,16 +19,19 @@ export async function getRequestAuth(req?: NextRequest): Promise<AuthResult> {
       return { authenticated: true, role: "admin" };
     }
 
-    const accessToken = cookieStore.get("accessToken")?.value;
+    // 동고리 세션 토큰은 JWT가 아니라 sessions 테이블에 저장되는 임의 토큰(UUID 등)입니다.
+    // 쿠키에서 토큰을 읽어 DB에서 유효성 검증을 수행합니다.
+    const accessToken = cookieStore.get("access_token")?.value;
     if (accessToken) {
-      try {
-        const payload = JSON.parse(
-          Buffer.from(accessToken.split(".")[1], "base64").toString()
-        );
-        if (payload.email) {
-          return { authenticated: true, userId: payload.sub || payload.id, email: payload.email, role: "user" };
-        }
-      } catch {}
+      const { valid, data } = await verifySessionToken(accessToken);
+      if (valid) {
+        return {
+          authenticated: true,
+          userId: String((data as any)?.user_id ?? ""),
+          email: (data as any)?.user_email ?? undefined,
+          role: "user",
+        };
+      }
     }
 
     for (const name of ["kakao_user", "naver_user", "google_user"]) {
@@ -42,16 +46,17 @@ export async function getRequestAuth(req?: NextRequest): Promise<AuthResult> {
       }
     }
 
-    const snsToken = cookieStore.get("snsAccessToken")?.value;
+    const snsToken = cookieStore.get("sns_access_token")?.value;
     if (snsToken) {
-      try {
-        const payload = JSON.parse(
-          Buffer.from(snsToken.split(".")[1], "base64").toString()
-        );
-        if (payload.email && payload.isInitialized) {
-          return { authenticated: true, userId: payload.sub, email: payload.email, role: "user" };
-        }
-      } catch {}
+      const { valid, data } = await verifySessionToken(snsToken);
+      if (valid) {
+        return {
+          authenticated: true,
+          userId: String((data as any)?.user_id ?? (data as any)?.external_id ?? ""),
+          email: (data as any)?.user_email ?? undefined,
+          role: "user",
+        };
+      }
     }
 
     const factorySession = cookieStore.get("factory_session")?.value;
