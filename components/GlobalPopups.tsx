@@ -53,7 +53,12 @@ export default function GlobalPopups() {
         const staticPromos = getActiveStaticPromoPopups();
         const mergedItems = [
           ...staticPromos,
-          ...apiItems.filter((item) => !staticPromos.some((promo) => promo.id === item.id)),
+          ...apiItems.filter(
+            (item) =>
+              item?.id &&
+              (item.image_url || item.title || item.content) &&
+              !staticPromos.some((promo) => promo.id === item.id)
+          ),
         ];
         setItems(mergedItems);
         setOpen(mergedItems.length > 0);
@@ -85,6 +90,8 @@ export default function GlobalPopups() {
   if (!open || loading || items.length === 0) return null;
 
   const current = items[Math.max(0, Math.min(index, items.length - 1))];
+  if (!current) return null;
+
   const currentLinkUrl = getPromoLinkUrl(current.id, isMobile) ?? current.link_url;
   const imageMaxHeight = current.title || current.content
     ? "calc(90vh - 12rem)"

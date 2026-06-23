@@ -10,9 +10,11 @@ export const FADDIT_PROMO_POPUP: PopupItem = {
   image_url: "https://res.cloudinary.com/dvvqaywkd/image/upload/v1780636668/Frame_433_vvd1kq.png",
 };
 
+export const FADDIT_CREATOR_CREW_KAKAO_URL = "https://open.kakao.com/o/pXWBTRri" as const;
+
 export const FADDIT_CREATOR_CREW_LINKS = {
-  pc: "https://faddit.co.kr/?utm_source=donggori&utm_medium=display&utm_campaign=creator_crew_202606&utm_content=pc_popup",
-  mobile: "https://faddit.co.kr/?utm_source=donggori&utm_medium=display&utm_campaign=creator_crew_202606&utm_content=mobile_popup",
+  pc: FADDIT_CREATOR_CREW_KAKAO_URL,
+  mobile: FADDIT_CREATOR_CREW_KAKAO_URL,
 } as const;
 
 export const FADDIT_CREATOR_CREW_POPUP: PopupItem = {

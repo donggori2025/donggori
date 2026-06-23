@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 // Clerk 제거 운영에 맞춰 로컬/쿠키/Supabase 기반 확인으로 전환
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,17 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   
   // 공장 이미지 훅 사용
   const { images: factoryImages, loading: imagesLoading } = useFactoryImages(factory?.name || factory?.company_name || '');
+  const displayImages = useMemo(
+    () =>
+      factoryImages.filter(
+        (img) =>
+          img &&
+          img !== "/logo_donggori.png" &&
+          !img.includes("unsplash") &&
+          !img.includes("logo_donggori")
+      ),
+    [factoryImages]
+  );
   const thumbnailRef = useRef<HTMLDivElement>(null);
   const majorItemsRef = useRef<HTMLParagraphElement | null>(null);
 
@@ -213,7 +224,17 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
         behavior: 'smooth'
       });
     }
-  }, [currentImageIndex, factory]);
+  }, [currentImageIndex, displayImages.length]);
+
+  useEffect(() => {
+    if (displayImages.length === 0) {
+      setCurrentImageIndex(0);
+      return;
+    }
+    if (currentImageIndex >= displayImages.length) {
+      setCurrentImageIndex(0);
+    }
+  }, [currentImageIndex, displayImages.length]);
 
   const majorItems = [
     factory?.top_items_upper,
@@ -332,16 +353,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       ? val.split(/,|\|| /).map((v) => v.trim()).filter(Boolean)
       : [];
 
-  // 실제 공장 이미지 배열 (훅에서 가져온 이미지들)
-  const displayImages = factoryImages && factoryImages.length > 0 
-    ? factoryImages.filter(img => 
-        img && 
-        img !== '/logo_donggori.png' && 
-        !img.includes('unsplash') &&
-        !img.includes('logo_donggori')
-      )
-    : []; // 이미지가 없으면 빈 배열
-
   const handleConsultRequest = () => {
     if (!isAppLoggedIn()) {
       goToRequestAfterSignIn("standard");
@@ -365,6 +376,9 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       ? String(factory.established_year)
       : "-";
 
+  const activeImageIndex =
+    displayImages.length > 0 ? Math.min(currentImageIndex, displayImages.length - 1) : 0;
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-[1250px] mx-auto px-4 lg:px-6 py-8">
@@ -374,12 +388,12 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
               <div className="relative">
                 <div className="relative w-full h-[560px] md:h-[620px] lg:h-[640px] xl:h-[660px] bg-[#f7f7f8] rounded-xl overflow-hidden">
                   <Image
-                    src={displayImages[currentImageIndex]}
-                    alt={`${factoryName} 이미지 ${currentImageIndex + 1}`}
+                    src={displayImages[activeImageIndex]}
+                    alt={`${factoryName} 이미지 ${activeImageIndex + 1}`}
                     fill
                     className="object-contain"
                     sizes="(max-width: 1024px) 100vw, 48vw"
-                    priority={currentImageIndex === 0}
+                    priority={activeImageIndex === 0}
                     quality={85}
                   />
                   {displayImages.length > 1 && (
@@ -411,7 +425,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                           key={index}
                           onClick={() => setCurrentImageIndex(index)}
                           className={`relative w-[66px] h-[66px] shrink-0 snap-start rounded-md overflow-hidden border ${
-                            index === currentImageIndex ? "border-black" : "border-gray-200"
+                            index === activeImageIndex ? "border-black" : "border-gray-200"
                           }`}
                         >
                           <Image src={image} alt={`${factoryName} 썸네일 ${index + 1}`} fill className="object-cover" />
@@ -422,7 +436,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                       {displayImages.map((_, index) => (
                         <span
                           key={index}
-                          className={`w-1.5 h-1.5 rounded-full ${index === currentImageIndex ? "bg-black" : "bg-gray-300"}`}
+                          className={`w-1.5 h-1.5 rounded-full ${index === activeImageIndex ? "bg-black" : "bg-gray-300"}`}
                         />
                       ))}
                     </div>
