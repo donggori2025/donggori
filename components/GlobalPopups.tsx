@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { getPromoLinkUrl, STATIC_PROMO_POPUPS } from "@/lib/promoPopups";
+import { getActiveStaticPromoPopups, getPromoLinkUrl } from "@/lib/promoPopups";
 import type { PopupItem } from "@/lib/types";
 
 function useIsMobile(breakpoint = 768) {
@@ -50,15 +50,17 @@ export default function GlobalPopups() {
         const res = await fetch('/api/popups');
         const json = await res.json();
         const apiItems = res.ok && json.success ? ((json.data || []) as PopupItem[]) : [];
+        const staticPromos = getActiveStaticPromoPopups();
         const mergedItems = [
-          ...STATIC_PROMO_POPUPS,
-          ...apiItems.filter((item) => !STATIC_PROMO_POPUPS.some((promo) => promo.id === item.id)),
+          ...staticPromos,
+          ...apiItems.filter((item) => !staticPromos.some((promo) => promo.id === item.id)),
         ];
         setItems(mergedItems);
         setOpen(mergedItems.length > 0);
       } catch {
-        setItems(STATIC_PROMO_POPUPS);
-        setOpen(STATIC_PROMO_POPUPS.length > 0);
+        const staticPromos = getActiveStaticPromoPopups();
+        setItems(staticPromos);
+        setOpen(staticPromos.length > 0);
       } finally {
         setLoading(false);
       }
@@ -130,12 +132,12 @@ export default function GlobalPopups() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex cursor-pointer items-center justify-center"
-                aria-label="faddit 바로가기"
+                aria-label={current.title ? `${current.title} 바로가기` : "faddit 바로가기"}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={current.image_url}
-                  alt={current.title || "faddit 프로모션"}
+                  alt={current.title || "프로모션"}
                   className="block h-auto w-auto max-w-[min(700px,calc(90vw-2rem))] object-contain"
                   style={{ maxHeight: imageMaxHeight }}
                 />
@@ -144,7 +146,7 @@ export default function GlobalPopups() {
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={current.image_url}
-                alt={current.title || "faddit 프로모션"}
+                alt={current.title || "프로모션"}
                 className="block h-auto w-auto max-w-[min(700px,calc(90vw-2rem))] object-contain"
                 style={{ maxHeight: imageMaxHeight }}
               />
