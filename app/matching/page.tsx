@@ -8,6 +8,7 @@ import { useAppAuth } from "@/contexts/AuthContext";
 import type { Factory } from "@/lib/factories";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
+import { recommendFactoriesFromPrompt } from "@/lib/factoryMatching";
 import { FACTORY_TYPES, MAIN_FABRICS, type FactoryType, type MainFabric } from "@/lib/types";
 
 
@@ -171,7 +172,8 @@ export default function MatchingPage() {
         // 실제 이미지 정보 가져오기
         const factoryWithImages = {
           ...factory,
-          // 공장 이름으로 실제 이미지 가져오기
+          intro: factory.intro_text || factory.intro,
+          description: factory.description || factory.intro_text || factory.intro,
           image: getFactoryMainImage(companyName),
           images: getFactoryImages(companyName)
         };
@@ -555,6 +557,9 @@ type ScoredFactory = Factory & { score: number };
         ...splitMultiValues(factory.top_items_sports_leisure),
         ...splitMultiValues(factory.top_items_pet),
         ...splitMultiValues(factory.items),
+        ...splitMultiValues(factory.intro),
+        ...splitMultiValues(factory.description),
+        ...splitMultiValues(factory.brands_supplied),
       ];
 
       // 1. 공장 타입 매칭 (가중치: 30)
@@ -718,76 +723,7 @@ type ScoredFactory = Factory & { score: number };
   }, [factories]);
 
   const getRecommendedFactoriesFromPrompt = useCallback((prompt: string) => {
-    const normalizedPrompt = String(prompt || "").toLowerCase();
-    const tokens = normalizedPrompt
-      .split(/[\s,./()]+/)
-      .map((v) => v.trim())
-      .filter((v) => v.length >= 2);
-
-    const scoredFactories = factories.map((factory) => {
-      const searchable = [
-        factory.factory_type,
-        factory.business_type,
-        factory.main_fabrics,
-        factory.admin_district,
-        factory.processes,
-        factory.sewing_machines,
-        factory.pattern_machines,
-        factory.special_machines,
-        factory.top_items_upper,
-        factory.top_items_lower,
-        factory.top_items_outer,
-        factory.top_items_dress_skirt,
-        factory.top_items_sports_leisure,
-        factory.top_items_underwear,
-      ]
-        .map((v) => String(v || "").toLowerCase())
-        .join(" ");
-
-      let score = 0;
-      const hitKeywords: string[] = [];
-
-      for (const token of tokens) {
-        if (searchable.includes(token)) {
-          score += 10;
-          hitKeywords.push(token);
-        }
-      }
-
-      const moqValue = getMoqValue(factory);
-
-      // 의도 키워드 보정
-      if ((normalizedPrompt.includes("샘플") || normalizedPrompt.includes("소량")) && moqValue !== null && moqValue <= 100) {
-        score += 18;
-      }
-      if ((normalizedPrompt.includes("대량") || normalizedPrompt.includes("양산")) && moqValue !== null && moqValue >= 300) {
-        score += 18;
-      }
-      if (
-        (normalizedPrompt.includes("스포츠") || normalizedPrompt.includes("기능성")) &&
-        toCanonicalSet(splitMultiValues(factory.main_fabrics)).includes("다이마루")
-      ) {
-        score += 8;
-      }
-      if (
-        (normalizedPrompt.includes("자켓") || normalizedPrompt.includes("아우터")) &&
-        splitMultiValues(factory.top_items_outer).length > 0
-      ) {
-        score += 10;
-      }
-
-      return {
-        ...factory,
-        score: Math.min(100, score),
-        hitKeywords,
-      };
-    });
-
-    const sorted = scoredFactories.sort((a, b) => b.score - a.score);
-    if ((sorted[0]?.score ?? 0) === 0) {
-      return pickRandomItems(scoredFactories, 3);
-    }
-    return sorted.slice(0, 3);
+    return recommendFactoriesFromPrompt(factories, prompt, 3);
   }, [factories]);
 
   const startTextMatching = useCallback((prompt: string) => {
