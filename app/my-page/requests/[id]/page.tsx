@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getMatchRequestById, MatchRequest } from "@/lib/matchRequests";
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 export default function MyRequestDetailPage() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function MyRequestDetailPage() {
     request.factoryId === "design-request";
 
   return (
-    <div className="max-w-[1200px] mx-auto py-16 px-4">
+    <div className={`${PAGE_CONTAINER_CLASS} py-16`}>
       <div className="mb-8">
         <button
           onClick={() => router.back()}

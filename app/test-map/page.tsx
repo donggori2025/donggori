@@ -3,6 +3,7 @@ import React from "react";
 import { useState } from 'react';
 import NaverMap from '@/components/NaverMap';
 import SimpleNaverMap from '@/components/SimpleNaverMap';
+import { PAGE_CONTAINER_CLASS } from '@/lib/layout';
 
 export default function TestMapPage() {
   const [mapType, setMapType] = useState<'simple' | 'full'>('full');
@@ -27,8 +28,8 @@ export default function TestMapPage() {
   const hasValidClientId = clientId && clientId !== 'your-naver-map-client-id' && clientId.length > 10;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-4">
+      <div className={PAGE_CONTAINER_CLASS}>
         <h1 className="text-3xl font-bold text-gray-900 mb-6">네이버 지도 테스트</h1>
         
         {/* API 설정 안내 */}

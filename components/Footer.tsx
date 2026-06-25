@@ -1,4 +1,5 @@
 import React from "react";
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 // Footer 컴포넌트: 사이트 하단에 고정적으로 표시되는 정보 영역입니다.
 // - md 미만에서는 햄버거 버튼이 나타나고, 클릭 시 전체 메뉴와 로그인/회원가입 버튼이 드롭다운으로 노출됩니다.
@@ -21,8 +22,8 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-[#fafafa] border-t border-gray-200 py-8 sm:py-12 px-4 sm:px-6 mt-8 sm:mt-16 relative z-50">
-      <div className="max-w-[1400px] mx-auto flex flex-col items-center gap-3 sm:gap-4 px-4 sm:px-10">
+    <footer className="w-full bg-[#fafafa] border-t border-gray-200 py-8 sm:py-12 mt-8 sm:mt-16 relative z-50">
+      <div className={`${PAGE_CONTAINER_CLASS} flex flex-col items-center gap-3 sm:gap-4`}>
         {/* nav: md 이상에서만 flex, md 미만에서는 hidden */}
         <nav className="hidden md:flex w-full justify-between items-center mb-3 sm:mb-4 text-sm text-gray-700">
           {/* 왼쪽 메뉴 그룹 */}

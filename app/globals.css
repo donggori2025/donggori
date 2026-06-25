@@ -266,6 +266,29 @@ body {
   }
 }
 
+/* AI 모델핏 메뉴 glow */
+.ai-model-fit-glow {
+  background: linear-gradient(45deg, #a78bfa, #c084fc, #f472b6, #818cf8);
+  background-size: 220% 220%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 2.5s ease-in-out infinite;
+  font-weight: 700;
+}
+
+.ai-model-fit-title {
+  background: linear-gradient(90deg, #c4b5fd, #f9a8d4, #93c5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ai-model-fit-hero-bg {
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139, 92, 246, 0.35), transparent),
+    radial-gradient(ellipse 60% 50% at 80% 50%, rgba(236, 72, 153, 0.2), transparent);
+}
+
 /* 스크롤바 숨김 스타일 */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */

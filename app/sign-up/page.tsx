@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loader } from "lucide-react";
 import { checkEmailExists, checkSupabaseConnection } from '@/lib/userService';
 import { config, safeValidateOAuthConfig } from "@/lib/config";
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 function SignUpForm() {
   const searchParams = useSearchParams();
@@ -434,6 +435,7 @@ function SignUpForm() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+      <div className={`${PAGE_CONTAINER_CLASS} flex flex-col items-center py-12`}>
       {/* 상단 로고/타이틀/설명 */}
       <div className="mb-8 flex flex-col items-center">
         <Image src="/logo_0624.svg" alt="동고리 로고" width={80} height={80} className="mb-2" />
@@ -654,6 +656,7 @@ function SignUpForm() {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }
