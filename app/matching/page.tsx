@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { RotateCcw, Search, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
@@ -88,7 +89,11 @@ function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number 
 function ChatBubble({ text, type, isTyping, showCursor, onEdit }: { text: string; type: "question" | "answer"; isTyping?: boolean; showCursor?: boolean; onEdit?: () => void }) {
   return (
     <div className={`flex flex-col items-${type === "answer" ? "end" : "start"} w-full`}>
-      <div className={`relative px-4 py-2 rounded-2xl text-base animate-fade-in max-w-[80%] ${type === "question" ? "bg-white text-black self-start" : "bg-[#222222] text-white self-end"}`} style={{ minHeight: 40 }}>
+      <div className={`relative px-4 py-2.5 rounded-2xl text-sm md:text-base animate-fade-in max-w-[85%] border ${
+        type === "question"
+          ? "bg-white text-gray-900 border-gray-200 self-start shadow-sm"
+          : "bg-[#111] text-white border-[#111] self-end"
+      }`} style={{ minHeight: 40 }}>
         {isTyping ? (
           <span>
             {text}
@@ -101,7 +106,7 @@ function ChatBubble({ text, type, isTyping, showCursor, onEdit }: { text: string
       {/* 답변(선택지) 말풍선에만 수정 버튼 노출 */}
       {type === "answer" && onEdit && (
         <button
-          className="mt-1 text-xs text-gray-400 underline hover:text-[#222222]"
+          className="mt-1 text-xs text-gray-400 underline hover:text-violet-600"
           onClick={onEdit}
         >
           수정
@@ -1028,10 +1033,21 @@ type ScoredFactory = Factory & { score: number };
 
   // 왼쪽: 질문/선택지 or 결과 카드 or 로딩
   return (
-    <div className="w-full min-h-screen bg-[#F4F5F7] flex flex-col items-center justify-start overflow-x-hidden py-6 md:py-12">
-      <div className={`${PAGE_CONTAINER_CLASS} flex flex-col lg:flex-row gap-4 items-stretch justify-center flex-1 transition-opacity duration-700 bg-[#F4F5F7] pb-0 mb-0 min-h-[78vh]`}>
+    <div className="min-h-screen bg-[#f6f7fb]">
+      <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-6`}>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <Sparkles className="w-7 h-7 text-violet-500 shrink-0" />
+            AI 매칭
+          </h1>
+          <p className="mt-2 text-sm md:text-base text-gray-600">
+            몇 가지 정보만 알려주시면 가장 적합한 봉제공장 3곳을 추천해드립니다.
+          </p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch justify-center flex-1 transition-opacity duration-700 min-h-[78vh]">
         {/* 왼쪽: 질문/선택지 or 결과 카드 or 로딩 */}
-        <div className="w-full lg:flex-[2] bg-white rounded-2xl shadow border p-4 md:p-6 flex flex-col min-h-[620px] md:min-h-[700px] lg:min-h-[760px] lg:max-h-[860px]">
+        <div className="w-full lg:flex-[2] bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6 flex flex-col min-h-[620px] md:min-h-[700px] lg:min-h-[760px] lg:max-h-[860px]">
           {isResultStage ? (
             resultLoading ? (
               <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] animate-fade-in">
@@ -1051,16 +1067,18 @@ type ScoredFactory = Factory & { score: number };
                 {/* 하단 버튼 영역 */}
                 <div className="flex w-full gap-4 pt-4 shrink-0">
                   <button
-                    className="flex-1 flex items-center justify-center border border-gray-300 rounded-lg py-3 text-sm md:text-base font-semibold bg-white hover:bg-gray-50 transition"
+                    className="flex-1 flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-3 text-sm md:text-base font-semibold bg-white hover:bg-gray-50 transition"
                     onClick={() => router.push('/factories')}
                   >
-                    <span className="mr-2">🔍</span>직접 찾기
+                    <Search className="w-4 h-4" />
+                    직접 찾기
                   </button>
                   <button
-                    className="flex-1 flex items-center justify-center rounded-lg py-3 text-sm md:text-base font-semibold bg-[#222] text-white hover:bg-[#111] transition"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-lg py-3 text-sm md:text-base font-semibold bg-[#111] text-white hover:bg-black transition"
                     onClick={handleRestart}
                   >
-                    <span className="mr-2">↻</span>다시하기
+                    <RotateCcw className="w-4 h-4" />
+                    다시하기
                   </button>
                 </div>
               </div>
@@ -1073,12 +1091,9 @@ type ScoredFactory = Factory & { score: number };
             <>
               {/* 상단~선택지 영역 */}
               <div className="flex-1 min-h-0 flex flex-col gap-4">
-                <div className="text-sm md:text-base text-gray-500 mb-4">
-                  몇 가지 정보를 알려주시면,<br />
-                  <span className="font-bold">가장 적합한 3개의 봉제공장을 추천</span>해드립니다.
-                </div>
                 <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 md:p-4">
-                  <div className="text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                  <div className="text-xs md:text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-violet-500" />
                     텍스트로 바로 매칭하기
                   </div>
                   <div className="flex flex-col md:flex-row gap-2">
@@ -1091,7 +1106,7 @@ type ScoredFactory = Factory & { score: number };
                         }
                       }}
                       placeholder="예: 여성 니트 상의 소량 생산 가능한 공장을 찾고 싶어요"
-                      className="w-full h-10 md:h-11 rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-[#333333]/20 focus:border-[#333333]"
+                      className="w-full h-10 md:h-11 rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400"
                     />
                     <button
                       type="button"
@@ -1099,7 +1114,7 @@ type ScoredFactory = Factory & { score: number };
                       disabled={!quickInput.trim()}
                       className={`h-10 md:h-11 px-4 rounded-lg text-sm font-bold whitespace-nowrap transition ${
                         quickInput.trim()
-                          ? "bg-[#222222] text-white hover:bg-[#111111]"
+                          ? "bg-violet-600 text-white hover:bg-violet-700"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     >
@@ -1110,7 +1125,7 @@ type ScoredFactory = Factory & { score: number };
                 <hr className="my-4 border-gray-200" />
                 <div className="flex gap-2 mb-6">
                   {QUESTIONS.map((_, idx) => (
-                    <div key={idx} className={`h-1 w-8 md:w-12 rounded-full ${idx <= step ? "bg-[#333333]" : "bg-gray-200"}`}></div>
+                    <div key={idx} className={`h-1 w-8 md:w-12 rounded-full ${idx <= step ? "bg-violet-600" : "bg-gray-200"}`}></div>
                   ))}
                 </div>
                 <div className="text-xs md:text-sm text-gray-400 mb-2">{step + 1} of {QUESTIONS.length}</div>
@@ -1122,10 +1137,10 @@ type ScoredFactory = Factory & { score: number };
                     <button
                       key={option}
                       type="button"
-                      className={`rounded-xl bg-white shadow text-xs md:text-[15px] font-medium py-4 md:py-8 transition border border-gray-200 flex items-center justify-center
+                      className={`rounded-xl bg-white shadow-sm text-xs md:text-[15px] font-medium py-4 md:py-8 transition border border-gray-200 flex items-center justify-center
                         ${selectedOptions.includes(option)
-                          ? "border-[#333333] ring-2 ring-[#333333]"
-                          : "hover:border-[#333333]"}
+                          ? "border-violet-500 ring-2 ring-violet-200"
+                          : "hover:border-violet-300"}
                       `}
                       onClick={() => handleOptionToggle(option)}
                     >
@@ -1141,7 +1156,7 @@ type ScoredFactory = Factory & { score: number };
                 <div className="flex gap-2">
                   <Button variant="ghost" className="text-[#333333] text-sm md:text-base px-4 md:px-6 py-2 md:py-3" onClick={handleSkip}>건너뛰기</Button>
                   <Button
-                    className="bg-[#333333] text-white rounded-lg px-6 md:px-8 py-2 md:py-3 font-bold text-sm md:text-base"
+                    className="bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-6 md:px-8 py-2 md:py-3 font-bold text-sm md:text-base"
                     onClick={handleConfirm}
                     disabled={selectedOptions.length === 0}
                   >
@@ -1154,7 +1169,7 @@ type ScoredFactory = Factory & { score: number };
         </div>
         {/* 오른쪽: 기존 채팅 UI + 결과 안내 메시지(답변 말풍선) */}
         <div
-          className="w-full lg:flex-[1] bg-[#F7F8FA] rounded-xl shadow-md p-4 min-h-[280px] md:min-h-[340px] lg:min-h-[760px] lg:max-h-[860px] max-h-[44vh] md:max-h-[50vh] lg:h-auto overflow-y-auto flex flex-col gap-6"
+          className="w-full lg:flex-[1] bg-white rounded-2xl border border-gray-200 shadow-sm p-4 min-h-[280px] md:min-h-[340px] lg:min-h-[760px] lg:max-h-[860px] max-h-[44vh] md:max-h-[50vh] lg:h-auto overflow-y-auto flex flex-col gap-6"
           ref={chatScrollRef}
         >
           {/* 기존 채팅/인트로 UI */}
@@ -1233,6 +1248,7 @@ type ScoredFactory = Factory & { score: number };
   animation: blink 1s step-end infinite;
 }
 `}</style>
+      </div>
     </div>
   );
 }

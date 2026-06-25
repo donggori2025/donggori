@@ -1,29 +1,15 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAppAuth } from "@/contexts/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
 import { getFactoryProfileImage } from "@/lib/factoryAuth";
 import { storage } from "@/lib/utils";
 import type { FactoryAuth } from "@/lib/types";
-import { ChevronDown } from "lucide-react";
-
-const AI_MENU_PATHS = ["/matching", "/ai-model-fit", "/ai-clothing"];
 
 type NavLinkItem = { type: "link"; href: string; label: string };
-type NavDropdownItem = {
-  type: "dropdown";
-  label: string;
-  children: { href: string; label: string }[];
-};
-type NavItem = NavLinkItem | NavDropdownItem;
-
-const AI_DROPDOWN_CHILDREN = [
-  { href: "/matching", label: "AI 매칭" },
-  { href: "/ai-model-fit", label: "AI 모델핏" },
-  { href: "/ai-clothing", label: "AI 의류 생성" },
-];
+type NavItem = NavLinkItem;
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -37,40 +23,18 @@ export default function Header() {
   const [kakaoUser, setKakaoUser] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [aiDropdownOpen, setAiDropdownOpen] = useState(false);
-  const [mobileAiOpen, setMobileAiOpen] = useState(false);
-  const aiDropdownRef = useRef<HTMLDivElement>(null);
 
-  const navMenu = useMemo<NavItem[]>(() => [
-    { type: "link", href: "/factories", label: "봉제공장 찾기" },
-    { type: "link", href: "/design-request", label: "디자인 의뢰하기" },
-    {
-      type: "dropdown",
-      label: "✦ 동고리 AI",
-      children: AI_DROPDOWN_CHILDREN,
-    },
-    { type: "link", href: "/notices", label: "공지사항" },
-  ], []);
+  const navMenu = useMemo<NavItem[]>(
+    () => [
+      { type: "link", href: "/factories", label: "봉제공장 찾기" },
+      { type: "link", href: "/design-request", label: "디자인 의뢰하기" },
+      { type: "link", href: "/matching", label: "AI 매칭" },
+      { type: "link", href: "/notices", label: "공지사항" },
+    ],
+    []
+  );
 
-  const isAiMenuActive = AI_MENU_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-
-  useEffect(() => {
-    setAiDropdownOpen(false);
-    setMobileAiOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    if (!aiDropdownOpen) return;
-
-    const handlePointerDown = (event: MouseEvent) => {
-      if (!aiDropdownRef.current?.contains(event.target as Node)) {
-        setAiDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handlePointerDown);
-    return () => document.removeEventListener("mousedown", handlePointerDown);
-  }, [aiDropdownOpen]);
+  const isMatchingActive = pathname === "/matching" || pathname.startsWith("/matching/");
 
   // 컴포넌트 마운트 확인
   useEffect(() => {
@@ -165,104 +129,32 @@ export default function Header() {
   // 메뉴 닫기 핸들러
   const closeMenu = useCallback(() => {
     setMenuOpen(false);
-    setMobileAiOpen(false);
   }, []);
 
-  const renderDesktopNavItem = (item: NavItem) => {
-    if (item.type === "link") {
-      return (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={`${navHoverClass} hover:font-bold transition-colors`}
-        >
-          {item.label}
-        </Link>
-      );
-    }
+  const renderDesktopNavItem = (item: NavItem) => (
+    <Link
+      key={item.href}
+      href={item.href}
+      className={`${navHoverClass} hover:font-bold transition-colors ${
+        item.href === "/matching" && isMatchingActive ? "font-bold" : ""
+      }`}
+    >
+      {item.label}
+    </Link>
+  );
 
-    return (
-      <div key="donggori-ai" className="relative" ref={aiDropdownRef}>
-        <button
-          type="button"
-          className={`inline-flex items-center gap-1 ai-model-fit-glow ${navHoverClass} hover:font-bold transition-colors ${
-            isAiMenuActive ? "opacity-100" : ""
-          }`}
-          onClick={() => setAiDropdownOpen((v) => !v)}
-          aria-expanded={aiDropdownOpen}
-          aria-haspopup="true"
-        >
-          {item.label}
-          <ChevronDown className={`w-4 h-4 transition-transform ${aiDropdownOpen ? "rotate-180" : ""}`} />
-        </button>
-        {aiDropdownOpen && (
-          <div className="absolute top-full left-0 pt-2 z-[10000]">
-            <div className="min-w-[190px] bg-white rounded-xl shadow-lg border border-gray-100 py-2">
-              {item.children.map((child) => (
-                <Link
-                  key={child.href}
-                  href={child.href}
-                  className={`block px-4 py-2.5 text-sm transition-colors hover:bg-gray-50 ${
-                    pathname === child.href
-                      ? "font-bold text-violet-700 bg-violet-50/50"
-                      : "text-gray-800"
-                  }`}
-                  onClick={() => setAiDropdownOpen(false)}
-                >
-                  {child.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const renderMobileNavItem = (item: NavItem) => {
-    if (item.type === "link") {
-      return (
-        <Link
-          key={item.href}
-          href={item.href}
-          className="py-3 px-4 rounded-lg hover:bg-gray-100 font-medium text-lg transition-colors text-gray-800"
-          onClick={closeMenu}
-        >
-          {item.label}
-        </Link>
-      );
-    }
-
-    return (
-      <div key="donggori-ai-mobile" className="flex flex-col gap-1">
-        <button
-          type="button"
-          className="py-3 px-4 rounded-lg hover:bg-gray-100 font-medium text-lg transition-colors ai-model-fit-glow inline-flex items-center justify-between w-full"
-          onClick={() => setMobileAiOpen((v) => !v)}
-          aria-expanded={mobileAiOpen}
-        >
-          {item.label}
-          <ChevronDown className={`w-5 h-5 transition-transform ${mobileAiOpen ? "rotate-180" : ""}`} />
-        </button>
-        {mobileAiOpen && (
-          <div className="flex flex-col gap-1 pl-4">
-            {item.children.map((child) => (
-              <Link
-                key={child.href}
-                href={child.href}
-                className={`py-2.5 px-4 rounded-lg text-base transition-colors hover:bg-gray-100 ${
-                  pathname === child.href ? "font-bold text-violet-700 bg-violet-50" : "text-gray-700"
-                }`}
-                onClick={closeMenu}
-              >
-                {child.label}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
+  const renderMobileNavItem = (item: NavItem) => (
+    <Link
+      key={item.href}
+      href={item.href}
+      className={`py-3 px-4 rounded-lg hover:bg-gray-100 font-medium text-lg transition-colors text-gray-800 ${
+        item.href === "/matching" && isMatchingActive ? "font-bold" : ""
+      }`}
+      onClick={closeMenu}
+    >
+      {item.label}
+    </Link>
+  );
 
   // 서버 사이드 렌더링 시 기본 UI만 표시
   const isHome = pathname === "/";
