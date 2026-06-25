@@ -8,6 +8,7 @@ import {
   type ModelSize,
   resolveModelImage,
 } from "@/lib/aiModelFit";
+import { featureFlags } from "@/lib/featureFlags";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -66,6 +67,10 @@ async function compositeGarmentOnModel(
 }
 
 export async function POST(req: Request) {
+  if (!featureFlags.aiModelFit) {
+    return NextResponse.json({ success: false, error: "서비스 준비 중입니다." }, { status: 503 });
+  }
+
   try {
     const form = await req.formData();
     const garment = form.get("garment");

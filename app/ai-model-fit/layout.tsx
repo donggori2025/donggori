@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { featureFlags } from "@/lib/featureFlags";
 
 export const metadata: Metadata = {
   title: "AI 모델핏 Studio | 동고리",
@@ -6,5 +8,6 @@ export const metadata: Metadata = {
 };
 
 export default function AiModelFitLayout({ children }: { children: React.ReactNode }) {
+  if (!featureFlags.aiModelFit) redirect("/matching");
   return children;
 }
