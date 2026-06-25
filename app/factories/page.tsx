@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowPathIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { List, Map as MapIcon } from "lucide-react";
+import { List, Map as MapIcon, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import { factories, fetchFactoriesFromDB, type Factory } from "@/lib/factories";
 import { testSupabaseConnection } from "@/lib/supabaseClient";
 import { FACTORY_TYPES, MAIN_FABRICS } from "@/lib/types";
@@ -19,6 +19,32 @@ import { useRouter } from "next/navigation";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 import { useFactoryImages, hasFactoryImages } from "@/lib/hooks/useFactoryImages";
 import { isKnitRelatedQuery, isParkwonKnitFactory, pinParkwonKnitFirst } from "@/lib/factoryMatching";
+
+function getFilterChipClass(isOn: boolean, sm = false) {
+  const base = sm
+    ? "rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
+    : "rounded-full border px-4";
+  return isOn
+    ? `${base} bg-[#222222] text-white border-[#222222] hover:bg-[#444444] hover:text-white`
+    : `${base} border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50`;
+}
+
+const EMPTY_FILTERS = {
+  admin_district: [] as string[],
+  moq: [] as string[],
+  monthly_capacity: [] as string[],
+  business_type: [] as string[],
+  distribution: [] as string[],
+  delivery: [] as string[],
+  items: [] as string[],
+  equipment: [] as string[],
+  sewing_machines: [] as string[],
+  pattern_machines: [] as string[],
+  special_machines: [] as string[],
+  factory_type: [] as string[],
+  main_fabrics: [] as string[],
+  processes: [] as string[],
+};
 
 // 공장 목록 페이지용 이미지 컴포넌트
 function FactoriesPageImage({ factory, idx }: { factory: Factory; idx: number }) {
@@ -37,7 +63,7 @@ function FactoriesPageImage({ factory, idx }: { factory: Factory; idx: number })
       <Image
         src={images[0]}
         alt={typeof factory.company_name === 'string' ? factory.company_name : '공장 이미지'}
-        className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
+        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
         width={400}
         height={224}
         priority={idx < 6}
@@ -470,76 +496,92 @@ export default function FactoriesPage() {
   }, [view, filtered, selectedFactory]);
 
   return (
-    <div className={`${PAGE_CONTAINER_CLASS} py-6 sm:py-8 md:py-12 lg:py-16 flex flex-col gap-4 sm:gap-6 md:gap-8`}>
-      {/* 로딩 표시 */}
+    <div className="min-h-screen bg-[#f6f7fb]">
+      <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-6`}>
       {loading && (
-        <div className="text-center py-6 sm:py-8 md:py-10">
-          <div className="text-sm sm:text-base md:text-lg">공장 정보를 불러오는 중입니다...</div>
+        <div className="flex flex-col items-center justify-center py-12 gap-3">
+          <div className="w-10 h-10 border-4 border-gray-200 border-t-[#222222] rounded-full animate-spin" />
+          <p className="text-sm text-gray-600">공장 정보를 불러오는 중입니다...</p>
         </div>
       )}
       
-      {/* 디버그 정보 - 연결 실패 시에만 표시 */}
       {connectionStatus && !connectionStatus.success && (
-        <div className="mb-4 p-3 rounded-lg text-sm bg-red-100 text-red-800 border border-red-300">
-          <div className="font-medium">
-            ❌ Supabase 연결 실패
-          </div>
-          {connectionStatus.error && <div>오류: {connectionStatus.error}</div>}
-          
-          {/* 환경 변수 설정 안내 */}
-          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
-            <div className="font-medium text-blue-800 mb-2">🔧 Supabase 설정이 필요합니다</div>
-            <div className="text-blue-700 text-xs space-y-1">
-              <div>1. 프로젝트 루트에 <code className="bg-blue-100 px-1 rounded">.env.local</code> 파일 생성</div>
-              <div>2. 다음 내용 추가:</div>
-              <div className="bg-blue-100 p-2 rounded font-mono text-xs">
-                NEXT_PUBLIC_SUPABASE_URL=https://your-project-url.supabase.co<br/>
-                NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-              </div>
-              <div>3. Supabase 프로젝트에서 URL과 Anon Key 확인</div>
-              <div>4. 개발 서버 재시작</div>
-            </div>
+        <div className="p-4 rounded-xl text-sm bg-red-50 text-red-800 border border-red-200">
+          <div className="font-semibold">Supabase 연결 실패</div>
+          {connectionStatus.error && <div className="mt-1">오류: {connectionStatus.error}</div>}
+          <div className="mt-3 p-3 bg-white border border-red-100 rounded-lg text-xs text-gray-600">
+            <div className="font-medium text-gray-800 mb-1">Supabase 설정이 필요합니다</div>
+            <div>프로젝트 루트에 <code className="bg-gray-100 px-1 rounded">.env.local</code> 파일을 생성하고 URL·Anon Key를 설정한 뒤 개발 서버를 재시작하세요.</div>
           </div>
         </div>
       )}
-      
-      <div className="flex flex-col gap-1">
-        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[40px] font-extrabold text-gray-900 mb-1 sm:mb-2">봉제공장 찾기</h1>
-        <p className="text-sm sm:text-base md:text-lg text-gray-500 mb-4 sm:mb-6 md:mb-8">퀄리티 좋은 의류 제작, 지금 바로 견적을 요청해보세요.</p>
+
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">봉제공장 찾기</h1>
+        <p className="mt-2 text-sm md:text-base text-gray-600">
+          동대문 봉제공장을 검색·필터링하고, 조건에 맞는 업장을 바로 확인하세요.
+        </p>
       </div>
-      {/* 모바일 필터 버튼 */}
-      <div className="lg:hidden flex mb-3 sm:mb-4">
+
+      <div className="rounded-xl border border-gray-200 bg-white p-3 md:p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <p className="text-xs md:text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-[#222222] shrink-0" aria-hidden />
+              AI로 공장 추천받기
+            </p>
+            <p className="text-xs text-gray-500 mt-1">몇 가지 조건만 알려주시면 맞춤 공장 3곳을 추천해드려요</p>
+          </div>
+          <Link
+            href="/matching"
+            className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-violet-600 text-white text-sm font-bold hover:bg-violet-700 transition shrink-0"
+          >
+            AI 매칭 시작
+          </Link>
+        </div>
+      </div>
+
+      <div className="lg:hidden">
         <button
-          className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#333] text-white rounded-lg font-semibold shadow text-sm sm:text-base"
+          type="button"
+          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-800 rounded-lg font-semibold shadow-sm text-sm hover:border-gray-400 transition"
           onClick={() => setShowMobileFilter(true)}
         >
-          <span>🔍</span> 필터
+          <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
+          필터
+          {badges.length > 0 && (
+            <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs min-w-5 h-5 px-1">
+              {badges.length}
+            </span>
+          )}
         </button>
       </div>
-      <div className="flex flex-row gap-12 items-start w-full">
-        {/* 필터 패널 (좌측) - 데스크탑 */}
-        <aside className="w-72 shrink-0 hidden lg:block">
-          <div className="bg-white rounded-xl mb-6 flex flex-col gap-2">
-            <div className="font-bold mb-2 flex items-center justify-between text-lg pt-4 pb-2 h-8">
-              <span className="text-gray-900">필터</span>
+
+      <div className="flex flex-row gap-6 lg:gap-8 items-start w-full">
+        <aside className="w-72 shrink-0 hidden lg:block sticky top-24">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-col gap-2">
+            <div className="font-bold flex items-center justify-between text-base pb-2">
+              <span className="text-gray-900 flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
+                필터
+              </span>
               <button
-                onClick={() => setSelected({
-                  admin_district: [], moq: [], monthly_capacity: [], business_type: [], distribution: [], delivery: [], items: [], equipment: [], sewing_machines: [], pattern_machines: [], special_machines: [], factory_type: [], main_fabrics: [], processes: []
-                })}
-                className="text-gray-500 hover:text-black text-lg font-bold flex items-center justify-center w-6 h-6"
+                type="button"
+                onClick={() => setSelected({ ...EMPTY_FILTERS })}
+                className="text-gray-400 hover:text-black transition flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100"
                 title="필터 초기화"
               >
                 <ArrowPathIcon className="w-5 h-5" />
               </button>
             </div>
-            <hr className="my-2 border-gray-200" />
+            <hr className="border-gray-200" />
             {/* 공장 타입 */}
             <div>
               <button className="w-full flex items-center justify-between py-2" onClick={() => setOpenFilter(f => ({ ...f, factory_type: !f.factory_type }))}>
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   공장 타입
                   {selected.factory_type.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.factory_type.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.factory_type.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.factory_type ? '' : 'rotate-180'}`} />
@@ -550,8 +592,8 @@ export default function FactoriesPage() {
                     <Button
                       key={opt}
                       size="sm"
-                      variant={selected.factory_type?.includes?.(opt) ? "default" : "outline"}
-                      className="rounded-full border px-4"
+                      variant="outline"
+                      className={getFilterChipClass(selected.factory_type?.includes?.(opt) )}
                       onClick={() => setSelected(sel => ({
                         ...sel,
                         factory_type: sel.factory_type?.includes?.(opt)
@@ -571,7 +613,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   주요 원단
                   {selected.main_fabrics.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.main_fabrics.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.main_fabrics.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`} />
@@ -582,8 +624,8 @@ export default function FactoriesPage() {
                     <Button
                       key={opt}
                       size="sm"
-                      variant={selected.main_fabrics.includes(opt) ? "default" : "outline"}
-                      className="rounded-full border px-4"
+                      variant="outline"
+                      className={getFilterChipClass(selected.main_fabrics.includes(opt) )}
                       onClick={() => setSelected(sel => ({
                         ...sel,
                         main_fabrics: sel.main_fabrics.includes(opt)
@@ -603,7 +645,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   지역
                   {selected.admin_district.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.admin_district.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.admin_district.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.region ? '' : 'rotate-180'}`} />
@@ -615,8 +657,8 @@ export default function FactoriesPage() {
                       <Button
                         key={opt}
                         size="sm"
-                        variant={selected.admin_district.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-4"
+                      variant="outline"
+                      className={getFilterChipClass(selected.admin_district.includes(opt) )}
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           admin_district: sel.admin_district.includes(opt)
@@ -637,7 +679,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   MOQ(최소수량)
                   {selected.moq.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.moq.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.moq.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.moq ? '' : 'rotate-180'}`} />
@@ -648,8 +690,8 @@ export default function FactoriesPage() {
                     <Button
                       key={opt.label}
                       size="sm"
-                      variant={selected.moq.includes(opt.label) ? "default" : "outline"}
-                      className="rounded-full border px-4"
+                      variant="outline"
+                      className={getFilterChipClass(selected.moq.includes(opt.label) )}
                       onClick={() => setSelected(sel => ({
                         ...sel,
                         moq: sel.moq.includes(opt.label)
@@ -669,7 +711,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   재봉기
                   {selected.sewing_machines.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.sewing_machines.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.sewing_machines.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.sewing_machines ? '' : 'rotate-180'}`} />
@@ -680,8 +722,8 @@ export default function FactoriesPage() {
                     <Button
                       key={opt}
                       size="sm"
-                      variant={selected.sewing_machines.includes(opt) ? "default" : "outline"}
-                      className="rounded-full border px-4"
+                      variant="outline"
+                      className={getFilterChipClass(selected.sewing_machines.includes(opt) )}
                       onClick={() => setSelected(sel => ({
                         ...sel,
                         sewing_machines: sel.sewing_machines.includes(opt)
@@ -701,7 +743,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   패턴기
                   {selected.pattern_machines.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.pattern_machines.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.pattern_machines.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.pattern_machines ? '' : 'rotate-180'}`} />
@@ -712,8 +754,8 @@ export default function FactoriesPage() {
                     <Button
                       key={opt}
                       size="sm"
-                      variant={selected.pattern_machines.includes(opt) ? "default" : "outline"}
-                      className="rounded-full border px-4"
+                      variant="outline"
+                      className={getFilterChipClass(selected.pattern_machines.includes(opt) )}
                       onClick={() => setSelected(sel => ({
                         ...sel,
                         pattern_machines: sel.pattern_machines.includes(opt)
@@ -733,7 +775,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   특수기
                   {selected.special_machines.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.special_machines.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.special_machines.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.special_machines ? '' : 'rotate-180'}`} />
@@ -744,8 +786,8 @@ export default function FactoriesPage() {
                     <Button
                       key={opt}
                       size="sm"
-                      variant={selected.special_machines.includes(opt) ? "default" : "outline"}
-                      className="rounded-full border px-4"
+                      variant="outline"
+                      className={getFilterChipClass(selected.special_machines.includes(opt) )}
                       onClick={() => setSelected(sel => ({
                         ...sel,
                         special_machines: sel.special_machines.includes(opt)
@@ -765,7 +807,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   품목
                   {selected.items.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-5 h-5">{selected.items.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.items.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.items ? '' : 'rotate-180'}`} />
@@ -776,8 +818,8 @@ export default function FactoriesPage() {
                     <Button
                       key={opt}
                       size="sm"
-                      variant={selected.items.includes(opt) ? "default" : "outline"}
-                      className="rounded-full border px-4"
+                      variant="outline"
+                      className={getFilterChipClass(selected.items.includes(opt) )}
                       onClick={() => setSelected(sel => ({
                         ...sel,
                         items: sel.items.includes(opt)
@@ -796,12 +838,21 @@ export default function FactoriesPage() {
         </aside>
         {/* 모바일 필터 오버레이 */}
         {showMobileFilter && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
-            <div className="bg-white rounded-lg sm:rounded-xl w-[95vw] sm:w-[90vw] max-w-md max-h-[85vh] sm:max-h-[80vh] flex flex-col relative border border-gray-200 shadow-lg">
-              {/* 헤더 - 고정 */}
-              <div className="p-4 sm:p-6 pb-3 sm:pb-4 border-b border-gray-200 flex-shrink-0 flex items-center justify-end h-10 sm:h-12">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div
+              className="absolute inset-0 bg-black/30"
+              onClick={() => setShowMobileFilter(false)}
+              aria-hidden
+            />
+            <div className="relative bg-white rounded-t-2xl sm:rounded-2xl w-full sm:w-[90vw] max-w-md max-h-[85vh] flex flex-col border border-gray-200 shadow-xl">
+              <div className="p-4 sm:p-6 pb-3 border-b border-gray-200 flex-shrink-0 flex items-center justify-between">
+                <span className="font-bold text-gray-900 flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
+                  필터
+                </span>
                 <button
-                  className="text-gray-500 hover:text-black text-xl sm:text-2xl flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8"
+                  type="button"
+                  className="text-gray-400 hover:text-gray-700 text-2xl flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100"
                   onClick={() => setShowMobileFilter(false)}
                   aria-label="필터 닫기"
                 >
@@ -818,7 +869,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-2 sm:gap-3">
                     공장 타입
                     {selected.factory_type.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.factory_type.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.factory_type.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.factory_type ? '' : 'rotate-180'}`} />
@@ -829,8 +880,8 @@ export default function FactoriesPage() {
                       <Button
                         key={opt}
                         size="sm"
-                        variant={selected.factory_type?.includes?.(opt) ? "default" : "outline"}
-                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
+                        variant="outline"
+                        className={getFilterChipClass(selected.factory_type?.includes?.(opt) , true)}
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           factory_type: sel.factory_type?.includes?.(opt)
@@ -850,7 +901,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-2 sm:gap-3">
                     주요 원단
                     {selected.main_fabrics.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.main_fabrics.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.main_fabrics.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`} />
@@ -861,8 +912,8 @@ export default function FactoriesPage() {
                       <Button
                         key={opt}
                         size="sm"
-                        variant={selected.main_fabrics.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
+                        variant="outline"
+                        className={getFilterChipClass(selected.main_fabrics.includes(opt) , true)}
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           main_fabrics: sel.main_fabrics.includes(opt)
@@ -882,7 +933,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     지역
                     {selected.admin_district.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.admin_district.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.admin_district.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.region ? '' : 'rotate-180'}`} />
@@ -894,8 +945,8 @@ export default function FactoriesPage() {
                         <Button
                           key={opt}
                           size="sm"
-                          variant={selected.admin_district.includes(opt) ? "default" : "outline"}
-                          className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
+                        variant="outline"
+                        className={getFilterChipClass(selected.admin_district.includes(opt) , true)}
                           onClick={() => setSelected(sel => ({
                             ...sel,
                             admin_district: sel.admin_district.includes(opt)
@@ -916,7 +967,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     MOQ(최소수량)
                     {selected.moq.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.moq.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.moq.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.moq ? '' : 'rotate-180'}`} />
@@ -927,8 +978,8 @@ export default function FactoriesPage() {
                       <Button
                         key={opt.label}
                         size="sm"
-                        variant={selected.moq.includes(opt.label) ? "default" : "outline"}
-                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
+                        variant="outline"
+                        className={getFilterChipClass(selected.moq.includes(opt.label) , true)}
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           moq: sel.moq.includes(opt.label)
@@ -948,7 +999,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     재봉기
                     {selected.sewing_machines.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.sewing_machines.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.sewing_machines.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.sewing_machines ? '' : 'rotate-180'}`} />
@@ -959,8 +1010,8 @@ export default function FactoriesPage() {
                       <Button
                         key={opt}
                         size="sm"
-                        variant={selected.sewing_machines.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
+                        variant="outline"
+                        className={getFilterChipClass(selected.sewing_machines.includes(opt) , true)}
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           sewing_machines: sel.sewing_machines.includes(opt)
@@ -980,7 +1031,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     패턴기
                     {selected.pattern_machines.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.pattern_machines.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.pattern_machines.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.pattern_machines ? '' : 'rotate-180'}`} />
@@ -991,8 +1042,8 @@ export default function FactoriesPage() {
                       <Button
                         key={opt}
                         size="sm"
-                        variant={selected.pattern_machines.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
+                        variant="outline"
+                        className={getFilterChipClass(selected.pattern_machines.includes(opt) , true)}
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           pattern_machines: sel.pattern_machines.includes(opt)
@@ -1012,7 +1063,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     특수기
                     {selected.special_machines.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.special_machines.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.special_machines.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.special_machines ? '' : 'rotate-180'}`} />
@@ -1023,8 +1074,8 @@ export default function FactoriesPage() {
                       <Button
                         key={opt}
                         size="sm"
-                        variant={selected.special_machines.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
+                        variant="outline"
+                        className={getFilterChipClass(selected.special_machines.includes(opt) , true)}
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           special_machines: sel.special_machines.includes(opt)
@@ -1044,7 +1095,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     품목
                     {selected.items.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#333333] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.items.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.items.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.items ? '' : 'rotate-180'}`} />
@@ -1055,8 +1106,8 @@ export default function FactoriesPage() {
                       <Button
                         key={opt}
                         size="sm"
-                        variant={selected.items.includes(opt) ? "default" : "outline"}
-                        className="rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
+                        variant="outline"
+                        className={getFilterChipClass(selected.items.includes(opt) , true)}
                         onClick={() => setSelected(sel => ({
                           ...sel,
                           items: sel.items.includes(opt)
@@ -1075,38 +1126,52 @@ export default function FactoriesPage() {
             </div>
           </div>
         )}
-        {/* 오른쪽: 검색+카드/지도 컨테이너 */}
+        {/* 오른쪽: 검색+카드/지도 */}
         <div className="flex-1 min-w-0 flex flex-col items-stretch">
-          {/* 검색 인풋 + 목록/지도 버튼 */}
-          <div className="flex flex-col sm:flex-row gap-2 mb-3 sm:mb-4 items-start sm:items-center self-start w-full">
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="공장명, 키워드로 검색하세요."
-              className="flex-1 w-full border rounded-[0.625rem] px-3 sm:px-4 py-2 focus:border-black focus:outline-none text-sm sm:text-base"
-            />
-            <div className="flex bg-gray-100 rounded-lg p-1 w-full sm:w-auto">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-5">
+          <div className="flex flex-col sm:flex-row gap-3 mb-4 items-stretch sm:items-center w-full">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="공장명, 키워드로 검색하세요"
+                className="w-full h-10 md:h-11 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm outline-none focus:ring-2 focus:ring-gray-200 focus:border-[#222222]"
+              />
+            </div>
+            <div className="flex bg-gray-100 rounded-lg p-1 w-full sm:w-auto shrink-0">
               <button
-                className={`flex-1 sm:flex-none px-3 sm:px-4 py-1 rounded-lg transition flex items-center justify-center gap-1 sm:gap-2 text-sm sm:text-base ${view === 'list' ? 'bg-white text-[#333] font-semibold shadow' : 'bg-transparent text-[#555] font-normal'}`}
-                onClick={() => setView('list')}
+                type="button"
+                className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md transition flex items-center justify-center gap-1.5 text-sm ${
+                  view === "list"
+                    ? "bg-white text-[#222222] font-semibold shadow-sm"
+                    : "bg-transparent text-gray-600 font-normal hover:text-gray-800"
+                }`}
+                onClick={() => setView("list")}
               >
-                <List className="w-3 h-3 sm:w-4 sm:h-4" /> 목록
+                <List className="w-4 h-4" /> 목록
               </button>
               <button
-                className={`flex-1 sm:flex-none px-3 sm:px-4 py-1 rounded-lg transition flex items-center justify-center gap-1 sm:gap-2 text-sm sm:text-base ${view === 'map' ? 'bg-white text-[#333] font-semibold shadow' : 'bg-transparent text-[#555] font-normal'}`}
-                onClick={() => setView('map')}
+                type="button"
+                className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md transition flex items-center justify-center gap-1.5 text-sm ${
+                  view === "map"
+                    ? "bg-white text-[#222222] font-semibold shadow-sm"
+                    : "bg-transparent text-gray-600 font-normal hover:text-gray-800"
+                }`}
+                onClick={() => setView("map")}
               >
-                <MapIcon className="w-3 h-3 sm:w-4 sm:h-4" /> 지도
+                <MapIcon className="w-4 h-4" /> 지도
               </button>
             </div>
           </div>
-          {/* 공장 개수 표시 */}
-          <div className="mb-2 text-xs sm:text-sm text-gray-500">{sortedFiltered.length}개</div>
+          <div className="mb-3 text-xs sm:text-sm font-semibold text-[#222222]">
+            {sortedFiltered.length}개 업장
+          </div>
           {/* 선택된 필터 뱃지 (오른쪽 컨테이너 내) */}
           {badges.length > 0 && (
             <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
               {badges.map((b) => (
-                <span key={b.key + b.val} className="bg-[#333333] text-white rounded-full px-2 sm:px-3 py-1 text-xs sm:text-[14px] font-semibold flex items-center gap-1">
+                <span key={b.key + b.val} className="bg-[#222222] text-white rounded-full px-2 sm:px-3 py-1 text-xs sm:text-[14px] font-semibold flex items-center gap-1">
                   {b.val}
                   <button onClick={() => setSelected(sel => ({
                     ...sel,
@@ -1114,9 +1179,7 @@ export default function FactoriesPage() {
                   }))} className="ml-1">×</button>
                 </span>
               ))}
-              <Button size="sm" variant="ghost" onClick={() => setSelected({
-                admin_district: [], moq: [], monthly_capacity: [], business_type: [], distribution: [], delivery: [], items: [], equipment: [], sewing_machines: [], pattern_machines: [], special_machines: [], factory_type: [], main_fabrics: [], processes: []
-              })}>전체 해제</Button>
+              <Button size="sm" variant="ghost" className="text-[#222222] hover:text-[#222222] hover:bg-gray-100" onClick={() => setSelected({ ...EMPTY_FILTERS })}>전체 해제</Button>
             </div>
           )}
           {/* 카드 리스트/지도 뷰 */}
@@ -1124,11 +1187,12 @@ export default function FactoriesPage() {
             {view === 'list' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 {loading ? (
-                  <div className="text-center py-6 sm:py-8 md:py-10">
-                    <div className="text-sm sm:text-base md:text-lg">공장 정보를 불러오는 중입니다...</div>
+                  <div className="col-span-full flex flex-col items-center justify-center py-16 gap-3">
+                    <div className="w-10 h-10 border-4 border-gray-200 border-t-[#222222] rounded-full animate-spin" />
+                    <p className="text-sm text-gray-600">공장 정보를 불러오는 중입니다...</p>
                   </div>
                 ) : factoriesData.length === 0 ? (
-                  <div className="text-center py-6 sm:py-8 md:py-10 text-gray-400">공장 데이터가 없습니다.</div>
+                  <div className="col-span-full text-center py-16 text-gray-400">공장 데이터가 없습니다.</div>
                 ) : (
                   sortedFiltered.map((f: Factory, idx: number) => {
                     const displayName = typeof f.name === 'string' && f.name
@@ -1142,15 +1206,15 @@ export default function FactoriesPage() {
                     const mainFabrics: string = typeof f.main_fabrics === 'string' && f.main_fabrics.length > 0 ? f.main_fabrics : '-';
                     const randomFabrics = cardFabricsById[f.id ?? idx] || [];
                     return (
-                      <Link href={`/factories/${f.id}`} key={f.id ?? idx} className="rounded-lg sm:rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer">
-                        {/* 이미지 영역 */}
-                        <div className="w-full h-32 sm:h-40 md:h-48 lg:h-56 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
+                      <Link
+                        href={`/factories/${f.id}`}
+                        key={f.id ?? idx}
+                        className="rounded-xl bg-white overflow-hidden flex flex-col cursor-pointer border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all group"
+                      >
+                        <div className="w-full h-40 sm:h-44 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden group">
                           <FactoriesPageImage factory={f} idx={idx} />
                         </div>
-                        {/* 이미지와 텍스트 사이 gap 줄임 */}
-                        <div className="mt-1 sm:mt-2" />
-                        {/* 정보 영역 */}
-                        <div className="flex-1 flex flex-col pt-1 sm:pt-2 px-3 sm:px-4">
+                        <div className="flex-1 flex flex-col px-3 sm:px-4 py-4">
                           {/* 공장 타입 및 주요 원단 칩 */}
                           <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 mb-1 sm:mb-2">
                             {randomFabrics.map((chip) => (
@@ -1159,18 +1223,18 @@ export default function FactoriesPage() {
                               </span>
                             ))}
                           </div>
-                          <div className="font-bold text-xs sm:text-sm md:text-base mb-1">{displayName}</div>
-                          {/* 주요 품목 */}
-                          <div className="text-xs sm:text-sm font-bold mt-1 sm:mt-2 mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
-                            <span className="shrink-0">주요품목</span>
-                            <span className="font-normal ml-1 sm:ml-2 flex-1 truncate">{mainItems}</span>
+                          <div className="font-bold text-sm md:text-base mb-1 text-gray-900">{displayName}</div>
+                          <div className="text-xs sm:text-sm text-gray-500 mt-1 flex items-start gap-2">
+                            <span className="shrink-0 font-semibold text-gray-600">주요품목</span>
+                            <span className="flex-1 truncate">{mainItems}</span>
                           </div>
-                          <div className="text-xs sm:text-sm font-bold mb-1 flex items-center" style={{ color: '#333333', opacity: 0.6 }}>
-                            <span className="shrink-0">주요원단</span>
-                            <span className="font-normal ml-1 sm:ml-2 flex-1 truncate">{mainFabrics}</span>
+                          <div className="text-xs sm:text-sm text-gray-500 mt-1 flex items-start gap-2">
+                            <span className="shrink-0 font-semibold text-gray-600">주요원단</span>
+                            <span className="flex-1 truncate">{mainFabrics}</span>
                           </div>
-                          <div className="text-xs sm:text-sm font-bold" style={{ color: '#333333', opacity: 0.6 }}>
-                            MOQ(최소 주문 수량) <span className="font-normal">{typeof f.moq === 'number' ? f.moq : (typeof f.moq === 'string' && !isNaN(Number(f.moq)) ? f.moq : (typeof f.minOrder === 'number' ? f.minOrder : '-'))}</span>
+                          <div className="text-xs sm:text-sm text-gray-500 mt-1">
+                            <span className="font-semibold text-gray-600">MOQ </span>
+                            <span>{typeof f.moq === "number" ? f.moq : typeof f.moq === "string" && !isNaN(Number(f.moq)) ? f.moq : typeof f.minOrder === "number" ? f.minOrder : "-"}</span>
                           </div>
                         </div>
                       </Link>
@@ -1179,7 +1243,7 @@ export default function FactoriesPage() {
                 )}
               </div>
             ) : (
-              <div className="w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-gray-100 rounded-lg sm:rounded-xl">
+              <div className="w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
                 {/* 네이버지도 뷰 */}
                 {loading ? (
                   <div className="w-full h-full flex items-center justify-center">
@@ -1239,7 +1303,9 @@ export default function FactoriesPage() {
               </div>
             )}
           </div>
+          </div>
         </div>
+      </div>
       </div>
     </div>
   );
