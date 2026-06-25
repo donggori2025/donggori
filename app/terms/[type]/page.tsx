@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 const TERMS_DATA: Record<string, { title: string; content: string }> = {
   service: {
@@ -253,9 +254,11 @@ export default function TermsDetailPage() {
   const data = TERMS_DATA[type] || { title: "약관", content: "임시 약관 내용입니다." };
 
   return (
-    <div className="max-w-2xl mx-auto py-16 px-4">
+    <div className={`${PAGE_CONTAINER_CLASS} py-16`}>
+      <div className="max-w-3xl">
               <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">{data.title}</h1>
       <pre className="bg-gray-100 rounded p-4 whitespace-pre-wrap text-sm">{data.content}</pre>
+      </div>
     </div>
   );
 } 

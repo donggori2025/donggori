@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 const TABS = [
   { key: "전체", label: "전체" },
@@ -40,7 +41,7 @@ export default function NoticesPage() {
 
   return (
     <section className="w-full bg-white py-16 min-h-[600px]">
-      <div className="max-w-[1400px] mx-auto px-6">
+      <div className={`${PAGE_CONTAINER_CLASS} py-16`}>
         <h2 className="text-[40px] font-extrabold text-gray-900 mb-2">공지사항</h2>
         <div className="text-gray-500 mb-8">동고리의 다양한 소식들을 확인해보세요.</div>
         {/* 탭 */}

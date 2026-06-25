@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 interface Notice {
   id: string;
@@ -19,7 +20,7 @@ export default function NoticeDetailClient({ notice }: NoticeDetailClientProps) 
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-[1400px] mx-auto py-16 px-6">
+      <div className={`${PAGE_CONTAINER_CLASS} py-16`}>
         {/* 상단 섹션 */}
         <div className="mb-12">
           <div className="text-sm text-gray-500 mb-2">{notice.category || '공지'}</div>

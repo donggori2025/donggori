@@ -16,6 +16,7 @@ import SimpleNaverMap from "@/components/SimpleNaverMap";
 import FactoryInfoPopup from "@/components/FactoryInfoPopup";
 import { getFactoryLocationByName, getDongdaemunCenter } from "@/lib/factoryLocationMapping";
 import { useRouter } from "next/navigation";
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 import { useFactoryImages, hasFactoryImages } from "@/lib/hooks/useFactoryImages";
 import { isKnitRelatedQuery, isParkwonKnitFactory, pinParkwonKnitFirst } from "@/lib/factoryMatching";
 
@@ -469,7 +470,7 @@ export default function FactoriesPage() {
   }, [view, filtered, selectedFactory]);
 
   return (
-    <div className="max-w-[1400px] mx-auto py-6 sm:py-8 md:py-12 lg:py-16 flex flex-col gap-4 sm:gap-6 md:gap-8 px-2 sm:px-4 md:px-6">
+    <div className={`${PAGE_CONTAINER_CLASS} py-6 sm:py-8 md:py-12 lg:py-16 flex flex-col gap-4 sm:gap-6 md:gap-8`}>
       {/* 로딩 표시 */}
       {loading && (
         <div className="text-center py-6 sm:py-8 md:py-10">

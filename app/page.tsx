@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 // 메인 페이지 컴포넌트
 export default function HomePage() {
   return (
-    <main className="px-2 sm:px-4 md:px-6">
+    <main className="bg-[#f6f7fb]">
       <Suspense fallback={null}>
         <OAuthCallbackHandler />
       </Suspense>

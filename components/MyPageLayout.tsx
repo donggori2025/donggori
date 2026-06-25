@@ -1,5 +1,5 @@
 'use client';
-import React from "react";
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -13,7 +13,7 @@ const menu = [
 export default function MyPageLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   return (
-    <div className="flex w-full max-w-[1200px] mx-auto min-h-[80vh] pt-10">
+    <div className={`flex w-full ${PAGE_CONTAINER_CLASS} min-h-[80vh] pt-10`}>
       {/* 좌측 사이드바 */}
       <aside className="w-56 pr-8 border-r">
         <div className="font-bold text-xl mb-8">마이페이지</div>

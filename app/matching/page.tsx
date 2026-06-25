@@ -10,6 +10,7 @@ import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import { recommendFactoriesFromPrompt } from "@/lib/factoryMatching";
 import { FACTORY_TYPES, MAIN_FABRICS, type FactoryType, type MainFabric } from "@/lib/types";
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 
 // factories 데이터에서 옵션 추출 유틸(공장 찾기에서 복사)
@@ -1027,8 +1028,8 @@ type ScoredFactory = Factory & { score: number };
 
   // 왼쪽: 질문/선택지 or 결과 카드 or 로딩
   return (
-    <div className="w-full min-h-screen bg-[#F4F5F7] flex flex-col items-center justify-start overflow-x-hidden py-6 md:py-12 px-3 md:px-6">
-      <div className="w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-4 items-stretch justify-center flex-1 transition-opacity duration-700 px-0 md:px-1 bg-[#F4F5F7] pb-0 mb-0 min-h-[78vh]">
+    <div className="w-full min-h-screen bg-[#F4F5F7] flex flex-col items-center justify-start overflow-x-hidden py-6 md:py-12">
+      <div className={`${PAGE_CONTAINER_CLASS} flex flex-col lg:flex-row gap-4 items-stretch justify-center flex-1 transition-opacity duration-700 bg-[#F4F5F7] pb-0 mb-0 min-h-[78vh]`}>
         {/* 왼쪽: 질문/선택지 or 결과 카드 or 로딩 */}
         <div className="w-full lg:flex-[2] bg-white rounded-2xl shadow border p-4 md:p-6 flex flex-col min-h-[620px] md:min-h-[700px] lg:min-h-[760px] lg:max-h-[860px]">
           {isResultStage ? (

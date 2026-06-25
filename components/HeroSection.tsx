@@ -1,36 +1,34 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 const EXAMPLES = [
-  "여성용 오버핏 셔츠를 소량(100장 내외) 제작하고 싶어요",
-  "기능성 원단으로 운동복 상하의 제작 가능한 공장을 찾고 싶어요",
-  "아동복 샘플 제작과 본생산을 함께 진행할 수 있는 곳이 필요해요",
+  "여성용 오버핏 셔츠 소량(100장) 제작",
+  "기능성 원단 운동복 상·하의 제작",
+  "아동복 샘플 + 본생산 동시 진행",
 ];
 
 const ROLE_FACES = [
-  { label: "디자이너", colorClass: "text-[#7DD3FC]" },
-  { label: "대표", colorClass: "text-[#F9A8D4]" },
-  { label: "MD", colorClass: "text-[#FDE68A]" },
-  { label: "메이커", colorClass: "text-[#86EFAC]" },
-  { label: "브랜드", colorClass: "text-[#C4B5FD]" },
+  { label: "디자이너", color: "text-[#7DD3FC]" },
+  { label: "대표", color: "text-[#F9A8D4]" },
+  { label: "MD", color: "text-[#FDE68A]" },
+  { label: "메이커", color: "text-[#86EFAC]" },
+  { label: "브랜드", color: "text-[#C4B5FD]" },
 ] as const;
 
 export default function HeroSection() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
-  const [spinStep, setSpinStep] = useState(0);
+  const [roleIndex, setRoleIndex] = useState(0);
 
   const trimmedPrompt = useMemo(() => prompt.trim(), [prompt]);
-  const faceAngle = 360 / ROLE_FACES.length;
-  const activeRoleIndex = ((spinStep % ROLE_FACES.length) + ROLE_FACES.length) % ROLE_FACES.length;
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = window.setInterval(() => {
-      // modulo로 되돌리지 않고 누적 회전시켜 항상 같은 방향(밑→위)으로 전환
-      setSpinStep((prev) => prev + 1);
-    }, 2600);
+      setRoleIndex((prev) => (prev + 1) % ROLE_FACES.length);
+    }, 2800);
     return () => window.clearInterval(timer);
   }, []);
 
@@ -42,177 +40,98 @@ export default function HeroSection() {
 
   return (
     <section
-      className="w-screen bg-white py-0 relative left-1/2 right-1/2 -mx-[50vw]"
+      className="w-screen relative left-1/2 right-1/2 -mx-[50vw]"
       style={{ left: "50%", right: "50%", marginLeft: "-50vw", marginRight: "-50vw" }}
     >
-      <div className="w-full mx-auto flex flex-col items-stretch min-h-[100svh] gap-0 px-0">
-        <div className="relative min-w-0 w-full min-h-[100svh] flex items-start md:items-center justify-center overflow-hidden bg-white py-24 md:py-0">
-          <img
-            src="https://res.cloudinary.com/dvvqaywkd/image/upload/v1774682297/image_4_ykback.png"
-            alt="동고리 메인 이미지"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/45 pointer-events-none" />
+      <div className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
+        <img
+          src="https://res.cloudinary.com/dvvqaywkd/image/upload/v1774682297/image_4_ykback.png"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover scale-105 brightness-[0.5]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/62 to-black/80" />
 
-          <div className="relative z-10 w-full flex items-start md:items-center justify-center px-4 py-8 md:py-0">
-            <div className="w-full max-w-[980px] p-2 md:p-4">
-              <p className="text-center text-sm md:text-lg font-semibold text-white/90 mb-4">
-                의류 봉제·생산 연결 플랫폼, 동고리 입니다.
-              </p>
-              <h2 className="text-2xl md:text-5xl font-extrabold text-white text-center leading-tight">
-                <span className="role-cube-wrap inline-flex items-center justify-center align-baseline">
-                  <span
-                    className="role-cube"
-                    style={{ transform: `rotateX(${spinStep * faceAngle}deg)` }}
-                  >
-                    {ROLE_FACES.map((role, idx) => (
-                      <span
-                        key={role.label}
-                        className={`role-face ${role.colorClass} ${idx === activeRoleIndex ? "role-face-active" : "role-face-hidden"}`}
-                        style={{ transform: `rotateX(${-idx * faceAngle}deg) translateZ(0.62em)` }}
-                      >
-                        {role.label}
-                      </span>
-                    ))}
-                  </span>
+        <div className="relative z-10 w-full max-w-[720px] mx-auto px-5 py-28 md:py-32">
+          <div className="flex justify-center mb-6">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] md:text-xs font-medium tracking-wide text-white/80 bg-white/10 backdrop-blur-md border border-white/15">
+              <Sparkles className="w-3 h-3 text-violet-300" />
+              의류 봉제·생산 연결 플랫폼
+            </span>
+          </div>
+
+          <h1 className="text-[1.75rem] md:text-[2.75rem] font-bold text-white text-center leading-[1.25] tracking-tight">
+            <span className="inline-grid h-[1.2em] min-w-[5.5ch] overflow-hidden align-bottom mr-1">
+              {ROLE_FACES.map((role, idx) => (
+                <span
+                  key={role.label}
+                  className={`col-start-1 row-start-1 ${role.color} transition-all duration-700 ease-out ${
+                    idx === roleIndex
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-full"
+                  }`}
+                >
+                  {role.label}
                 </span>
-                님, 어떤 옷을 만들고 싶으신가요?
-              </h2>
-              <p className="mt-3 text-sm md:text-base text-white/90 text-center">
-                입력해주시면 조건을 분석해서 가장 적합한 봉제공장 3곳을 추천해드려요.
-              </p>
+              ))}
+            </span>
+            님,
+            <br className="sm:hidden" />
+            <span className="sm:ml-1">어떤 옷을 만드시나요?</span>
+          </h1>
 
-              <div className="mt-5 md:mt-6">
-                <div className="hero-input-border rounded-2xl p-[2.5px] shadow-sm">
-                  <div className="rounded-2xl bg-white p-3 md:p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <input
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          goToMatchingWithPrompt(prompt);
-                        }
-                      }}
-                      placeholder="예: 여성 자켓 300장, 직기 원단, 샘플부터 본생산까지 가능한 공장"
-                      className="w-full h-12 md:h-14 px-2 rounded-xl bg-transparent text-[#111111] placeholder:text-gray-400 outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => goToMatchingWithPrompt(prompt)}
-                      disabled={!trimmedPrompt}
-                      className={`h-10 md:h-11 px-4 md:px-5 rounded-lg text-sm font-bold transition shrink-0 w-full sm:w-auto ${
-                        trimmedPrompt
-                          ? "bg-[#111111] text-white hover:bg-black"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      }`}
-                    >
-                      AI 분석
-                    </button>
-                  </div>
-                </div>
-                </div>
-              </div>
+          <p className="mt-4 text-sm md:text-[15px] text-white/55 text-center leading-relaxed">
+            조건을 분석해 최적의 봉제공장 3곳을 추천합니다.
+          </p>
 
-              <div className="mt-5">
-                <p className="text-xs md:text-sm font-extrabold tracking-wider text-white/90 mb-2 uppercase">
-                  아래 예시로 시작해보세요.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {EXAMPLES.map((example) => (
-                    <button
-                      key={example}
-                      type="button"
-                      onClick={() => goToMatchingWithPrompt(example)}
-                      className="text-left min-h-[92px] rounded-xl border border-gray-200 bg-[#f8f9fc] px-4 py-3 text-sm text-gray-700 hover:border-[#333333] hover:bg-white transition"
-                    >
-                      {example}
-                    </button>
-                  ))}
-                </div>
-              </div>
+          <div className="mt-8 md:mt-10">
+            <div className="flex items-center gap-2 rounded-full bg-white/[0.97] backdrop-blur-xl pl-5 pr-2 py-2 shadow-[0_8px_40px_rgba(0,0,0,0.18)]">
+              <input
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    goToMatchingWithPrompt(prompt);
+                  }
+                }}
+                placeholder="여성 자켓 300장, 직기 원단, 샘플~본생산"
+                className="flex-1 min-w-0 h-11 bg-transparent text-[15px] text-gray-900 placeholder:text-gray-400 outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => goToMatchingWithPrompt(prompt)}
+                disabled={!trimmedPrompt}
+                aria-label="AI 분석"
+                className={`flex items-center justify-center w-11 h-11 rounded-full shrink-0 transition-all duration-200 ${
+                  trimmedPrompt
+                    ? "bg-[#111] text-white hover:scale-105 hover:bg-black"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-6 md:mt-8">
+            <p className="text-[11px] md:text-xs text-white/40 text-center mb-3 tracking-wide">
+              예시로 시작하기
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {EXAMPLES.map((example) => (
+                <button
+                  key={example}
+                  type="button"
+                  onClick={() => goToMatchingWithPrompt(example)}
+                  className="px-4 py-2 rounded-full text-xs md:text-sm text-white/75 bg-white/[0.07] backdrop-blur-sm border border-white/15 hover:bg-white/15 hover:text-white hover:border-white/30 transition-all duration-200"
+                >
+                  {example}
+                </button>
+              ))}
             </div>
           </div>
         </div>
       </div>
-      <style jsx>{`
-        .role-cube-wrap {
-          perspective: 760px;
-          width: 5.8ch;
-          height: 1.15em;
-          vertical-align: baseline;
-          transform: translateY(0.24em);
-          overflow: hidden;
-        }
-
-        .role-cube {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          transform-style: preserve-3d;
-          transition: transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
-          will-change: transform;
-        }
-
-        .role-face {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
-          line-height: 1.05;
-          white-space: nowrap;
-        }
-
-        .role-face-active {
-          opacity: 1;
-          visibility: visible;
-          transition: opacity 220ms ease;
-        }
-
-        .role-face-hidden {
-          opacity: 0;
-          visibility: hidden;
-          transition: opacity 220ms ease;
-        }
-
-        .hero-input-border {
-          background: linear-gradient(120deg, #79a8ff, #8ec5ff, #e88bef, #79a8ff);
-          background-size: 240% 240%;
-          animation: border-ambient-flow 7s ease-in-out infinite;
-          box-shadow:
-            0 0 0 1px rgba(255, 255, 255, 0.2),
-            0 0 24px rgba(121, 168, 255, 0.25),
-            0 0 36px rgba(232, 139, 239, 0.2);
-        }
-
-        @keyframes border-ambient-flow {
-          0% {
-            background-position: 0% 50%;
-            box-shadow:
-              0 0 0 1px rgba(255, 255, 255, 0.2),
-              0 0 16px rgba(121, 168, 255, 0.22),
-              0 0 24px rgba(232, 139, 239, 0.18);
-          }
-          50% {
-            background-position: 100% 50%;
-            box-shadow:
-              0 0 0 1px rgba(255, 255, 255, 0.25),
-              0 0 28px rgba(121, 168, 255, 0.3),
-              0 0 40px rgba(232, 139, 239, 0.25);
-          }
-          100% {
-            background-position: 0% 50%;
-            box-shadow:
-              0 0 0 1px rgba(255, 255, 255, 0.2),
-              0 0 16px rgba(121, 168, 255, 0.22),
-              0 0 24px rgba(232, 139, 239, 0.18);
-          }
-        }
-      `}</style>
     </section>
   );
 }

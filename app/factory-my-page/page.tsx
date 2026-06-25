@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getFactoryDataFromDB, updateFactoryData, getRealFactoryName, getFactoryImages, updateFactoryImages, uploadFactoryImage, deleteFactoryImage } from "@/lib/factoryAuth";
 import { getMatchRequestsByFactoryId, updateMatchRequestStatus, MatchRequest } from "@/lib/matchRequests";
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
 type SidebarMenu = typeof SIDEBAR_MENUS[number];
@@ -351,7 +352,7 @@ export default function FactoryMyPage() {
   const showExtra = false;
 
   return (
-    <div className="max-w-[1400px] mx-auto py-4 md:py-16 px-4 h-full min-h-[500px]">
+    <div className={`${PAGE_CONTAINER_CLASS} py-4 md:py-16 h-full min-h-[500px]`}>
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl md:text-[40px] font-extrabold text-gray-900 mb-2">마이페이지</h1>
       </div>
