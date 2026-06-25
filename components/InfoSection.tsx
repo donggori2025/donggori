@@ -163,7 +163,7 @@ const InfoSection = () => {
                       className="rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer w-[calc(25%-12px)] flex-shrink-0 border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all"
                     >
                       <FactoryImageCard factory={f} idx={idx} />
-                      <div className="flex-1 flex flex-col px-0 py-4 text-left">
+                      <div className="flex-1 flex flex-col px-3 sm:px-4 py-4 text-left">
                         <div className="flex flex-wrap gap-1 mb-2">
                           {randomFabrics.map((chip, chipIndex) => (
                             <span
