@@ -1150,7 +1150,7 @@ export default function FactoriesPage() {
                         {/* 이미지와 텍스트 사이 gap 줄임 */}
                         <div className="mt-1 sm:mt-2" />
                         {/* 정보 영역 */}
-                        <div className="flex-1 flex flex-col pt-1 sm:pt-2 px-2 sm:px-3">
+                        <div className="flex-1 flex flex-col pt-1 sm:pt-2 px-3 sm:px-4">
                           {/* 공장 타입 및 주요 원단 칩 */}
                           <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 mb-1 sm:mb-2">
                             {randomFabrics.map((chip) => (
