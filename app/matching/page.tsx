@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { RotateCcw, Search, Sparkles } from "lucide-react";
+import { RotateCcw, Search } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
@@ -86,27 +86,53 @@ function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number 
 }
 
 // 채팅 말풍선 컴포넌트 (fade-in + 타이핑 효과)
-function ChatBubble({ text, type, isTyping, showCursor, onEdit }: { text: string; type: "question" | "answer"; isTyping?: boolean; showCursor?: boolean; onEdit?: () => void }) {
-  return (
-    <div className={`flex flex-col items-${type === "answer" ? "end" : "start"} w-full`}>
-      <div className={`relative px-4 py-2.5 rounded-2xl text-sm md:text-base animate-fade-in max-w-[85%] border ${
-        type === "question"
-          ? "bg-white text-gray-900 border-gray-200 self-start shadow-sm"
-          : "bg-[#111] text-white border-[#111] self-end"
-      }`} style={{ minHeight: 40 }}>
-        {isTyping ? (
-          <span>
-            {text}
-            {showCursor && <span className="inline-block w-2 animate-blink ml-0.5">|</span>}
-          </span>
-        ) : (
-          text
-        )}
+function ChatBubble({
+  text,
+  type,
+  isTyping,
+  showCursor,
+  onEdit,
+}: {
+  text: string;
+  type: "question" | "answer";
+  isTyping?: boolean;
+  showCursor?: boolean;
+  onEdit?: () => void;
+}) {
+  const content = isTyping ? (
+    <span>
+      {text}
+      {showCursor && <span className="inline-block w-2 animate-blink ml-0.5">|</span>}
+    </span>
+  ) : (
+    <span className="whitespace-pre-line">{text}</span>
+  );
+
+  if (type === "question") {
+    return (
+      <div className="flex flex-col items-start w-full">
+        <div
+          className="px-4 py-2.5 rounded-2xl bg-white border border-gray-200 shadow-sm text-sm md:text-[15px] text-gray-800 leading-relaxed animate-fade-in max-w-[85%]"
+          style={{ minHeight: 40 }}
+        >
+          {content}
+        </div>
       </div>
-      {/* 답변(선택지) 말풍선에만 수정 버튼 노출 */}
-      {type === "answer" && onEdit && (
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-end w-full">
+      <div
+        className="px-4 py-2.5 rounded-2xl bg-[#111] text-white text-sm md:text-[15px] leading-relaxed animate-fade-in max-w-[85%]"
+        style={{ minHeight: 40 }}
+      >
+        {content}
+      </div>
+      {onEdit && (
         <button
-          className="mt-1 text-xs text-gray-400 underline hover:text-violet-600"
+          type="button"
+          className="mt-1.5 text-xs text-gray-400 underline hover:text-violet-600"
           onClick={onEdit}
         >
           수정
@@ -115,6 +141,9 @@ function ChatBubble({ text, type, isTyping, showCursor, onEdit }: { text: string
     </div>
   );
 }
+
+const INTRO_GREETINGS = ["반갑습니다:)", "동고리가 봉제공장을 추천해드릴게요!"] as const;
+const INTRO_MESSAGE_COUNT = INTRO_GREETINGS.length + 1;
 
 export default function MatchingPage() {
   const { user } = useAppAuth();
@@ -252,59 +281,80 @@ type ScoredFactory = Factory & { score: number };
   const [introDone, setIntroDone] = useState(false);
 
   // 인트로 타이핑 상태 추가
-  const [typingText, setTypingText] = useState(""); // 현재 타이핑 중인 텍스트
-  // introMessages를 useMemo로 관리
-  const introMessages = useMemo(() => [
-    "반갑습니다:)",
-    "동고리가 봉제공장을 추천해드릴게요!",
-    QUESTIONS[0]?.question || "어떤 공정을 원하시나요?",
-  ], [QUESTIONS]);
-  const [introStep, setIntroStep] = useState(0); // 0: 타이핑, 1: ... 표시, 2: 다음 메시지
+  const [typingText, setTypingText] = useState("");
+  const [introStep, setIntroStep] = useState(0);
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [introRestartKey, setIntroRestartKey] = useState(0); // 인트로 재시작을 위한 키
+  const introTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const [introRestartKey, setIntroRestartKey] = useState(0);
   const suspendIntroRef = useRef(false);
+  const questionsRef = useRef(QUESTIONS);
+  questionsRef.current = QUESTIONS;
 
   useEffect(() => {
-    // 인트로 타이핑 효과
+    let cancelled = false;
+    introTimersRef.current.forEach(clearTimeout);
+    introTimersRef.current = [];
+    if (typingTimer.current) {
+      clearTimeout(typingTimer.current);
+      typingTimer.current = null;
+    }
+
+    const schedule = (fn: () => void, ms: number) => {
+      const id = setTimeout(() => {
+        if (!cancelled && !suspendIntroRef.current) fn();
+      }, ms);
+      introTimersRef.current.push(id);
+      return id;
+    };
+
     setChat([]);
     setIntroDone(false);
     setTypingText("");
     setIntroStep(0);
-    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    const firstQuestion =
+      questionsRef.current[0]?.question || "어떤 공정을 원하시나요?";
+    const messages = [...INTRO_GREETINGS, firstQuestion];
+
     let currentMsgIdx = 0;
     let currentCharIdx = 0;
+
     function typeNextChar() {
-      if (suspendIntroRef.current) return;
-      const msg = introMessages[currentMsgIdx];
+      if (cancelled || suspendIntroRef.current) return;
+      const msg = messages[currentMsgIdx];
       if (currentCharIdx < msg.length) {
         setTypingText(msg.slice(0, currentCharIdx + 1));
         currentCharIdx++;
-        typingTimer.current = setTimeout(typeNextChar, 40); // 타이핑 속도
+        typingTimer.current = schedule(typeNextChar, 40);
       } else {
-        // 타이핑 끝나면 바로 메시지 추가 및 다음 메시지로 이동
-        setChat(prev => [...prev, { type: "question", text: msg }]);
+        setChat((prev) => [...prev, { type: "question", text: msg }]);
         setTypingText("");
         setIntroStep(2);
-        if (currentMsgIdx < introMessages.length - 1) {
+        if (currentMsgIdx < messages.length - 1) {
           currentMsgIdx++;
           currentCharIdx = 0;
-          setTimeout(() => {
+          schedule(() => {
             setIntroStep(0);
             typeNextChar();
-          }, 200); // 바로 다음 메시지 타이핑 시작, 약간의 텀만 둠
+          }, 280);
         } else {
-          // 인트로 끝: setTimeout 없이 바로 introDone 처리
           setIntroDone(true);
         }
       }
     }
-    // 첫 메시지 타이핑 시작
+
     typeNextChar();
+
     return () => {
-      timers.forEach(clearTimeout);
-      if (typingTimer.current) clearTimeout(typingTimer.current);
+      cancelled = true;
+      introTimersRef.current.forEach(clearTimeout);
+      introTimersRef.current = [];
+      if (typingTimer.current) {
+        clearTimeout(typingTimer.current);
+        typingTimer.current = null;
+      }
     };
-  }, [introMessages, introRestartKey]);
+  }, [introRestartKey]);
   // 현재 질문 인덱스
   const [step, setStep] = useState(0);
   // 사용자가 선택한 답변들
@@ -941,7 +991,7 @@ type ScoredFactory = Factory & { score: number };
     setStep(editStep);
     setSelectedOptions(answers[editStep] || []);
     setAnswers(answers.slice(0, editStep));
-    setChat(chat.slice(0, 1 + editStep * 2)); // 질문/답변 쌍이므로
+    setChat(chat.slice(0, INTRO_MESSAGE_COUNT + editStep * 2));
   };
 
   // 추천 결과(매칭 완료) 시 왼쪽 하단에 '직접 찾기'와 '다시하기' 버튼을 추가합니다. '직접 찾기'는 /factories로 이동, '다시하기'는 매칭 상태(answers, step, chat 등) 초기화. 버튼은 Figma 예시처럼 스타일링(직접 찾기: 흰색, 다시하기: 검정 배경, 아이콘 포함)합니다.
@@ -1036,10 +1086,7 @@ type ScoredFactory = Factory & { score: number };
     <div className="min-h-screen bg-[#f6f7fb]">
       <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-6`}>
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Sparkles className="w-7 h-7 text-violet-500 shrink-0" />
-            AI 매칭
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">AI 매칭</h1>
           <p className="mt-2 text-sm md:text-base text-gray-600">
             몇 가지 정보만 알려주시면 가장 적합한 봉제공장 3곳을 추천해드립니다.
           </p>
@@ -1051,8 +1098,9 @@ type ScoredFactory = Factory & { score: number };
           {isResultStage ? (
             resultLoading ? (
               <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] animate-fade-in">
-                <div className="w-16 h-16 border-4 border-gray-300 border-t-[#222222] rounded-full animate-spin mb-6"></div>
-                <div className="text-lg font-semibold">분석 중입니다...</div>
+                <div className="w-16 h-16 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin mb-6" />
+                <div className="text-lg font-semibold text-gray-800">분석 중입니다...</div>
+                <p className="text-sm text-gray-500 mt-2">가장 적합한 공장을 찾고 있어요</p>
               </div>
             ) : (
               <div className="flex flex-col h-full">
@@ -1084,16 +1132,21 @@ type ScoredFactory = Factory & { score: number };
               </div>
             )
           ) : !introDone ? (
-            // 인트로 타이핑 중에는 아무것도 안 보이게(또는 로딩/스켈레톤 등)
-            <div className="flex-1 flex items-center justify-center text-gray-400 text-lg">...</div>
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-6">
+              <p className="text-sm text-gray-500">동고리가 맞춤 공장을 찾고 있어요...</p>
+              <div className="flex gap-1">
+                <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:0ms]" />
+                <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:150ms]" />
+                <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:300ms]" />
+              </div>
+            </div>
           ) : (
             // 기존 질문/선택지 UI
             <>
               {/* 상단~선택지 영역 */}
               <div className="flex-1 min-h-0 flex flex-col gap-4">
                 <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 md:p-4">
-                  <div className="text-xs md:text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-violet-500" />
+                  <div className="text-xs md:text-sm font-semibold text-gray-700 mb-2">
                     텍스트로 바로 매칭하기
                   </div>
                   <div className="flex flex-col md:flex-row gap-2">
@@ -1128,8 +1181,10 @@ type ScoredFactory = Factory & { score: number };
                     <div key={idx} className={`h-1 w-8 md:w-12 rounded-full ${idx <= step ? "bg-violet-600" : "bg-gray-200"}`}></div>
                   ))}
                 </div>
-                <div className="text-xs md:text-sm text-gray-400 mb-2">{step + 1} of {QUESTIONS.length}</div>
-                <div className="text-lg md:text-xl font-bold mb-6">{QUESTIONS[step].question}</div>
+                <div className="text-xs md:text-sm font-semibold text-violet-600 mb-2">
+                  {step + 1} / {QUESTIONS.length}
+                </div>
+                <div className="text-lg md:text-xl font-bold mb-6 text-gray-900">{QUESTIONS[step].question}</div>
                 {/* 선택지 영역 */}
                 <div className={QUESTIONS[step].key === 'items' ? 'bg-gray-50 rounded-xl p-4 md:p-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 overflow-y-auto flex-1' : 'bg-gray-50 rounded-xl p-4 md:p-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 overflow-y-auto flex-1'}
                   style={QUESTIONS[step].key === 'items' ? { maxHeight: 'unset' } : {}}>
@@ -1167,30 +1222,35 @@ type ScoredFactory = Factory & { score: number };
             </>
           )}
         </div>
-        {/* 오른쪽: 기존 채팅 UI + 결과 안내 메시지(답변 말풍선) */}
-        <div
-          className="w-full lg:flex-[1] bg-white rounded-2xl border border-gray-200 shadow-sm p-4 min-h-[280px] md:min-h-[340px] lg:min-h-[760px] lg:max-h-[860px] max-h-[44vh] md:max-h-[50vh] lg:h-auto overflow-y-auto flex flex-col gap-6"
-          ref={chatScrollRef}
-        >
+        {/* 오른쪽: 채팅 UI */}
+        <div className="w-full lg:flex-[1] bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col min-h-[280px] md:min-h-[340px] lg:min-h-[760px] lg:max-h-[860px] max-h-[44vh] md:max-h-[50vh] lg:max-h-none">
+          <div className="px-4 py-3 border-b border-gray-200 bg-white shrink-0">
+            <p className="font-bold text-sm text-gray-900">동고리 매칭 도우미</p>
+            <p className="text-xs text-gray-500 mt-0.5">질문에 답하면 최적의 공장을 추천해드려요</p>
+          </div>
+          <div
+            className="flex-1 overflow-y-auto p-4 md:p-5 flex flex-col gap-4 bg-[#f8f9fc]"
+            ref={chatScrollRef}
+          >
           {/* 기존 채팅/인트로 UI */}
           {chat.map((msg, idx) => (
-            <div key={idx} className={`flex ${msg.type === "answer" ? "justify-end" : "justify-start"}`}>
+            <div key={`${idx}-${msg.text.slice(0, 12)}`} className="w-full">
               <ChatBubble
                 text={msg.text}
                 type={msg.type}
-                onEdit={msg.type === "answer" && introDone ? () => handleEdit(Math.floor((idx - introMessages.length) / 2)) : undefined}
+                onEdit={msg.type === "answer" && introDone ? () => handleEdit(Math.floor((idx - INTRO_MESSAGE_COUNT) / 2)) : undefined}
               />
             </div>
           ))}
           {/* 현재 타이핑 중인 메시지 */}
           {!introDone && typingText && (
-            <div className="flex justify-start">
+            <div className="w-full">
               <ChatBubble text={typingText} type="question" isTyping={true} showCursor={introStep === 0} />
             </div>
           )}
           {/* 결과 안내 메시지(답변 말풍선) - 두 개로 분리, 순차 등장 */}
           {showResultMsg1 && recommended.length > 0 && (
-            <div className="flex justify-end">
+            <div className="w-full">
               <ChatBubble
                 text={`가장 적합한 봉제공장은\n${recommended.map(f => (typeof f.name === 'string' && f.name) ? f.name : (typeof f.company_name === 'string' && f.company_name) ? f.company_name : '이름 없음').join(', ')} 입니다!`}
                 type="answer"
@@ -1198,13 +1258,14 @@ type ScoredFactory = Factory & { score: number };
             </div>
           )}
           {showResultMsg2 && (
-            <div className="flex justify-end">
+            <div className="w-full">
               <ChatBubble
                 text={`봉제를 진행할 공장을 선택하여\n공정을 시작해보세요:)`}
                 type="answer"
               />
             </div>
           )}
+          </div>
         </div>
       </div>
       {/* 로그인 필요 모달 */}

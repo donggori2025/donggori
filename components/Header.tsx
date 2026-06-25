@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { getFactoryProfileImage } from "@/lib/factoryAuth";
 import { storage } from "@/lib/utils";
 import type { FactoryAuth } from "@/lib/types";
+import { Sparkles } from "lucide-react";
 
 type NavLinkItem = { type: "link"; href: string; label: string };
 type NavItem = NavLinkItem;
@@ -33,8 +34,6 @@ export default function Header() {
     ],
     []
   );
-
-  const isMatchingActive = pathname === "/matching" || pathname.startsWith("/matching/");
 
   // 컴포넌트 마운트 확인
   useEffect(() => {
@@ -131,31 +130,6 @@ export default function Header() {
     setMenuOpen(false);
   }, []);
 
-  const renderDesktopNavItem = (item: NavItem) => (
-    <Link
-      key={item.href}
-      href={item.href}
-      className={`${navHoverClass} hover:font-bold transition-colors ${
-        item.href === "/matching" && isMatchingActive ? "font-bold" : ""
-      }`}
-    >
-      {item.label}
-    </Link>
-  );
-
-  const renderMobileNavItem = (item: NavItem) => (
-    <Link
-      key={item.href}
-      href={item.href}
-      className={`py-3 px-4 rounded-lg hover:bg-gray-100 font-medium text-lg transition-colors text-gray-800 ${
-        item.href === "/matching" && isMatchingActive ? "font-bold" : ""
-      }`}
-      onClick={closeMenu}
-    >
-      {item.label}
-    </Link>
-  );
-
   // 서버 사이드 렌더링 시 기본 UI만 표시
   const isHome = pathname === "/";
   const isTransparentMode = isHome && !isScrolled && !menuOpen;
@@ -174,6 +148,64 @@ export default function Header() {
   const mobileMenuButtonClass = isTransparentMode
     ? "p-2 rounded hover:bg-white/10 focus:outline-none text-white"
     : "p-2 rounded hover:bg-gray-100 focus:outline-none";
+
+  const aiMatchingIconClass = isTransparentMode ? "text-violet-300" : "text-violet-500";
+
+  const renderDesktopNavItem = (item: NavItem) => {
+    if (item.href === "/matching") {
+      return (
+        <Link
+          key={item.href}
+          href={item.href}
+          className="inline-flex items-center gap-1.5 font-bold transition-opacity hover:opacity-90"
+        >
+          <Sparkles className={`w-4 h-4 shrink-0 ${aiMatchingIconClass}`} aria-hidden />
+          <span className="ai-model-fit-glow">{item.label}</span>
+        </Link>
+      );
+    }
+
+    const isActive = pathname === item.href;
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        className={`${navHoverClass} hover:font-bold transition-colors ${isActive ? "font-bold" : ""}`}
+      >
+        {item.label}
+      </Link>
+    );
+  };
+
+  const renderMobileNavItem = (item: NavItem) => {
+    if (item.href === "/matching") {
+      return (
+        <Link
+          key={item.href}
+          href={item.href}
+          className="py-3 px-4 rounded-lg hover:bg-gray-100 inline-flex items-center gap-2 font-bold text-lg transition-colors"
+          onClick={closeMenu}
+        >
+          <Sparkles className="w-5 h-5 shrink-0 text-violet-500" aria-hidden />
+          <span className="ai-model-fit-glow">{item.label}</span>
+        </Link>
+      );
+    }
+
+    const isActive = pathname === item.href;
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        className={`py-3 px-4 rounded-lg hover:bg-gray-100 font-medium text-lg transition-colors text-gray-800 ${
+          isActive ? "bg-gray-100 font-bold" : ""
+        }`}
+        onClick={closeMenu}
+      >
+        {item.label}
+      </Link>
+    );
+  };
 
   if (!mounted) {
     return (
