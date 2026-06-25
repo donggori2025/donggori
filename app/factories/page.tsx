@@ -17,6 +17,7 @@ import FactoryInfoPopup from "@/components/FactoryInfoPopup";
 import { getFactoryLocationByName, getDongdaemunCenter } from "@/lib/factoryLocationMapping";
 import { useRouter } from "next/navigation";
 import { useFactoryImages, hasFactoryImages } from "@/lib/hooks/useFactoryImages";
+import { isKnitRelatedQuery, isParkwonKnitFactory, pinParkwonKnitFirst } from "@/lib/factoryMatching";
 
 // 공장 목록 페이지용 이미지 컴포넌트
 function FactoriesPageImage({ factory, idx }: { factory: Factory; idx: number }) {
@@ -157,7 +158,13 @@ export default function FactoriesPage() {
   }
 
   // 필터링 로직 (여러 값 중 하나라도 포함되면 통과, range/검색 포함)
+  const knitQueryActive = useMemo(() => {
+    if (isKnitRelatedQuery(search)) return true;
+    return selected.items.some((item) => isKnitRelatedQuery(item));
+  }, [search, selected.items]);
+
   const filtered = factoriesData.filter(f => {
+    const knitBoost = knitQueryActive && isParkwonKnitFactory(f);
     const itemList = [f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt, f.top_items_bag, f.top_items_fashion_accessory, f.top_items_underwear, f.top_items_sports_leisure, f.top_items_pet];
     // 검색어 필터
     const searchMatch = !search ||
@@ -183,7 +190,7 @@ export default function FactoriesPage() {
     const sewingArr = typeof f.sewing_machines === 'string' ? f.sewing_machines.split(',').map(s => s.trim()) : [];
     const patternArr = typeof f.pattern_machines === 'string' ? f.pattern_machines.split(',').map(s => s.trim()) : [];
     const specialArr = typeof f.special_machines === 'string' ? f.special_machines.split(',').map(s => s.trim()) : [];
-    return (
+    return knitBoost || (
       searchMatch &&
       (selected.admin_district.length === 0 || (typeof f.admin_district === 'string' && selected.admin_district.includes(f.admin_district))) &&
       moqMatch &&
@@ -207,6 +214,10 @@ export default function FactoriesPage() {
   const sortedFiltered = useMemo(() => {
     // 필터가 걸려있지 않은 경우에만 정렬 적용
     const hasActiveFilters = Object.values(selected).some(arr => arr.length > 0) || search;
+
+    if (knitQueryActive) {
+      return pinParkwonKnitFirst(filtered);
+    }
     
     if (!hasActiveFilters) {
       return [...filtered].sort((a, b) => {
@@ -231,7 +242,7 @@ export default function FactoriesPage() {
     }
     
     return filtered;
-  }, [filtered, selected, search]);
+  }, [filtered, selected, search, knitQueryActive]);
 
   // 필터 뱃지
   const badges = Object.entries(selected).flatMap(([key, arr]) =>
