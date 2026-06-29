@@ -30,7 +30,10 @@ function resolveLinkUrl(popup: PopupItem, isMobile: boolean): string | undefined
 }
 
 function openPopupLink(url: string) {
-  window.open(url, "_blank", "noopener,noreferrer");
+  const opened = window.open(url, "_blank", "noopener,noreferrer");
+  if (!opened) {
+    window.location.assign(url);
+  }
 }
 
 export default function GlobalPopups() {
@@ -106,6 +109,11 @@ export default function GlobalPopups() {
     setOpen(false);
   };
 
+  const handleLinkClick = (url: string) => {
+    setOpen(false);
+    openPopupLink(url);
+  };
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4" onClick={(e) => e.stopPropagation()}>
       <div
@@ -134,16 +142,11 @@ export default function GlobalPopups() {
         {current.image_url && (
           <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto bg-gray-100">
             {currentLinkUrl ? (
-              <a
-                href={currentLinkUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-full flex-1 min-h-[120px] cursor-pointer items-center justify-center p-2 transition-opacity hover:opacity-95 active:opacity-90"
+              <button
+                type="button"
+                className="flex w-full flex-1 min-h-[120px] cursor-pointer items-center justify-center border-0 bg-transparent p-2 transition-opacity hover:opacity-95 active:opacity-90"
                 aria-label={current.title ? `${current.title} 바로가기` : "팝업 바로가기"}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openPopupLink(currentLinkUrl);
-                }}
+                onClick={() => handleLinkClick(currentLinkUrl)}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -153,7 +156,7 @@ export default function GlobalPopups() {
                   style={{ maxHeight: imageMaxHeight }}
                   draggable={false}
                 />
-              </a>
+              </button>
             ) : (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
