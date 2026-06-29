@@ -3,19 +3,28 @@ import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
 import { validatePopupBody } from "@/lib/adminHelpers";
 import { insertPopupRow } from "@/lib/adminPopupDb";
-import { STATIC_PROMO_POPUPS } from "@/lib/promoPopups";
+import { ensurePopupSeeds } from "@/lib/ensurePopupSeeds";
 
 export async function GET() {
   const auth = await requireAdmin();
   if (auth) return auth;
   const supabase = getServiceSupabase();
-  const { data, error } = await supabase.from("popups").select("*").order("created_at", { ascending: false });
-  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  return NextResponse.json({
-    success: true,
-    data: data ?? [],
-    staticPopups: STATIC_PROMO_POPUPS,
-  });
+  await ensurePopupSeeds(supabase);
+
+  const { data, error } = await supabase
+    .from("popups")
+    .select("*")
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    // sort_order 컬럼 없을 때 fallback
+    const fallback = await supabase.from("popups").select("*").order("created_at", { ascending: false });
+    if (fallback.error) return NextResponse.json({ success: false, error: fallback.error.message }, { status: 500 });
+    return NextResponse.json({ success: true, data: fallback.data ?? [] });
+  }
+
+  return NextResponse.json({ success: true, data: data ?? [] });
 }
 
 export async function POST(req: Request) {
