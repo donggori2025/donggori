@@ -4,6 +4,7 @@ import ImageUpload from "@/components/ImageUpload";
 import FactoryImageManager from "@/components/FactoryImageManager";
 import FactoryBlobImageManager from "@/components/FactoryBlobImageManager";
 import { Factory, ColumnSchema, FactoryForm } from "@/lib/types";
+import { adminFetch } from "@/lib/adminFetch";
 
 export default function AdminFactoriesPage() {
   const [items, setItems] = useState<Factory[]>([]);
@@ -22,8 +23,8 @@ export default function AdminFactoriesPage() {
     setError(null);
     try {
       const [listRes, schemaRes] = await Promise.all([
-        fetch("/api/admin/factories"),
-        fetch("/api/admin/factories/schema"),
+        adminFetch("/api/admin/factories"),
+        adminFetch("/api/admin/factories/schema"),
       ]);
       const listJson = listRes.ok ? await listRes.json().catch(()=>({ success:false, error:`목록 응답 파싱 실패(${listRes.status})` })) : { success:false, error:`목록 요청 실패(${listRes.status})` };
       const schemaJson = schemaRes.ok ? await schemaRes.json().catch(()=>({ success:false, error:`스키마 응답 파싱 실패(${schemaRes.status})` })) : { success:false, error:`스키마 요청 실패(${schemaRes.status})` };
@@ -85,7 +86,7 @@ export default function AdminFactoriesPage() {
         return;
       }
 
-      const res = await fetch("/api/admin/factories", {
+      const res = await adminFetch("/api/admin/factories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -107,7 +108,7 @@ export default function AdminFactoriesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/factories/${id}`, {
+      const res = await adminFetch(`/api/admin/factories/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Object.fromEntries(Object.entries(patch).filter(([k])=>!k.startsWith("__")))),
@@ -133,7 +134,7 @@ export default function AdminFactoriesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/factories/${id}`, { method: "DELETE" });
+      const res = await adminFetch(`/api/admin/factories/${id}`, { method: "DELETE" });
       const json = res.ok ? await res.json().catch(()=>({ success:false, error:`응답 파싱 실패(${res.status})` })) : { success:false, error:`요청 실패(${res.status})` };
       if (!res.ok || !json.success) throw new Error(json.error || "삭제 실패");
       await load();
@@ -205,13 +206,16 @@ export default function AdminFactoriesPage() {
 
   // 필드 변경 시 변경사항 체크
   const handleFieldChange = (field: string, value: unknown) => {
-    setSelected((prev) => prev ? { ...prev, [field]: value } : null);
-    
-    // 변경사항 체크
-    if (originalSelected && originalSelected[field] !== value) {
-      setHasChanges(true);
-    }
+    setSelected((prev) => (prev ? { ...prev, [field]: value } : null));
   };
+
+  useEffect(() => {
+    if (!selected || !originalSelected) {
+      setHasChanges(false);
+      return;
+    }
+    setHasChanges(JSON.stringify(selected) !== JSON.stringify(originalSelected));
+  }, [selected, originalSelected]);
 
   // 변경사항 저장
   const handleSaveChanges = () => {

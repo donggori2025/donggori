@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
+import { validateNoticeBody } from "@/lib/adminHelpers";
 
 export async function GET() {
   const auth = await requireAdmin();
@@ -18,27 +19,19 @@ export async function POST(req: Request) {
   const auth = await requireAdmin();
   if (auth) return auth;
   const body = await req.json();
+  const validated = validateNoticeBody(body);
+  if (!validated.ok) {
+    return NextResponse.json({ success: false, error: validated.error }, { status: 400 });
+  }
+
   const supabase = getServiceSupabase();
-  
-  // image_urls 컬럼이 없을 경우를 대비한 안전한 삽입
-  const insertData: any = {
-    title: body.title,
-    content: body.content ?? "",
-    category: body.category ?? "일반",
-    start_at: body.start_at ?? null,
-    end_at: body.end_at ?? null,
+  const insertData = {
+    ...validated.data,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
-  
-  // image_urls가 제공된 경우에만 추가
-  if (body.image_urls !== undefined) {
-    insertData.image_urls = body.image_urls;
-  }
-  
+
   const { error } = await supabase.from("notices").insert(insertData);
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }
-
-

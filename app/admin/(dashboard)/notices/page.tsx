@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import type { NoticeItem, NoticeCategory } from "@/lib/types";
 import ImageUpload from "@/components/ImageUpload";
+import { adminFetch } from "@/lib/adminFetch";
 
 const CATEGORIES: NoticeCategory[] = ["공지", "일반", "채용공고"];
 
@@ -18,7 +19,7 @@ export default function AdminNoticesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/notices");
+      const res = await adminFetch("/api/admin/notices");
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "불러오기 실패");
       setItems(json.data || []);
@@ -35,7 +36,7 @@ export default function AdminNoticesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/notices", {
+      const res = await adminFetch("/api/admin/notices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -44,7 +45,7 @@ export default function AdminNoticesPage() {
       if (!res.ok || !json.success) throw new Error(json.error || "등록 실패");
 
       if (addToPopup) {
-        const popupRes = await fetch("/api/admin/popups", {
+        const popupRes = await adminFetch("/api/admin/popups", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -75,7 +76,7 @@ export default function AdminNoticesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/notices/${id}`, {
+      const res = await adminFetch(`/api/admin/notices/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patch),
@@ -97,7 +98,7 @@ export default function AdminNoticesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/notices/${id}`, { method: "DELETE" });
+      const res = await adminFetch(`/api/admin/notices/${id}`, { method: "DELETE" });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "삭제 실패");
       await load();
@@ -134,7 +135,7 @@ export default function AdminNoticesPage() {
 
     if (editingAddToPopup) {
       try {
-        const popupRes = await fetch("/api/admin/popups", {
+        const popupRes = await adminFetch("/api/admin/popups", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

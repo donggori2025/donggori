@@ -20,8 +20,7 @@ export default function AdminSidebar() {
       });
 
       if (response.ok) {
-        // 로그아웃 성공 시 메인페이지로 리다이렉트
-        window.location.href = "/";
+        window.location.href = "/admin/login";
       } else {
         console.error("로그아웃 실패");
         alert("로그아웃에 실패했습니다.");
@@ -39,9 +38,17 @@ export default function AdminSidebar() {
       <div className="font-bold text-xl mb-8">관리자 대시보드</div>
       <nav className="flex flex-col gap-2">
         <Link 
+          href="/admin" 
+          className={`px-3 py-2 rounded text-base font-medium transition-colors ${
+            pathname === "/admin" ? "bg-gray-100 text-black font-bold" : "text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          대시보드
+        </Link>
+        <Link 
           href="/admin/factories" 
           className={`px-3 py-2 rounded text-base font-medium transition-colors ${
-            pathname === "/admin/factories" ? "bg-toss-blue text-black font-bold" : "text-gray-700 hover:bg-gray-100"
+            pathname === "/admin/factories" ? "bg-gray-100 text-black font-bold" : "text-gray-700 hover:bg-gray-100"
           }`}
         >
           업장 관리
@@ -49,7 +56,7 @@ export default function AdminSidebar() {
         <Link 
           href="/admin/popups" 
           className={`px-3 py-2 rounded text-base font-medium transition-colors ${
-            pathname === "/admin/popups" ? "bg-toss-blue text-black font-bold" : "text-gray-700 hover:bg-gray-100"
+            pathname === "/admin/popups" ? "bg-gray-100 text-black font-bold" : "text-gray-700 hover:bg-gray-100"
           }`}
         >
           팝업 관리
@@ -57,7 +64,7 @@ export default function AdminSidebar() {
         <Link 
           href="/admin/notices" 
           className={`px-3 py-2 rounded text-base font-medium transition-colors ${
-            pathname === "/admin/notices" ? "bg-toss-blue text-black font-bold" : "text-gray-700 hover:bg-gray-100"
+            pathname === "/admin/notices" ? "bg-gray-100 text-black font-bold" : "text-gray-700 hover:bg-gray-100"
           }`}
         >
           공지 관리

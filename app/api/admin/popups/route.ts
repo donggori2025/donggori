@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
+import { validatePopupBody } from "@/lib/adminHelpers";
 
 export async function GET() {
-  // 관리자 목록 조회 (모든 팝업)
   const auth = await requireAdmin();
   if (auth) return auth;
   const supabase = getServiceSupabase();
@@ -16,18 +16,17 @@ export async function POST(req: Request) {
   const auth = await requireAdmin();
   if (auth) return auth;
   const body = await req.json();
+  const validated = validatePopupBody(body);
+  if (!validated.ok) {
+    return NextResponse.json({ success: false, error: validated.error }, { status: 400 });
+  }
+
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("popups").insert({
-    title: body.title ?? null,
-    content: body.content ?? null,
-    image_url: body.image_url ?? null,
-    start_at: body.start_at ?? null,
-    end_at: body.end_at ?? null,
+    ...validated.data,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   });
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }
-
-
