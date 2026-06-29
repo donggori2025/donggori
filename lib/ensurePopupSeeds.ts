@@ -1,34 +1,55 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { POPUP_SEEDS } from "@/lib/popupSeeds";
-import { insertPopupRow } from "@/lib/adminPopupDb";
+import { insertPopupRow, updatePopupRow } from "@/lib/adminPopupDb";
 
 function isMissingColumnError(message: string, column: string): boolean {
   const lower = message.toLowerCase();
   return lower.includes(column.toLowerCase()) && (lower.includes("column") || lower.includes("schema"));
 }
 
-/** slug 기준으로 기본 팝업이 없으면 DB에 등록 */
+async function findExistingSeed(
+  supabase: SupabaseClient,
+  seed: (typeof POPUP_SEEDS)[number]
+): Promise<{ id: string; link_url?: string | null; link_url_mobile?: string | null } | null> {
+  const { data: bySlug, error: slugError } = await supabase
+    .from("popups")
+    .select("id, link_url, link_url_mobile")
+    .eq("slug", seed.slug)
+    .maybeSingle();
+
+  if (!slugError && bySlug) return bySlug;
+
+  if (slugError && isMissingColumnError(slugError.message, "slug")) {
+    const { data: byTitle } = await supabase
+      .from("popups")
+      .select("id, link_url, link_url_mobile")
+      .eq("title", seed.title)
+      .eq("image_url", seed.image_url)
+      .maybeSingle();
+    return byTitle;
+  }
+
+  if (slugError) {
+    console.error("[ensurePopupSeeds] lookup failed:", slugError.message);
+  }
+  return null;
+}
+
+/** slug 기준으로 기본 팝업이 없으면 DB에 등록, 링크가 비어 있으면 보완 */
 export async function ensurePopupSeeds(supabase: SupabaseClient): Promise<void> {
   for (const seed of POPUP_SEEDS) {
-    const { data: bySlug, error: slugError } = await supabase
-      .from("popups")
-      .select("id")
-      .eq("slug", seed.slug)
-      .maybeSingle();
+    const existing = await findExistingSeed(supabase, seed);
 
-    if (!slugError && bySlug) continue;
+    if (existing) {
+      const patch: Record<string, unknown> = {};
+      if (seed.link_url && !existing.link_url) patch.link_url = seed.link_url;
+      if (seed.link_url_mobile && !existing.link_url_mobile) patch.link_url_mobile = seed.link_url_mobile;
+      if (Object.keys(patch).length === 0) continue;
 
-    if (slugError && isMissingColumnError(slugError.message, "slug")) {
-      // slug 컬럼 없음: 제목+이미지로 중복 확인
-      const { data: byTitle } = await supabase
-        .from("popups")
-        .select("id")
-        .eq("title", seed.title)
-        .eq("image_url", seed.image_url)
-        .maybeSingle();
-      if (byTitle) continue;
-    } else if (slugError) {
-      console.error("[ensurePopupSeeds] slug lookup failed:", slugError.message);
+      const error = await updatePopupRow(supabase, existing.id, patch);
+      if (error) {
+        console.error(`[ensurePopupSeeds] link backfill failed (${seed.slug}):`, error.message);
+      }
       continue;
     }
 
