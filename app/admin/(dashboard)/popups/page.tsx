@@ -246,6 +246,37 @@ export default function AdminPopupsPage() {
   const allSelected = items.length > 0 && selectedIds.size === items.length;
   const someSelected = selectedIds.size > 0;
 
+  const dedupeDuplicates = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminFetch("/api/admin/popups/dedupe", { method: "POST" });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || "중복 정리 실패");
+      await load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "중복 정리 실패");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const seedDefaults = async () => {
+    if (!confirm("FADDIT 기본 팝업을 등록하시겠습니까? (이미 있으면 건너뜁니다)")) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminFetch("/api/admin/popups/seed", { method: "POST" });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || "기본 팝업 등록 실패");
+      await load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "기본 팝업 등록 실패");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const saveEdit = async () => {
     if (!editingItem) return;
     await update(editingItem.id, {
@@ -340,9 +371,19 @@ export default function AdminPopupsPage() {
             <AdminButton
               variant="secondary"
               disabled={loading}
+              onClick={dedupeDuplicates}
+            >
+              중복 정리
+            </AdminButton>
+            <AdminButton
+              variant="secondary"
+              disabled={loading}
               onClick={() => removeBulk({ all: true })}
             >
               전체 삭제
+            </AdminButton>
+            <AdminButton variant="ghost" disabled={loading} onClick={seedDefaults}>
+              기본 팝업 등록
             </AdminButton>
           </div>
         )}
@@ -351,7 +392,7 @@ export default function AdminPopupsPage() {
       {loading && items.length === 0 ? (
         <AdminEmpty message="불러오는 중..." />
       ) : items.length === 0 ? (
-        <AdminEmpty message="등록된 팝업이 없습니다. 페이지를 새로고침하면 기본 팝업이 자동 등록됩니다." />
+        <AdminEmpty message="등록된 팝업이 없습니다. 새로 등록하거나 「기본 팝업 등록」을 눌러주세요." />
       ) : (
         <div className="space-y-4">
           {items.map((item) => (

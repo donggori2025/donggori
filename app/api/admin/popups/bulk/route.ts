@@ -31,9 +31,9 @@ export async function DELETE(req: Request) {
     if (allIds.length === 0) {
       return NextResponse.json({ success: true, deleted: 0 });
     }
-    const { error } = await supabase.from("popups").delete().in("id", allIds);
+    const { data: deleted, error } = await supabase.from("popups").delete().in("id", allIds).select("id");
     if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-    return NextResponse.json({ success: true, deleted: allIds.length });
+    return NextResponse.json({ success: true, deleted: deleted?.length ?? 0 });
   }
 
   if (!Array.isArray(body.ids)) {
@@ -45,7 +45,7 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ success: false, error: "삭제할 항목이 없습니다." }, { status: 400 });
   }
 
-  const { error } = await supabase.from("popups").delete().in("id", ids);
+  const { data: deleted, error } = await supabase.from("popups").delete().in("id", ids).select("id");
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true, deleted: ids.length });
+  return NextResponse.json({ success: true, deleted: deleted?.length ?? 0 });
 }

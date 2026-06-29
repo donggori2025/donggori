@@ -1,51 +1,43 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { POPUP_SEEDS } from "@/lib/popupSeeds";
 import { insertPopupRow, updatePopupRow } from "@/lib/adminPopupDb";
+import { popupDedupeKey } from "@/lib/popupList";
+import type { PopupItem } from "@/lib/types";
 
-function isMissingColumnError(message: string, column: string): boolean {
-  const lower = message.toLowerCase();
-  return lower.includes(column.toLowerCase()) && (lower.includes("column") || lower.includes("schema"));
-}
+type SeedRow = {
+  id: string;
+  title?: string | null;
+  image_url?: string | null;
+  link_url?: string | null;
+  link_url_mobile?: string | null;
+  slug?: string | null;
+};
 
 async function findExistingSeed(
   supabase: SupabaseClient,
   seed: (typeof POPUP_SEEDS)[number]
-): Promise<{ id: string; link_url?: string | null; link_url_mobile?: string | null; slug?: string | null } | null> {
-  const selectFields = "id, link_url, link_url_mobile, slug";
+): Promise<SeedRow | null> {
+  const queries = [
+    () => supabase.from("popups").select("*").eq("slug", seed.slug).limit(1),
+    () =>
+      supabase
+        .from("popups")
+        .select("*")
+        .eq("title", seed.title)
+        .eq("image_url", seed.image_url)
+        .limit(1),
+    () => supabase.from("popups").select("*").eq("image_url", seed.image_url).limit(1),
+  ];
 
-  const { data: bySlug, error: slugError } = await supabase
-    .from("popups")
-    .select(selectFields)
-    .eq("slug", seed.slug)
-    .maybeSingle();
-
-  if (!slugError && bySlug) return bySlug;
-
-  const { data: byTitleImage } = await supabase
-    .from("popups")
-    .select(selectFields)
-    .eq("title", seed.title)
-    .eq("image_url", seed.image_url)
-    .maybeSingle();
-
-  if (byTitleImage) return byTitleImage;
-
-  const { data: byImage } = await supabase
-    .from("popups")
-    .select(selectFields)
-    .eq("image_url", seed.image_url)
-    .maybeSingle();
-
-  if (byImage) return byImage;
-
-  if (slugError && !isMissingColumnError(slugError.message, "slug")) {
-    console.error("[ensurePopupSeeds] lookup failed:", slugError.message);
+  for (const run of queries) {
+    const { data, error } = await run();
+    if (!error && data?.[0]) return data[0] as SeedRow;
   }
 
   return null;
 }
 
-/** slug 기준으로 기본 팝업이 없으면 DB에 등록, 기존 행은 링크·slug 보완 */
+/** 기본 팝업 수동 등록 전용 — 자동 호출 금지 */
 export async function ensurePopupSeeds(supabase: SupabaseClient): Promise<void> {
   for (const seed of POPUP_SEEDS) {
     const existing = await findExistingSeed(supabase, seed);
@@ -82,4 +74,37 @@ export async function ensurePopupSeeds(supabase: SupabaseClient): Promise<void> 
       console.error(`[ensurePopupSeeds] insert failed (${seed.slug}):`, error.message);
     }
   }
+}
+
+/** 동일 slug/이미지 중복 행 삭제 (가장 오래된 1건만 유지) */
+export async function removeDuplicatePopups(supabase: SupabaseClient): Promise<number> {
+  const { data, error } = await supabase
+    .from("popups")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  if (error || !data?.length) return 0;
+
+  const seenKeys = new Set<string>();
+  const toDelete: string[] = [];
+
+  for (const row of data as PopupItem[]) {
+    const key = popupDedupeKey(row);
+    if (seenKeys.has(key)) {
+      toDelete.push(row.id);
+    } else {
+      seenKeys.add(key);
+    }
+  }
+
+  if (toDelete.length === 0) return 0;
+
+  const { data: deleted, error: deleteError } = await supabase
+    .from("popups")
+    .delete()
+    .in("id", toDelete)
+    .select("id");
+
+  if (deleteError) throw deleteError;
+  return deleted?.length ?? 0;
 }
