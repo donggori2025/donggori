@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import type { PopupItem } from "@/lib/types";
 import ImageUpload from "@/components/ImageUpload";
 import { POPUP_IMAGE_SPEC, POPUP_IMAGE_SPEC_LABEL } from "@/lib/popupSpec";
+import { adminFetch } from "@/lib/adminFetch";
 
 export default function AdminPopupsPage() {
   const [items, setItems] = useState<PopupItem[]>([]);
@@ -17,7 +18,7 @@ export default function AdminPopupsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/popups");
+      const res = await adminFetch("/api/admin/popups");
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "불러오기 실패");
       setItems(json.data || []);
@@ -34,7 +35,7 @@ export default function AdminPopupsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/popups", {
+      const res = await adminFetch("/api/admin/popups", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -43,7 +44,7 @@ export default function AdminPopupsPage() {
       if (!res.ok || !json.success) throw new Error(json.error || "등록 실패");
 
       if (addToNotice) {
-        const noticeRes = await fetch("/api/admin/notices", {
+        const noticeRes = await adminFetch("/api/admin/notices", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -75,7 +76,7 @@ export default function AdminPopupsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/popups/${id}`, {
+      const res = await adminFetch(`/api/admin/popups/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patch),
@@ -97,7 +98,7 @@ export default function AdminPopupsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/popups/${id}`, { method: "DELETE" });
+      const res = await adminFetch(`/api/admin/popups/${id}`, { method: "DELETE" });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "삭제 실패");
       await load();
@@ -125,6 +126,7 @@ export default function AdminPopupsPage() {
       title: editingItem.title,
       content: editingItem.content,
       image_url: editingItem.image_url,
+      link_url: editingItem.link_url,
       start_at: editingItem.start_at,
       end_at: editingItem.end_at,
     };
@@ -133,7 +135,7 @@ export default function AdminPopupsPage() {
 
     if (editingAddToNotice) {
       try {
-        const noticeRes = await fetch("/api/admin/notices", {
+        const noticeRes = await adminFetch("/api/admin/notices", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -178,6 +180,7 @@ export default function AdminPopupsPage() {
           <input className="border rounded px-3 py-2" placeholder="제목" value={form.title ?? ""} onChange={(e)=>setForm(v=>({ ...v, title: e.target.value }))} />
           <input className="border rounded px-3 py-2" placeholder="노출 시작(YYYY-MM-DD)" value={form.start_at ?? ""} onChange={(e)=>setForm(v=>({ ...v, start_at: e.target.value }))} />
           <input className="border rounded px-3 py-2" placeholder="노출 종료(YYYY-MM-DD)" value={form.end_at ?? ""} onChange={(e)=>setForm(v=>({ ...v, end_at: e.target.value }))} />
+          <input className="md:col-span-2 border rounded px-3 py-2" placeholder="클릭 시 이동 URL (https://...)" value={form.link_url ?? ""} onChange={(e)=>setForm(v=>({ ...v, link_url: e.target.value }))} />
           <textarea className="md:col-span-2 border rounded px-3 py-2" rows={3} placeholder="내용" value={form.content ?? ""} onChange={(e)=>setForm(v=>({ ...v, content: e.target.value }))} />
         </div>
         
@@ -246,6 +249,12 @@ export default function AdminPopupsPage() {
                     value={editingItem.end_at ?? ""} 
                     onChange={(e)=>setEditingItem({...editingItem, end_at: e.target.value})} 
                   />
+                  <input
+                    className="md:col-span-2 border rounded px-3 py-2"
+                    placeholder="클릭 시 이동 URL (https://...)"
+                    value={editingItem.link_url ?? ""}
+                    onChange={(e)=>setEditingItem({...editingItem, link_url: e.target.value})}
+                  />
                   <textarea 
                     className="md:col-span-2 border rounded px-3 py-2" 
                     rows={3} 
@@ -310,6 +319,9 @@ export default function AdminPopupsPage() {
                 <div className="flex-1">
                   <div className="font-semibold">{item.title || "(제목 없음)"}</div>
                   <div className="text-sm text-gray-600">기간: {item.start_at || "-"} ~ {item.end_at || "-"}</div>
+                  {item.link_url && (
+                    <div className="text-sm text-blue-600 mt-1 truncate">링크: {item.link_url}</div>
+                  )}
                   <div className="text-sm whitespace-pre-wrap mt-2">{item.content}</div>
                   {item.image_url && (
                     <div className="mt-3">

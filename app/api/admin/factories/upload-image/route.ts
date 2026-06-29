@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { requireAdmin } from "@/lib/adminSession";
+import { sanitizeBlobFolder } from "@/lib/adminHelpers";
 
 export async function POST(req: Request) {
   const auth = await requireAdmin();
@@ -9,13 +10,18 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
-    const folder = formData.get("folder") as string;
+    const folderRaw = formData.get("folder") as string;
 
-    if (!file || !folder) {
+    if (!file || !folderRaw) {
       return NextResponse.json(
         { success: false, error: "file과 folder가 필요합니다." },
         { status: 400 }
       );
+    }
+
+    const folder = sanitizeBlobFolder(folderRaw);
+    if (!folder) {
+      return NextResponse.json({ success: false, error: "유효하지 않은 folder 경로입니다." }, { status: 400 });
     }
 
     if (!file.type.startsWith("image/")) {

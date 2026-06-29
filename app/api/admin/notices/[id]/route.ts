@@ -1,32 +1,22 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
+import { validateNoticeBody } from "@/lib/adminHelpers";
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin();
   if (auth) return auth;
   const body = await req.json();
+  const validated = validateNoticeBody(body);
+  if (!validated.ok) {
+    return NextResponse.json({ success: false, error: validated.error }, { status: 400 });
+  }
+
   const { id } = await params;
   const supabase = getServiceSupabase();
-  
-  // image_urls 컬럼이 없을 경우를 대비한 안전한 업데이트
-  const updateData: any = {
-    title: body.title,
-    content: body.content ?? "",
-    category: body.category ?? "일반",
-    start_at: body.start_at ?? null,
-    end_at: body.end_at ?? null,
-    updated_at: new Date().toISOString(),
-  };
-  
-  // image_urls가 제공된 경우에만 추가
-  if (body.image_urls !== undefined) {
-    updateData.image_urls = body.image_urls;
-  }
-  
   const { error } = await supabase
     .from("notices")
-    .update(updateData)
+    .update({ ...validated.data, updated_at: new Date().toISOString() })
     .eq("id", id);
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
@@ -41,5 +31,3 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }
-
-

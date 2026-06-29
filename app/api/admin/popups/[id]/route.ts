@@ -1,23 +1,22 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
+import { validatePopupBody } from "@/lib/adminHelpers";
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin();
   if (auth) return auth;
   const body = await req.json();
+  const validated = validatePopupBody(body);
+  if (!validated.ok) {
+    return NextResponse.json({ success: false, error: validated.error }, { status: 400 });
+  }
+
   const { id } = await params;
   const supabase = getServiceSupabase();
   const { error } = await supabase
     .from("popups")
-    .update({
-      title: body.title ?? null,
-      content: body.content ?? null,
-      image_url: body.image_url ?? null,
-      start_at: body.start_at ?? null,
-      end_at: body.end_at ?? null,
-      updated_at: new Date().toISOString(),
-    })
+    .update({ ...validated.data, updated_at: new Date().toISOString() })
     .eq("id", id);
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
@@ -32,5 +31,3 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }
-
-
