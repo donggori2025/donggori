@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
 import { validatePopupBody } from "@/lib/adminHelpers";
+import { updatePopupRow } from "@/lib/adminPopupDb";
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin();
@@ -14,10 +15,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
   const { id } = await params;
   const supabase = getServiceSupabase();
-  const { error } = await supabase
-    .from("popups")
-    .update({ ...validated.data, updated_at: new Date().toISOString() })
-    .eq("id", id);
+  const error = await updatePopupRow(supabase, id, validated.data);
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }

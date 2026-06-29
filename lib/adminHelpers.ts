@@ -107,7 +107,7 @@ export function validatePopupBody(body: Record<string, unknown>): { ok: true; da
   return {
     ok: true,
     data: {
-      title: title || null,
+      title: title || (imageUrl ? "팝업" : "제목 없음"),
       content: content || null,
       image_url: imageUrl || null,
       link_url: linkUrl || null,

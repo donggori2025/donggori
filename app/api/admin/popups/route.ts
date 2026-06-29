@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
 import { validatePopupBody } from "@/lib/adminHelpers";
+import { insertPopupRow } from "@/lib/adminPopupDb";
+import { STATIC_PROMO_POPUPS } from "@/lib/promoPopups";
 
 export async function GET() {
   const auth = await requireAdmin();
@@ -9,7 +11,11 @@ export async function GET() {
   const supabase = getServiceSupabase();
   const { data, error } = await supabase.from("popups").select("*").order("created_at", { ascending: false });
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true, data });
+  return NextResponse.json({
+    success: true,
+    data: data ?? [],
+    staticPopups: STATIC_PROMO_POPUPS,
+  });
 }
 
 export async function POST(req: Request) {
@@ -22,11 +28,7 @@ export async function POST(req: Request) {
   }
 
   const supabase = getServiceSupabase();
-  const { error } = await supabase.from("popups").insert({
-    ...validated.data,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  });
+  const error = await insertPopupRow(supabase, validated.data);
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }
