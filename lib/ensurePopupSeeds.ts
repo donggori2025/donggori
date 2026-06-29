@@ -10,45 +10,56 @@ function isMissingColumnError(message: string, column: string): boolean {
 async function findExistingSeed(
   supabase: SupabaseClient,
   seed: (typeof POPUP_SEEDS)[number]
-): Promise<{ id: string; link_url?: string | null; link_url_mobile?: string | null } | null> {
+): Promise<{ id: string; link_url?: string | null; link_url_mobile?: string | null; slug?: string | null } | null> {
+  const selectFields = "id, link_url, link_url_mobile, slug";
+
   const { data: bySlug, error: slugError } = await supabase
     .from("popups")
-    .select("id, link_url, link_url_mobile")
+    .select(selectFields)
     .eq("slug", seed.slug)
     .maybeSingle();
 
   if (!slugError && bySlug) return bySlug;
 
-  if (slugError && isMissingColumnError(slugError.message, "slug")) {
-    const { data: byTitle } = await supabase
-      .from("popups")
-      .select("id, link_url, link_url_mobile")
-      .eq("title", seed.title)
-      .eq("image_url", seed.image_url)
-      .maybeSingle();
-    return byTitle;
-  }
+  const { data: byTitleImage } = await supabase
+    .from("popups")
+    .select(selectFields)
+    .eq("title", seed.title)
+    .eq("image_url", seed.image_url)
+    .maybeSingle();
 
-  if (slugError) {
+  if (byTitleImage) return byTitleImage;
+
+  const { data: byImage } = await supabase
+    .from("popups")
+    .select(selectFields)
+    .eq("image_url", seed.image_url)
+    .maybeSingle();
+
+  if (byImage) return byImage;
+
+  if (slugError && !isMissingColumnError(slugError.message, "slug")) {
     console.error("[ensurePopupSeeds] lookup failed:", slugError.message);
   }
+
   return null;
 }
 
-/** slug 기준으로 기본 팝업이 없으면 DB에 등록, 링크가 비어 있으면 보완 */
+/** slug 기준으로 기본 팝업이 없으면 DB에 등록, 기존 행은 링크·slug 보완 */
 export async function ensurePopupSeeds(supabase: SupabaseClient): Promise<void> {
   for (const seed of POPUP_SEEDS) {
     const existing = await findExistingSeed(supabase, seed);
 
     if (existing) {
       const patch: Record<string, unknown> = {};
+      if (seed.slug && !existing.slug) patch.slug = seed.slug;
       if (seed.link_url && !existing.link_url) patch.link_url = seed.link_url;
       if (seed.link_url_mobile && !existing.link_url_mobile) patch.link_url_mobile = seed.link_url_mobile;
       if (Object.keys(patch).length === 0) continue;
 
       const error = await updatePopupRow(supabase, existing.id, patch);
       if (error) {
-        console.error(`[ensurePopupSeeds] link backfill failed (${seed.slug}):`, error.message);
+        console.error(`[ensurePopupSeeds] backfill failed (${seed.slug}):`, error.message);
       }
       continue;
     }
