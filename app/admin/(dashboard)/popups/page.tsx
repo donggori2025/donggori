@@ -1,12 +1,38 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import type { PopupItem } from "@/lib/types";
 import ImageUpload from "@/components/ImageUpload";
-import { POPUP_IMAGE_SPEC, POPUP_IMAGE_SPEC_LABEL } from "@/lib/popupSpec";
+import { POPUP_IMAGE_SPEC_LABEL } from "@/lib/popupSpec";
 import { adminFetch } from "@/lib/adminFetch";
+import { getPromoLinkUrl } from "@/lib/promoPopups";
+import {
+  AdminAlert,
+  AdminBadge,
+  AdminButton,
+  AdminCard,
+  AdminEmpty,
+  AdminInput,
+  AdminPageHeader,
+  AdminTextarea,
+  AdminToggle,
+} from "@/components/admin/admin-ui";
+
+function formatPeriod(start?: string, end?: string) {
+  const fmt = (v?: string) => (v ? v.slice(0, 10) : "—");
+  return `${fmt(start)} ~ ${fmt(end)}`;
+}
+
+function isStaticPopupActive(popup: PopupItem) {
+  const now = new Date();
+  if (popup.start_at && now < new Date(popup.start_at)) return false;
+  if (popup.end_at && now > new Date(popup.end_at)) return false;
+  return true;
+}
 
 export default function AdminPopupsPage() {
   const [items, setItems] = useState<PopupItem[]>([]);
+  const [staticPopups, setStaticPopups] = useState<PopupItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Partial<PopupItem>>({});
   const [addToNotice, setAddToNotice] = useState(false);
@@ -22,14 +48,17 @@ export default function AdminPopupsPage() {
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "불러오기 실패");
       setItems(json.data || []);
-    } catch (e: any) {
-      setError(e?.message || "불러오기 실패");
+      setStaticPopups(json.staticPopups || []);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "불러오기 실패");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const submit = async () => {
     setLoading(true);
@@ -65,8 +94,8 @@ export default function AdminPopupsPage() {
       setForm({});
       setAddToNotice(false);
       await load();
-    } catch (e: any) {
-      setError(e?.message || "등록 실패");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "등록 실패");
     } finally {
       setLoading(false);
     }
@@ -85,8 +114,8 @@ export default function AdminPopupsPage() {
       if (!res.ok || !json.success) throw new Error(json.error || "수정 실패");
       setEditingItem(null);
       await load();
-    } catch (e: any) {
-      setError(e?.message || "수정 실패");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "수정 실패");
     } finally {
       setLoading(false);
     }
@@ -94,7 +123,6 @@ export default function AdminPopupsPage() {
 
   const remove = async (id: string) => {
     if (!confirm("정말 삭제하시겠습니까?")) return;
-    
     setLoading(true);
     setError(null);
     try {
@@ -102,36 +130,23 @@ export default function AdminPopupsPage() {
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "삭제 실패");
       await load();
-    } catch (e: any) {
-      setError(e?.message || "삭제 실패");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "삭제 실패");
     } finally {
       setLoading(false);
     }
   };
 
-  const startEdit = (item: PopupItem) => {
-    setEditingItem(item);
-    setEditingAddToNotice(false);
-  };
-
-  const cancelEdit = () => {
-    setEditingItem(null);
-    setEditingAddToNotice(false);
-  };
-
   const saveEdit = async () => {
     if (!editingItem) return;
-    
-    const updatedData = {
+    await update(editingItem.id, {
       title: editingItem.title,
       content: editingItem.content,
       image_url: editingItem.image_url,
       link_url: editingItem.link_url,
       start_at: editingItem.start_at,
       end_at: editingItem.end_at,
-    };
-    
-    await update(editingItem.id, updatedData);
+    });
 
     if (editingAddToNotice) {
       try {
@@ -158,202 +173,213 @@ export default function AdminPopupsPage() {
     setEditingAddToNotice(false);
   };
 
-  const handleFormImagesChange = (images: string[]) => {
-    setForm(prev => ({ ...prev, image_url: images[0] || "" }));
-  };
-
-  const handleEditImagesChange = (images: string[]) => {
-    if (editingItem) {
-      setEditingItem({ ...editingItem, image_url: images[0] || "" });
-    }
-  };
-
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-extrabold mb-4">팝업 관리</h1>
-      {error && <div className="text-red-600 text-sm mb-3">{error}</div>}
-      
-      {/* 등록 폼 */}
-      <div className="bg-white border rounded-xl p-4 shadow-sm mb-6">
-        <h2 className="text-lg font-semibold mb-3">새 팝업 등록</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input className="border rounded px-3 py-2" placeholder="제목" value={form.title ?? ""} onChange={(e)=>setForm(v=>({ ...v, title: e.target.value }))} />
-          <input className="border rounded px-3 py-2" placeholder="노출 시작(YYYY-MM-DD)" value={form.start_at ?? ""} onChange={(e)=>setForm(v=>({ ...v, start_at: e.target.value }))} />
-          <input className="border rounded px-3 py-2" placeholder="노출 종료(YYYY-MM-DD)" value={form.end_at ?? ""} onChange={(e)=>setForm(v=>({ ...v, end_at: e.target.value }))} />
-          <input className="md:col-span-2 border rounded px-3 py-2" placeholder="클릭 시 이동 URL (https://...)" value={form.link_url ?? ""} onChange={(e)=>setForm(v=>({ ...v, link_url: e.target.value }))} />
-          <textarea className="md:col-span-2 border rounded px-3 py-2" rows={3} placeholder="내용" value={form.content ?? ""} onChange={(e)=>setForm(v=>({ ...v, content: e.target.value }))} />
+    <>
+      <AdminPageHeader
+        title="팝업 관리"
+        description="메인 화면에 노출되는 팝업을 관리합니다."
+      />
+
+      {error && <AdminAlert>{error}</AdminAlert>}
+
+      {staticPopups.length > 0 && (
+        <AdminCard
+          title="코드로 관리되는 팝업"
+          description="아래 팝업은 lib/promoPopups.ts 에서 관리됩니다. 관리자에서 수정할 수 없으며, 사이트에는 정상 노출됩니다."
+          className="mb-8"
+        >
+          <div className="space-y-4">
+            {staticPopups.map((popup) => {
+              const active = isStaticPopupActive(popup);
+              const link = getPromoLinkUrl(popup.id, false);
+              return (
+                <div
+                  key={popup.id}
+                  className="flex flex-col sm:flex-row gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4"
+                >
+                  {popup.image_url && (
+                    <img
+                      src={popup.image_url}
+                      alt=""
+                      className="w-full sm:w-40 h-28 object-cover rounded-lg border border-gray-200"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="font-semibold text-gray-900">{popup.title || popup.id}</span>
+                      <AdminBadge tone={active ? "success" : "neutral"}>
+                        {active ? "노출 중" : "기간 외"}
+                      </AdminBadge>
+                      <AdminBadge tone="info">코드 관리</AdminBadge>
+                    </div>
+                    <p className="text-sm text-gray-500">ID: {popup.id}</p>
+                    <p className="text-sm text-gray-500 mt-1">기간: {formatPeriod(popup.start_at, popup.end_at)}</p>
+                    {link && (
+                      <p className="text-sm text-blue-600 mt-1 truncate">링크: {link}</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </AdminCard>
+      )}
+
+      <AdminCard title="새 팝업 등록" className="mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AdminInput
+            label="제목"
+            placeholder="팝업 제목"
+            value={form.title ?? ""}
+            onChange={(e) => setForm((v) => ({ ...v, title: e.target.value }))}
+          />
+          <AdminInput
+            label="노출 시작"
+            placeholder="YYYY-MM-DD"
+            value={form.start_at ?? ""}
+            onChange={(e) => setForm((v) => ({ ...v, start_at: e.target.value }))}
+          />
+          <AdminInput
+            label="노출 종료"
+            placeholder="YYYY-MM-DD"
+            value={form.end_at ?? ""}
+            onChange={(e) => setForm((v) => ({ ...v, end_at: e.target.value }))}
+          />
+          <AdminInput
+            label="클릭 시 이동 URL"
+            placeholder="https://..."
+            className="md:col-span-2"
+            value={form.link_url ?? ""}
+            onChange={(e) => setForm((v) => ({ ...v, link_url: e.target.value }))}
+          />
+          <AdminTextarea
+            label="내용"
+            className="md:col-span-2"
+            rows={3}
+            value={form.content ?? ""}
+            onChange={(e) => setForm((v) => ({ ...v, content: e.target.value }))}
+          />
         </div>
-        
-        {/* 이미지 업로드 */}
-        <div className="mt-4">
-          <p className="text-sm text-gray-600 mb-2">{POPUP_IMAGE_SPEC_LABEL}</p>
+
+        <div className="mt-5">
+          <p className="text-sm font-medium text-gray-700 mb-2">{POPUP_IMAGE_SPEC_LABEL}</p>
           <ImageUpload
-            onImagesChange={handleFormImagesChange}
+            onImagesChange={(images) => setForm((v) => ({ ...v, image_url: images[0] || "" }))}
             currentImages={form.image_url ? [form.image_url] : []}
             multiple={false}
           />
         </div>
 
-        {/* 공지사항에도 추가 토글 */}
-        <div className="flex items-center gap-3 mt-4">
-          <button
-            type="button"
-            role="switch"
-            aria-checked={addToNotice}
-            onClick={() => setAddToNotice((v) => !v)}
-            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 ${
-              addToNotice ? "bg-black" : "bg-gray-200"
-            }`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
-                addToNotice ? "translate-x-5" : "translate-x-1"
-              }`}
-              style={{ marginTop: 2 }}
-            />
-          </button>
-          <label className="text-sm font-medium text-gray-700 cursor-pointer" onClick={() => setAddToNotice((v) => !v)}>
-            공지사항에도 추가
-          </label>
+        <div className="mt-5">
+          <AdminToggle checked={addToNotice} onChange={setAddToNotice} label="공지사항에도 추가" />
         </div>
-        
-        <div className="mt-3">
-          <button disabled={loading} onClick={submit} className="bg-black text-white rounded px-4 py-2 disabled:opacity-50">{loading ? "처리 중..." : "등록"}</button>
+
+        <div className="mt-6">
+          <AdminButton onClick={submit} disabled={loading}>
+            {loading ? "처리 중..." : "팝업 등록"}
+          </AdminButton>
         </div>
-      </div>
+      </AdminCard>
 
-      {/* 팝업 목록 */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">등록된 팝업 목록</h2>
-        {items.map(item => (
-          <div key={item.id} className="bg-white border rounded-xl p-4 shadow-sm">
-            {editingItem?.id === item.id ? (
-              // 수정 모드
-              <div className="space-y-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <input 
-                    className="border rounded px-3 py-2" 
-                    placeholder="제목" 
-                    value={editingItem.title ?? ""} 
-                    onChange={(e)=>setEditingItem({...editingItem, title: e.target.value})} 
-                  />
-                  <input 
-                    className="border rounded px-3 py-2" 
-                    placeholder="노출 시작(YYYY-MM-DD)" 
-                    value={editingItem.start_at ?? ""} 
-                    onChange={(e)=>setEditingItem({...editingItem, start_at: e.target.value})} 
-                  />
-                  <input 
-                    className="border rounded px-3 py-2" 
-                    placeholder="노출 종료(YYYY-MM-DD)" 
-                    value={editingItem.end_at ?? ""} 
-                    onChange={(e)=>setEditingItem({...editingItem, end_at: e.target.value})} 
-                  />
-                  <input
-                    className="md:col-span-2 border rounded px-3 py-2"
-                    placeholder="클릭 시 이동 URL (https://...)"
-                    value={editingItem.link_url ?? ""}
-                    onChange={(e)=>setEditingItem({...editingItem, link_url: e.target.value})}
-                  />
-                  <textarea 
-                    className="md:col-span-2 border rounded px-3 py-2" 
-                    rows={3} 
-                    placeholder="내용" 
-                    value={editingItem.content ?? ""} 
-                    onChange={(e)=>setEditingItem({...editingItem, content: e.target.value})} 
-                  />
-                </div>
-                
-                {/* 이미지 업로드 (수정 모드) */}
-                <div className="mt-4">
-                  <p className="text-sm text-gray-600 mb-2">{POPUP_IMAGE_SPEC_LABEL}</p>
-                  <ImageUpload
-                    onImagesChange={handleEditImagesChange}
-                    currentImages={editingItem.image_url ? [editingItem.image_url] : []}
-                    multiple={false}
-                  />
-                </div>
+      <h2 className="text-base font-semibold text-gray-900 mb-4">DB 등록 팝업 ({items.length})</h2>
 
-                {/* 수정 시 공지사항에도 추가 토글 */}
-                <div className="flex items-center gap-3 mt-4">
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={editingAddToNotice}
-                    onClick={() => setEditingAddToNotice((v) => !v)}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 ${
-                      editingAddToNotice ? "bg-black" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
-                        editingAddToNotice ? "translate-x-5" : "translate-x-1"
-                      }`}
-                      style={{ marginTop: 2 }}
+      {loading && items.length === 0 ? (
+        <AdminEmpty message="불러오는 중..." />
+      ) : items.length === 0 ? (
+        <AdminEmpty message="DB에 등록된 팝업이 없습니다. 위 폼에서 새 팝업을 등록하세요." />
+      ) : (
+        <div className="space-y-4">
+          {items.map((item) => (
+            <AdminCard key={item.id}>
+              {editingItem?.id === item.id ? (
+                <div className="space-y-4 -m-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <AdminInput
+                      label="제목"
+                      value={editingItem.title ?? ""}
+                      onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
                     />
-                  </button>
-                  <label className="text-sm font-medium text-gray-700 cursor-pointer" onClick={() => setEditingAddToNotice((v) => !v)}>
-                    공지사항에도 추가
-                  </label>
+                    <AdminInput
+                      label="노출 시작"
+                      value={editingItem.start_at ?? ""}
+                      onChange={(e) => setEditingItem({ ...editingItem, start_at: e.target.value })}
+                    />
+                    <AdminInput
+                      label="노출 종료"
+                      value={editingItem.end_at ?? ""}
+                      onChange={(e) => setEditingItem({ ...editingItem, end_at: e.target.value })}
+                    />
+                    <AdminInput
+                      label="클릭 시 이동 URL"
+                      className="md:col-span-2"
+                      value={editingItem.link_url ?? ""}
+                      onChange={(e) => setEditingItem({ ...editingItem, link_url: e.target.value })}
+                    />
+                    <AdminTextarea
+                      label="내용"
+                      className="md:col-span-2"
+                      rows={3}
+                      value={editingItem.content ?? ""}
+                      onChange={(e) => setEditingItem({ ...editingItem, content: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">{POPUP_IMAGE_SPEC_LABEL}</p>
+                    <ImageUpload
+                      onImagesChange={(images) =>
+                        setEditingItem({ ...editingItem, image_url: images[0] || "" })
+                      }
+                      currentImages={editingItem.image_url ? [editingItem.image_url] : []}
+                      multiple={false}
+                    />
+                  </div>
+                  <AdminToggle
+                    checked={editingAddToNotice}
+                    onChange={setEditingAddToNotice}
+                    label="공지사항에도 추가"
+                  />
+                  <div className="flex gap-2">
+                    <AdminButton onClick={saveEdit} disabled={loading}>
+                      {loading ? "저장 중..." : "저장"}
+                    </AdminButton>
+                    <AdminButton variant="secondary" onClick={() => setEditingItem(null)}>
+                      취소
+                    </AdminButton>
+                  </div>
                 </div>
-                
-                <div className="flex gap-2">
-                  <button 
-                    disabled={loading} 
-                    onClick={saveEdit} 
-                    className="bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
-                  >
-                    {loading ? "저장 중..." : "저장"}
-                  </button>
-                  <button 
-                    onClick={cancelEdit} 
-                    className="bg-gray-500 text-white rounded px-4 py-2"
-                  >
-                    취소
-                  </button>
-                </div>
-              </div>
-            ) : (
-              // 보기 모드
-              <div className="flex items-start gap-4">
-                <div className="flex-1">
-                  <div className="font-semibold">{item.title || "(제목 없음)"}</div>
-                  <div className="text-sm text-gray-600">기간: {item.start_at || "-"} ~ {item.end_at || "-"}</div>
-                  {item.link_url && (
-                    <div className="text-sm text-blue-600 mt-1 truncate">링크: {item.link_url}</div>
-                  )}
-                  <div className="text-sm whitespace-pre-wrap mt-2">{item.content}</div>
+              ) : (
+                <div className="flex flex-col sm:flex-row gap-4 -m-2">
                   {item.image_url && (
-                    <div className="mt-3">
-                      <img 
-                        src={item.image_url} 
-                        alt="팝업 이미지" 
-                        className="w-32 h-24 object-cover rounded border"
-                      />
-                    </div>
+                    <img
+                      src={item.image_url}
+                      alt=""
+                      className="w-full sm:w-36 h-28 object-cover rounded-xl border border-gray-200"
+                    />
                   )}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-900">{item.title || "(제목 없음)"}</div>
+                    <p className="text-sm text-gray-500 mt-1">기간: {formatPeriod(item.start_at, item.end_at)}</p>
+                    {item.link_url && (
+                      <p className="text-sm text-blue-600 mt-1 truncate">링크: {item.link_url}</p>
+                    )}
+                    {item.content && (
+                      <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap line-clamp-3">{item.content}</p>
+                    )}
+                  </div>
+                  <div className="flex sm:flex-col gap-2">
+                    <AdminButton variant="secondary" onClick={() => setEditingItem(item)}>
+                      수정
+                    </AdminButton>
+                    <AdminButton variant="danger" onClick={() => remove(item.id)}>
+                      삭제
+                    </AdminButton>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <button 
-                    className="border rounded px-3 py-1 bg-blue-50 hover:bg-blue-100" 
-                    onClick={() => startEdit(item)}
-                  >
-                    수정
-                  </button>
-                  <button 
-                    className="border rounded px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600" 
-                    onClick={() => remove(item.id)}
-                  >
-                    삭제
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
+              )}
+            </AdminCard>
+          ))}
+        </div>
+      )}
+    </>
   );
 }
-
-
