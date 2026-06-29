@@ -144,12 +144,16 @@ export interface PaginatedResponse<T> {
 // 관리자: 팝업/공지 타입
 export interface PopupItem {
   id: string;
+  slug?: string;
   title?: string;
   content?: string;
   image_url?: string;
   link_url?: string;
+  link_url_mobile?: string;
   start_at?: string; // ISO string
   end_at?: string;   // ISO string
+  is_active?: boolean;
+  sort_order?: number;
   created_at?: string;
   updated_at?: string;
 }

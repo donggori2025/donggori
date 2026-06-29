@@ -5,7 +5,6 @@ import type { PopupItem } from "@/lib/types";
 import ImageUpload from "@/components/ImageUpload";
 import { POPUP_IMAGE_SPEC_LABEL } from "@/lib/popupSpec";
 import { adminFetch } from "@/lib/adminFetch";
-import { getPromoLinkUrl } from "@/lib/promoPopups";
 import {
   AdminAlert,
   AdminBadge,
@@ -23,18 +22,84 @@ function formatPeriod(start?: string, end?: string) {
   return `${fmt(start)} ~ ${fmt(end)}`;
 }
 
-function isStaticPopupActive(popup: PopupItem) {
+function isPopupCurrentlyActive(popup: PopupItem) {
+  if (popup.is_active === false) return false;
   const now = new Date();
   if (popup.start_at && now < new Date(popup.start_at)) return false;
   if (popup.end_at && now > new Date(popup.end_at)) return false;
   return true;
 }
 
+function PopupFormFields({
+  values,
+  onChange,
+}: {
+  values: Partial<PopupItem>;
+  onChange: (patch: Partial<PopupItem>) => void;
+}) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <AdminInput
+        label="제목"
+        placeholder="팝업 제목"
+        value={values.title ?? ""}
+        onChange={(e) => onChange({ title: e.target.value })}
+      />
+      <AdminInput
+        label="노출 순서"
+        type="number"
+        hint="숫자가 작을수록 먼저 표시"
+        value={values.sort_order ?? 0}
+        onChange={(e) => onChange({ sort_order: Number(e.target.value) || 0 })}
+      />
+      <AdminInput
+        label="노출 시작"
+        placeholder="YYYY-MM-DD"
+        value={values.start_at ?? ""}
+        onChange={(e) => onChange({ start_at: e.target.value })}
+      />
+      <AdminInput
+        label="노출 종료"
+        placeholder="YYYY-MM-DD"
+        value={values.end_at ?? ""}
+        onChange={(e) => onChange({ end_at: e.target.value })}
+      />
+      <AdminInput
+        label="클릭 시 이동 URL (PC)"
+        placeholder="https://..."
+        className="md:col-span-2"
+        value={values.link_url ?? ""}
+        onChange={(e) => onChange({ link_url: e.target.value })}
+      />
+      <AdminInput
+        label="클릭 시 이동 URL (모바일, 선택)"
+        placeholder="비우면 PC 링크 사용"
+        className="md:col-span-2"
+        value={values.link_url_mobile ?? ""}
+        onChange={(e) => onChange({ link_url_mobile: e.target.value })}
+      />
+      <AdminTextarea
+        label="내용"
+        className="md:col-span-2"
+        rows={3}
+        value={values.content ?? ""}
+        onChange={(e) => onChange({ content: e.target.value })}
+      />
+      <div className="md:col-span-2">
+        <AdminToggle
+          checked={values.is_active !== false}
+          onChange={(checked) => onChange({ is_active: checked })}
+          label="노출 활성화"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPopupsPage() {
   const [items, setItems] = useState<PopupItem[]>([]);
-  const [staticPopups, setStaticPopups] = useState<PopupItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<Partial<PopupItem>>({});
+  const [form, setForm] = useState<Partial<PopupItem>>({ is_active: true, sort_order: 0 });
   const [addToNotice, setAddToNotice] = useState(false);
   const [editingAddToNotice, setEditingAddToNotice] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +113,6 @@ export default function AdminPopupsPage() {
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "불러오기 실패");
       setItems(json.data || []);
-      setStaticPopups(json.staticPopups || []);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "불러오기 실패");
     } finally {
@@ -91,7 +155,7 @@ export default function AdminPopupsPage() {
         }
       }
 
-      setForm({});
+      setForm({ is_active: true, sort_order: 0 });
       setAddToNotice(false);
       await load();
     } catch (e: unknown) {
@@ -144,8 +208,11 @@ export default function AdminPopupsPage() {
       content: editingItem.content,
       image_url: editingItem.image_url,
       link_url: editingItem.link_url,
+      link_url_mobile: editingItem.link_url_mobile,
       start_at: editingItem.start_at,
       end_at: editingItem.end_at,
+      is_active: editingItem.is_active,
+      sort_order: editingItem.sort_order,
     });
 
     if (editingAddToNotice) {
@@ -177,89 +244,13 @@ export default function AdminPopupsPage() {
     <>
       <AdminPageHeader
         title="팝업 관리"
-        description="메인 화면에 노출되는 팝업을 관리합니다."
+        description="메인 화면에 노출되는 팝업을 등록·수정·비활성화합니다."
       />
 
       {error && <AdminAlert>{error}</AdminAlert>}
 
-      {staticPopups.length > 0 && (
-        <AdminCard
-          title="코드로 관리되는 팝업"
-          description="아래 팝업은 lib/promoPopups.ts 에서 관리됩니다. 관리자에서 수정할 수 없으며, 사이트에는 정상 노출됩니다."
-          className="mb-8"
-        >
-          <div className="space-y-4">
-            {staticPopups.map((popup) => {
-              const active = isStaticPopupActive(popup);
-              const link = getPromoLinkUrl(popup.id, false);
-              return (
-                <div
-                  key={popup.id}
-                  className="flex flex-col sm:flex-row gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4"
-                >
-                  {popup.image_url && (
-                    <img
-                      src={popup.image_url}
-                      alt=""
-                      className="w-full sm:w-40 h-28 object-cover rounded-lg border border-gray-200"
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="font-semibold text-gray-900">{popup.title || popup.id}</span>
-                      <AdminBadge tone={active ? "success" : "neutral"}>
-                        {active ? "노출 중" : "기간 외"}
-                      </AdminBadge>
-                      <AdminBadge tone="info">코드 관리</AdminBadge>
-                    </div>
-                    <p className="text-sm text-gray-500">ID: {popup.id}</p>
-                    <p className="text-sm text-gray-500 mt-1">기간: {formatPeriod(popup.start_at, popup.end_at)}</p>
-                    {link && (
-                      <p className="text-sm text-blue-600 mt-1 truncate">링크: {link}</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </AdminCard>
-      )}
-
       <AdminCard title="새 팝업 등록" className="mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <AdminInput
-            label="제목"
-            placeholder="팝업 제목"
-            value={form.title ?? ""}
-            onChange={(e) => setForm((v) => ({ ...v, title: e.target.value }))}
-          />
-          <AdminInput
-            label="노출 시작"
-            placeholder="YYYY-MM-DD"
-            value={form.start_at ?? ""}
-            onChange={(e) => setForm((v) => ({ ...v, start_at: e.target.value }))}
-          />
-          <AdminInput
-            label="노출 종료"
-            placeholder="YYYY-MM-DD"
-            value={form.end_at ?? ""}
-            onChange={(e) => setForm((v) => ({ ...v, end_at: e.target.value }))}
-          />
-          <AdminInput
-            label="클릭 시 이동 URL"
-            placeholder="https://..."
-            className="md:col-span-2"
-            value={form.link_url ?? ""}
-            onChange={(e) => setForm((v) => ({ ...v, link_url: e.target.value }))}
-          />
-          <AdminTextarea
-            label="내용"
-            className="md:col-span-2"
-            rows={3}
-            value={form.content ?? ""}
-            onChange={(e) => setForm((v) => ({ ...v, content: e.target.value }))}
-          />
-        </div>
+        <PopupFormFields values={form} onChange={(patch) => setForm((v) => ({ ...v, ...patch }))} />
 
         <div className="mt-5">
           <p className="text-sm font-medium text-gray-700 mb-2">{POPUP_IMAGE_SPEC_LABEL}</p>
@@ -281,48 +272,22 @@ export default function AdminPopupsPage() {
         </div>
       </AdminCard>
 
-      <h2 className="text-base font-semibold text-gray-900 mb-4">DB 등록 팝업 ({items.length})</h2>
+      <h2 className="text-base font-semibold text-gray-900 mb-4">등록된 팝업 ({items.length})</h2>
 
       {loading && items.length === 0 ? (
         <AdminEmpty message="불러오는 중..." />
       ) : items.length === 0 ? (
-        <AdminEmpty message="DB에 등록된 팝업이 없습니다. 위 폼에서 새 팝업을 등록하세요." />
+        <AdminEmpty message="등록된 팝업이 없습니다. 페이지를 새로고침하면 기본 팝업이 자동 등록됩니다." />
       ) : (
         <div className="space-y-4">
           {items.map((item) => (
             <AdminCard key={item.id}>
               {editingItem?.id === item.id ? (
                 <div className="space-y-4 -m-2">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <AdminInput
-                      label="제목"
-                      value={editingItem.title ?? ""}
-                      onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
-                    />
-                    <AdminInput
-                      label="노출 시작"
-                      value={editingItem.start_at ?? ""}
-                      onChange={(e) => setEditingItem({ ...editingItem, start_at: e.target.value })}
-                    />
-                    <AdminInput
-                      label="노출 종료"
-                      value={editingItem.end_at ?? ""}
-                      onChange={(e) => setEditingItem({ ...editingItem, end_at: e.target.value })}
-                    />
-                    <AdminInput
-                      label="클릭 시 이동 URL"
-                      className="md:col-span-2"
-                      value={editingItem.link_url ?? ""}
-                      onChange={(e) => setEditingItem({ ...editingItem, link_url: e.target.value })}
-                    />
-                    <AdminTextarea
-                      label="내용"
-                      className="md:col-span-2"
-                      rows={3}
-                      value={editingItem.content ?? ""}
-                      onChange={(e) => setEditingItem({ ...editingItem, content: e.target.value })}
-                    />
-                  </div>
+                  <PopupFormFields
+                    values={editingItem}
+                    onChange={(patch) => setEditingItem({ ...editingItem, ...patch })}
+                  />
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-2">{POPUP_IMAGE_SPEC_LABEL}</p>
                     <ImageUpload
@@ -357,10 +322,19 @@ export default function AdminPopupsPage() {
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-gray-900">{item.title || "(제목 없음)"}</div>
-                    <p className="text-sm text-gray-500 mt-1">기간: {formatPeriod(item.start_at, item.end_at)}</p>
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="font-semibold text-gray-900">{item.title || "(제목 없음)"}</span>
+                      <AdminBadge tone={isPopupCurrentlyActive(item) ? "success" : "neutral"}>
+                        {item.is_active === false ? "비활성" : isPopupCurrentlyActive(item) ? "노출 중" : "기간 외"}
+                      </AdminBadge>
+                      {item.slug && <AdminBadge tone="info">{item.slug}</AdminBadge>}
+                    </div>
+                    <p className="text-sm text-gray-500">기간: {formatPeriod(item.start_at, item.end_at)}</p>
                     {item.link_url && (
-                      <p className="text-sm text-blue-600 mt-1 truncate">링크: {item.link_url}</p>
+                      <p className="text-sm text-blue-600 mt-1 truncate">PC 링크: {item.link_url}</p>
+                    )}
+                    {item.link_url_mobile && (
+                      <p className="text-sm text-blue-600 mt-1 truncate">모바일 링크: {item.link_url_mobile}</p>
                     )}
                     {item.content && (
                       <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap line-clamp-3">{item.content}</p>

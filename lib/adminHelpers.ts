@@ -104,15 +104,29 @@ export function validatePopupBody(body: Record<string, unknown>): { ok: true; da
     return { ok: false, error: "링크 URL은 http:// 또는 https:// 로 시작해야 합니다." };
   }
 
-  return {
-    ok: true,
-    data: {
-      title: title || (imageUrl ? "팝업" : "제목 없음"),
-      content: content || null,
-      image_url: imageUrl || null,
-      link_url: linkUrl || null,
-      start_at: body.start_at ?? null,
-      end_at: body.end_at ?? null,
-    },
+  const linkUrlMobile = typeof body.link_url_mobile === "string" ? body.link_url_mobile.trim() : "";
+  if (linkUrlMobile && !/^https?:\/\/.+/.test(linkUrlMobile)) {
+    return { ok: false, error: "모바일 링크 URL은 http:// 또는 https:// 로 시작해야 합니다." };
+  }
+
+  const data: Record<string, unknown> = {
+    title: title || (imageUrl ? "팝업" : "제목 없음"),
+    content: content || null,
+    image_url: imageUrl || null,
+    link_url: linkUrl || null,
+    link_url_mobile: linkUrlMobile || null,
+    start_at: body.start_at ?? null,
+    end_at: body.end_at ?? null,
   };
+
+  if (body.is_active !== undefined) {
+    data.is_active = Boolean(body.is_active);
+  }
+
+  if (body.sort_order !== undefined && body.sort_order !== null && body.sort_order !== "") {
+    const order = Number(body.sort_order);
+    if (!Number.isNaN(order)) data.sort_order = order;
+  }
+
+  return { ok: true, data };
 }

@@ -16,9 +16,17 @@ export async function insertPopupRow(supabase: SupabaseClient, row: PopupRow) {
   };
 
   let { error } = await supabase.from("popups").insert(payload);
-  if (error && isMissingColumnError(error.message, "link_url") && "link_url" in payload) {
-    const { link_url: _removed, ...fallback } = payload;
-    ({ error } = await supabase.from("popups").insert(fallback));
+  if (error) {
+    const optionalCols = ["link_url", "link_url_mobile", "slug", "sort_order"] as const;
+    let fallback: PopupRow = { ...payload };
+    for (const col of optionalCols) {
+      if (isMissingColumnError(error.message, col) && col in fallback) {
+        const { [col]: _removed, ...rest } = fallback;
+        fallback = rest;
+        ({ error } = await supabase.from("popups").insert(fallback));
+        if (!error) break;
+      }
+    }
   }
   return error;
 }
@@ -27,9 +35,17 @@ export async function updatePopupRow(supabase: SupabaseClient, id: string, row: 
   const payload = { ...row, updated_at: new Date().toISOString() };
 
   let { error } = await supabase.from("popups").update(payload).eq("id", id);
-  if (error && isMissingColumnError(error.message, "link_url") && "link_url" in payload) {
-    const { link_url: _removed, ...fallback } = payload;
-    ({ error } = await supabase.from("popups").update(fallback).eq("id", id));
+  if (error) {
+    const optionalCols = ["link_url", "link_url_mobile", "slug", "sort_order"] as const;
+    let fallback: PopupRow = { ...payload };
+    for (const col of optionalCols) {
+      if (isMissingColumnError(error.message, col) && col in fallback) {
+        const { [col]: _removed, ...rest } = fallback;
+        fallback = rest;
+        ({ error } = await supabase.from("popups").update(fallback).eq("id", id));
+        if (!error) break;
+      }
+    }
   }
   return error;
 }
