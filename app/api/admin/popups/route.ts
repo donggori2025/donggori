@@ -3,13 +3,18 @@ import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
 import { validatePopupBody } from "@/lib/adminHelpers";
 import { insertPopupRow } from "@/lib/adminPopupDb";
-import { ensurePopupSeeds } from "@/lib/ensurePopupSeeds";
+import { removeDuplicatePopups } from "@/lib/ensurePopupSeeds";
 
 export async function GET() {
   const auth = await requireAdmin();
   if (auth) return auth;
   const supabase = getServiceSupabase();
-  await ensurePopupSeeds(supabase);
+
+  try {
+    await removeDuplicatePopups(supabase);
+  } catch (e) {
+    console.error("[admin/popups] dedupe failed:", e);
+  }
 
   const { data, error } = await supabase
     .from("popups")
@@ -18,7 +23,6 @@ export async function GET() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    // sort_order 컬럼 없을 때 fallback
     const fallback = await supabase.from("popups").select("*").order("created_at", { ascending: false });
     if (fallback.error) return NextResponse.json({ success: false, error: fallback.error.message }, { status: 500 });
     return NextResponse.json({ success: true, data: fallback.data ?? [] });

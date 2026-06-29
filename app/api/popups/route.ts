@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import type { PopupItem } from "@/lib/types";
+import { dedupePopups } from "@/lib/popupList";
 
 function isPopupActive(popup: PopupItem, now: Date) {
   if (popup.is_active === false) return false;
@@ -9,19 +10,6 @@ function isPopupActive(popup: PopupItem, now: Date) {
   if (start && now < start) return false;
   if (end && now > end) return false;
   return true;
-}
-
-/** slug/이미지 기준 중복 제거 (과거 중복 삽입 대비) */
-function dedupePopups(popups: PopupItem[]): PopupItem[] {
-  const seen = new Set<string>();
-  const result: PopupItem[] = [];
-  for (const popup of popups) {
-    const key = popup.slug || popup.image_url || popup.id;
-    if (!key || seen.has(key)) continue;
-    seen.add(key);
-    result.push(popup);
-  }
-  return result;
 }
 
 export async function GET() {

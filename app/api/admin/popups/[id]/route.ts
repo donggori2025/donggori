@@ -25,7 +25,10 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   if (auth) return auth;
   const { id } = await params;
   const supabase = getServiceSupabase();
-  const { error } = await supabase.from("popups").delete().eq("id", id);
+  const { data, error } = await supabase.from("popups").delete().eq("id", id).select("id");
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  if (!data?.length) {
+    return NextResponse.json({ success: false, error: "삭제할 팝업을 찾을 수 없습니다." }, { status: 404 });
+  }
   return NextResponse.json({ success: true });
 }
