@@ -104,6 +104,7 @@ export default function AdminPopupsPage() {
   const [editingAddToNotice, setEditingAddToNotice] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<PopupItem | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const load = async () => {
     setLoading(true);
@@ -113,6 +114,7 @@ export default function AdminPopupsPage() {
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "불러오기 실패");
       setItems(json.data || []);
+      setSelectedIds(new Set());
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "불러오기 실패");
     } finally {
@@ -193,6 +195,7 @@ export default function AdminPopupsPage() {
       const res = await adminFetch(`/api/admin/popups/${id}`, { method: "DELETE" });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "삭제 실패");
+      if (editingItem?.id === id) setEditingItem(null);
       await load();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "삭제 실패");
@@ -200,6 +203,48 @@ export default function AdminPopupsPage() {
       setLoading(false);
     }
   };
+
+  const removeBulk = async (payload: { ids?: string[]; all?: boolean }) => {
+    const count = payload.all ? items.length : payload.ids?.length ?? 0;
+    if (count === 0) return;
+    const label = payload.all ? `등록된 팝업 ${count}개를 전부` : `선택한 팝업 ${count}개를`;
+    if (!confirm(`${label} 삭제하시겠습니까?`)) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminFetch("/api/admin/popups/bulk", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || "삭제 실패");
+      setEditingItem(null);
+      await load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "삭제 실패");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleSelect = (id: string, checked: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) setSelectedIds(new Set(items.map((item) => item.id)));
+    else setSelectedIds(new Set());
+  };
+
+  const allSelected = items.length > 0 && selectedIds.size === items.length;
+  const someSelected = selectedIds.size > 0;
 
   const saveEdit = async () => {
     if (!editingItem) return;
@@ -272,7 +317,36 @@ export default function AdminPopupsPage() {
         </div>
       </AdminCard>
 
-      <h2 className="text-base font-semibold text-gray-900 mb-4">등록된 팝업 ({items.length})</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <h2 className="text-base font-semibold text-gray-900">등록된 팝업 ({items.length})</h2>
+        {items.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="inline-flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none mr-1">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-gray-300"
+                checked={allSelected}
+                onChange={(e) => toggleSelectAll(e.target.checked)}
+              />
+              전체 선택
+            </label>
+            <AdminButton
+              variant="danger"
+              disabled={loading || !someSelected}
+              onClick={() => removeBulk({ ids: Array.from(selectedIds) })}
+            >
+              선택 삭제 ({selectedIds.size})
+            </AdminButton>
+            <AdminButton
+              variant="secondary"
+              disabled={loading}
+              onClick={() => removeBulk({ all: true })}
+            >
+              전체 삭제
+            </AdminButton>
+          </div>
+        )}
+      </div>
 
       {loading && items.length === 0 ? (
         <AdminEmpty message="불러오는 중..." />
@@ -314,6 +388,15 @@ export default function AdminPopupsPage() {
                 </div>
               ) : (
                 <div className="flex flex-col sm:flex-row gap-4 -m-2">
+                  <label className="flex items-start pt-1 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 mt-1 rounded border-gray-300"
+                      checked={selectedIds.has(item.id)}
+                      onChange={(e) => toggleSelect(item.id, e.target.checked)}
+                      aria-label={`${item.title || "팝업"} 선택`}
+                    />
+                  </label>
                   {item.image_url && (
                     <img
                       src={item.image_url}
