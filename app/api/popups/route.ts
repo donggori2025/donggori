@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import type { PopupItem } from "@/lib/types";
+import { ensurePopupSeeds } from "@/lib/ensurePopupSeeds";
 
 function isPopupActive(popup: PopupItem, now: Date) {
   if (popup.is_active === false) return false;
@@ -14,6 +15,7 @@ function isPopupActive(popup: PopupItem, now: Date) {
 export async function GET() {
   const now = new Date();
   const supabase = getServiceSupabase();
+  await ensurePopupSeeds(supabase);
 
   let query = supabase.from("popups").select("*");
   const { data, error } = await query.order("sort_order", { ascending: true }).order("created_at", { ascending: false });

@@ -16,9 +16,21 @@ function useIsMobile(breakpoint = 768) {
   return isMobile;
 }
 
+function normalizeUrl(url?: string | null): string | undefined {
+  const trimmed = url?.trim();
+  if (!trimmed) return undefined;
+  return trimmed;
+}
+
 function resolveLinkUrl(popup: PopupItem, isMobile: boolean): string | undefined {
-  if (isMobile && popup.link_url_mobile) return popup.link_url_mobile;
-  return popup.link_url;
+  const pc = normalizeUrl(popup.link_url);
+  const mobile = normalizeUrl(popup.link_url_mobile);
+  if (isMobile && mobile) return mobile;
+  return pc || mobile;
+}
+
+function openPopupLink(url: string) {
+  window.open(url, "_blank", "noopener,noreferrer");
 }
 
 export default function GlobalPopups() {
@@ -126,15 +138,20 @@ export default function GlobalPopups() {
                 href={currentLinkUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex cursor-pointer items-center justify-center"
+                className="flex w-full flex-1 min-h-[120px] cursor-pointer items-center justify-center p-2 transition-opacity hover:opacity-95 active:opacity-90"
                 aria-label={current.title ? `${current.title} 바로가기` : "팝업 바로가기"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openPopupLink(currentLinkUrl);
+                }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={current.image_url}
                   alt={current.title || "프로모션"}
-                  className="block h-auto w-auto max-w-[min(700px,calc(90vw-2rem))] object-contain"
+                  className="pointer-events-none block h-auto w-auto max-w-[min(700px,calc(90vw-2rem))] select-none object-contain"
                   style={{ maxHeight: imageMaxHeight }}
+                  draggable={false}
                 />
               </a>
             ) : (
