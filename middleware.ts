@@ -11,7 +11,7 @@ export default function middleware(req: NextRequest) {
     }
   }
 
-  if (process.env.NODE_ENV === "production" && host === "donggori.com") {
+  if (process.env.NODE_ENV === "production" && (host === "donggori.com" || host === "donggori.kr" || host === "www.donggori.kr")) {
     const url = new URL(req.url);
     url.hostname = "www.donggori.com";
     return NextResponse.redirect(url, 308);

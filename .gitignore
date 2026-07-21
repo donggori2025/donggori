@@ -33,3 +33,15 @@ next-env.d.ts
 .gstack/
 # 동고리_사진데이터 폴더 제외 해제
 public/동고리_사진데이터/
+
+# 업장 사진 추출 산출물 (대용량)
+동고리_업장사진_*/
+동고리_업장사진_*.zip
+동고리_업장목록_*.xlsx
+
+# 인수인계 계정 정보 (비밀번호 포함)
+docs/handover/08-계정-정보.md
+docs/handover/pdf/08-계정-정보.pdf
+docs/handover/**/08-계정-정보.pdf
+
+scripts/output/

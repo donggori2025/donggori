@@ -56,7 +56,7 @@ function getRedirectUri(provider: 'naver' | 'kakao'): string {
   }
 
   // 프로덕션 환경 - 환경 변수에서 가져오거나 기본값 사용
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://donggori.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.donggori.com';
   return `${baseUrl}/api/auth/${provider}/callback`;
 }
 

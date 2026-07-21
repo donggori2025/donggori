@@ -154,7 +154,7 @@ export default function MatchingPage() {
   // 로그인 상태 확인
   useEffect(() => {
     const checkLoginStatus = () => {
-      // Clerk 사용자 확인
+      // 로그인 사용자 확인
       if (user) {
         setIsLoggedIn(true);
         return;
