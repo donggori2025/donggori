@@ -83,7 +83,7 @@ function ChipGroup<T extends string>({
 
 export default function DesignRequestPage() {
   const router = useRouter();
-  const { user: clerkUser } = useAppAuth();
+  const { user: authUser } = useAppAuth();
   const [requesterType, setRequesterType] = useState<RequesterType>("기업");
   const [productType, setProductType] = useState<ProductType | "">("");
   const [productTypeDetail, setProductTypeDetail] = useState("");
@@ -136,7 +136,7 @@ export default function DesignRequestPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAppLoggedIn() && !clerkUser) {
+    if (!isAppLoggedIn() && !authUser) {
       alert("로그인 후 이용 가능합니다.");
       router.push("/sign-in?next=/design-request");
       return;
@@ -156,7 +156,7 @@ export default function DesignRequestPage() {
 
     setSubmitting(true);
     try {
-      const userIdentity = getAppUserIdentity(clerkUser);
+      const userIdentity = getAppUserIdentity(authUser);
       if (!userIdentity.id || !userIdentity.email) {
         alert("사용자 정보 확인에 실패했습니다. 다시 로그인 후 시도해주세요.");
         return;

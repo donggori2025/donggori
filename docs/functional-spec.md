@@ -8,8 +8,8 @@
 - **스타일**: Tailwind CSS, shadcn/ui 컴포넌트(`components/ui`)
 - **데이터**: PostgreSQL(+ Prisma), Supabase(클라이언트/스토리지)
 - **인증**:
-  - OAuth: 카카오, 네이버 (기존 라우트 유지: `app/api/auth/kakao`, `app/api/auth/naver` 등)
-  - 세션/유저관리: Clerk 기반 세션 미들웨어 + 커스텀 OAuth 연동 보조 (`lib/clerkConfig.ts`, `middleware.ts`)
+  - OAuth: 카카오, 네이버 (`app/api/auth/kakao/callback`, `app/api/auth/naver/callback`)
+  - 세션: 커스텀 쿠키 + Supabase `sessions` 테이블 (`contexts/AuthContext.tsx`, `lib/session.ts`)
 - **자원 저장**: Vercel Blob(이미지/문서 업로드) + Supabase Storage 선택 사용
 - **지도**: 네이버 지도 SDK (`components/NaverMap.tsx` 등)
 - **배포/환경**: Vercel 기준, `.env`로 환경변수 주입

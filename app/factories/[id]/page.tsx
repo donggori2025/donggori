@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
-// Clerk 제거 운영에 맞춰 로컬/쿠키/Supabase 기반 확인으로 전환
+// 커스텀 쿠키/Supabase 기반 로그인 확인
 import { Button } from "@/components/ui/button";
 import { Factory } from "@/lib/factories";
 import { Share, ArrowLeft, Check, MessageCircle, FileText } from "lucide-react";
@@ -38,7 +38,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const thumbnailRef = useRef<HTMLDivElement>(null);
   const majorItemsRef = useRef<HTMLParagraphElement | null>(null);
 
-  // 앱 레벨 로그인 감지 (Clerk 또는 커스텀 쿠키/스토리지)
+  // 앱 레벨 로그인 감지 (쿠키/스토리지)
   const isAppLoggedIn = () => {
     try {
       if (typeof document === 'undefined') return false;

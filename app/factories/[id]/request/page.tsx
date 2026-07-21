@@ -16,7 +16,7 @@ const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user: clerkUser } = useAppAuth();
+  const { user: authUser } = useAppAuth();
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -64,7 +64,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
   // 진입 시 로그인 강제 체크 (직접 URL 접근 포함)
   useEffect(() => {
-    const loggedIn = Boolean(clerkUser?.id) || isAppLoggedIn();
+    const loggedIn = Boolean(authUser?.id) || isAppLoggedIn();
     setAuthorized(loggedIn);
     setAuthChecked(true);
 
@@ -80,23 +80,23 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       }
       return;
     }
-  }, [clerkUser, factoryId, router]);
+  }, [authUser, factoryId, router]);
 
   // 로그인한 유저의 이름을 자동으로 입력
   useEffect(() => {
     if (!authorized) return;
 
     const nameFromUrl = searchParams.get("name");
-    const userIdentity = getAppUserIdentity(clerkUser);
+    const userIdentity = getAppUserIdentity(authUser);
     
     // 개발 환경에서만 디버깅 정보 출력
     if (process.env.NODE_ENV === 'development') {
       console.log('사용자 정보:', {
-        clerkUser: clerkUser ? {
-          id: clerkUser.id,
-          name: clerkUser.name,
-          email: clerkUser.email,
-          phone: clerkUser.phoneNumber
+        authUser: authUser ? {
+          id: authUser.id,
+          name: authUser.name,
+          email: authUser.email,
+          phone: authUser.phoneNumber
         } : null,
         userIdentity,
         nameFromUrl
@@ -117,7 +117,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     if (userIdentity.phone) {
       storage.set('userPhone', userIdentity.phone);
     }
-  }, [searchParams, authorized, clerkUser]);
+  }, [searchParams, authorized, authUser]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
@@ -360,7 +360,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
       // 서버 API 경유로 의뢰 데이터 저장 (RLS 회피 및 상세 오류 전달)
       try {
-        const loggedInUser = getAppUserIdentity(clerkUser);
+        const loggedInUser = getAppUserIdentity(authUser);
         
         if (process.env.NODE_ENV === 'development') {
           console.log('의뢰 제출 시 사용자 정보:', loggedInUser);
