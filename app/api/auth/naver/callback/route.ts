@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateRandomName } from '@/lib/randomNameGenerator';
 import { config } from '@/lib/config';
 import { createUser, createUserWithServiceRole, getUserByExternalId, getUserByEmail, linkSocialAccount } from '@/lib/userService';
+import { createSessionRecord } from '@/lib/session';
+import { SESSION_DURATIONS } from '@/lib/sessionConfig';
 
 export async function GET(request: NextRequest) {
   try {
@@ -149,24 +151,17 @@ export async function GET(request: NextRequest) {
     if (existingUser) {
       console.log('기존 네이버 사용자 로그인:', existingUser.email);
       
-      // 로그인 세션 생성 (초기화 완료 상태)
-      try {
-        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-          method: 'POST', 
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            email: existingUser.email, 
-            externalId: naverUser.id, 
-            provider: 'naver', 
-            isInitialized: true 
-          })
-        });
-      } catch (sessionError) {
-        console.error('세션 생성 실패:', sessionError);
-      }
-
       // 사용자 정보를 쿠키에 저장 (로그인 상태)
       const response = NextResponse.redirect(new URL('/', request.url));
+      const { token } = await createSessionRecord({
+        type: 'sns', userId: existingUser.id, userEmail: existingUser.email,
+        externalId: naverUser.id, provider: 'naver', isInitialized: true,
+        ttlSec: SESSION_DURATIONS.SOCIAL,
+      });
+      response.cookies.set('sns_access_token', token, {
+        httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax',
+        path: '/', maxAge: SESSION_DURATIONS.SOCIAL,
+      });
       response.cookies.set('naver_user', JSON.stringify({
         id: existingUser.id,
         email: existingUser.email,
@@ -206,15 +201,6 @@ export async function GET(request: NextRequest) {
       sameSite: 'lax',
       maxAge: 60 * 60 * 24,
     });
-
-    // snsAccessToken 발급 (초기화되지 않음)
-    try {
-      await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, externalId: naverUser.id, provider: 'naver', isInitialized: false })
-      });
-    } catch {}
 
     return response;
 

@@ -21,6 +21,13 @@ export async function POST(req: Request) {
       if (!parsed.hostname.includes("vercel-storage.com") && !parsed.hostname.includes("blob.")) {
         return NextResponse.json({ ok: false, error: "유효하지 않은 이미지 URL입니다." }, { status: 400 });
       }
+      if (auth.role === "factory") {
+        const pathname = decodeURIComponent(parsed.pathname);
+        const ownedPrefix = `/factories/${auth.userId}/`;
+        if (!pathname.includes(ownedPrefix)) {
+          return unauthorized("자신의 공장 이미지들만 삭제할 수 있습니다.");
+        }
+      }
     } catch {
       return NextResponse.json({ ok: false, error: "유효하지 않은 URL 형식입니다." }, { status: 400 });
     }
