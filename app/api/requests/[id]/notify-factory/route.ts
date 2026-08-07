@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { config } from "@/lib/config";
 import { sendAlimtalk, sendSMS } from "@/lib/messaging";
 import { getRequestAuth, unauthorized } from "@/lib/authHelpers";
+import { canAccessMatchRequest } from "@/lib/matchRequestAuth";
 
 export async function POST(
   req: NextRequest,
@@ -34,6 +35,9 @@ export async function POST(
         { ok: false, error: error?.message || "의뢰를 찾을 수 없습니다." },
         { status: 404 }
       );
+    }
+    if (!canAccessMatchRequest(auth, orderData)) {
+      return unauthorized("해당 의뢰에 알림을 보낼 권한이 없습니다.");
     }
 
     let factoryPhone = orderData.factory_phone || orderData.factory_contact || null;

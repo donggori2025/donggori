@@ -4,8 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader } from "lucide-react";
-import { checkEmailExists, checkSupabaseConnection } from '@/lib/userService';
-import { config, safeValidateOAuthConfig } from "@/lib/config";
+import { config } from "@/lib/config";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 function SignUpForm() {
@@ -174,23 +173,6 @@ function SignUpForm() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(cleanEmail)) return setError("올바른 이메일 형식이 아닙니다.");
     
-    // 이메일 중복 체크
-    try {
-      const exists = await checkEmailExists(cleanEmail);
-      if (exists) {
-        const msg = '이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.';
-        setError(msg);
-        if (typeof window !== 'undefined') alert(msg);
-        return;
-      }
-    } catch (e: any) {
-      // 중복 체크 실패 시에도 인증 요청을 막지는 않음
-      // 단, 명확한 오류 메시지가 있으면 표시
-      if (e?.message && !e.message.includes('PGRST116')) {
-        console.warn('이메일 중복 체크 실패:', e.message);
-      }
-    }
-    
     setLoading(true);
     try {
       const res = await fetch('/api/auth/email/request', {
@@ -230,11 +212,6 @@ function SignUpForm() {
     
     setLoading(true);
     try {
-      // Supabase 연결 상태 확인
-      const connectionCheck = await checkSupabaseConnection();
-      if (!connectionCheck.success) {
-        throw new Error(`데이터베이스 연결 오류: ${connectionCheck.error || '알 수 없는 오류'}`);
-      }
       // OAuth 사용자인 경우
       if (provider === 'kakao' || provider === 'naver') {
         const tempUserKey = provider === 'kakao' ? 'temp_kakao_user' : 'temp_naver_user';
@@ -245,16 +222,6 @@ function SignUpForm() {
         
         if (tempUserStr) {
           const tempUser = JSON.parse(decodeURIComponent(tempUserStr));
-          
-          // 이메일 중복 체크
-          const emailExists = await checkEmailExists(cleanEmail);
-          if (emailExists) {
-            const msg = '이미 등록된 이메일이라 해당 소셜로는 회원가입이 불가합니다. 메인으로 이동합니다.';
-            setError(msg);
-            if (typeof window !== 'undefined') alert(msg);
-            window.location.href = '/';
-            return;
-          }
           
           // 서버 API를 통해 사용자 저장 (개인정보/비밀번호 처리 서버 전용)
           const signupRes = await fetch('/api/auth/signup', {
@@ -280,6 +247,7 @@ function SignUpForm() {
           
           // OAuth 사용자 정보를 쿠키에 저장
           const userData = {
+            id: newUser.id,
             email: newUser.email,
             name: newUser.name,
             phoneNumber: newUser.phoneNumber,
@@ -313,13 +281,6 @@ function SignUpForm() {
       if (!password) return setError("비밀번호를 입력해주세요.");
       if (password.length < 6) return setError("비밀번호는 6자 이상이어야 합니다.");
       if (password !== passwordConfirm) return setError("비밀번호가 일치하지 않습니다.");
-      
-      // 이메일 중복 체크
-      const emailExists = await checkEmailExists(cleanEmail);
-      if (emailExists) {
-        setError('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인해주세요.');
-        return;
-      }
       
       // 서버 API를 통해 사용자 저장 (비밀번호 해시는 서버에서 처리)
       const signupRes = await fetch('/api/auth/signup', {
@@ -676,4 +637,4 @@ export default function SignUpPage() {
       <SignUpForm />
     </Suspense>
   );
-} 
+}
