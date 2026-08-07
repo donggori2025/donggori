@@ -500,6 +500,15 @@ export const factories: Factory[] = factoriesRaw.map((f, idx) => ({
   images: getRandomImages(idx),
 }));
 
+/**
+ * 지역 필터 칩으로 노출할 수 있는 행정동인지 판단한다.
+ * 주소를 확인하지 못한 업장은 admin_district에 "확인 불가" 같은 값이 들어 있어 칩에서 제외한다.
+ */
+export function isSelectableRegion(region: string | undefined | null): boolean {
+  const value = String(region ?? "").trim();
+  return value.endsWith("동") && value !== "용신동";
+}
+
 // Supabase에서 봉제공장 데이터를 가져오는 함수
 export async function fetchFactoriesFromDB(): Promise<Factory[]> {
   try {
