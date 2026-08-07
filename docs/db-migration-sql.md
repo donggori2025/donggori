@@ -21,9 +21,14 @@ create table if not exists public.email_otps (
   purpose text not null,
   expires_at timestamptz not null,
   consumed_at timestamptz,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  verify_attempts integer not null default 0
 );
 create index if not exists idx_email_otps_email on public.email_otps(email);
+
+-- 기존 email_otps 에 컬럼만 추가할 때
+alter table public.email_otps
+  add column if not exists verify_attempts integer not null default 0;
 
 -- 메시지 로그 테이블
 create table if not exists public.message_logs (
