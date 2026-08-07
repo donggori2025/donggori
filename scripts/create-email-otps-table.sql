@@ -9,8 +9,13 @@ CREATE TABLE IF NOT EXISTS public.email_otps (
   purpose TEXT NOT NULL CHECK (purpose IN ('signup', 'login', 'reset')),
   expires_at TIMESTAMPTZ NOT NULL,
   consumed_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  verify_attempts INTEGER NOT NULL DEFAULT 0
 );
+
+-- 기존 테이블에 컬럼만 추가할 때
+ALTER TABLE public.email_otps
+  ADD COLUMN IF NOT EXISTS verify_attempts INTEGER NOT NULL DEFAULT 0;
 
 -- 이메일 인덱스 생성 (성능 최적화)
 CREATE INDEX IF NOT EXISTS idx_email_otps_email ON public.email_otps(email);

@@ -19,8 +19,7 @@ export async function getRequestAuth(req?: NextRequest): Promise<AuthResult> {
       return { authenticated: true, role: "admin" };
     }
 
-    // 동고리 세션 토큰은 JWT가 아니라 sessions 테이블에 저장되는 임의 토큰(UUID 등)입니다.
-    // 쿠키에서 토큰을 읽어 DB에서 유효성 검증을 수행합니다.
+    // access_token 은 HMAC 서명 토큰(v1.*)이며, 구형 DB 세션 토큰도 호환 검증한다.
     const accessToken = cookieStore.get("access_token")?.value;
     if (accessToken) {
       const { valid, data } = await verifySessionToken(accessToken);

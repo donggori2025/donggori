@@ -38,6 +38,7 @@ export async function requestEmailOtp(email: string, purpose: OtpPurpose) {
     }
   }
 
+  // email_otps 실제 컬럼만 사용 (verify_attempts 등은 마이그레이션 전 환경에 없음)
   const { error } = await supabaseServer.from("email_otps").insert([
     {
       email,
@@ -45,7 +46,6 @@ export async function requestEmailOtp(email: string, purpose: OtpPurpose) {
       purpose,
       expires_at: expiresAt,
       created_at: new Date().toISOString(),
-      verify_attempts: 0,
     },
   ]);
   if (error) {
@@ -88,16 +88,6 @@ export async function verifyEmailOtp(email: string, code: string, purpose: OtpPu
   const record = data?.[0];
   if (!record) throw new Error("인증 요청을 찾을 수 없습니다.");
 
-  const attempts = (record.verify_attempts || 0) + 1;
-  await supabaseServer
-    .from("email_otps")
-    .update({ verify_attempts: attempts })
-    .eq("id", record.id);
-
-  if (attempts > MAX_VERIFY_ATTEMPTS) {
-    throw new Error("인증 시도 횟수를 초과했습니다. 새로운 인증 코드를 요청해주세요.");
-  }
-
   if (record.consumed_at) {
     throw new Error("이미 사용된 인증 코드입니다.");
   }
@@ -106,10 +96,30 @@ export async function verifyEmailOtp(email: string, code: string, purpose: OtpPu
     throw new Error("인증 코드가 만료되었습니다.");
   }
 
+  // verify_attempts 컬럼이 있으면 사용, 없으면 무시하고 검증만 진행
+  const currentAttempts = Number(record.verify_attempts ?? 0);
+  if (currentAttempts >= MAX_VERIFY_ATTEMPTS) {
+    throw new Error("인증 시도 횟수를 초과했습니다. 새로운 인증 코드를 요청해주세요.");
+  }
+
   const codeMatch =
+    typeof record.code === "string" &&
     code.length === record.code.length &&
     crypto.timingSafeEqual(Buffer.from(code), Buffer.from(record.code));
+
   if (!codeMatch) {
+    const nextAttempts = currentAttempts + 1;
+    const { error: attemptError } = await supabaseServer
+      .from("email_otps")
+      .update({ verify_attempts: nextAttempts })
+      .eq("id", record.id);
+    // 컬럼이 없는 환경에서는 업데이트 실패를 무시한다.
+    if (attemptError && !/verify_attempts|schema cache/i.test(attemptError.message)) {
+      console.warn("[emailOtp] verify_attempts update skipped:", attemptError.message);
+    }
+    if (nextAttempts >= MAX_VERIFY_ATTEMPTS) {
+      throw new Error("인증 시도 횟수를 초과했습니다. 새로운 인증 코드를 요청해주세요.");
+    }
     throw new Error("인증 코드가 올바르지 않습니다.");
   }
 
