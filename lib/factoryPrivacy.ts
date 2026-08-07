@@ -7,8 +7,6 @@ export const PUBLIC_FACTORY_SELECT = [
   "company_name",
   "admin_district",
   "intro",
-  "intro_text",
-  "description",
   "factory_type",
   "business_type",
   "main_fabrics",
@@ -36,7 +34,6 @@ export const PUBLIC_FACTORY_SELECT = [
   "brands_supplied",
   "established_year",
   "employees",
-  "processes",
   "image",
 ].join(",");
 
