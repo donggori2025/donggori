@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import FooterWrapper from "@/components/FooterWrapper";
 import GlobalPopups from "@/components/GlobalPopups";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Analytics } from "@vercel/analytics/react";
@@ -40,7 +40,7 @@ export default function RootLayout({
           <main className="w-full flex-1">
             {children}
           </main>
-          <Footer />
+          <FooterWrapper />
         </AuthProvider>
         <Analytics />
       </body>

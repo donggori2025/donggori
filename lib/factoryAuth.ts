@@ -315,34 +315,23 @@ export async function getFactoryImages(factoryId: string): Promise<string[]> {
     const { data, error } = await supabase
       .from('donggori')
       .select('image, company_name, name')
-      .eq('id', parseInt(factoryId)) // factoryId를 숫자로 변환
-      .single();
+      .eq('id', parseInt(factoryId))
+      .maybeSingle();
 
     if (error) {
-      console.error('공장 이미지 조회 중 오류:', {
-        factoryId,
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-        fullError: error
-      });
-      return [];
+      console.warn('공장 이미지 조회 중 오류:', error.message || error);
     }
 
-    // DB 대표 이미지
-    const primary = data?.image ? [data.image as string] : [];
-    // 프리셋 이미지(공장명 기반) 병합
     const factoryName = (data?.company_name || data?.name || getRealFactoryName(factoryId)) as string;
+    const primary = data?.image ? [data.image as string] : [];
     const preset = factoryName ? getPresetImagesByName(factoryName) : [];
-    // 중복 제거
-    const merged = Array.from(new Set([...
-      primary,
-      ...preset
-    ].filter(Boolean)));
+    const merged = Array.from(new Set([...primary, ...preset].filter(Boolean)));
 
-    console.log('공장 이미지 조회 성공:', { factoryId, primary, presetCount: preset.length });
-    return merged;
+    if (merged.length > 0) {
+      return merged;
+    }
+
+    return preset.length > 0 ? preset : [];
   } catch (error) {
     console.error('공장 이미지 조회 중 예외 발생:', {
       factoryId,

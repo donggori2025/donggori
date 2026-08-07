@@ -930,7 +930,7 @@ type ScoredFactory = Factory & { score: number };
                         alert('로그인 후 이용 가능합니다.');
                         return;
                       }
-                      router.push(`/factories/${f.id}`);
+                      router.push(`/factories/${f.id}/request`);
                     }}
                   >
                     의뢰하기

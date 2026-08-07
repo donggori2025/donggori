@@ -63,6 +63,7 @@ function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [socialLoading, setSocialLoading] = useState<null | 'kakao' | 'naver'>(null);
   const cookieSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+  const isDev = process.env.NODE_ENV === "development";
   
   // 이메일 인증 로그인 관련 상태 (제거)
 
@@ -164,7 +165,16 @@ function SignInForm() {
           localStorage.setItem('factoryAuth', JSON.stringify(factoryAuth));
         } catch {}
 
-        window.location.href = '/';
+        try {
+          await fetch('/api/factory/login', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: cleanId, password: cleanPw }),
+          });
+        } catch {}
+
+        window.location.href = '/factory-my-page/work-orders';
         return;
       }
 
@@ -198,6 +208,54 @@ function SignInForm() {
     } catch (err: unknown) {
       console.error('로그인 오류:', err);
       setError(err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDevLogin = async (role: "user" | "factory" | "admin") => {
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/dev-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ role }),
+      });
+      const js = await res.json();
+      if (!res.ok || !js.success) {
+        setError(js.error || "개발 로그인에 실패했습니다.");
+        return;
+      }
+
+      if (role === "user" && js.user) {
+        localStorage.setItem("userType", "user");
+        localStorage.setItem("userId", js.user.id || "");
+        localStorage.setItem("userEmail", js.user.email || "");
+        localStorage.setItem("userName", js.user.name || "");
+        localStorage.setItem("userPhone", js.user.phoneNumber || "");
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.removeItem("factoryAuth");
+      }
+
+      if (role === "factory" && js.factory) {
+        localStorage.setItem("userType", "factory");
+        localStorage.setItem(
+          "factoryAuth",
+          JSON.stringify({
+            factoryId: js.factory.factoryId,
+            factoryName: js.factory.factoryName,
+          })
+        );
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userName");
+      }
+
+      window.location.href = js.redirectTo || "/";
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "개발 로그인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -303,6 +361,41 @@ function SignInForm() {
         <div className="text-center text-sm text-gray-600 mt-3">
           {socialLoading === 'kakao' && '카카오로 이동 중입니다...'}
           {socialLoading === 'naver' && '네이버로 이동 중입니다...'}
+        </div>
+      )}
+
+      {isDev && (
+        <div className="mt-6 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4">
+          <div className="mb-3 text-sm font-semibold text-gray-700">개발용 빠른 로그인</div>
+          <div className="grid gap-2">
+            <button
+              type="button"
+              onClick={() => handleDevLogin("user")}
+              disabled={loading}
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-100 disabled:opacity-50"
+            >
+              일반 사용자로 로그인
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDevLogin("factory")}
+              disabled={loading}
+              className="w-full rounded-lg border border-gray-400 bg-gray-200 px-4 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-300 disabled:opacity-50"
+            >
+              공장 사장님으로 로그인
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDevLogin("admin")}
+              disabled={loading}
+              className="w-full rounded-lg bg-gray-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-900 disabled:opacity-50"
+            >
+              관리자로 로그인
+            </button>
+          </div>
+          <p className="mt-3 text-xs text-gray-500">
+            로컬 개발 환경에서만 표시됩니다.
+          </p>
         </div>
       )}
     </div>

@@ -7,6 +7,18 @@ const nextConfig: NextConfig = {
       {
         pathname: '/api/factory-images/url',
       },
+      {
+        pathname: '/logo_donggori.svg',
+      },
+      {
+        pathname: '/logo_donggori.png',
+      },
+      {
+        pathname: '/popups/**',
+      },
+      {
+        pathname: '/**',
+      },
     ],
     remotePatterns: [
       {

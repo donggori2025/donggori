@@ -9,6 +9,7 @@ import { useAppAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { isAppLoggedIn, getAppUserIdentity, storage } from "@/lib/utils";
+import { createWorkOrder } from "@/lib/workOrders";
 import type { RequestFormData } from "@/lib/types";
 
 const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
@@ -427,11 +428,48 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           }
         }
 
-        // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
-        await copyToClipboardAndOpenKakao(uploadedFileUrls);
-        
-        // 팝업이 뜬 후 제출 상태 해제
-        setSubmitting(false);
+        const requestSummary = generateRequestText(uploadedFileUrls);
+        try {
+          const workOrder = await createWorkOrder({
+            match_request_id: newId,
+            user_id: loggedInUser.id || undefined,
+            user_email: loggedInUser.email || payload.user_email,
+            user_name: formData.name,
+            factory_id: String(factoryId),
+            factory_name: factoryName,
+            title: `${factoryName} 작업지시서`,
+            description: [formData.detailDescription, formData.detailRequest].filter(Boolean).join("\n\n"),
+            work_order_json: {
+              요청구분: "의뢰하기",
+              브랜드: formData.brandName || "미입력",
+              담당자: formData.name,
+              연락처: formData.contact,
+              샘플: formData.sample,
+              패턴: formData.pattern,
+              QC: formData.qc,
+              시아게: formData.finishing,
+              포장: formData.packaging,
+              상세설명: formData.detailDescription,
+              요청사항: formData.detailRequest,
+              첨부파일: uploadedFileUrls,
+              링크: formData.links,
+              의뢰일: new Date().toLocaleDateString("ko-KR"),
+            },
+            amount: 0,
+            initial_message: requestSummary,
+          });
+
+          setSubmitting(false);
+          router.push(`/my-page/work-orders/${workOrder.id}`);
+          return;
+        } catch (workOrderError) {
+          setSubmitting(false);
+          const message =
+            workOrderError instanceof Error ? workOrderError.message : "거래 채팅을 열 수 없습니다.";
+          alert(message);
+          router.push("/my-page/work-orders");
+          return;
+        }
       } catch (dbError: unknown) {
         const error = dbError as Error;
         if (process.env.NODE_ENV === 'development') {

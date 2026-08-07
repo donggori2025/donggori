@@ -36,27 +36,38 @@ function openPopupLink(url: string) {
   }
 }
 
+const POPUP_DISMISSED_SESSION_KEY = "popup_dismissed_session";
+
+function getTodayHiddenKey() {
+  const d = new Date();
+  return `popup_hidden_${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function isPopupSuppressed(): boolean {
+  if (typeof window === "undefined") return true;
+  if (window.location.pathname.startsWith("/admin")) return true;
+  if (window.sessionStorage.getItem(POPUP_DISMISSED_SESSION_KEY) === "1") return true;
+  if (window.localStorage.getItem(getTodayHiddenKey()) === "1") return true;
+  return false;
+}
+
+function dismissPopupForSession() {
+  if (typeof window !== "undefined") {
+    window.sessionStorage.setItem(POPUP_DISMISSED_SESSION_KEY, "1");
+  }
+}
+
 export default function GlobalPopups() {
   const [items, setItems] = useState<PopupItem[]>([]);
   const [index, setIndex] = useState(0);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const isMobile = useIsMobile();
 
-  const cookieKey = useMemo(() => {
-    const d = new Date();
-    const ymd = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    return `popup_hidden_${ymd}`;
-  }, []);
+  const cookieKey = useMemo(() => getTodayHiddenKey(), []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
-      setOpen(false);
-      return;
-    }
-
-    const hidden = typeof window !== 'undefined' ? window.localStorage.getItem(cookieKey) : null;
-    if (hidden === '1') {
+    if (isPopupSuppressed()) {
       setOpen(false);
       return;
     }
@@ -64,12 +75,12 @@ export default function GlobalPopups() {
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch('/api/popups');
+        const res = await fetch("/api/popups");
         const json = await res.json();
         const apiItems = res.ok && json.success ? ((json.data || []) as PopupItem[]) : [];
         const visible = apiItems.filter((item) => item?.id && (item.image_url || item.title || item.content));
         setItems(visible);
-        setOpen(visible.length > 0);
+        setOpen(!isPopupSuppressed() && visible.length > 0);
       } catch {
         setItems([]);
         setOpen(false);
@@ -81,14 +92,22 @@ export default function GlobalPopups() {
   }, [cookieKey]);
 
   useEffect(() => {
-    if (open && items.length > 0) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    if (!open || items.length === 0) return;
+
+    const html = document.documentElement;
+    const body = document.body;
+    const previousHtmlOverflow = html.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyTouchAction = body.style.touchAction;
+
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.touchAction = "none";
 
     return () => {
-      document.body.style.overflow = 'unset';
+      html.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
+      body.style.touchAction = previousBodyTouchAction;
     };
   }, [open, items.length]);
 
@@ -103,22 +122,38 @@ export default function GlobalPopups() {
     : "calc(90vh - 5.5rem)";
 
   const closeForToday = (remember: boolean) => {
-    if (remember && typeof window !== 'undefined') {
-      window.localStorage.setItem(cookieKey, '1');
+    dismissPopupForSession();
+    if (remember && typeof window !== "undefined") {
+      window.localStorage.setItem(cookieKey, "1");
     }
     setOpen(false);
   };
 
   const handleLinkClick = (url: string) => {
+    dismissPopupForSession();
     setOpen(false);
     openPopupLink(url);
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/40 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="공지 팝업"
+      onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) e.preventDefault();
+      }}
+      onTouchStart={(e) => {
+        if (e.target === e.currentTarget) e.preventDefault();
+      }}
+    >
       <div
         className="relative flex w-full max-w-[min(700px,90vw)] max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
       >
         <button 
           className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/20 text-white transition-colors hover:bg-black/30"

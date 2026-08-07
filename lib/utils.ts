@@ -146,6 +146,35 @@ export const cookies = {
 };
 
 /**
+ * 쿠키에 저장된 JSON 값을 파싱합니다.
+ * plain JSON / URI 인코딩 / 이중 인코딩 모두 처리합니다.
+ */
+export function parseCookieJson<T = Record<string, unknown>>(value: string): T | null {
+  let current = value.trim();
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const parsed = JSON.parse(current);
+      if (parsed && typeof parsed === "object") {
+        return parsed as T;
+      }
+      return null;
+    } catch {
+      if (!current.includes("%")) return null;
+      try {
+        const decoded = decodeURIComponent(current);
+        if (decoded === current) return null;
+        current = decoded;
+      } catch {
+        return null;
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
  * 사용자 인증 관련 유틸리티
  */
 export interface UserIdentity {
@@ -169,38 +198,20 @@ export function isAppLoggedIn(): boolean {
     // 소셜 로그인 쿠키 확인
     const kakaoUser = cookies.get('kakao_user');
     if (kakaoUser) {
-      try {
-        const user = JSON.parse(decodeURIComponent(kakaoUser));
-        if (user && user.id && user.email) return true;
-      } catch (e) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('카카오 사용자 쿠키 파싱 오류:', e);
-        }
-      }
+      const user = parseCookieJson<{ id?: string; email?: string }>(kakaoUser);
+      if (user?.id && user?.email) return true;
     }
     
     const naverUser = cookies.get('naver_user');
     if (naverUser) {
-      try {
-        const user = JSON.parse(decodeURIComponent(naverUser));
-        if (user && user.id && user.email) return true;
-      } catch (e) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('네이버 사용자 쿠키 파싱 오류:', e);
-        }
-      }
+      const user = parseCookieJson<{ id?: string; email?: string }>(naverUser);
+      if (user?.id && user?.email) return true;
     }
     
     const factoryUser = cookies.get('factory_user');
     if (factoryUser) {
-      try {
-        const user = JSON.parse(decodeURIComponent(factoryUser));
-        if (user && user.id) return true;
-      } catch (e) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('팩토리 사용자 쿠키 파싱 오류:', e);
-        }
-      }
+      const user = parseCookieJson<{ id?: string }>(factoryUser);
+      if (user?.id) return true;
     }
     
   } catch (error) {
@@ -231,40 +242,28 @@ export function getAppUserIdentity(appUser?: any): UserIdentity {
     // 카카오 사용자 정보 확인
     const kakao = cookies.get('kakao_user');
     if (kakao) {
-      try {
-        const u = JSON.parse(decodeURIComponent(kakao));
-        if (u && u.id && u.email) {
-          return { 
-            name: u.name || name, 
-            phone: u.phoneNumber || phone,
-            id: u.id,
-            email: u.email
-          };
-        }
-      } catch (e) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('카카오 사용자 정보 파싱 오류:', e);
-        }
+      const u = parseCookieJson<{ id?: string; email?: string; name?: string; phoneNumber?: string }>(kakao);
+      if (u?.id && u?.email) {
+        return { 
+          name: u.name || name, 
+          phone: u.phoneNumber || phone,
+          id: u.id,
+          email: u.email
+        };
       }
     }
     
     // 네이버 사용자 정보 확인 (우선순위 3)
     const naver = cookies.get('naver_user');
     if (naver) {
-      try {
-        const u = JSON.parse(decodeURIComponent(naver));
-        if (u && u.id && u.email) {
-          return { 
-            name: u.name || name, 
-            phone: u.phoneNumber || phone,
-            id: u.id,
-            email: u.email
-          };
-        }
-      } catch (e) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('네이버 사용자 정보 파싱 오류:', e);
-        }
+      const u = parseCookieJson<{ id?: string; email?: string; name?: string; phoneNumber?: string }>(naver);
+      if (u?.id && u?.email) {
+        return { 
+          name: u.name || name, 
+          phone: u.phoneNumber || phone,
+          id: u.id,
+          email: u.email
+        };
       }
     }
     

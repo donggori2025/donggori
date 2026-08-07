@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { parseCookieJson } from "@/lib/utils";
 
 export interface AppUser {
   id: string;
@@ -46,7 +47,7 @@ function loadUserFromSources(): AppUser | null {
   try {
     const kakao = getCookie("kakao_user");
     if (kakao) {
-      const u = JSON.parse(decodeURIComponent(kakao));
+      const u = parseCookieJson<{ id?: string; email?: string; name?: string; phoneNumber?: string; profileImage?: string }>(kakao);
       if (u?.id && u?.email) {
         return {
           id: u.id,
@@ -63,7 +64,7 @@ function loadUserFromSources(): AppUser | null {
   try {
     const naver = getCookie("naver_user");
     if (naver) {
-      const u = JSON.parse(decodeURIComponent(naver));
+      const u = parseCookieJson<{ id?: string; email?: string; name?: string; phoneNumber?: string; profileImage?: string }>(naver);
       if (u?.id && u?.email) {
         return {
           id: u.id,

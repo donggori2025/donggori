@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAppAuth } from "@/contexts/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
 import { getFactoryProfileImage } from "@/lib/factoryAuth";
-import { storage } from "@/lib/utils";
+import { storage, parseCookieJson } from "@/lib/utils";
 import type { FactoryAuth } from "@/lib/types";
 import { Sparkles } from "lucide-react";
 
@@ -15,8 +15,8 @@ type NavItem = NavLinkItem;
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user: authUser, isSignedIn, isLoaded } = useAppAuth();
-  const router = useRouter();
   const pathname = usePathname();
+  const router = useRouter();
   const [userType, setUserType] = useState<string | null>(null);
   const [factoryAuth, setFactoryAuth] = useState<FactoryAuth | null>(null);
   const [factoryProfileImage, setFactoryProfileImage] = useState<string | null>(null);
@@ -90,24 +90,20 @@ export default function Header() {
 
       const naverUserCookie = getCookie('naver_user');
       if (naverUserCookie) {
-        try {
-          const userData = JSON.parse(decodeURIComponent(naverUserCookie));
+        const userData = parseCookieJson(naverUserCookie);
+        if (userData) {
           setNaverUser(userData);
           console.log('네이버 사용자 정보 로드:', userData);
-        } catch (error) {
-          console.error('네이버 사용자 정보 파싱 오류:', error);
         }
       }
 
       // 카카오 사용자 정보 로드
       const kakaoUserCookie = getCookie('kakao_user');
       if (kakaoUserCookie) {
-        try {
-          const userData = JSON.parse(decodeURIComponent(kakaoUserCookie));
+        const userData = parseCookieJson(kakaoUserCookie);
+        if (userData) {
           setKakaoUser(userData);
           console.log('카카오 사용자 정보 로드:', userData);
-        } catch (error) {
-          console.error('카카오 사용자 정보 파싱 오류:', error);
         }
       }
     } catch (error) {
@@ -139,6 +135,11 @@ export default function Header() {
     : `w-full bg-white border-b px-4 sm:px-6 ${positionClass} z-[9999] transition-colors duration-300`;
   const navTextClass = isTransparentMode ? "text-white" : "text-[#222222]";
   const navHoverClass = isTransparentMode ? "hover:text-white/90" : "hover:text-[#222222]";
+
+  if (pathname.startsWith("/factory-my-page")) {
+    return null;
+  }
+
   const logoClass = isTransparentMode
     ? "w-24 sm:w-28 md:w-[113px] h-auto min-h-[32px] brightness-0 invert"
     : "w-24 sm:w-28 md:w-[113px] h-auto min-h-[32px]";
@@ -291,7 +292,7 @@ export default function Header() {
             {isSignedIn && authUser && !naverUser && !kakaoUser && userType !== "factory" && (
               <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
                 <Image
-                  src={authUser.profileImage || "/logo_donggori.png"}
+                  src={authUser.profileImage || "/logo_donggori.svg"}
                   alt="프로필 이미지"
                   width={40}
                   height={40}
@@ -304,7 +305,7 @@ export default function Header() {
             {naverUser && (
               <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
                 <Image
-                  src={naverUser.profileImage || "/logo_donggori.png"}
+                  src={naverUser.profileImage || "/logo_donggori.svg"}
                   alt="네이버 프로필 이미지"
                   width={40}
                   height={40}
@@ -317,7 +318,7 @@ export default function Header() {
             {kakaoUser && (
               <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
                 <img
-                  src={kakaoUser.profileImage || "/logo_donggori.png"}
+                  src={kakaoUser.profileImage || "/logo_donggori.svg"}
                   alt="카카오 프로필 이미지"
                   className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
                 />
@@ -328,7 +329,7 @@ export default function Header() {
             {userType === 'factory' && factoryAuth && (
               <Link href="/factory-my-page" className="flex items-center" aria-label="공장 마이페이지로 이동">
                 <Image
-                  src={factoryProfileImage || "/logo_donggori.png"}
+                  src={factoryProfileImage || "/logo_donggori.svg"}
                   alt="공장 프로필 이미지"
                   width={40}
                   height={40}
@@ -407,7 +408,7 @@ export default function Header() {
                   {isSignedIn && authUser && !naverUser && !kakaoUser && userType !== "factory" && (
                     <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
                       <Image
-                        src={authUser.profileImage || "/logo_donggori.png"}
+                        src={authUser.profileImage || "/logo_donggori.svg"}
                         alt="프로필 이미지"
                         width={40}
                         height={40}
@@ -421,7 +422,7 @@ export default function Header() {
                   {naverUser && (
                     <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
                       <Image
-                        src={naverUser.profileImage || "/logo_donggori.png"}
+                        src={naverUser.profileImage || "/logo_donggori.svg"}
                         alt="네이버 프로필 이미지"
                         width={40}
                         height={40}
@@ -435,7 +436,7 @@ export default function Header() {
                   {kakaoUser && (
                     <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
                       <img
-                        src={kakaoUser.profileImage || "/logo_donggori.png"}
+                        src={kakaoUser.profileImage || "/logo_donggori.svg"}
                         alt="카카오 프로필 이미지"
                         className="w-8 h-8 rounded-full object-cover border border-gray-200"
                       />
@@ -447,7 +448,7 @@ export default function Header() {
                   {userType === 'factory' && factoryAuth && (
                     <Link href="/factory-my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
                       <Image
-                        src={factoryProfileImage || "/logo_donggori.png"}
+                        src={factoryProfileImage || "/logo_donggori.svg"}
                         alt="공장 프로필 이미지"
                         width={40}
                         height={40}

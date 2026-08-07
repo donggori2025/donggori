@@ -8,6 +8,7 @@ import { MatchRequest } from "@/lib/matchRequests";
 import { Factory } from "@/lib/factories";
 import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
 import { validateName } from "@/lib/randomNameGenerator";
+import { parseCookieJson } from "@/lib/utils";
 import { Loader } from "lucide-react";
 
 const SIDEBAR_MENUS = ["프로필", "문의내역", "의뢰내역"] as const;
@@ -173,23 +174,19 @@ export default function MyPage() {
 
     const naverUserCookie = getCookie('naver_user');
     if (naverUserCookie) {
-      try {
-        const userData = JSON.parse(decodeURIComponent(naverUserCookie));
+      const userData = parseCookieJson(naverUserCookie);
+      if (userData) {
         setNaverUser(userData);
         console.log('마이페이지에서 네이버 사용자 정보 로드:', userData);
-      } catch (error) {
-        console.error('네이버 사용자 정보 파싱 오류:', error);
       }
     }
 
     const kakaoUserCookie = getCookie('kakao_user');
     if (kakaoUserCookie) {
-      try {
-        const userData = JSON.parse(decodeURIComponent(kakaoUserCookie));
+      const userData = parseCookieJson(kakaoUserCookie);
+      if (userData) {
         setKakaoUser(userData);
         console.log('마이페이지에서 카카오 사용자 정보 로드:', userData);
-      } catch (error) {
-        console.error('카카오 사용자 정보 파싱 오류:', error);
       }
     }
   }, []);
@@ -987,7 +984,13 @@ export default function MyPage() {
 
           {selectedMenu === "의뢰내역" && (
             <div>
-              <h2 className="text-2xl font-bold mb-8">의뢰내역</h2>
+              <h2 className="text-2xl font-bold mb-4">의뢰내역</h2>
+              <a
+                href="/my-page/work-orders"
+                className="mb-8 inline-flex rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+              >
+                거래 내역 (채팅·결제) 보기
+              </a>
               {isLoadingRequests ? (
                 <div className="text-center py-20 text-gray-400 text-lg">의뢰내역을 불러오는 중...</div>
               ) : requestError ? (

@@ -6,6 +6,8 @@ import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 // - md 이상에서는 기존 nav 메뉴가 그대로 노출됩니다.
 // - 스타일은 Tailwind CSS를 사용합니다.
 
+const SUPPORT_EMAIL = "donggori2025@gmail.com";
+
 const Footer = () => {
   // 메뉴 항목(왼쪽/오른쪽 메뉴)
   const leftMenu = [
@@ -15,8 +17,8 @@ const Footer = () => {
     { href: "/notices", label: "공지사항" },
   ];
   const rightMenu = [
-    { href: "#", label: "고객센터" },
-    { href: "#", label: "제휴문의" },
+    { href: `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("고객센터 문의")}`, label: "고객센터" },
+    { href: `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("제휴 문의")}`, label: "제휴문의" },
     { href: "/terms/service", label: "이용약관" },
     { href: "/terms/privacy", label: "개인정보처리방침" },
   ];

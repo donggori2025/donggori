@@ -17,6 +17,18 @@ export default function middleware(req: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
+  const userType = req.cookies.get("userType")?.value;
+  const isFactoryArea = pathname.startsWith("/factory-my-page");
+  const isAllowedForFactory =
+    isFactoryArea ||
+    pathname.startsWith("/sign-in") ||
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/_next");
+
+  if (userType === "factory" && !isAllowedForFactory) {
+    return NextResponse.redirect(new URL("/factory-my-page/work-orders", req.url));
+  }
+
   return NextResponse.next();
 }
 
