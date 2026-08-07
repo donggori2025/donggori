@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowPathIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { List, Map as MapIcon, Search, SlidersHorizontal, Sparkles } from "lucide-react";
-import { factories, fetchFactoriesFromDB, type Factory } from "@/lib/factories";
+import { factories, fetchFactoriesFromDB, isSelectableRegion, type Factory } from "@/lib/factories";
 import { testSupabaseConnection } from "@/lib/supabaseClient";
 import { FACTORY_TYPES, MAIN_FABRICS } from "@/lib/types";
 // import dynamic from "next/dynamic";
@@ -175,6 +175,10 @@ export default function FactoriesPage() {
     if (key === 'main_fabrics') {
       const values = factoriesData.flatMap(f => (f.main_fabrics ? String(f.main_fabrics).split(',').map((v: string) => v.trim()) : []));
       return Array.from(new Set(values.filter((v): v is string => typeof v === 'string' && Boolean(v))));
+    }
+    if (key === 'admin_district') {
+      const values = factoriesData.flatMap(f => (typeof f.admin_district === 'string' ? [f.admin_district.trim()] : []));
+      return Array.from(new Set(values.filter(isSelectableRegion)));
     }
     const values = factoriesData.map(f => f[key]);
     // 항상 배열 반환 보장
