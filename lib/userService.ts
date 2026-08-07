@@ -186,7 +186,7 @@ export async function createUserWithServiceRole(userData: CreateUserData): Promi
 // 이메일로 사용자 조회
 export async function getUserByEmail(email: string): Promise<User | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getServiceSupabase()
       .from('users')
       .select('*')
       .eq('email', email)
@@ -228,7 +228,7 @@ export async function getUserByPhoneNumber(phoneNumber: string): Promise<User | 
 // 외부 ID로 사용자 조회 (소셜 로그인용)
 export async function getUserByExternalId(externalId: string, signupMethod: string): Promise<User | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getServiceSupabase()
       .from('users')
       .select('*')
       .eq('externalId', externalId)
@@ -272,7 +272,7 @@ export async function updateUser(userId: string, updates: Partial<User>): Promis
 // 소셜 로그인 연동 정보 업데이트 (중복 회원가입 방지용)
 export async function linkSocialAccount(userId: string, externalId: string, signupMethod: string): Promise<User> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getServiceSupabase()
       .from('users')
       .update({
         externalId,
