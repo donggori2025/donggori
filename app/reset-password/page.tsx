@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
-import { requestEmailOtp, verifyEmailOtp } from "@/lib/emailOtp";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -60,23 +59,13 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setError("");
     try {
-      // 먼저 사용자 정보를 확인하여 소셜 로그인 사용자인지 체크
-      const userCheckRes = await fetch('/api/auth/check-user-type', {
+      const response = await fetch('/api/auth/email/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, purpose: 'reset' }),
       });
-      
-      if (userCheckRes.ok) {
-        const userData = await userCheckRes.json();
-        if (userData.isSocialUser) {
-          setError(`${userData.signupMethod === 'kakao' ? '카카오' : userData.signupMethod === 'naver' ? '네이버' : '소셜'}로 가입된 계정입니다. 소셜 로그인을 이용해주세요.`);
-          setLoading(false);
-          return;
-        }
-      }
-
-      await requestEmailOtp(email, 'reset');
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || '인증번호 발송에 실패했습니다.');
       setStep('verify');
       startTimer();
     } catch (err: any) {
@@ -97,7 +86,13 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setError("");
     try {
-      await verifyEmailOtp(email, verificationCode, 'reset');
+      const response = await fetch('/api/auth/email/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: verificationCode, purpose: 'reset' }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || '인증번호가 올바르지 않습니다.');
       setStep('password');
       clearTimer();
     } catch (err: any) {
@@ -157,7 +152,13 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setError("");
     try {
-      await requestEmailOtp(email, 'reset');
+      const response = await fetch('/api/auth/email/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, purpose: 'reset' }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || '인증번호 재발송에 실패했습니다.');
       startTimer();
       setError("");
     } catch (err: any) {

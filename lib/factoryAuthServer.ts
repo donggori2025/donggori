@@ -1,4 +1,6 @@
+import "server-only";
 import { createClient } from "@supabase/supabase-js";
+import bcrypt from "bcryptjs";
 import { config } from "./config";
 
 export interface FactoryAuthRecord {
@@ -7,19 +9,6 @@ export interface FactoryAuthRecord {
   username: string;
   password: string;
   factoryName: string;
-}
-
-const factoryAuthData: FactoryAuthRecord[] = [];
-
-for (let i = 1; i <= 70; i++) {
-  const factoryNumber = i.toString().padStart(2, "0");
-  factoryAuthData.push({
-    id: i.toString(),
-    factoryId: i.toString(),
-    username: `factory${factoryNumber}`,
-    password: `factory${factoryNumber}!`,
-    factoryName: `봉제공장${factoryNumber}`,
-  });
 }
 
 function getRealFactoryName(factoryId: string): string {
@@ -48,18 +37,31 @@ export async function validateFactoryLogin(
     normalizedUsername = `factory${factoryMatch[1].padStart(2, "0")}`;
   }
 
-  const record = factoryAuthData.find((auth) => auth.username.toLowerCase() === normalizedUsername);
-  if (!record) return null;
+  if (!config.supabase.url || !config.supabase.serviceRoleKey) return null;
+  const supabase = createClient(config.supabase.url, config.supabase.serviceRoleKey, {
+    auth: { persistSession: false },
+  });
+  const { data, error } = await supabase
+    .from("factory_auth")
+    .select("id,factory_id,username,password,factory_name")
+    .ilike("username", normalizedUsername)
+    .maybeSingle();
+  if (error || !data) return null;
 
-  const bcrypt = await import("bcryptjs");
-  if (record.password.startsWith("$2a$") || record.password.startsWith("$2b$")) {
-    const valid = await bcrypt.compare(rawPass, record.password);
-    if (!valid) return null;
-  } else if (record.password !== rawPass) {
+  const passwordHash = String(data.password || "");
+  if (!/^\$2[aby]\$/.test(passwordHash)) {
+    console.error("[SECURITY] factory_auth에 평문 비밀번호가 있어 로그인을 차단했습니다.");
     return null;
   }
+  if (!(await bcrypt.compare(rawPass, passwordHash))) return null;
 
-  return record;
+  return {
+    id: String(data.id),
+    factoryId: String(data.factory_id),
+    username: String(data.username),
+    password: passwordHash,
+    factoryName: String(data.factory_name || getRealFactoryName(String(data.factory_id))),
+  };
 }
 
 export async function getFactoryAuthWithRealName(

@@ -36,7 +36,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "파일 크기는 10MB 이하여야 합니다." }, { status: 400 });
     }
 
-    const safeFolder = folder.replace(/[^a-zA-Z0-9가-힣_-]/g, "_");
+    // 공장 계정은 자신의 ID 하위에만 파일을 만들 수 있다.
+    const safeFolder = auth.role === "factory"
+      ? `factories/${auth.userId}`
+      : folder.replace(/[^a-zA-Z0-9가-힣_/-]/g, "_");
     const safeFilename = filename.replace(/[^a-zA-Z0-9가-힣_.-]/g, "_");
     const key = `${safeFolder}/${Date.now()}_${safeFilename}`;
 

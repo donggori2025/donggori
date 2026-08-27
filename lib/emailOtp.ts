@@ -60,14 +60,12 @@ export async function requestEmailOtp(email: string, purpose: OtpPurpose) {
   );
 
   if (emailResult.provider === "mock") {
-    console.log(`[EMAIL OTP] Mock 모드: ${email}로 인증번호 ${code} 발송됨 (콘솔 확인)`);
+    console.log(`[EMAIL OTP] 개발 Mock: ${email} / ${code}`);
     return { ok: true };
   }
 
   if (!emailResult.ok) {
-    console.warn(`[EMAIL OTP] 이메일 발송 실패, Mock 모드로 전환: ${emailResult.message}`);
-    console.log(`[EMAIL OTP] Mock 모드: ${email}로 인증번호 ${code} 발송됨 (콘솔 확인)`);
-    return { ok: true };
+    throw new Error(emailResult.message || "이메일 발송에 실패했습니다.");
   }
 
   return { ok: true };

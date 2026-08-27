@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminSession } from "./adminSession";
+import { verifyFactorySessionValue } from "./factorySession";
 import { verifySessionToken } from "./session";
 
 export interface AuthResult {
@@ -23,36 +24,24 @@ export async function getRequestAuth(req?: NextRequest): Promise<AuthResult> {
     const accessToken = cookieStore.get("access_token")?.value;
     if (accessToken) {
       const { valid, data } = await verifySessionToken(accessToken);
-      if (valid) {
+      if (valid && data?.user_id && data.is_initialized) {
         return {
           authenticated: true,
-          userId: String((data as any)?.user_id ?? ""),
-          email: (data as any)?.user_email ?? undefined,
+          userId: String(data.user_id),
+          email: data.user_email ?? undefined,
           role: "user",
         };
-      }
-    }
-
-    for (const name of ["kakao_user", "naver_user", "google_user"]) {
-      const socialCookie = cookieStore.get(name)?.value;
-      if (socialCookie) {
-        try {
-          const data = JSON.parse(socialCookie);
-          if (data.email || data.id) {
-            return { authenticated: true, userId: data.id, email: data.email, role: "user" };
-          }
-        } catch {}
       }
     }
 
     const snsToken = cookieStore.get("sns_access_token")?.value;
     if (snsToken) {
       const { valid, data } = await verifySessionToken(snsToken);
-      if (valid) {
+      if (valid && data?.user_id && data.is_initialized) {
         return {
           authenticated: true,
-          userId: String((data as any)?.user_id ?? (data as any)?.external_id ?? ""),
-          email: (data as any)?.user_email ?? undefined,
+          userId: String(data.user_id),
+          email: data.user_email ?? undefined,
           role: "user",
         };
       }
@@ -60,12 +49,10 @@ export async function getRequestAuth(req?: NextRequest): Promise<AuthResult> {
 
     const factorySession = cookieStore.get("factory_session")?.value;
     if (factorySession) {
-      try {
-        const data = JSON.parse(factorySession);
-        if (data.factoryId) {
-          return { authenticated: true, userId: data.factoryId, role: "factory" };
-        }
-      } catch {}
+      const data = verifyFactorySessionValue(factorySession);
+      if (data?.factoryId) {
+        return { authenticated: true, userId: data.factoryId, role: "factory" };
+      }
     }
 
     return { authenticated: false };

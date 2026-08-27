@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateRandomName } from '@/lib/randomNameGenerator';
 import { config } from '@/lib/config';
-import { createUser, createUserWithServiceRole, getUserByExternalId, getUserByEmail, linkSocialAccount } from '@/lib/userService';
+import { getUserByExternalId, getUserByEmail, linkSocialAccount } from '@/lib/userService';
+import { createSessionRecord } from '@/lib/session';
+import { SESSION_DURATIONS } from '@/lib/sessionConfig';
+import { setVerificationProofCookie } from '@/lib/signupProof';
+import { clearOAuthStateCookie, getOAuthCallbackUrl, oauthStateCookieName, verifyOAuthState } from '@/lib/oauthState';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,7 +14,9 @@ export async function GET(request: NextRequest) {
     const state = searchParams.get('state');
     const error = searchParams.get('error');
 
-    console.log('네이버 OAuth 콜백 파라미터:', { code: code ? '있음' : '없음', state, error });
+    if (!verifyOAuthState(state, request.cookies.get(oauthStateCookieName('naver'))?.value)) {
+      return NextResponse.redirect(new URL('/sign-in?error=invalid_oauth_state', request.url));
+    }
 
     if (error) {
       console.error('네이버 OAuth 오류:', error);
@@ -34,28 +40,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/sign-in?error=oauth_config_missing&provider=naver', request.url));
     }
 
-    // 네이버 OAuth 토큰 교환
-    // 안전한 base64 JSON 디코더 (Edge/Node 모두 동작)
-    const safeDecodeState = (s: string | null) => {
-      if (!s) return null as any;
-      try {
-        if (typeof Buffer !== 'undefined') {
-          return JSON.parse(Buffer.from(s, 'base64').toString('utf-8'));
-        }
-      } catch {}
-      try {
-        const bin = atob(s);
-        const bytes = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-        return JSON.parse(new TextDecoder().decode(bytes));
-      } catch {}
-      return null as any;
-    };
-
-    let parsedRedirect: string | null = null;
-    const stateObj = safeDecodeState(state);
-    if (stateObj?.redirectUri) parsedRedirect = stateObj.redirectUri;
-
     const tokenResponse = await fetch('https://nid.naver.com/oauth2.0/token', {
       method: 'POST',
       headers: {
@@ -67,13 +51,12 @@ export async function GET(request: NextRequest) {
         client_secret: naverClientSecret,
         code,
         state: state || '',
-        redirect_uri: parsedRedirect || `${new URL(request.url).origin}/api/auth/naver/callback`,
+        redirect_uri: getOAuthCallbackUrl('naver', request.nextUrl.origin),
       }),
     });
 
     if (!tokenResponse.ok) {
-      const errorData = await tokenResponse.text();
-      console.error('네이버 OAuth 토큰 교환 실패:', errorData);
+      console.error('네이버 OAuth 토큰 교환 실패:', tokenResponse.status);
       return NextResponse.redirect(new URL('/sign-in?error=token_exchange_failed', request.url));
     }
 
@@ -93,7 +76,6 @@ export async function GET(request: NextRequest) {
     }
 
     const userInfo = await userInfoResponse.json();
-    console.log('네이버 사용자 정보:', userInfo);
 
     if (userInfo.resultcode !== '00') {
       console.error('네이버 사용자 정보 조회 실패:', userInfo.message);
@@ -105,24 +87,10 @@ export async function GET(request: NextRequest) {
     const name = naverUser.name || naverUser.nickname || generateRandomName();
     const profileImage = naverUser.profile_image;
 
-    console.log('네이버 사용자 정보 추출:', {
-      email,
-      name,
-      profileImage,
-      naverId: naverUser.id
-    });
-
     if (!email) {
       console.error('네이버 사용자 이메일이 없습니다.');
       const response = NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
-      // snsAccessToken 발급 (초기화되지 않음)
-      try {
-        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ externalId: naverUser.id, provider: 'naver', isInitialized: false })
-        });
-      } catch {}
+      clearOAuthStateCookie(response, 'naver');
       return response;
     }
 
@@ -133,12 +101,10 @@ export async function GET(request: NextRequest) {
       // 이메일로도 확인 (다른 소셜 로그인으로 가입한 사용자)
       existingUser = await getUserByEmail(email);
       if (existingUser) {
-        console.log('이미 다른 방법으로 가입된 사용자:', existingUser.email);
         // 기존 사용자 정보를 업데이트하여 네이버 연동
         try {
           const updatedUser = await linkSocialAccount(existingUser.id, naverUser.id, 'naver');
           existingUser = updatedUser;
-          console.log('네이버 계정 연동 완료:', existingUser.email);
         } catch (updateError) {
           console.error('사용자 정보 업데이트 실패:', updateError);
         }
@@ -147,26 +113,17 @@ export async function GET(request: NextRequest) {
 
     // 기존 사용자가 있으면 바로 로그인 처리
     if (existingUser) {
-      console.log('기존 네이버 사용자 로그인:', existingUser.email);
-      
-      // 로그인 세션 생성 (초기화 완료 상태)
-      try {
-        await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-          method: 'POST', 
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            email: existingUser.email, 
-            externalId: naverUser.id, 
-            provider: 'naver', 
-            isInitialized: true 
-          })
-        });
-      } catch (sessionError) {
-        console.error('세션 생성 실패:', sessionError);
-      }
-
       // 사용자 정보를 쿠키에 저장 (로그인 상태)
       const response = NextResponse.redirect(new URL('/', request.url));
+      const { token } = await createSessionRecord({
+        type: 'sns', userId: existingUser.id, userEmail: existingUser.email,
+        externalId: naverUser.id, provider: 'naver', isInitialized: true,
+        ttlSec: SESSION_DURATIONS.SOCIAL,
+      });
+      response.cookies.set('sns_access_token', token, {
+        httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax',
+        path: '/', maxAge: SESSION_DURATIONS.SOCIAL,
+      });
       response.cookies.set('naver_user', JSON.stringify({
         id: existingUser.id,
         email: existingUser.email,
@@ -182,6 +139,7 @@ export async function GET(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 30,
       });
+      clearOAuthStateCookie(response, 'naver');
       
       return response;
     }
@@ -206,15 +164,10 @@ export async function GET(request: NextRequest) {
       sameSite: 'lax',
       maxAge: 60 * 60 * 24,
     });
-
-    // snsAccessToken 발급 (초기화되지 않음)
-    try {
-      await fetch(`${request.nextUrl.origin}/api/auth/sns/session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, externalId: naverUser.id, provider: 'naver', isInitialized: false })
-      });
-    } catch {}
+    await setVerificationProofCookie(response, 'signup_proof', {
+      type: 'sns', email, externalId: naverUser.id, provider: 'naver',
+    });
+    clearOAuthStateCookie(response, 'naver');
 
     return response;
 

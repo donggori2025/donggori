@@ -107,6 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refresh]);
 
   const signOut = useCallback(async () => {
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => null);
     removeCookie("kakao_user");
     removeCookie("naver_user");
     removeCookie("isLoggedIn");

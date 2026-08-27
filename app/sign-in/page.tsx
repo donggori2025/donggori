@@ -4,8 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { getFactoryAuthWithRealName } from "@/lib/factoryAuth";
-import { config } from "@/lib/config";
 
 // 오류 메시지 처리를 위한 컴포넌트
 function ErrorHandler({ onError }: { onError: (error: string) => void }) {
@@ -74,53 +72,8 @@ function SignInForm() {
     setSocialLoading(provider === 'oauth_kakao' ? 'kakao' : 'naver');
     
     try {
-      if (provider === 'oauth_naver') {
-        const naverConfig = config.oauth.naver;
-        if (!naverConfig.clientId) {
-          setError('네이버 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
-          setLoading(false);
-          setSocialLoading(null);
-          return;
-        }
-        
-        const state = Math.random().toString(36).substring(7);
-        const baseOrigin = typeof window !== 'undefined'
-          ? (window.location.hostname.endsWith('donggori.com') ? 'https://www.donggori.com' : window.location.origin)
-          : (process.env.NEXT_PUBLIC_SITE_URL || (naverConfig.redirectUri ? new URL(naverConfig.redirectUri).origin : ''));
-        const naverRedirect = `${baseOrigin}/api/auth/naver/callback`;
-        const naverState = btoa(JSON.stringify({ nonce: state, redirectUri: naverRedirect }));
-        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverConfig.clientId}&redirect_uri=${encodeURIComponent(naverRedirect)}&state=${encodeURIComponent(naverState)}&scope=email,name,profile_image`;
-        
-        console.log('네이버 OAuth URL:', naverAuthUrl);
-        window.location.href = naverAuthUrl;
-        return;
-      }
-
-      if (provider === 'oauth_kakao') {
-        const kakaoConfig = config.oauth.kakao;
-        if (!kakaoConfig.clientId) {
-          setError('카카오 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.');
-          setLoading(false);
-          setSocialLoading(null);
-          return;
-        }
-        
-        const state = Math.random().toString(36).substring(7);
-        // 카카오 닉네임도 받아오기 위해 profile_nickname 포함
-        const scope = 'account_email profile_nickname';
-        const baseOrigin2 = typeof window !== 'undefined'
-          ? (window.location.hostname.endsWith('donggori.com') ? 'https://www.donggori.com' : window.location.origin)
-          : (process.env.NEXT_PUBLIC_SITE_URL || (kakaoConfig.redirectUri ? new URL(kakaoConfig.redirectUri).origin : ''));
-        const kakaoRedirect = `${baseOrigin2}/api/auth/kakao/callback`;
-        const kakaoState = btoa(JSON.stringify({ nonce: state, redirectUri: kakaoRedirect }));
-        const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoConfig.clientId}&redirect_uri=${encodeURIComponent(kakaoRedirect)}&state=${encodeURIComponent(kakaoState)}&scope=${encodeURIComponent(scope)}&prompt=consent`;
-        
-        console.log('카카오 OAuth URL:', kakaoAuthUrl);
-        window.location.href = kakaoAuthUrl;
-        return;
-      }
-      
-      // Kakao/Naver만 지원: 방어적 코드 (여기 도달하지 않음)
+      const name = provider === 'oauth_kakao' ? 'kakao' : 'naver';
+      window.location.href = `/api/auth/oauth/start?provider=${name}`;
     } catch (err: unknown) {
       console.error('OAuth 로그인 오류:', err);
       setError(err instanceof Error ? err.message : '소셜 로그인 중 오류가 발생했습니다.');
@@ -140,9 +93,14 @@ function SignInForm() {
       const cleanId = normalizeInvisible(email);
       const cleanPw = normalizeInvisible(password);
 
-      const factoryAuth = await getFactoryAuthWithRealName(cleanId, cleanPw);
+      const factoryRes = await fetch('/api/factory/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: cleanId, password: cleanPw }),
+      });
+      const factoryAuth = await factoryRes.json().catch(() => null);
       
-      if (factoryAuth) {
+      if (factoryRes.ok && factoryAuth?.success) {
         console.log('봉제공장 로그인 성공:', factoryAuth.factoryName);
         
         // 봉제공장 세션 유지 시간: 14일
@@ -329,4 +287,4 @@ export default function SignInPage() {
       </Suspense>
     </div>
   );
-} 
+}

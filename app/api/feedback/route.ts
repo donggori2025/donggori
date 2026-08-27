@@ -13,19 +13,32 @@ function getSupabase() {
 
 export async function POST(req: Request) {
   try {
+    const auth = await getRequestAuth();
+    if (!auth.authenticated || auth.role !== "user") {
+      return unauthorized("로그인한 사용자만 피드백을 등록할 수 있습니다.");
+    }
+
     const supabase = getSupabase();
     if (!supabase) {
       return NextResponse.json({ success: false, error: "서버 설정 오류" }, { status: 500 });
     }
 
     const body = await req.json();
-    const { factory_id, rating, user_answers, timestamp } = body;
+    const { factory_id, rating, user_answers } = body;
+    const numericRating = Number(rating);
+    const serializedAnswers = JSON.stringify(user_answers ?? {});
+    if (!factory_id || !Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
+      return NextResponse.json({ success: false, error: "공장과 1~5점 평점이 필요합니다." }, { status: 400 });
+    }
+    if (serializedAnswers.length > 10_000) {
+      return NextResponse.json({ success: false, error: "피드백 내용이 너무 깁니다." }, { status: 400 });
+    }
 
     const { error } = await supabase.from("matching_feedback").insert({
       factory_id,
-      rating,
-      user_answers: JSON.stringify(user_answers),
-      created_at: timestamp || new Date().toISOString(),
+      rating: numericRating,
+      user_answers: serializedAnswers,
+      created_at: new Date().toISOString(),
     });
 
     if (error) {
@@ -41,8 +54,8 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const auth = await getRequestAuth();
-    if (!auth.authenticated) {
-      return unauthorized("피드백 조회에는 인증이 필요합니다.");
+    if (!auth.authenticated || auth.role !== "admin") {
+      return unauthorized("관리자만 피드백을 조회할 수 있습니다.");
     }
 
     const supabase = getSupabase();

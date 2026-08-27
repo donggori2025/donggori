@@ -242,7 +242,8 @@ export default function FactoryMyPage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => null);
     localStorage.removeItem('factoryAuth');
     localStorage.removeItem('userType');
     // 메인페이지로 리다이렉트
@@ -1111,4 +1112,4 @@ export default function FactoryMyPage() {
       </div>
     </div>
   );
-} 
+}

@@ -1,17 +1,11 @@
 import crypto from "crypto";
 
-let warnedMissingFactorySessionSecret = false;
 const FACTORY_SESSION_SECRET =
   process.env.FACTORY_SESSION_SECRET ||
   process.env.ADMIN_SESSION_SECRET ||
   (() => {
-    if (typeof process !== "undefined" && process.env.NODE_ENV === "production") {
-      if (!warnedMissingFactorySessionSecret) {
-        warnedMissingFactorySessionSecret = true;
-        console.error(
-          "[SECURITY] FACTORY_SESSION_SECRET 환경변수가 설정되지 않았습니다. 서버 재시작 시 공장 세션이 무효화됩니다."
-        );
-      }
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("FACTORY_SESSION_SECRET 또는 ADMIN_SESSION_SECRET 환경변수가 필요합니다.");
     }
     return crypto.randomBytes(32).toString("hex");
   })();

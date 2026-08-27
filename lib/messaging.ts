@@ -266,36 +266,23 @@ async function sendViaSendGrid(to: string, subject: string, text: string) {
 
 export async function sendEmail(to: string, subject: string, text: string): Promise<{ ok: boolean; provider?: string; message?: string }> {
   const provider = (process.env.EMAIL_PROVIDER || 'mock').toLowerCase();
+  const allowMock = process.env.NODE_ENV !== 'production';
   try {
     if (provider === 'sendgrid') {
-      // SendGrid API 키가 없거나 유효하지 않으면 mock 모드로 폴백
       const apiKey = process.env.SENDGRID_API_KEY;
       if (!apiKey || apiKey.length < 10) {
-        console.warn('[EMAIL] SendGrid API 키가 설정되지 않았습니다. Mock 모드로 전환합니다.');
+        if (!allowMock) throw new Error('SendGrid API 키가 설정되지 않았습니다.');
         console.log('[EMAIL:mock] to=%s, subject=%s, text=%s', to, subject, text);
-        await logMessage({ channel: 'EMAIL', to, payload: { subject, text, provider: 'mock' }, status: 'SENT' });
         return { ok: true, provider: 'mock', message: 'queued (SendGrid not configured)' };
       }
-      
-      try {
-        return await sendViaSendGrid(to, subject, text);
-      } catch (sendgridError: any) {
-        // SendGrid 오류 발생 시 mock 모드로 폴백
-        console.warn('[EMAIL] SendGrid 오류 발생, Mock 모드로 전환:', sendgridError?.message);
-        console.log('[EMAIL:mock] to=%s, subject=%s, text=%s', to, subject, text);
-        await logMessage({ channel: 'EMAIL', to, payload: { subject, text, provider: 'mock' }, status: 'SENT' });
-        return { ok: true, provider: 'mock', message: 'queued (SendGrid error)' };
-      }
+      return await sendViaSendGrid(to, subject, text);
     }
 
-    // 기본: 목킹 (로컬/미설정 환경)
+    if (!allowMock) throw new Error('운영 이메일 발송 제공자가 설정되지 않았습니다.');
     console.log('[EMAIL:mock] to=%s, subject=%s, text=%s', to, subject, text);
-    await logMessage({ channel: 'EMAIL', to, payload: { subject, text, provider: 'mock' }, status: 'SENT' });
     return { ok: true, provider: 'mock', message: 'queued' };
   } catch (error: any) {
-    await logMessage({ channel: 'EMAIL', to, payload: { subject, text, provider }, status: 'FAILED', error: error?.message });
+    await logMessage({ channel: 'EMAIL', to, payload: { subject, provider }, status: 'FAILED', error: error?.message });
     return { ok: false, message: error?.message };
   }
 }
-
-

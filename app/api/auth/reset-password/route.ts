@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { getServiceSupabase } from "@/lib/supabaseService";
+import { readSignupProof } from "@/lib/signupProof";
+import { revokeSessionToken } from "@/lib/session";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, newPassword, otpCode } = await req.json();
+    const { email, newPassword } = await req.json();
+    const normalizedEmail = String(email || "").trim().toLowerCase();
 
-    if (!email || !newPassword || !otpCode) {
+    if (!normalizedEmail || !newPassword) {
       return NextResponse.json(
-        { success: false, error: "이메일, 새 비밀번호, 인증 코드가 모두 필요합니다." },
+        { success: false, error: "이메일과 새 비밀번호가 필요합니다." },
         { status: 400 }
       );
     }
@@ -19,50 +23,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const proofToken = req.cookies.get("reset_proof")?.value;
+    const proof = await readSignupProof(proofToken);
+    if (proof?.type !== "local" || proof.email !== normalizedEmail) {
+      return NextResponse.json(
+        { success: false, error: "비밀번호 재설정 인증이 없거나 만료되었습니다." },
+        { status: 401 }
+      );
+    }
+    await revokeSessionToken(proofToken!);
+
     const supabase = getServiceSupabase();
-
-    const { data: otpRecords, error: otpError } = await supabase
-      .from("email_otps")
-      .select("*")
-      .eq("email", email)
-      .eq("purpose", "reset")
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    if (otpError || !otpRecords || otpRecords.length === 0) {
-      return NextResponse.json(
-        { success: false, error: "인증 요청을 찾을 수 없습니다." },
-        { status: 400 }
-      );
-    }
-
-    const otpRecord = otpRecords[0];
-
-    if (otpRecord.code !== otpCode) {
-      return NextResponse.json(
-        { success: false, error: "인증 코드가 올바르지 않습니다." },
-        { status: 400 }
-      );
-    }
-
-    if (new Date(otpRecord.expires_at).getTime() < Date.now()) {
-      return NextResponse.json(
-        { success: false, error: "인증 코드가 만료되었습니다." },
-        { status: 400 }
-      );
-    }
-
-    if (otpRecord.consumed_at) {
-      return NextResponse.json(
-        { success: false, error: "이미 사용된 인증 코드입니다." },
-        { status: 400 }
-      );
-    }
 
     const { data: users, error: findError } = await supabase
       .from("users")
-      .select("id, email")
-      .eq("email", email)
+      .select("id, email, signupMethod")
+      .eq("email", normalizedEmail)
       .limit(1);
 
     if (findError || !users || users.length === 0) {
@@ -74,7 +50,13 @@ export async function POST(req: NextRequest) {
 
     const user = users[0];
 
-    const bcrypt = await import("bcryptjs");
+    if (user.signupMethod && user.signupMethod !== "email") {
+      return NextResponse.json(
+        { success: false, error: "소셜 로그인으로 가입된 계정입니다." },
+        { status: 400 }
+      );
+    }
+
     const hashedPassword = await bcrypt.hash(newPassword, 12);
 
     const { error: updateError } = await supabase
@@ -89,15 +71,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await supabase
-      .from("email_otps")
-      .update({ consumed_at: new Date().toISOString() })
-      .eq("id", otpRecord.id);
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "비밀번호가 성공적으로 재설정되었습니다.",
     });
+    response.cookies.set("reset_proof", "", { path: "/", maxAge: 0 });
+    return response;
   } catch (error) {
     console.error("비밀번호 재설정 오류:", error);
     return NextResponse.json(
