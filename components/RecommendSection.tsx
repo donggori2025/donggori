@@ -2,12 +2,12 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchFactoriesFromDB } from "@/lib/factories";
+import { fetchFactoriesFromDB } from "@/lib/factoryCatalog";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 import { ArrowRight } from "lucide-react";
 
 const RecommendSection = () => {
-  const [factoryCount, setFactoryCount] = useState<number>(70);
+  const [factoryCount, setFactoryCount] = useState<number | null>(null);
 
   useEffect(() => {
     const loadFactoryCount = async () => {
@@ -44,7 +44,7 @@ const RecommendSection = () => {
 
         <div className="flex flex-col items-center">
           <p className="text-sm md:text-base text-gray-500 text-center mb-6 md:mb-8 leading-relaxed">
-            {factoryCount}개 이상의 인증된 봉제공장을
+            {factoryCount === null ? "등록된 봉제공장을" : `${factoryCount}개의 봉제공장을`}
             <br className="sm:hidden" />
             직접 검색하고 필터링해 보세요.
           </p>

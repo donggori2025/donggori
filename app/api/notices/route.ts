@@ -1,24 +1,15 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
+import { isPublicNoticeVisible, PUBLIC_NOTICE_SELECT, type PublicNotice } from "@/lib/notices";
 
 export async function GET() {
-  // 공개: 노출기간 필터 + 최신순
-  const now = new Date();
   const supabase = getServiceSupabase();
   const { data, error } = await supabase
     .from("notices")
-    .select("*")
+    .select(PUBLIC_NOTICE_SELECT)
+    .eq("is_active", true)
     .order("created_at", { ascending: false });
-  if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  const filtered = (data || []).filter((n: any) => {
-    if (!n.start_at && !n.end_at) return true;
-    const start = n.start_at ? new Date(n.start_at) : null;
-    const end = n.end_at ? new Date(n.end_at) : null;
-    if (start && now < start) return false;
-    if (end && now > end) return false;
-    return true;
-  });
+  if (error) return NextResponse.json({ success: false, error: "공지사항을 불러오지 못했습니다." }, { status: 500 });
+  const filtered = (data as PublicNotice[] || []).filter((notice) => isPublicNoticeVisible(notice));
   return NextResponse.json({ success: true, data: filtered });
 }
-
-

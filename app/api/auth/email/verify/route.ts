@@ -11,7 +11,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: '지원하지 않는 인증 목적입니다.' }, { status: 400 });
     }
     const normalizedEmail = String(email).trim().toLowerCase();
-    const result = await verifyEmailOtp(normalizedEmail, code, p);
+    const normalizedCode = String(code).trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || !/^\d{6}$/.test(normalizedCode)) {
+      return NextResponse.json({ ok: false, error: '이메일 또는 인증 코드 형식이 올바르지 않습니다.' }, { status: 400 });
+    }
+    const result = await verifyEmailOtp(normalizedEmail, normalizedCode, p);
     const response = NextResponse.json(result);
 
     if (result.ok && p === 'signup') {

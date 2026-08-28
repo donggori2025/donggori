@@ -9,6 +9,8 @@ import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 function SignUpForm() {
   const searchParams = useSearchParams();
   const provider = searchParams.get('provider');
+  const next = searchParams.get("next");
+  const nextPath = next && /^\/(?!\/)[^\\\r\n]*$/.test(next) ? next : "/";
   
   // 입력값 상태
   const [name, setName] = useState("");
@@ -21,8 +23,6 @@ function SignUpForm() {
   const [agreeAll, setAgreeAll] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
-  const [agreeMarketing, setAgreeMarketing] = useState(false);
-  const [agreeKakaoMessage, setAgreeKakaoMessage] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
@@ -33,56 +33,38 @@ function SignUpForm() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const router = useRouter();
 
-  // OAuth 사용자 정보 로드
+  // HttpOnly 가입 proof에서 검증된 소셜 가입 문맥만 로드한다.
   useEffect(() => {
     if (provider === 'kakao' || provider === 'naver') {
-      const tempUserKey = provider === 'kakao' ? 'temp_kakao_user' : 'temp_naver_user';
-      const tempUserStr = document.cookie
-        .split('; ')
-        .find(row => row.startsWith(tempUserKey + '='))
-        ?.split('=')[1];
-      
-      if (tempUserStr) {
-        try {
-          const tempUser = JSON.parse(decodeURIComponent(tempUserStr));
-          setName(tempUser.name || "");
-          setEmail(tempUser.email || "");
-          const hasEmail = !!tempUser.email;
-          if (tempUser.phoneNumber) {
-            const normalized = formatPhone(tempUser.phoneNumber);
-            setPhone(normalized);
+      fetch('/api/auth/signup-context', { cache: 'no-store' })
+        .then(async (response) => {
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok || payload.provider !== provider) {
+            throw new Error(payload.error || '소셜 가입 인증 정보가 올바르지 않습니다.');
           }
-          // 소셜 로그인 사용자는 이메일 인증 완료로 간주
-          if (tempUser.email) {
+          if (payload.email) {
+            setEmail(payload.email);
             setEmailVerified(true);
           }
-          if (hasEmail) {
-            setPassword("OAuthUserPassword123!");
-            setPasswordConfirm("OAuthUserPassword123!");
-          }
-        } catch (error) {
-          console.error('OAuth 사용자 정보 파싱 오류:', error);
-        }
-      }
+        })
+        .catch((reason) => setError(reason instanceof Error ? reason.message : '소셜 가입 정보를 확인하지 못했습니다.'));
     }
   }, [provider]);
 
   // 전체동의 <-> 개별동의 상태 동기화
   useEffect(() => {
-    if (agreeTerms && agreePrivacy && agreeMarketing && agreeKakaoMessage) {
+    if (agreeTerms && agreePrivacy) {
       setAgreeAll(true);
     } else {
       setAgreeAll(false);
     }
-  }, [agreeTerms, agreePrivacy, agreeMarketing, agreeKakaoMessage]);
+  }, [agreeTerms, agreePrivacy]);
 
   // 전체동의 클릭 시 모든 항목 동기화
   const handleAgreeAll = (checked: boolean) => {
     setAgreeAll(checked);
     setAgreeTerms(checked);
     setAgreePrivacy(checked);
-    setAgreeMarketing(checked);
-    setAgreeKakaoMessage(checked);
   };
 
   // 타이머 시작 함수
@@ -213,72 +195,27 @@ function SignUpForm() {
     try {
       // OAuth 사용자인 경우
       if (provider === 'kakao' || provider === 'naver') {
-        const tempUserKey = provider === 'kakao' ? 'temp_kakao_user' : 'temp_naver_user';
-        const tempUserStr = document.cookie
-          .split('; ')
-          .find(row => row.startsWith(tempUserKey + '='))
-          ?.split('=')[1];
-        
-        if (tempUserStr) {
-          const tempUser = JSON.parse(decodeURIComponent(tempUserStr));
-          
-          // 서버 API를 통해 사용자 저장 (개인정보/비밀번호 처리 서버 전용)
-          const signupRes = await fetch('/api/auth/signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: tempUser.email || cleanEmail,
-              name: tempUser.name,
-              phoneNumber: phone,
-              profileImage: tempUser.profileImage,
-              signupMethod: provider,
-              externalId: tempUser.kakaoId || tempUser.naverId,
-              kakaoMessageConsent: agreeKakaoMessage,
-            }),
-          });
-          const signupJson = await signupRes.json().catch(() => ({}));
-          if (!signupRes.ok) {
-            throw new Error(signupJson?.error || '회원가입 중 오류가 발생했습니다.');
-          }
-          const newUser = signupJson.user;
-          
-          console.log('OAuth 사용자 생성 성공:', newUser.email);
-          
-          // OAuth 사용자 정보를 쿠키에 저장
-          const userData = {
-            id: newUser.id,
-            email: newUser.email,
-            name: newUser.name,
-            phoneNumber: newUser.phoneNumber,
-            profileImage: newUser.profileImage,
-            kakaoId: tempUser.kakaoId,
-            naverId: tempUser.naverId,
-            isOAuthUser: true,
+        const signupRes = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: cleanEmail,
+            name: name.trim(),
+            phoneNumber: phone,
             signupMethod: provider,
-          };
-          
-          const finalUserKey = provider === 'kakao' ? 'kakao_user' : 'naver_user';
-          document.cookie = `${finalUserKey}=${JSON.stringify(userData)}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
-          document.cookie = `userType=user; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
-          document.cookie = `isLoggedIn=true; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
-          
-          // 임시 쿠키 삭제
-          document.cookie = `${tempUserKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-          
-          // 사용자 정보를 localStorage에 저장
-          localStorage.setItem('userType', 'user');
-          localStorage.setItem('userName', name.trim());
-          localStorage.setItem('userPhone', phone);
-          localStorage.setItem('kakaoMessageConsent', agreeKakaoMessage.toString());
-          
-          window.location.href = '/';
-          return;
+          }),
+        });
+        const signupJson = await signupRes.json().catch(() => ({}));
+        if (!signupRes.ok) {
+          throw new Error(signupJson?.error || '회원가입 중 오류가 발생했습니다.');
         }
+        window.location.assign(nextPath);
+        return;
       }
       
       // 일반 회원가입 (Supabase만 사용)
       if (!password) return setError("비밀번호를 입력해주세요.");
-      if (password.length < 6) return setError("비밀번호는 6자 이상이어야 합니다.");
+      if (password.length < 10) return setError("비밀번호는 10자 이상이어야 합니다.");
       if (password !== passwordConfirm) return setError("비밀번호가 일치하지 않습니다.");
       
       // 서버 API를 통해 사용자 저장 (비밀번호 해시는 서버에서 처리)
@@ -291,27 +228,14 @@ function SignUpForm() {
           phoneNumber: phone,
           password,
           signupMethod: 'email',
-          kakaoMessageConsent: agreeKakaoMessage,
         }),
       });
       const signupJson = await signupRes.json().catch(() => ({}));
       if (!signupRes.ok) {
         throw new Error(signupJson?.error || '회원가입 중 오류가 발생했습니다.');
       }
-      const newUser = signupJson.user;
-      
-      console.log('일반 사용자 생성 성공:', newUser.email);
-      
-      // 회원가입 완료 처리 - 사용자 정보를 localStorage에 저장
-      localStorage.setItem('userType', 'user');
-      localStorage.setItem('userName', name.trim());
-      localStorage.setItem('userPhone', phone);
-      localStorage.setItem('kakaoMessageConsent', agreeKakaoMessage.toString());
-      localStorage.setItem('userEmail', cleanEmail);
-      
-      // 성공 메시지 표시 후 메인 페이지로 이동
       alert('회원가입이 완료되었습니다!');
-      window.location.href = '/';
+      window.location.assign(nextPath);
     } catch (err: unknown) {
       console.error('회원가입 오류:', err);
       if (err instanceof Error) {
@@ -330,7 +254,7 @@ function SignUpForm() {
     setLoading(true);
     try {
       const name = provider === 'oauth_kakao' ? 'kakao' : 'naver';
-      window.location.href = `/api/auth/oauth/start?provider=${name}&mode=signup`;
+      window.location.href = `/api/auth/oauth/start?provider=${name}&mode=signup&next=${encodeURIComponent(nextPath)}`;
     } catch (err: unknown) {
       console.error('소셜 로그인 오류:', err);
       if (err instanceof Error) {
@@ -495,26 +419,6 @@ function SignUpForm() {
               />
               <Link href="/terms/privacy" target="_blank" className="text-sm text-gray-700 underline hover:text-toss-blue">개인정보이용동의(필수)</Link>
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={agreeMarketing}
-                onChange={e => setAgreeMarketing(e.target.checked)}
-                id="agree-marketing"
-                className="w-4 h-4"
-              />
-              <Link href="/terms/marketing" target="_blank" className="text-sm text-gray-700 underline hover:text-toss-blue">마케팅정보활용동의(선택)</Link>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={agreeKakaoMessage}
-                onChange={e => setAgreeKakaoMessage(e.target.checked)}
-                id="agree-kakao-message"
-                className="w-4 h-4"
-              />
-              <Link href="/terms/privacy" target="_blank" className="text-sm text-gray-700 underline hover:text-toss-blue">카카오톡 메시지 수신 동의(선택)</Link>
-            </div>
           </div>
         </div>
         {error && (
@@ -536,7 +440,7 @@ function SignUpForm() {
             !name.trim() ||
             !email ||
             !emailVerified ||
-            (!provider && (!password || password.length < 6 || password !== passwordConfirm)) ||
+            (!provider && (!password || password.length < 10 || password !== passwordConfirm)) ||
             !agreeTerms ||
             !agreePrivacy
           }

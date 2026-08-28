@@ -3,7 +3,9 @@ import { config } from "@/lib/config";
 import {
   createOAuthState,
   getOAuthCallbackUrl,
+  oauthNextCookieName,
   oauthStateCookieName,
+  safeNextPath,
   type OAuthProvider,
 } from "@/lib/oauthState";
 
@@ -17,6 +19,7 @@ export async function GET(request: NextRequest) {
 
   const provider = request.nextUrl.searchParams.get("provider") as OAuthProvider | null;
   const mode = request.nextUrl.searchParams.get("mode");
+  const next = safeNextPath(request.nextUrl.searchParams.get("next"));
   if (provider !== "kakao" && provider !== "naver") {
     return NextResponse.json({ error: "지원하지 않는 소셜 로그인입니다." }, { status: 400 });
   }
@@ -46,6 +49,13 @@ export async function GET(request: NextRequest) {
 
   const response = NextResponse.redirect(authorizeUrl);
   response.cookies.set(oauthStateCookieName(provider), state, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: `/api/auth/${provider}/callback`,
+    maxAge: 10 * 60,
+  });
+  response.cookies.set(oauthNextCookieName(provider), next, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

@@ -12,9 +12,7 @@ export async function POST(request: NextRequest) {
       password,
       name,
       phoneNumber,
-      profileImage,
       signupMethod = "email",
-      kakaoMessageConsent = false,
     } = await request.json();
 
     const normalizedEmail = String(email || "").trim().toLowerCase();
@@ -48,8 +46,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (signupMethod === "email") {
-      if (!password || String(password).length < 6) {
-        return NextResponse.json({ error: "비밀번호는 6자 이상이어야 합니다." }, { status: 400 });
+      if (!password || String(password).length < 10) {
+        return NextResponse.json({ error: "비밀번호는 10자 이상이어야 합니다." }, { status: 400 });
       }
     }
 
@@ -71,6 +69,20 @@ export async function POST(request: NextRequest) {
       signupMethod === "email" && password ? await bcrypt.hash(String(password), 12) : null;
 
     const verifiedExternalId = signupMethod === "email" ? null : proof.externalId;
+    if (verifiedExternalId) {
+      const { data: existingSocial, error: socialFindError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("signupMethod", signupMethod)
+        .eq("externalId", verifiedExternalId)
+        .maybeSingle();
+      if (socialFindError) {
+        return NextResponse.json({ error: "회원 정보 조회 중 오류가 발생했습니다." }, { status: 500 });
+      }
+      if (existingSocial) {
+        return NextResponse.json({ error: "이미 가입된 소셜 계정입니다." }, { status: 409 });
+      }
+    }
 
     const { data: created, error: insertError } = await supabase
       .from("users")
@@ -80,16 +92,18 @@ export async function POST(request: NextRequest) {
           name: normalizedName,
           phoneNumber: String(phoneNumber || ""),
           password: hashedPassword,
-          profileImage: profileImage || null,
+          profileImage: null,
           signupMethod,
           externalId: verifiedExternalId,
-          kakaoMessageConsent: Boolean(kakaoMessageConsent),
         },
       ])
       .select("id,email,name,phoneNumber,profileImage,signupMethod")
       .single();
 
     if (insertError) {
+      if (insertError.code === "23505") {
+        return NextResponse.json({ error: "이미 가입된 계정입니다." }, { status: 409 });
+      }
       return NextResponse.json({ error: "회원가입 중 오류가 발생했습니다." }, { status: 500 });
     }
 

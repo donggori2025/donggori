@@ -1,192 +1,27 @@
-// Vercel Blob Storage 사용
-import { getVercelBlobImageUrl } from './vercelBlobConfig';
+const FALLBACK_IMAGE = "/logo_donggori.png";
 
-function getProxyUrl(factoryName: string, fileName: string) {
-  // Blob/스토리지는 업체명 기준으로 저장되므로 company name을 folder로 전달
-  return `/api/factory-images/url?folder=${encodeURIComponent(factoryName)}&file=${encodeURIComponent(fileName)}`;
-}
-
-// 업장 이름과 이미지 폴더 매칭
-const factoryImageMapping: Record<string, string> = {
-  // 기존 공장들
-  '강훈무역': '강훈무역',
-  '건영실업': '건영실업',
-  '경림패션': '경림패션',
-  '꼬메오패션': '꼬메오',
-  '나인': '나인',
-  '뉴에일린': '뉴에일린',
-  '다엘': '다엘',
-  '대명어패럴': '대명어패럴',
-  '더시크컴퍼니': '더시크컴퍼니',
-  '라이브 어패럴': '라이브',
-  '라인스': '라인스',
-  '백산실업': '백산실업',
-  '부연사': '부연사',
-  '새가온': '새가온',
-  '선화사': '선화사',
-  '스마일업체': '스마일업체',
-  '스마일': '스마일',
-  '시즌': '시즌',
-  '실루엣컴퍼니': '실루엣컴퍼니',
-  '아트패션': '아트',
-  '에이스': '에이스',
-  '오르다': '오르다',
-  '오성섬유': '오성섬유',
-  '오스카 디자인': '오스카 디자인',
-  '우정샘플': '우정샘플',
-  '우정패션': '우정패션',
-  '우진모피': '우진모피',
-  '유화 섬유': '유화 섬유',
-  '재민상사': '재민상사',
-  '좋은사람': '좋은사람',
-  '하늘패션': '하늘패션',
-  '혜민사': '혜민사',
-  '화담어패럴': '화담어패럴',
-  '화신사': '화신사',
-  '희란패션': '희란패션',
-  // 새로 추가된 공장들
-  'jk패션': 'jk패션',
-  '기훈패션': '기훈패션',
-  '나르샤': '나르샤',
-  '다래디자인': '다래디자인',
-  '다온패션': '다온패션',
-  '레오실업': '레오실업',
-  '민경패션': '민경패션',
-  '바비패션': '바비패션',
-  '수미어패럴': '수미어패럴',
-  '으뜸어패럴': '으뜸어패럴',
-  '조아스타일': '조아스타일',
-  '태경패션': '태경패션',
-  '태광사': '태광사',
-  '태성어패럴': '태성어패럴',
-  // 추가 공장들
-  '미호패션': '미호패션',
-  '박원니트': '박원니트',
-  '희망사': '희망사',
-  '정인어패럴': '정인어패럴',
-  '미니팩토리': '미니팩토리',
-  '신원자수': '신원자수',
-  '옷 만드는 사람들': '옷 만드는 사람들',
-  '제훈사 (구 아이템)': '제훈사',
-  '부라더': '부라더',
-};
-
-// 업장별 실제 업로드된 이미지 파일명들 (동적으로 생성)
-const factoryImageFiles: Record<string, string[]> = {};
-
-// 업장 이름으로 이미지 폴더 찾기
-export function getFactoryImageFolder(factoryName: string): string | null {
-  return factoryImageMapping[factoryName] || null;
-}
-
-// API 조회 시 업체명/매핑 폴더명 모두 시도
-export function getFactoryImageFolderCandidates(factoryName: string): string[] {
-  const mappedFolder = getFactoryImageFolder(factoryName);
-  const reverseMappedNames = Object.entries(factoryImageMapping)
-    .filter(([, folder]) => folder === factoryName)
-    .map(([companyName]) => companyName);
-
-  return [...new Set([factoryName, mappedFolder, ...reverseMappedNames].filter((name): name is string => Boolean(name)))];
-}
-
-// 업장 이름으로 썸네일 이미지 URL 생성 (Vercel Blob 사용)
-export function getFactoryThumbnailImage(factoryName: string): string {
-  const folderName = getFactoryImageFolder(factoryName);
-  
-  if (!folderName) {
-    // 기본 이미지 반환
-    return '/logo_donggori.png';
+function strings(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((item): item is string => typeof item === "string" && Boolean(item.trim()));
+  if (typeof value !== "string" || !value.trim()) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed.filter((item): item is string => typeof item === "string" && Boolean(item.trim()));
+  } catch {
+    // A single URL is the normal legacy format.
   }
-
-  // 첫 번째 이미지를 썸네일로 사용
-  const images = getFactoryImages(factoryName);
-  return images.length > 0 ? images[0] : '/logo_donggori.png';
+  return [value.trim()];
 }
 
-// 업장 이름으로 모든 이미지 URL 생성 (배포 환경 호환)
-export function getFactoryImages(factoryName: string): string[] {
-  const folderName = getFactoryImageFolder(factoryName);
-  
-  if (!folderName) {
-    return ['/logo_donggori.png'];
-  }
-
-  // 각 공장별 모든 이미지 파일명 매핑
-  const allImageFiles: Record<string, string[]> = {
-    'jk패션': ['KakaoTalk_20250902_230359893.jpg', 'KakaoTalk_20250902_230359893_01.jpg', 'KakaoTalk_20250902_230359893_02.jpg', 'KakaoTalk_20250902_230359893_03.jpg', 'KakaoTalk_20250902_230359893_04.jpg', 'KakaoTalk_20250902_230359893_05.jpg', 'KakaoTalk_20250902_230359893_06.jpg'],
-    '강훈무역': ['20250710_103857.jpg', '20250710_103905.jpg', '20250710_104157.jpg', '20250710_104242.jpg', '20250710_104321.jpg', '20250710_104453.jpg', '20250710_104638.jpg', 'KakaoTalk_20250716_130514861.jpg', 'KakaoTalk_20250716_130514861_01.jpg', 'KakaoTalk_20250716_130514861_02.jpg', 'KakaoTalk_20250716_130600692.jpg'],
-    '건영실업': ['20250715_101845.jpg', '20250715_102913.jpg', '20250715_102934.jpg', '20250715_102936.jpg', 'KakaoTalk_20250716_132620778.jpg', 'KakaoTalk_20250716_132620778_01.jpg', 'KakaoTalk_20250716_132620778_02.jpg', 'KakaoTalk_20250716_132620778_03.jpg', 'KakaoTalk_20250716_132620778_04.jpg', 'KakaoTalk_20250716_132620778_05.jpg', 'KakaoTalk_20250716_132620778_06.jpg'],
-    '경림패션': ['20250710_113356.jpg', '20250710_113435.jpg', '20250710_113456.jpg', '20250710_113602.jpg', '20250710_113613.jpg', 'KakaoTalk_20250716_135837616.jpg', 'KakaoTalk_20250716_135837616_01.jpg'],
-    '기훈패션': ['KakaoTalk_20250902_230310883.jpg', 'KakaoTalk_20250902_230310883_01.jpg', 'KakaoTalk_20250902_230310883_02.jpg', 'KakaoTalk_20250902_230310883_03.jpg', 'KakaoTalk_20250902_230310883_04.jpg', 'KakaoTalk_20250902_230310883_05.jpg', 'KakaoTalk_20250902_230310883_06.jpg'],
-    '꼬메오': ['20250714_160113.jpg', '20250714_160151.jpg', '20250714_160227.jpg', '20250714_160228.jpg', '20250714_160230.jpg', '20250714_160319.jpg', '20250714_160323.jpg', '20250714_160350.jpg', 'KakaoTalk_20250716_112907341.jpg', 'KakaoTalk_20250716_112907341_01.jpg', 'KakaoTalk_20250716_112907341_02.jpg', 'KakaoTalk_20250716_112907341_03.jpg'],
-    '나르샤': ['KakaoTalk_20250902_230256978.jpg', 'KakaoTalk_20250902_230256978_01.jpg', 'KakaoTalk_20250902_230256978_02.jpg', 'KakaoTalk_20250902_230256978_03.jpg', 'KakaoTalk_20250902_230256978_04.jpg', 'KakaoTalk_20250902_230256978_05.jpg', 'KakaoTalk_20250902_230256978_06.jpg', 'KakaoTalk_20250902_230256978_07.jpg'],
-    '나인': ['20250710_111150.jpg', '20250710_112153.jpg', '20250710_112246.jpg', '20250710_112303.jpg', '20250710_112327.jpg', 'KakaoTalk_20250716_133551909.jpg', 'KakaoTalk_20250716_133551909_01.jpg', 'KakaoTalk_20250716_133551909_02.jpg'],
-    '뉴에일린': ['20250708_160127.jpg', '20250708_160310.jpg', '20250708_160433.jpg', '20250708_162059.jpg', '20250708_162123.jpg', '20250708_162224.jpg', '20250708_162238.jpg', 'KakaoTalk_20250715_230105291.jpg', 'KakaoTalk_20250715_230105291_01.jpg', 'KakaoTalk_20250715_230105291_02.jpg', 'KakaoTalk_20250715_230105291_03.jpg', 'KakaoTalk_20250715_230105291_04.jpg', 'KakaoTalk_20250715_230105291_05.jpg', 'KakaoTalk_20250715_230105291_06.jpg', 'KakaoTalk_20250715_230105291_07.jpg', 'KakaoTalk_20250715_230105291_08.jpg', 'KakaoTalk_20250716_082502651.jpg', 'KakaoTalk_20250716_134725801.jpg'],
-    '다래디자인': ['KakaoTalk_20250902_230419383.jpg', 'KakaoTalk_20250902_230419383_01.jpg', 'KakaoTalk_20250902_230419383_02.jpg', 'KakaoTalk_20250902_230419383_03.jpg', 'KakaoTalk_20250902_230419383_04.jpg', 'KakaoTalk_20250902_230419383_05.jpg'],
-    // 기본 이미지만 있는 공장들
-    '다엘': ['20250715_105148.jpg', '20250715_105227.jpg', '20250715_105259.jpg', '20250715_105435.jpg', '20250715_105441.jpg', 'KakaoTalk_20250717_104803045.jpg', 'KakaoTalk_20250717_104803045_01.jpg', 'KakaoTalk_20250717_104803045_02.jpg', 'KakaoTalk_20250717_104803045_03.jpg'],
-    '다온패션': ['KakaoTalk_20250902_230530170.jpg', 'KakaoTalk_20250902_230530170_01.jpg', 'KakaoTalk_20250902_230530170_02.jpg', 'KakaoTalk_20250902_230530170_03.jpg', 'KakaoTalk_20250902_230530170_04.jpg'],
-    '대명어패럴': ['20250709_104228.jpg', '20250709_104706.jpg', '20250709_104717.jpg', '20250709_104801.jpg', '20250709_104805.jpg', 'KakaoTalk_20250716_104725250.jpg', 'KakaoTalk_20250716_104736173.jpg', 'KakaoTalk_20250716_104736173_01.jpg', 'KakaoTalk_20250716_104736173_02.jpg', 'KakaoTalk_20250716_104859731.jpg'],
-    '더시크컴퍼니': ['20250709_225247.jpg', '20250710_145051.jpg', '20250715_160832.jpg', '20250715_212315.jpg', '20250715_212318.jpg', '20250715_212535.jpg', '20250715_212811.jpg', '20250715_213817.jpg', '20250715_214039.jpg', '20250715_214302.jpg', '20250715_215213.jpg', '20250715_215248.jpg', '20250716_100521.jpg', '20250716_101450.jpg', '20250716_101653.jpg', '20250716_141824.jpg', '20250716_142100.jpg', '20250716_142226.jpg', '20250716_142334.jpg', '8.020THC-BR1.jpg', '8.020THC-G1.jpg', '8.020THR-B1.jpg', '8.020THR-SB1.jpg', '8.020TTC-B1.jpg', '8.020TTR-B1.jpg', 'Souvenir20Tee20520-20F.jpg', 'copy-1740071059-8.020THC-LY1.jpg', 'copy-1740072012-8.020THC-B1.jpg'],
-    '라이브': ['20250711_155242.jpg', '20250711_155336.jpg', '20250711_155352.jpg', '20250711_155422.jpg', '20250711_155428.jpg', '20250711_155432.jpg'],
-    '라인스': ['20250709_105019.jpg'],
-    '레오실업': ['KakaoTalk_20250902_230515328.jpg', 'KakaoTalk_20250902_230515328_01.jpg', 'KakaoTalk_20250902_230515328_02.jpg', 'KakaoTalk_20250902_230515328_03.jpg', 'KakaoTalk_20250902_230515328_04.jpg', 'KakaoTalk_20250902_230515328_05.jpg', 'KakaoTalk_20250902_230515328_06.jpg'],
-    '미니팩토리': ['21-10-15-S1810.jpg', '21-10-15-S2359.jpg', '20250904_181307.jpg'],
-    '미호패션': ['20250716_090508.jpg', '20250716_090852.jpg', '20250716_090902.jpg', '20250716_090942.jpg', '20250716_090952.jpg', '20250717_211343.png', '20250717_211419.png', '20250717_211458.png', '20250717_211544.png', '20250717_211659.png'],
-    '박원니트': ['20250711_102529.jpg', '20250711_102609.jpg', '20250711_102611.jpg', '20250711_102634.jpg', '20250711_102637.jpg', '20250711_102712.jpg', '20250711_102729.jpg', '20250711_102731.jpg', '20250711_102735.jpg', '20250711_102815.jpg', '20250711_102822.jpg', '20250711_102838.jpg', '20250711_102843.jpg', '20250711_102910.jpg', '20250711_102912.jpg', '20250711_102914.jpg', '20250711_102916.jpg', 'KakaoTalk_20250716_144106688.jpg', 'KakaoTalk_20250716_144106688_01.jpg', 'KakaoTalk_20250716_144106688_02.jpg'],
-    '민경패션': ['KakaoTalk_20250902_230615438.jpg', 'KakaoTalk_20250902_230615438_01.jpg', 'KakaoTalk_20250902_230615438_02.jpg', 'KakaoTalk_20250902_230615438_03.jpg', 'KakaoTalk_20250902_230615438_04.jpg', 'KakaoTalk_20250902_230615438_05.jpg', 'KakaoTalk_20250902_230615438_06.jpg', 'KakaoTalk_20250902_230615438_07.jpg'],
-    '바비패션': ['KakaoTalk_20250902_230235575.jpg', 'KakaoTalk_20250902_230235575_01.jpg', 'KakaoTalk_20250902_230235575_02.jpg', 'KakaoTalk_20250902_230235575_03.jpg', 'KakaoTalk_20250902_230235575_04.jpg', 'KakaoTalk_20250902_230235575_05.jpg'],
-    '백산실업': ['20250715_170154.jpg', '20250715_170259.jpg', '20250715_170319.jpg', '20250715_170340.jpg', '20250715_170342.jpg', '20250715_170351.jpg', 'KakaoTalk_20250716_135433805.jpg', 'KakaoTalk_20250716_135433805_01.jpg', 'KakaoTalk_20250716_135433805_02.jpg', 'KakaoTalk_20250716_135433805_03.jpg', 'KakaoTalk_20250716_135433805_04.jpg'],
-    '부라더': ['20250818_184415.jpg', '20250818_184441.jpg', '20250818_184452 (2).jpg'],
-    '부연사': ['20250710_130032.jpg', '20250710_130129.jpg', '20250710_130153.jpg', '20250710_130204.jpg', '20250710_130257.jpg', '20250710_130835.jpg', '20250710_130841.jpg', 'KakaoTalk_20250716_120305880.jpg', 'KakaoTalk_20250716_120305880_01.jpg', 'KakaoTalk_20250716_120305880_02.jpg', 'KakaoTalk_20250716_120305880_03.jpg'],
-    '새가온': ['20250714_152602.jpg', '20250714_152634.jpg', '20250714_152659.jpg', '20250714_152704.jpg', '20250714_152848.jpg', '20250714_152855.jpg', '20250714_152945.jpg'],
-    '선화사': ['20250709_115204.jpg', '20250709_115222.jpg', '20250715_192620.jpg', '20250715_192629.jpg', 'm21-w.jpg', 'm25-w.jpg', 'm26-w (1).jpg', 'm26-w.jpg', 'm30-w.jpg'],
-    '수미어패럴': ['KakaoTalk_20250902_230321148.jpg', 'KakaoTalk_20250902_230321148_01.jpg', 'KakaoTalk_20250902_230321148_02.jpg', 'KakaoTalk_20250902_230321148_03.jpg', 'KakaoTalk_20250902_230321148_04.jpg', 'KakaoTalk_20250902_230321148_05.jpg'],
-    '스마일': ['KakaoTalk_20250902_230342248.jpg', 'KakaoTalk_20250902_230342248_01.jpg', 'KakaoTalk_20250902_230342248_02.jpg', 'KakaoTalk_20250902_230342248_03.jpg', 'KakaoTalk_20250902_230342248_04.jpg', 'KakaoTalk_20250902_230342248_05.jpg'],
-    '스마일업체': ['20250711_104314.jpg', '20250711_103907.jpg', '20250711_103918.jpg', '20250711_103957.jpg', '20250711_104009.jpg', '20250711_104019.jpg', '20250711_104251.jpg', 'KakaoTalk_20250716_135926515.jpg', 'KakaoTalk_20250716_135926515_01.jpg', 'KakaoTalk_20250716_135926515_02.jpg', 'KakaoTalk_20250716_135926515_03.jpg', 'KakaoTalk_20250716_135926515_04.jpg', 'KakaoTalk_20250716_135926515_05.jpg', 'KakaoTalk_20250716_135926515_06.jpg'],
-    '시즌': ['20250710_112809.jpg', '20250710_112828.jpg', '20250710_112837.jpg', '20250710_112914.jpg', 'KakaoTalk_20250716_151546116.jpg', 'KakaoTalk_20250716_151546116_01.jpg', 'KakaoTalk_20250716_151546116_02.jpg', 'KakaoTalk_20250716_151546116_03.jpg'],
-    '신원자수': ['temp_1755482617691.-314581507.jpeg', 'temp_1755482617698.-314581507.jpeg', 'temp_1755482617707.-314581507.jpeg', 'temp_1755482617713.-314581507.jpeg', 'temp_1755482617717.-314581507.jpeg', 'temp_1755482617723.-314581507.jpeg'],
-    '실루엣컴퍼니': ['20250710_123520.jpg', '20250710_123536.jpg', '20250710_123801.jpg', '20250710_123859.jpg', 'KakaoTalk_20250716_135701588.jpg', 'KakaoTalk_20250716_135701588_01.jpg', 'KakaoTalk_20250716_135701588_02.jpg', 'KakaoTalk_20250716_135701588_03.jpg', 'KakaoTalk_20250716_135701588_04.jpg', 'KakaoTalk_20250716_135701588_05.jpg', 'KakaoTalk_20250716_135701588_06.jpg'],
-    '아트': ['20250709_112748.jpg', '20250709_112919.jpg', '20250709_112925.jpg', '20250709_112951.jpg', '20250709_113042.jpg', '20250709_113050.jpg', '20250709_113337.jpg', '20250709_113349.jpg', 'KakaoTalk_20250716_141355256.jpg', 'KakaoTalk_20250716_141355256_01.jpg', 'KakaoTalk_20250716_141407669.jpg'],
-    '에이스': ['20250714_114137.jpg', '20250714_114225.jpg', '20250714_114230.jpg', '20250714_114242.jpg', '20250714_114255.jpg', 'KakaoTalk_20250716_102214059.jpg', 'KakaoTalk_20250716_102214059_01.jpg', 'KakaoTalk_20250716_102214059_02.jpg', 'KakaoTalk_20250716_102214059_03.jpg', 'KakaoTalk_20250716_102214059_04.jpg', 'KakaoTalk_20250716_102214059_05.jpg', 'KakaoTalk_20250716_102214059_06.jpg', 'KakaoTalk_20250716_102214059_07.jpg', 'KakaoTalk_20250716_102214059_08.jpg', 'KakaoTalk_20250716_102214059_09.jpg', 'KakaoTalk_20250716_102214059_10.jpg', 'KakaoTalk_20250716_102214059_11.jpg'],
-    '오르다': ['20250709_135416.jpg', '20250709_135445.jpg', '20250709_135531.jpg', '20250709_135537.jpg', '20250709_135549.jpg', '20250709_135602.jpg', '20250709_135615.jpg', '20250709_135617.jpg', 'KakaoTalk_20250716_134840666.jpg', 'KakaoTalk_20250716_134840666_01.jpg', 'KakaoTalk_20250716_134840666_02.jpg', 'KakaoTalk_20250716_134840666_03.jpg'],
-    '오성섬유': ['20250715_182743.jpg', '20250715_182849.jpg', 'KakaoTalk_20250716_142428784.jpg', 'KakaoTalk_20250716_142428784_01.jpg', 'KakaoTalk_20250716_142428784_02.jpg', 'KakaoTalk_20250716_142428784_03.jpg'],
-    '오스카 디자인': ['20250711_101241.jpg', '20250711_101327.jpg', '20250711_101340.jpg', '20250711_101415.jpg', '20250711_101544.jpg', 'KakaoTalk_20250716_135432795.jpg', 'KakaoTalk_20250716_135432795_01.jpg', 'KakaoTalk_20250716_135432795_02.jpg', 'KakaoTalk_20250716_135432795_03.jpg', 'KakaoTalk_20250716_135432795_04.jpg', 'KakaoTalk_20250716_135432795_05.jpg', 'KakaoTalk_20250716_135432795_06.jpg', 'KakaoTalk_20250716_135432795_07.jpg', 'KakaoTalk_20250716_135432795_08.jpg', 'KakaoTalk_20250716_135432795_09.jpg', 'KakaoTalk_20250716_135432795_10.jpg', 'KakaoTalk_20250716_135432795_11.jpg'],
-    '옷 만드는 사람들': ['temp_1755505483924.1451555862.jpeg', 'temp_1755505483982.1451555862.jpeg', 'temp_1755505483992.1451555862.jpeg', 'temp_1755505483995.1451555862.jpeg'],
-    '우정샘플': ['20250714_111200.jpg'],
-    '우정패션': ['20250714_111200.jpg', '20250714_111228.jpg', '20250714_111415.jpg', '20250714_111424.jpg', '20250714_111438.jpg', 'KakaoTalk_20250716_094918963.jpg', 'KakaoTalk_20250716_094918963_01.jpg', 'KakaoTalk_20250716_094918963_02.jpg', 'KakaoTalk_20250716_094918963_03.jpg'],
-    '우진모피': ['20250715_103650.jpg', '20250715_103942.jpg', '20250715_103950.jpg', '20250715_104002.jpg', '20250715_104013.jpg', '20250715_104041.jpg', '20250715_104044.jpg', '20250715_104122.jpg', '20250715_104710.jpg', '20250715_104804.jpg', '20250715_104805.jpg', '20250715_104807.jpg', '20250715_104833.jpg', 'KakaoTalk_20250715_160749945.jpg', 'KakaoTalk_20250715_160749945_01.jpg', 'KakaoTalk_20250715_160749945_02.jpg', 'KakaoTalk_20250715_160917657.jpg', 'KakaoTalk_20250715_160917657_01.jpg', 'KakaoTalk_20250715_160917657_02.jpg', 'KakaoTalk_20250715_160917657_03.jpg', 'KakaoTalk_20250715_160917657_04.jpg', 'KakaoTalk_20250715_160917657_05.jpg', 'KakaoTalk_20250715_160917657_06.jpg', 'KakaoTalk_20250715_160917657_07.jpg', 'KakaoTalk_20250715_160917657_08.jpg', 'KakaoTalk_20250715_160917657_09.jpg', 'KakaoTalk_20250715_160917657_10.jpg', 'KakaoTalk_20250715_160917657_11.jpg', 'KakaoTalk_20250715_160917657_12.jpg', 'KakaoTalk_20250715_160917657_13.jpg', 'KakaoTalk_20250715_160917657_14.jpg', 'KakaoTalk_20250715_160917657_15.jpg', 'KakaoTalk_20250715_160917657_16.jpg', 'KakaoTalk_20250715_160917657_17.jpg', 'KakaoTalk_20250715_160917657_18.jpg', 'KakaoTalk_20250715_160917657_19.jpg', 'KakaoTalk_20250715_160917657_20.jpg', 'KakaoTalk_20250715_160917657_21.jpg', 'KakaoTalk_20250715_160917657_22.jpg', 'KakaoTalk_20250715_160917657_23.jpg', 'KakaoTalk_20250715_160917657_24.jpg', 'KakaoTalk_20250715_160917657_25.jpg', 'KakaoTalk_20250715_160917657_26.jpg', 'KakaoTalk_20250715_160917657_27.jpg', 'KakaoTalk_20250715_160917657_28.jpg', 'KakaoTalk_20250715_160917657_29.jpg'],
-    '유화섬유': ['20250714_093043.jpg'],
-    '유화 섬유': ['20250714_093043.jpg', '20250714_093129.jpg', '20250714_093135.jpg', '20250714_093205.jpg', 'KakaoTalk_20250715_114616611.jpg', 'KakaoTalk_20250715_114616611_01.jpg', 'KakaoTalk_20250715_114616611_02.jpg', 'KakaoTalk_20250715_114616611_03.jpg', 'KakaoTalk_20250715_114616611_04.jpg', 'KakaoTalk_20250715_114616611_05.jpg', 'KakaoTalk_20250715_114616611_06.jpg', 'KakaoTalk_20250715_114616611_07.jpg', 'KakaoTalk_20250715_114616611_08.jpg', 'KakaoTalk_20250715_114616611_09.jpg', 'KakaoTalk_20250715_114616611_10.jpg', 'KakaoTalk_20250715_114616611_11.jpg', 'KakaoTalk_20250715_114616611_12.jpg', 'KakaoTalk_20250715_114616611_13.jpg'],
-    '으뜸어패럴': ['KakaoTalk_20250902_230214593.jpg', 'KakaoTalk_20250902_230214593_01.jpg', 'KakaoTalk_20250902_230214593_02.jpg', 'KakaoTalk_20250902_230214593_03.jpg', 'KakaoTalk_20250902_230214593_04.jpg', 'KakaoTalk_20250902_230214593_05.jpg'],
-    '재민상사': ['20250714_120323.jpg', '20250714_120423.jpg', '20250714_120430.jpg', '20250714_120452.jpg', 'KakaoTalk_20250715_163600624 (1).jpg', 'KakaoTalk_20250715_163600624.jpg', 'KakaoTalk_20250715_163600624_01 (1).jpg', 'KakaoTalk_20250715_163600624_01.jpg', 'KakaoTalk_20250715_163600624_02 (1).jpg', 'KakaoTalk_20250715_163600624_02.jpg', 'KakaoTalk_20250715_163600624_03 (1).jpg', 'KakaoTalk_20250715_163600624_03.jpg', 'KakaoTalk_20250715_163600624_04 (1).jpg', 'KakaoTalk_20250715_163600624_04.jpg'],
-    '정인어패럴': ['KakaoTalk_20250902_230604583.jpg', 'KakaoTalk_20250902_230604583_01.jpg', 'KakaoTalk_20250902_230604583_02.jpg', 'KakaoTalk_20250902_230604583_03.jpg', 'KakaoTalk_20250902_230604583_04.jpg', 'KakaoTalk_20250902_230604583_05.jpg', 'KakaoTalk_20250902_230604583_06.jpg', 'KakaoTalk_20250902_230604583_07.jpg'],
-    '제훈사': ['temp_1754980701768.1010321190.jpeg', 'temp_1754980701779.1010321190.jpeg', 'temp_1754980701791.1010321190.jpeg', 'temp_1754980701804.1010321190.jpeg'],
-    '조아스타일': ['20250714_121748.jpg', '20250714_121813.jpg', '20250714_121820.jpg', '20250714_121830.jpg', '20250714_121919.jpg', '20250714_121942.jpg', 'KakaoTalk_20250716_135531637.jpg', 'KakaoTalk_20250716_135531637_01.jpg', 'KakaoTalk_20250716_135531637_02.jpg', 'KakaoTalk_20250716_135612062.jpg', 'KakaoTalk_20250716_135612062_01.jpg'],
-    '좋은사람': ['114498789873579979_1220069723.jpg', '114502409569521622_992212250.jpg', '20250715_174014.jpg', '20250715_174407.jpg', '20250717_105746.jpg', '471757754363300_1057632601.jfif'],
-    '태경패션': ['KakaoTalk_20250902_230457546.jpg', 'KakaoTalk_20250902_230457546_01.jpg', 'KakaoTalk_20250902_230457546_02.jpg', 'KakaoTalk_20250902_230457546_03.jpg', 'KakaoTalk_20250902_230457546_04.jpg', 'KakaoTalk_20250902_230457546_05.jpg'],
-    '태광사': ['KakaoTalk_20250902_230445963.jpg', 'KakaoTalk_20250902_230445963_01.jpg', 'KakaoTalk_20250902_230445963_02.jpg', 'KakaoTalk_20250902_230445963_03.jpg', 'KakaoTalk_20250902_230445963_04.jpg', 'KakaoTalk_20250902_230445963_05.jpg', 'KakaoTalk_20250902_230445963_06.jpg'],
-    '태성어패럴': ['KakaoTalk_20250902_230331718.jpg', 'KakaoTalk_20250902_230331718_01.jpg', 'KakaoTalk_20250902_230331718_02.jpg', 'KakaoTalk_20250902_230331718_03.jpg', 'KakaoTalk_20250902_230331718_04.jpg', 'KakaoTalk_20250902_230331718_05.jpg'],
-    '하늘패션': ['20250712_172704.jpg', '20250712_172834.jpg', '20250712_172836.jpg', '20250712_172901.jpg', '20250712_172909.jpg', '20250712_172928.jpg', '20250712_172949.jpg', 'KakaoTalk_20250716_192507452.jpg', 'KakaoTalk_20250716_192607200.jpg', 'KakaoTalk_20250716_192614422.jpg', 'KakaoTalk_20250716_192632111.jpg'],
-    '혜민사': ['20250710_131750.jpg', '20250710_131801.jpg', '20250710_131845.jpg', '20250710_131856.jpg', '20250710_131941.jpg', '20250710_131948.jpg', '20250710_132030.jpg', '20250710_132128.jpg', '20250710_132136.jpg', '20250710_132138.jpg', 'KakaoTalk_20250716_135332059.jpg', 'KakaoTalk_20250716_135332059_01.jpg', 'KakaoTalk_20250716_135332059_02.jpg'],
-    '화담어패럴': ['KakaoTalk_20250716_103440984.jpg', 'KakaoTalk_20250716_103440984_01.jpg', 'KakaoTalk_20250716_103440984_02.jpg', 'KakaoTalk_20250716_103440984_03.jpg', 'KakaoTalk_20250716_103440984_04.jpg', 'KakaoTalk_20250716_103440984_05.jpg', 'KakaoTalk_20250716_103440984_06.jpg', 'KakaoTalk_20250716_103440984_07.jpg', 'KakaoTalk_20250716_103524651.jpg', 'KakaoTalk_20250716_130000282.jpg', 'KakaoTalk_20250716_130000282_01.jpg', 'KakaoTalk_20250716_130000282_02.jpg', 'KakaoTalk_20250716_130000282_03.jpg', 'KakaoTalk_20250716_130000282_04.jpg', 'KakaoTalk_20250716_130000282_05.jpg', 'KakaoTalk_20250716_130000282_06.jpg', 'KakaoTalk_20250716_130000282_07.jpg', 'KakaoTalk_20250716_130000282_08.jpg', 'KakaoTalk_20250716_130000282_09.jpg', 'KakaoTalk_20250716_130000282_10.jpg', 'KakaoTalk_20250716_130000282_11.jpg', 'KakaoTalk_20250716_130218059.jpg'],
-    '화신사': ['20250715_180243.jpg', '20250715_180505.jpg', '20250715_180731.jpg', '20250715_180737.jpg', '20250715_180743.jpg', 'KakaoTalk_20250716_120441666.jpg', 'KakaoTalk_20250716_120441666_01.jpg', 'KakaoTalk_20250716_120441666_02.jpg', 'KakaoTalk_20250716_120441666_03.jpg', 'KakaoTalk_20250716_120441666_04.jpg', 'KakaoTalk_20250716_120441666_05.jpg', 'KakaoTalk_20250716_120441666_06.jpg'],
-    '희란패션': ['20250709_110315.jpg', '20250709_110536.jpg', '20250709_110541.jpg', '20250709_110606.jpg', '20250709_110619.jpg', '20250709_110634.jpg', '20250709_110712.jpg', '20250709_110747.jpg'],
-    '희망사': ['20250715_190601.jpg', '20250715_190813.jpg', '20250715_190815.jpg', '20250715_190839.jpg', '20250715_190844.jpg', '20250717_210212.png', '20250717_210238.png', '20250717_210302.png', '20250717_210340.png', '20250717_210400.png'],
-  };
-
-  const imageFiles = allImageFiles[folderName] || ['20250710_103857.jpg'];
-  const imageUrls = imageFiles.map((fileName) => getProxyUrl(factoryName, fileName));
-  
-  return imageUrls;
+/** Images are administered in the factory row. Do not derive public URLs from a name. */
+export function getFactoryImages(value: unknown): string[] {
+  const row = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  return Array.from(new Set([...strings(row.images), ...strings(row.image)]));
 }
 
-// 업장 이름으로 대표 이미지 경로 생성 (썸네일용)
-export function getFactoryMainImage(factoryName: string): string {
-  return getFactoryThumbnailImage(factoryName);
+export function getFactoryMainImage(value: unknown): string {
+  return getFactoryImages(value)[0] || FALLBACK_IMAGE;
 }
 
-// 이미지 존재 여부 확인 (선택적)
-export function hasFactoryImages(factoryName: string): boolean {
-  return getFactoryImageFolder(factoryName) !== null;
-} 
+export function hasFactoryImages(value: unknown): boolean {
+  return getFactoryImages(value).length > 0;
+}

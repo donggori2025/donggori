@@ -7,7 +7,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const auth = await requireAdmin();
   if (auth) return auth;
   const body = await req.json();
-  const validated = validateNoticeBody(body);
+  const validated = validateNoticeBody(body, false);
   if (!validated.ok) {
     return NextResponse.json({ success: false, error: validated.error }, { status: 400 });
   }

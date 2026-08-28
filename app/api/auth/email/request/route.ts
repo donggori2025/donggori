@@ -28,7 +28,9 @@ export async function POST(req: Request) {
         .select('signupMethod')
         .eq('email', normalizedEmail)
         .maybeSingle();
-      if (error) throw new Error(error.message);
+      if (error) {
+        return NextResponse.json({ ok: false, error: '인증 요청을 처리하지 못했습니다.' }, { status: 500 });
+      }
       if (!user || ['kakao', 'naver', 'google'].includes(user.signupMethod)) {
         return NextResponse.json({ ok: true });
       }

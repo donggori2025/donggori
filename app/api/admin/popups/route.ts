@@ -3,18 +3,11 @@ import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
 import { validatePopupBody } from "@/lib/adminHelpers";
 import { insertPopupRow } from "@/lib/adminPopupDb";
-import { removeDuplicatePopups } from "@/lib/ensurePopupSeeds";
 
 export async function GET() {
   const auth = await requireAdmin();
   if (auth) return auth;
   const supabase = getServiceSupabase();
-
-  try {
-    await removeDuplicatePopups(supabase);
-  } catch (e) {
-    console.error("[admin/popups] dedupe failed:", e);
-  }
 
   const { data, error } = await supabase
     .from("popups")

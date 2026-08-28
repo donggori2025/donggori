@@ -247,12 +247,12 @@ export default function AdminFactoriesPage() {
                   const res = await adminFetch("/api/admin/factories/export");
                   if (!res.ok) {
                     const json = await res.json().catch(() => ({}));
-                    throw new Error(json.error || "엑셀 다운로드 실패");
+                    throw new Error(json.error || "CSV 다운로드 실패");
                   }
                   const blob = await res.blob();
                   const disposition = res.headers.get("Content-Disposition") || "";
                   const match = disposition.match(/filename\*=UTF-8''([^;]+)/i);
-                  const filename = match ? decodeURIComponent(match[1]) : "동고리_업장목록.xlsx";
+                  const filename = match ? decodeURIComponent(match[1]) : "동고리_업장목록.csv";
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement("a");
                   a.href = url;
@@ -260,11 +260,11 @@ export default function AdminFactoriesPage() {
                   a.click();
                   URL.revokeObjectURL(url);
                 } catch (e: unknown) {
-                  setError(e instanceof Error ? e.message : "엑셀 다운로드 실패");
+                  setError(e instanceof Error ? e.message : "CSV 다운로드 실패");
                 }
               }}
             >
-              엑셀 추출
+              CSV 추출
             </AdminButton>
             <AdminButton onClick={() => setShowCreateForm((v) => !v)}>
               {showCreateForm ? "등록 폼 닫기" : "+ 새 업장 등록"}

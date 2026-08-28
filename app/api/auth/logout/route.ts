@@ -4,15 +4,9 @@ import { revokeSessionToken } from "@/lib/session";
 const COOKIE_NAMES = [
   "access_token",
   "sns_access_token",
-  "factory_session",
   "admin_session",
   "signup_proof",
   "reset_proof",
-  "kakao_user",
-  "naver_user",
-  "factory_user",
-  "isLoggedIn",
-  "userType",
 ];
 
 export async function POST(request: NextRequest) {

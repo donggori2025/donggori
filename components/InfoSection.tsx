@@ -1,31 +1,27 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { fetchFactoriesFromDB, Factory } from "@/lib/factories";
+import { fetchFactoriesFromDB, Factory } from "@/lib/factoryCatalog";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 import Link from "next/link";
 
 function getCardFabricsById(factories: Factory[]) {
-  const fabricChips = [
-    { label: '봉제', color: '#0ACF83', bg: 'rgba(10, 207, 131, 0.1)' },
-    { label: '샘플', color: '#08B7FF', bg: 'rgba(8, 183, 255, 0.1)' },
-    { label: '패턴', color: '#FF8308', bg: 'rgba(255, 131, 8, 0.1)' },
-    { label: '나염', color: '#A259FF', bg: 'rgba(162, 89, 255, 0.1)' },
-    { label: '전사', color: '#ED6262', bg: 'rgba(237, 98, 98, 0.1)' },
-  ];
+  const colors = [
+    { color: '#0ACF83', bg: 'rgba(10, 207, 131, 0.1)' },
+    { color: '#08B7FF', bg: 'rgba(8, 183, 255, 0.1)' },
+  ] as const;
   return Object.fromEntries(
     factories.map((f, idx) => {
-      const seed = String(f.id ?? idx);
-      let hash = 0;
-      for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-      const shuffled = [...fabricChips].sort((a, b) => {
-        const h1 = Math.abs(Math.sin(hash + a.label.length)) % 1;
-        const h2 = Math.abs(Math.sin(hash + b.label.length)) % 1;
-        return h1 - h2;
-      });
-      const count = (Math.abs(hash) % 2) + 1;
-      return [f.id ?? idx, shuffled.slice(0, count)];
+      const labels = [f.factory_type, f.main_fabrics]
+        .flatMap((value) => typeof value === "string" ? value.split(",") : [])
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .slice(0, 2);
+      return [
+        f.id ?? idx,
+        labels.map((label, chipIndex) => ({ label, ...colors[chipIndex % colors.length] })),
+      ];
     })
   );
 }
@@ -35,7 +31,7 @@ const VISIBLE_COUNT = 4;
 
 // 공장 이미지 카드 컴포넌트
 function FactoryImageCard({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory.name || factory.company_name || '');
+  const { images, loading } = useFactoryImages(factory);
   
   return (
     <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
@@ -224,12 +220,12 @@ const InfoSection = () => {
           {/* 텍스트 + CTA — 모바일 하단, 데스크탑 좌측 */}
           <div className="order-2 lg:order-1 flex flex-col items-start text-left mt-6 lg:mt-0">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight tracking-tight">
-              70+ 개의 인증된
+              조건에 맞는
               <br />
-              고퀄리티 봉제공장
+              봉제공장 찾기
             </h2>
             <p className="mt-3 md:mt-4 text-sm md:text-base text-gray-500 leading-relaxed max-w-sm">
-              동고리는 70개 이상의 봉제공장과 3개 패션봉제협회 품질인증을 통해 고퀄리티 봉제를 약속합니다.
+              지역, 생산 품목, 최소 주문 수량 등을 비교해 적합한 공장을 찾아보세요.
             </p>
             <Link
               href="/matching"
@@ -247,4 +243,4 @@ const InfoSection = () => {
   );
 };
 
-export default InfoSection; 
+export default InfoSection;

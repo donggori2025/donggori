@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { put } from "@vercel/blob";
 import { requireAdmin } from "@/lib/adminSession";
-import { sanitizeBlobFolder } from "@/lib/adminHelpers";
+import { imageUploadExtension, sanitizeBlobFolder } from "@/lib/adminHelpers";
 
 export async function POST(req: Request) {
   const auth = await requireAdmin();
@@ -24,17 +25,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "유효하지 않은 folder 경로입니다." }, { status: 400 });
     }
 
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ success: false, error: "이미지 파일만 업로드 가능합니다." }, { status: 400 });
+    const extension = imageUploadExtension(file.type);
+    if (!extension) {
+      return NextResponse.json({ success: false, error: "JPG, PNG, WEBP, GIF 이미지만 업로드 가능합니다." }, { status: 400 });
     }
 
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json({ success: false, error: "파일 크기는 10MB 이하여야 합니다." }, { status: 400 });
     }
 
-    const timestamp = Date.now();
-    const safeName = file.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
-    const pathname = `${folder}/${timestamp}-${safeName}`;
+    const pathname = `${folder}/${randomUUID()}.${extension}`;
 
     const blob = await put(pathname, file, { access: 'public' });
 

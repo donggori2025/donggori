@@ -43,6 +43,9 @@ function ErrorHandler({ onError }: { onError: (error: string) => void }) {
         case 'server_error':
           onError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
           break;
+        case 'account_link_required':
+          onError('같은 이메일로 이미 가입된 계정입니다. 기존 로그인 방식을 이용해주세요.');
+          break;
         default:
           onError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
@@ -53,6 +56,7 @@ function ErrorHandler({ onError }: { onError: (error: string) => void }) {
 }
 
 function SignInForm() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -60,7 +64,8 @@ function SignInForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [socialLoading, setSocialLoading] = useState<null | 'kakao' | 'naver'>(null);
-  const cookieSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+  const next = searchParams.get("next");
+  const nextPath = next && /^\/(?!\/)[^\\\r\n]*$/.test(next) ? next : "/";
   
   // 이메일 인증 로그인 관련 상태 (제거)
 
@@ -73,7 +78,7 @@ function SignInForm() {
     
     try {
       const name = provider === 'oauth_kakao' ? 'kakao' : 'naver';
-      window.location.href = `/api/auth/oauth/start?provider=${name}`;
+      window.location.href = `/api/auth/oauth/start?provider=${name}&next=${encodeURIComponent(nextPath)}`;
     } catch (err: unknown) {
       console.error('OAuth 로그인 오류:', err);
       setError(err instanceof Error ? err.message : '소셜 로그인 중 오류가 발생했습니다.');
@@ -88,45 +93,9 @@ function SignInForm() {
     setLoading(true);
     
     try {
-      // 먼저 봉제공장 로그인 시도
       const normalizeInvisible = (s: string) => s.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
       const cleanId = normalizeInvisible(email);
       const cleanPw = normalizeInvisible(password);
-
-      const factoryRes = await fetch('/api/factory/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: cleanId, password: cleanPw }),
-      });
-      const factoryAuth = await factoryRes.json().catch(() => null);
-      
-      if (factoryRes.ok && factoryAuth?.success) {
-        console.log('봉제공장 로그인 성공:', factoryAuth.factoryName);
-        
-        // 봉제공장 세션 유지 시간: 14일
-        const factorySessionDuration = 60 * 60 * 24 * 14;
-        
-        document.cookie = `factory_user=${JSON.stringify({
-          id: cleanId,
-          factoryId: factoryAuth.factoryId,
-          realName: factoryAuth.factoryName,
-          isFactoryUser: true,
-        })}; path=/; max-age=${factorySessionDuration}; SameSite=Lax${cookieSecure}`;
-
-        document.cookie = `userType=factory; path=/; max-age=${factorySessionDuration}; SameSite=Lax${cookieSecure}`;
-        document.cookie = `isLoggedIn=true; path=/; max-age=${factorySessionDuration}; SameSite=Lax${cookieSecure}`;
-
-        // Header는 localStorage의 userType/factoryAuth를 읽으므로 로컬에도 저장
-        try {
-          localStorage.setItem('userType', 'factory');
-          localStorage.setItem('factoryAuth', JSON.stringify(factoryAuth));
-        } catch {}
-
-        window.location.href = '/';
-        return;
-      }
-
-      // 봉제공장 로그인 실패 시 일반 사용자 로그인 시도
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -135,21 +104,7 @@ function SignInForm() {
       const js = await res.json();
 
       if (res.ok && js.success) {
-        const userSessionDuration = 60 * 60 * 24 * 30;
-        document.cookie = `userType=user; path=/; max-age=${userSessionDuration}; SameSite=Lax${cookieSecure}`;
-        document.cookie = `isLoggedIn=true; path=/; max-age=${userSessionDuration}; SameSite=Lax${cookieSecure}`;
-
-        if (js.user) {
-          try {
-            localStorage.setItem('userId', js.user.id || '');
-            localStorage.setItem('userEmail', js.user.email || '');
-            localStorage.setItem('userName', js.user.name || '');
-            localStorage.setItem('userPhone', js.user.phoneNumber || '');
-            localStorage.setItem('isLoggedIn', 'true');
-          } catch {}
-        }
-
-        window.location.href = '/';
+        window.location.assign(nextPath);
       } else {
         setError(js.error || '이메일 또는 비밀번호가 올바르지 않습니다.');
       }
@@ -167,7 +122,7 @@ function SignInForm() {
       <label className="text-sm font-semibold">이메일</label>
       <input
         type="text"
-        placeholder="이메일(사용자) 또는 봉제공장 아이디 입력"
+        placeholder="이메일을 입력해주세요."
         value={email}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
         required

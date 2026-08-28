@@ -42,12 +42,12 @@ export async function POST(req: Request) {
     });
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: "피드백을 저장하지 못했습니다." }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, message: "피드백이 성공적으로 저장되었습니다." });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ success: false, error: "피드백을 저장하지 못했습니다." }, { status: 500 });
   }
 }
 
@@ -74,11 +74,11 @@ export async function GET(req: Request) {
     const { data, error } = await query.order("created_at", { ascending: false });
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: "피드백을 조회하지 못했습니다." }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, data });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ success: false, error: "피드백을 조회하지 못했습니다." }, { status: 500 });
   }
 }

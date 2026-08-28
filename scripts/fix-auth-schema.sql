@@ -11,7 +11,7 @@ begin;
 
 -- 1) 세션 테이블 — 로그인 성공 시 발급하는 access_token 을 여기에 적재한다.
 create table if not exists public.sessions (
-  id text primary key, -- 토큰 자체를 키로 사용
+  id text primary key, -- SHA-256(token); bearer token 원문은 저장하지 않는다.
   type text not null check (type in ('local', 'sns')),
   user_id text,
   user_email text,
@@ -23,6 +23,7 @@ create table if not exists public.sessions (
 );
 
 create index if not exists idx_sessions_user_email on public.sessions(user_email);
+create index if not exists idx_sessions_user_id on public.sessions(user_id);
 create index if not exists idx_sessions_expires_at on public.sessions(expires_at);
 
 -- 토큰이 곧 기본키라 anon 키로 한 행이라도 읽히면 계정 탈취로 이어진다.

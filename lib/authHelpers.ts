@@ -1,14 +1,13 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminSession } from "./adminSession";
-import { verifyFactorySessionValue } from "./factorySession";
 import { verifySessionToken } from "./session";
 
 export interface AuthResult {
   authenticated: boolean;
   userId?: string;
   email?: string;
-  role?: "user" | "admin" | "factory";
+  role?: "user" | "admin";
 }
 
 export async function getRequestAuth(req?: NextRequest): Promise<AuthResult> {
@@ -44,14 +43,6 @@ export async function getRequestAuth(req?: NextRequest): Promise<AuthResult> {
           email: data.user_email ?? undefined,
           role: "user",
         };
-      }
-    }
-
-    const factorySession = cookieStore.get("factory_session")?.value;
-    if (factorySession) {
-      const data = verifyFactorySessionValue(factorySession);
-      if (data?.factoryId) {
-        return { authenticated: true, userId: data.factoryId, role: "factory" };
       }
     }
 

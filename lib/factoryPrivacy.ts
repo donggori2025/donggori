@@ -1,5 +1,5 @@
 import { getFactoryImages, getFactoryMainImage } from "./factoryImages";
-import type { Factory } from "./factories";
+import type { Factory } from "./factoryCatalog";
 
 /** 공개 목록/상세에 노출해도 되는 업장 컬럼 (연락처·이메일·상세주소·대표자명 제외) */
 export const PUBLIC_FACTORY_SELECT = [
@@ -18,7 +18,6 @@ export const PUBLIC_FACTORY_SELECT = [
   "monthly_capacity",
   "lat",
   "lng",
-  "kakao_url",
   "equipment",
   "sewing_machines",
   "pattern_machines",
@@ -38,9 +37,17 @@ export const PUBLIC_FACTORY_SELECT = [
   "employees",
   "processes",
   "image",
+  "images",
 ].join(",");
 
 const HIDDEN_FACTORY_NAMES = new Set(["희망사"]);
+
+function toPublicCoordinate(value: unknown, min: number, max: number): number {
+  const coordinate = Number(value);
+  if (!Number.isFinite(coordinate) || coordinate < min || coordinate > max) return 0;
+  // Public markers show only an approximate neighbourhood, not a building-level location.
+  return Math.round(coordinate * 100) / 100;
+}
 
 export function mapPublicFactoryRow(item: Record<string, unknown>): Factory {
   const companyName = String(item.company_name || item.name || "공장명 없음");
@@ -53,12 +60,13 @@ export function mapPublicFactoryRow(item: Record<string, unknown>): Factory {
     items: [],
     minOrder: Number(item.moq) || 0,
     description: String(item.intro_text || item.intro || item.description || "설명 없음"),
-    image: getFactoryMainImage(companyName),
-    images: getFactoryImages(companyName),
+    image: getFactoryMainImage(item),
+    images: getFactoryImages(item),
     contact: "",
-    lat: Number(item.lat) || 37.5665,
-    lng: Number(item.lng) || 126.9780,
-    kakaoUrl: String(item.kakao_url || ""),
+    // 0/0 means location is unavailable; valid coordinates are coarsened for public privacy.
+    lat: toPublicCoordinate(item.lat, -90, 90),
+    lng: toPublicCoordinate(item.lng, -180, 180),
+    kakaoUrl: "",
     processes: item.processes
       ? Array.isArray(item.processes)
         ? (item.processes as string[])

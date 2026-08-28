@@ -115,17 +115,6 @@ const markers = [
 />
 ```
 
-### 4.3 간단한 지도 (마커 없음)
-```tsx
-import SimpleNaverMap from '@/components/SimpleNaverMap';
-
-<SimpleNaverMap
-  center={{ lat: 37.5665, lng: 126.9780 }}
-  level={8}
-  className="w-full h-96"
-/>
-```
-
 ## 5. 주의사항
 
 ### 5.1 도메인 등록
@@ -155,11 +144,6 @@ import SimpleNaverMap from '@/components/SimpleNaverMap';
 - `onLoadError`: 로드 실패 콜백
 - `className`: CSS 클래스
 
-### SimpleNaverMap Props
-- `center`: 지도 중심 좌표
-- `level`: 줌 레벨
-- `className`: CSS 클래스
-
 ## 7. 마이그레이션 (카카오맵 → 네이버맵)
 
 ### 7.1 환경 변수 변경
@@ -179,7 +163,6 @@ import SimpleKakaoMap from '@/components/SimpleKakaoMap';
 
 // 변경 후
 import NaverMap from '@/components/NaverMap';
-import SimpleNaverMap from '@/components/SimpleNaverMap';
 ```
 
 ### 7.3 API 차이점
@@ -190,15 +173,9 @@ import SimpleNaverMap from '@/components/SimpleNaverMap';
 
 ## 8. 테스트
 
-### 8.1 테스트 페이지
-`http://localhost:3000/test-map`에서 지도 기능을 테스트할 수 있습니다.
+### 8.1 테스트
 
-### 8.2 디버그 정보
-테스트 페이지에서 다음 정보를 확인:
-- 환경 변수 설정 상태
-- Client ID 유효성
-- API 상태
-- 현재 도메인
+로컬 `/factories`의 지도 보기와 Vercel Preview에서 Client ID, 허용 도메인, 마커 표시, 목록 전환을 확인합니다. 전용 공개 테스트 페이지는 운영하지 않습니다.
 
 ## 9. 유용한 링크
 

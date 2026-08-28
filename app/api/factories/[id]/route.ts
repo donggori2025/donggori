@@ -35,7 +35,7 @@ export async function GET(
       .maybeSingle();
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: "공장 정보를 불러오지 못했습니다." }, { status: 500 });
     }
     if (!data) {
       return NextResponse.json({ success: false, error: "업장을 찾을 수 없습니다." }, { status: 404 });
@@ -45,10 +45,9 @@ export async function GET(
       success: true,
       data: mapPublicFactoryRow(data as unknown as Record<string, unknown>),
     });
-  } catch (err: unknown) {
-    const error = err as Error;
+  } catch {
     return NextResponse.json(
-      { success: false, error: error?.message || "알 수 없는 오류" },
+      { success: false, error: "공장 정보를 불러오지 못했습니다." },
       { status: 500 }
     );
   }

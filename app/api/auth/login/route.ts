@@ -70,8 +70,7 @@ export async function POST(req: NextRequest) {
       maxAge: SESSION_DURATIONS.USER 
     });
     return res;
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'server error' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: '로그인 처리 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }
-

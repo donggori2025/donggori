@@ -110,8 +110,8 @@ export default function ResetPasswordPage() {
       setError("새 비밀번호를 입력해주세요.");
       return;
     }
-    if (newPassword.length < 6) {
-      setError("비밀번호는 6자 이상이어야 합니다.");
+    if (newPassword.length < 10) {
+      setError("비밀번호는 10자 이상이어야 합니다.");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -200,7 +200,7 @@ export default function ResetPasswordPage() {
                 required
                 className="w-full border rounded px-3 py-2 mt-1"
               />
-              <p className="text-xs text-gray-500 mt-1">가입 시 사용한 이메일을 입력해주세요.</p>
+              <p className="text-xs text-gray-500 mt-1">이메일과 비밀번호로 가입한 계정의 이메일을 입력해주세요.</p>
             </div>
             {error && <div className="text-red-500 text-sm text-center">{error}</div>}
             <button
@@ -235,8 +235,9 @@ export default function ResetPasswordPage() {
                   {canResend ? "재발송" : formatTime(timer)}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                {email}로 발송된 인증번호를 입력해주세요.
+              <p className="text-xs text-gray-500 mt-1 leading-5">
+                해당 이메일이 비밀번호 계정으로 등록되어 있으면 인증번호가 발송됩니다.
+                메일이 오지 않으면 카카오·네이버 로그인을 이용해주세요.
               </p>
             </div>
             {error && <div className="text-red-500 text-sm text-center">{error}</div>}
@@ -262,7 +263,7 @@ export default function ResetPasswordPage() {
                 required
                 className="w-full border rounded px-3 py-2 mt-1"
               />
-              <p className="text-xs text-gray-500 mt-1">6자 이상 입력해주세요.</p>
+              <p className="text-xs text-gray-500 mt-1">10자 이상 입력해주세요.</p>
             </div>
             <div>
               <label className="text-sm font-semibold text-gray-700">비밀번호 확인</label>

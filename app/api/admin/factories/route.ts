@@ -1,87 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
-
-type AllowedValue = string | number | boolean | null | string[];
-
-function sanitizeFactoryPatch(input: unknown): Record<string, AllowedValue> {
-  const body = (input && typeof input === "object" ? (input as Record<string, unknown>) : {}) as Record<
-    string,
-    unknown
-  >;
-
-  // `donggori` 테이블에 넣을 수 있는 안전한 컬럼만 허용합니다.
-  // (운영 보안: 임의 컬럼 주입/권한 오남용 방지)
-  const allowedKeys = new Set<string>([
-    "company_name",
-    "name",
-    "address",
-    "business_type",
-    "phone_number",
-    "contact",
-    "contact_name",
-    "email",
-    "admin_district",
-    "intro",
-    "factory_type",
-    "main_fabrics",
-    "distribution",
-    "delivery",
-    "equipment",
-    "sewing_machines",
-    "pattern_machines",
-    "special_machines",
-    "processes",
-    "top_items_upper",
-    "top_items_lower",
-    "top_items_outer",
-    "top_items_dress_skirt",
-    "top_items_bag",
-    "top_items_fashion_accessory",
-    "top_items_underwear",
-    "top_items_sports_leisure",
-    "top_items_pet",
-    "items",
-    "kakao_url",
-    "image",
-    "images",
-    "lat",
-    "lng",
-    "moq",
-    "minOrder",
-    "monthly_capacity",
-    "monthlyCapacity",
-    "established_year",
-    "establishedYear",
-  ]);
-
-  const out: Record<string, AllowedValue> = {};
-  for (const [k, v] of Object.entries(body)) {
-    if (!allowedKeys.has(k)) continue;
-    if (v === undefined) continue;
-
-    if (k === "images") {
-      if (Array.isArray(v)) {
-        out[k] = v.map((x) => String(x)).filter((x) => x.length > 0);
-      } else if (typeof v === "string" && v.length > 0) {
-        out[k] = [v];
-      }
-      continue;
-    }
-
-    if (k === "lat" || k === "lng" || k === "moq" || k === "minOrder" || k === "monthly_capacity" || k === "monthlyCapacity" || k === "established_year" || k === "establishedYear") {
-      const num = typeof v === "number" ? v : Number(String(v));
-      if (!Number.isNaN(num)) out[k] = num;
-      continue;
-    }
-
-    // 나머지는 문자열로 저장(테이블 스키마에 따라 supabase에서 캐스팅)
-    if (v === null) out[k] = null;
-    else out[k] = String(v);
-  }
-
-  return out;
-}
+import { validateFactoryPatch } from "@/lib/adminHelpers";
 
 export async function GET() {
   const auth = await requireAdmin();
@@ -143,17 +63,14 @@ export async function POST(req: Request) {
   if (auth) return auth;
   try {
     const body = await req.json();
-    const patch = sanitizeFactoryPatch(body);
-    if (Object.keys(patch).length === 0) {
-      return NextResponse.json({ success: false, error: "등록할 데이터가 없습니다." }, { status: 400 });
-    }
+    const validated = validateFactoryPatch(body, true);
+    if (!validated.ok) return NextResponse.json({ success: false, error: validated.error }, { status: 400 });
     const supabase = getServiceSupabase();
-    const { error } = await supabase.from("donggori").insert(patch);
+    const { error } = await supabase.from("donggori").insert(validated.data);
     if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     return NextResponse.json({ success: true });
   } catch (e) {
     return NextResponse.json({ success: false, error: "서버 오류" }, { status: 500 });
   }
 }
-
 

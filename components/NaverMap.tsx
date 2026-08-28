@@ -80,7 +80,7 @@ export default function NaverMap({
   const loadNaverMap = useCallback(() => {
     // API 키가 없으면 에러 처리
     if (!clientId) {
-      setErrorDetails('환경 변수 NEXT_PUBLIC_NAVER_CLIENT_ID가 설정되지 않았습니다.');
+      setErrorDetails('환경 변수 NEXT_PUBLIC_NAVER_MAP_CLIENT_ID가 설정되지 않았습니다.');
       setHasError(true);
       return;
     }
@@ -342,4 +342,4 @@ export default function NaverMap({
       />
     </div>
   );
-} 
+}

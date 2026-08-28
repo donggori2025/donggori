@@ -3,6 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import { getRequestAuth, unauthorized } from "@/lib/authHelpers";
 import { canAccessMatchRequest } from "@/lib/matchRequestAuth";
 
+const REQUEST_SELECT = "id,user_id,user_email,user_name,factory_id,factory_name,status,items,quantity,description,contact,deadline,budget,additional_info,created_at,updated_at";
+
 function getSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -18,8 +20,8 @@ export async function POST(req: Request) {
     if (!auth.authenticated) {
       return unauthorized();
     }
-    if (auth.role === "factory") {
-      return unauthorized("의뢰는 일반 사용자 또는 관리자만 생성할 수 있습니다.");
+    if (auth.role !== "user") {
+      return unauthorized("의뢰는 로그인한 사용자만 생성할 수 있습니다.");
     }
 
     const supabase = getSupabase();
@@ -29,15 +31,21 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    // 일반 사용자는 요청 본문의 사용자 식별자를 신뢰하지 않는다.
-    // 로그인 세션에서 확인한 본인 정보로 강제해 타인 명의 의뢰 생성을 막는다.
-    if (auth.role === "user") {
-      body.user_id = auth.userId;
-      body.user_email = auth.email;
-      body.status = "pending";
+    const { data: account, error: accountError } = await supabase
+      .from("users")
+      .select("id,email,name")
+      .eq("id", auth.userId)
+      .maybeSingle();
+    if (accountError || !account?.email || !account?.name) {
+      return unauthorized("사용자 정보를 확인할 수 없습니다. 다시 로그인해주세요.");
     }
 
-    const required = ["user_id", "user_email", "user_name", "factory_id", "factory_name"];
+    // Client identity, status, timestamps and factory name are never trusted.
+    body.user_id = account.id;
+    body.user_email = account.email;
+    body.status = "pending";
+
+    const required = ["user_id", "user_email", "factory_id"];
     const missing = required.filter((k) => !body?.[k]);
     if (missing.length > 0) {
       return NextResponse.json(
@@ -46,40 +54,59 @@ export async function POST(req: Request) {
       );
     }
 
+    const userName = String(account.name).trim().slice(0, 80);
+    const contact = String(body.contact || "").trim().slice(0, 60);
+    const description = String(body.description || "").trim().slice(0, 4000);
+    if (!userName || !contact) {
+      return NextResponse.json({ success: false, error: "이름과 연락처를 입력해주세요." }, { status: 400 });
+    }
+
+    let factoryName = "디자인 의뢰";
+    if (String(body.factory_id) !== "design-request") {
+      const { data: factory, error: factoryError } = await supabase
+        .from("donggori")
+        .select("id,company_name")
+        .eq("id", String(body.factory_id))
+        .maybeSingle();
+      if (factoryError) return NextResponse.json({ success: false, error: "공장 정보를 확인할 수 없습니다." }, { status: 500 });
+      if (!factory?.company_name) return NextResponse.json({ success: false, error: "대상 공장을 찾을 수 없습니다." }, { status: 404 });
+      factoryName = factory.company_name;
+    }
+
+    const now = new Date().toISOString();
     const { data: inserted, error: insertError } = await supabase
       .from("match_requests")
       .insert({
         user_id: body.user_id,
         user_email: body.user_email,
-        user_name: body.user_name,
+        user_name: userName,
         factory_id: body.factory_id,
-        factory_name: body.factory_name,
-        status: body.status ?? "pending",
-        items: body.items ?? [],
-        quantity: body.quantity ?? 0,
-        description: body.description ?? "",
-        contact: body.contact ?? "",
-        deadline: body.deadline ?? "",
-        budget: body.budget ?? "",
-        additional_info: body.additional_info ?? null,
-        created_at: body.created_at ?? new Date().toISOString(),
-        updated_at: body.updated_at ?? new Date().toISOString(),
+        factory_name: factoryName,
+        status: "pending",
+        items: Array.isArray(body.items) ? body.items.filter((item: unknown) => typeof item === "string").slice(0, 20) : [],
+        quantity: Math.max(0, Math.min(Number(body.quantity) || 0, 1_000_000_000)),
+        description,
+        contact,
+        deadline: String(body.deadline || "").slice(0, 60),
+        budget: String(body.budget || "").slice(0, 80),
+        additional_info: typeof body.additional_info === "string" ? body.additional_info.slice(0, 8000) : null,
+        created_at: now,
+        updated_at: now,
       })
       .select("id")
       .single();
 
     if (insertError) {
       return NextResponse.json(
-        { success: false, error: insertError.message, code: insertError.code },
+        { success: false, error: "의뢰를 저장하지 못했습니다." },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ success: true, id: inserted?.id });
-  } catch (err: unknown) {
-    const error = err as Error;
+  } catch {
     return NextResponse.json(
-      { success: false, error: error?.message || "알 수 없는 오류" },
+      { success: false, error: "의뢰를 처리하지 못했습니다." },
       { status: 500 }
     );
   }
@@ -100,18 +127,16 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
     const userEmail = searchParams.get("userEmail");
-    const factoryId = searchParams.get("factoryId");
-    const factoryName = searchParams.get("factoryName");
     const requestId = searchParams.get("id");
 
     if (requestId) {
       const { data, error } = await supabase
         .from("match_requests")
-        .select("*")
+        .select(REQUEST_SELECT)
         .eq("id", requestId)
         .limit(1);
       if (error) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        return NextResponse.json({ success: false, error: "의뢰를 조회하지 못했습니다." }, { status: 500 });
       }
       if (data?.[0] && !canAccessMatchRequest(auth, data[0])) {
         return unauthorized("해당 의뢰를 조회할 권한이 없습니다.");
@@ -119,53 +144,27 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: true, data });
     }
 
-    if (!userId && !userEmail && !factoryId && !factoryName) {
-      return NextResponse.json(
-        { success: false, error: "쿼리 파라미터가 필요합니다: userId/userEmail 또는 factoryId/factoryName" },
-        { status: 400 }
-      );
-    }
-
-    if (auth.role === "user") {
-      if (factoryId && !userId && !userEmail) {
-        return unauthorized("자신의 의뢰 내역만 조회할 수 있습니다.");
-      }
-      if ((userId && userId !== auth.userId) || (userEmail && userEmail !== auth.email)) {
-        return unauthorized("자신의 의뢰 내역만 조회할 수 있습니다.");
-      }
-    }
-    if (auth.role === "factory" && (
-      userId || userEmail || factoryName || (factoryId && factoryId !== auth.userId)
-    )) {
-      return unauthorized("자신의 공장 의뢰만 조회할 수 있습니다.");
-    }
-
-    // 조건을 하나의 쿼리로 합쳐 Supabase 타입 이슈를 피하고, 결과를 예측 가능하게 만듭니다.
-    let query = supabase.from("match_requests").select("*");
+    // A user can only enumerate their own requests. Admin filters are optional.
+    let query = supabase.from("match_requests").select(REQUEST_SELECT);
     if (auth.role === "user") {
       if (auth.userId) query = query.eq("user_id", auth.userId);
       else if (auth.email) query = query.eq("user_email", auth.email);
     } else if (auth.role === "admin") {
       if (userId) query = query.eq("user_id", userId);
       if (userEmail) query = query.eq("user_email", userEmail);
-    }
-    if (auth.role === "factory") {
-      query = query.eq("factory_id", auth.userId);
     } else {
-      if (factoryId) query = query.eq("factory_id", factoryId);
-      if (factoryName) query = query.eq("factory_name", factoryName);
+      return unauthorized();
     }
 
     const { data, error } = await query.order("created_at", { ascending: false });
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: "의뢰내역을 조회하지 못했습니다." }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, data: data ?? [] });
-  } catch (err: unknown) {
-    const error = err as Error;
+  } catch {
     return NextResponse.json(
-      { success: false, error: error?.message || "알 수 없는 오류" },
+      { success: false, error: "의뢰내역을 조회하지 못했습니다." },
       { status: 500 }
     );
   }
@@ -177,8 +176,8 @@ export async function PUT(req: Request) {
     if (!auth.authenticated) {
       return unauthorized();
     }
-    if (auth.role !== "admin" && auth.role !== "factory") {
-      return unauthorized("의뢰 상태는 공장 또는 관리자만 변경할 수 있습니다.");
+    if (auth.role !== "admin") {
+      return unauthorized("의뢰 상태는 관리자만 변경할 수 있습니다.");
     }
 
     const supabase = getSupabase();
@@ -198,7 +197,7 @@ export async function PUT(req: Request) {
       .eq("id", id)
       .maybeSingle();
     if (targetError) {
-      return NextResponse.json({ success: false, error: targetError.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: "의뢰를 확인하지 못했습니다." }, { status: 500 });
     }
     if (!target) {
       return NextResponse.json({ success: false, error: "의뢰를 찾을 수 없습니다." }, { status: 404 });
@@ -213,14 +212,13 @@ export async function PUT(req: Request) {
       .eq("id", id);
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: "의뢰 상태를 변경하지 못했습니다." }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
-  } catch (err: unknown) {
-    const error = err as Error;
+  } catch {
     return NextResponse.json(
-      { success: false, error: error?.message || "알 수 없는 오류" },
+      { success: false, error: "의뢰 상태를 변경하지 못했습니다." },
       { status: 500 }
     );
   }

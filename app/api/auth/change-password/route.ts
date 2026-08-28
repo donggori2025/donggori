@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { getRequestAuth, unauthorized } from "@/lib/authHelpers";
+import { revokeUserSessions } from "@/lib/session";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   try {
     const auth = await getRequestAuth();
-    if (!auth.authenticated || !auth.email) {
+    if (!auth.authenticated || auth.role !== "user" || !auth.userId) {
       return unauthorized("로그인이 필요합니다.");
     }
 
@@ -19,9 +20,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (newPassword.length < 6) {
+    if (String(newPassword).length < 10) {
       return NextResponse.json(
-        { success: false, error: "비밀번호는 6자 이상이어야 합니다." },
+        { success: false, error: "비밀번호는 10자 이상이어야 합니다." },
         { status: 400 }
       );
     }
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
     const { data: user, error } = await supabase
       .from("users")
       .select("id, email, password")
-      .eq("email", auth.email)
+      .eq("id", auth.userId)
       .maybeSingle();
 
     if (error || !user || !user.password) {
@@ -62,10 +63,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    await revokeUserSessions(user.id);
+
+    const response = NextResponse.json({
       success: true,
-      message: "비밀번호가 성공적으로 변경되었습니다.",
+      message: "비밀번호가 변경되었습니다. 모든 기기에서 다시 로그인해주세요.",
     });
+    response.cookies.set("access_token", "", { httpOnly: true, path: "/", maxAge: 0 });
+    response.cookies.set("sns_access_token", "", { httpOnly: true, path: "/", maxAge: 0 });
+    return response;
   } catch (error) {
     console.error("비밀번호 변경 오류:", error);
     return NextResponse.json(

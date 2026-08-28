@@ -1,0 +1,34 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SITE_URL: https://www.donggori.com
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ci-service-role-key-placeholder
+      SESSION_SECRET: ci-session-secret-placeholder-32-bytes
+      ADMIN_SESSION_SECRET: ci-admin-session-secret-placeholder-32-bytes
+      ADMIN_ID: ci-admin
+      ADMIN_PW: ci-password
+      NEXT_PUBLIC_NAVER_CLIENT_ID: ci-naver-client
+      NAVER_CLIENT_SECRET: ci-naver-secret
+      NEXT_PUBLIC_KAKAO_CLIENT_ID: ci-kakao-client
+      KAKAO_CLIENT_SECRET: ci-kakao-secret
+      NEXT_PUBLIC_NAVER_MAP_CLIENT_ID: ci-map-client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run verify

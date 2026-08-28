@@ -1,19 +1,17 @@
 "use client";
 import { useEffect, useMemo, useState, useRef } from "react";
-import { supabase } from "@/lib/supabaseClient";
-// 커스텀 쿠키/Supabase 기반 로그인 확인
+import { useAppAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Factory } from "@/lib/factories";
+import { Factory } from "@/lib/factoryCatalog";
 import { Share, ArrowLeft, Check, MessageCircle, FileText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getFactoryMainImage } from "@/lib/factoryImages";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
+import { DONGGORI_OPEN_KAKAO_CHAT_URL } from "@/lib/site";
 
-const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
 
 export default function FactoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const user: any = null;
+  const { user, isSignedIn } = useAppAuth();
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [factoryId, setFactoryId] = useState<string | null>(null);
@@ -23,7 +21,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const [majorItemsOverflow, setMajorItemsOverflow] = useState(false);
   
   // 공장 이미지 훅 사용
-  const { images: factoryImages, loading: imagesLoading } = useFactoryImages(factory?.name || factory?.company_name || '');
+  const { images: factoryImages, loading: imagesLoading } = useFactoryImages(factory);
   const displayImages = useMemo(
     () =>
       factoryImages.filter(
@@ -38,87 +36,6 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const thumbnailRef = useRef<HTMLDivElement>(null);
   const majorItemsRef = useRef<HTMLParagraphElement | null>(null);
 
-  // 앱 레벨 로그인 감지 (쿠키/스토리지)
-  const isAppLoggedIn = () => {
-    try {
-      if (typeof document === 'undefined') return false;
-      
-      // 일반 로그인 확인
-      if (document.cookie.includes('isLoggedIn=true')) return true;
-      if (typeof localStorage !== 'undefined' && (localStorage.getItem('userType') || localStorage.getItem('isLoggedIn') === 'true')) return true;
-      
-      // 소셜 로그인 쿠키 확인
-      const getCookie = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-        return null;
-      };
-      
-      // 카카오 로그인 확인
-      const kakaoUser = getCookie('kakao_user');
-      if (kakaoUser) {
-        try {
-          const user = JSON.parse(decodeURIComponent(kakaoUser));
-          if (user && user.id && user.email) return true;
-        } catch (e) {
-          console.error('카카오 사용자 쿠키 파싱 오류:', e);
-        }
-      }
-      
-      // 네이버 로그인 확인
-      const naverUser = getCookie('naver_user');
-      if (naverUser) {
-        try {
-          const user = JSON.parse(decodeURIComponent(naverUser));
-          if (user && user.id && user.email) return true;
-        } catch (e) {
-          console.error('네이버 사용자 쿠키 파싱 오류:', e);
-        }
-      }
-      
-      // 팩토리 로그인 확인
-      const factoryUser = getCookie('factory_user');
-      if (factoryUser) {
-        try {
-          const user = JSON.parse(decodeURIComponent(factoryUser));
-          if (user && user.id) return true;
-        } catch (e) {
-          console.error('팩토리 사용자 쿠키 파싱 오류:', e);
-        }
-      }
-      
-    } catch (error) {
-      console.error('로그인 상태 확인 오류:', error);
-    }
-    return false;
-  };
-
-  const getAppUserName = () => {
-    try {
-      const lsName = localStorage.getItem('userName');
-      if (lsName) return lsName;
-      // 쿠키에서 카카오/네이버 사용자명 시도
-      const getCookie = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-        return null;
-      };
-      const kakao = getCookie('kakao_user');
-      if (kakao) {
-        const u = JSON.parse(decodeURIComponent(kakao));
-        if (u?.name) return u.name;
-      }
-      const naver = getCookie('naver_user');
-      if (naver) {
-        const u = JSON.parse(decodeURIComponent(naver));
-        if (u?.name) return u.name;
-      }
-    } catch {}
-    return '';
-  };
-
   useEffect(() => {
     (async () => {
       const resolved = await params;
@@ -127,70 +44,13 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   }, [params]);
 
   useEffect(() => {
-    if (!factoryId) return;
+    const id = factoryId;
+    if (!id) return;
     async function fetchFactory() {
       setLoading(true);
-      const { data } = await supabase.from("donggori").select("*").eq("id", factoryId).single();
-      
-      if (data) {
-        // 이미지 매핑 적용
-        const companyName = String(data.company_name || data.name || "공장명 없음");
-        const mappedFactory: Factory = {
-          ...data,
-          id: String(data.id || Math.random()),
-          name: companyName,
-          ownerUserId: String(data.owner_user_id || data.ownerUserId || "unknown"),
-          region: String(data.admin_district || data.region || "지역 없음"),
-          items: [], // items는 별도 필드들로 구성
-          minOrder: Number(data.moq) || 0,
-          description: String(data.intro_text || data.intro || data.description || "설명 없음"),
-          image: getFactoryMainImage(companyName), // 업장 이름으로 이미지 매칭
-          images: [], // 이미지는 훅에서 가져옴
-          contact: String(data.phone_num || data.phone_number || data.contact || "연락처 없음"),
-          lat: Number(data.lat) || 37.5665,
-          lng: Number(data.lng) || 126.9780,
-          kakaoUrl: String(data.kakao_url || data.kakaoUrl || ""),
-          processes: data.processes ? (Array.isArray(data.processes) ? data.processes as string[] : [String(data.processes)]) : [],
-          // DB 연동용 확장 필드들
-          business_type: data.business_type as string | undefined,
-          equipment: data.equipment as string | undefined,
-          sewing_machines: data.sewing_machines as string | undefined,
-          pattern_machines: data.pattern_machines as string | undefined,
-          special_machines: data.special_machines as string | undefined,
-          top_items_upper: data.top_items_upper as string | undefined,
-          top_items_lower: data.top_items_lower as string | undefined,
-          top_items_outer: data.top_items_outer as string | undefined,
-          top_items_dress_skirt: data.top_items_dress_skirt as string | undefined,
-          top_items_bag: data.top_items_bag as string | undefined,
-          top_items_fashion_accessory: data.top_items_fashion_accessory as string | undefined,
-          top_items_underwear: data.top_items_underwear as string | undefined,
-          top_items_sports_leisure: data.top_items_sports_leisure as string | undefined,
-          top_items_pet: data.top_items_pet as string | undefined,
-          moq: Number(data.moq) || undefined,
-          monthly_capacity: Number(data.monthly_capacity) || undefined,
-          admin_district: data.admin_district as string | undefined,
-          intro: (data.intro_text || data.intro) as string | undefined,
-          phone_number: (data.phone_num || data.phone_number) as string | undefined,
-          factory_type: data.factory_type as string | undefined,
-          main_fabrics: data.main_fabrics as string | undefined,
-          distribution: data.distribution as string | undefined,
-          delivery: data.delivery as string | undefined,
-          company_name: data.company_name as string | undefined,
-          contact_name: data.contact_name as string | undefined,
-          email: data.email as string | undefined,
-          address: data.address as string | undefined,
-          established_year: Number(data.established_year) || undefined,
-          brands_supplied: data.brands_supplied as string | undefined,
-        };
-        
-        // 디버깅을 위한 로그 추가
-        console.log("Fetched factory data:", data);
-        console.log("Mapped factory:", mappedFactory);
-        console.log("Factory images:", mappedFactory.images);
-        console.log("Factory image:", mappedFactory.image);
-        
-        setFactory(mappedFactory);
-      }
+      const response = await fetch(`/api/factories/${encodeURIComponent(String(id))}`, { cache: "no-store" });
+      const payload = response.ok ? await response.json() : null;
+      setFactory(payload?.data ?? null);
       
       setLoading(false);
     }
@@ -270,51 +130,55 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   if (loading) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">로딩 중...</div>;
   if (!factory) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 공장입니다.</div>;
 
-  const handleKakaoInquiry = () => {
-    if (!isAppLoggedIn()) {
-      alert('로그인 후 이용 가능합니다.');
+  const handleKakaoInquiry = async () => {
+    if (!isSignedIn || !user) {
+      const nextPath = factoryId ? `/factories/${factoryId}` : "/factories";
+      window.location.href = `/sign-in?next=${encodeURIComponent(nextPath)}`;
       return;
     }
-    const inquiryCode = `INQ-${Date.now().toString().slice(-8)}`;
+
+    const resolvedFactoryId = factoryId || String(factory.id || "");
     const factoryName = factory.company_name || factory.name || "공장";
-    const userName = getAppUserName() || "미입력";
-    const inquiryDate = new Date().toLocaleDateString("ko-KR");
+    const contact = user.phoneNumber || user.email;
+    if (!resolvedFactoryId || !user.name || !contact) {
+      alert("문의에 필요한 이름과 연락처를 마이페이지에서 확인해주세요.");
+      return;
+    }
 
-    const inquiryText = [
-      `[${factoryName} 문의]`,
-      "",
-      "- 요청 구분: 문의하기",
-      `- 문의번호: ${inquiryCode}`,
-      `- 업장명: ${factoryName}`,
-      `- 문의자: ${userName}`,
-      `- 문의일: ${inquiryDate}`,
-      "",
-      "동고리를 통해 문의드립니다.",
-    ].join("\n");
-
-    const inquiry = {
-      id: Date.now(),
-      inquiryCode,
-      userId: 'custom',
-      factoryId: factory.id,
-      factoryName,
-      userName,
-      date: new Date().toISOString().slice(0, 10),
-      status: "카톡 문의 완료",
-      method: "카카오톡",
-      image: displayImages?.[0] || factory.image,
-    };
-    const prev = JSON.parse(localStorage.getItem("inquiries") || "[]");
-    localStorage.setItem("inquiries", JSON.stringify([inquiry, ...prev]));
-    navigator.clipboard.writeText(inquiryText)
-      .then(() => {
-        alert("문의 내용이 클립보드에 복사되었습니다.\n카카오톡 채팅창에 붙여넣기 후 전송해주세요.\n(문의번호 포함)");
-        window.open(OPEN_KAKAO_CHAT_URL, "_blank");
-      })
-      .catch(() => {
-        alert("클립보드 복사에 실패하여 카카오톡만 이동합니다.\n문의번호: " + inquiryCode);
-        window.open(OPEN_KAKAO_CHAT_URL, "_blank");
+    try {
+      const response = await fetch("/api/match-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_name: user.name,
+          factory_id: resolvedFactoryId,
+          contact,
+          description: "빠른 공장 문의",
+          additional_info: JSON.stringify({ requestType: "quick-inquiry" }),
+        }),
       });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.error || "문의를 저장하지 못했습니다.");
+
+      const inquiryCode = payload?.id ? `INQ-${String(payload.id).slice(-8)}` : "INQ";
+      const inquiryText = [
+        `[${factoryName} 문의]`,
+        "",
+        "- 요청 구분: 문의하기",
+        `- 문의번호: ${inquiryCode}`,
+        `- 업장명: ${factoryName}`,
+        `- 문의자: ${user.name}`,
+        `- 문의일: ${new Date().toLocaleDateString("ko-KR")}`,
+        "",
+        "동고리를 통해 문의드립니다.",
+      ].join("\n");
+
+      await navigator.clipboard.writeText(inquiryText).catch(() => undefined);
+      alert("문의가 저장되었습니다. 카카오 오픈채팅에서 상담을 이어가주세요.");
+      window.location.assign(DONGGORI_OPEN_KAKAO_CHAT_URL);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "문의를 저장하지 못했습니다.");
+    }
   };
 
   const goToRequestAfterSignIn = (service: "standard" | "deluxe" | "premium") => {
@@ -354,18 +218,17 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       : [];
 
   const handleConsultRequest = () => {
-    if (!isAppLoggedIn()) {
+    if (!isSignedIn) {
       goToRequestAfterSignIn("standard");
       return;
     }
-    const userName = getAppUserName();
     const resolvedFactoryId = factoryId || String(factory.id || "");
-    window.location.href = `/factories/${resolvedFactoryId}/request?service=standard&name=${encodeURIComponent(userName)}`;
+    window.location.href = `/factories/${resolvedFactoryId}/request?service=standard`;
   };
 
   const factoryName = factory.company_name || "공장";
-  const primaryBadge = factory.admin_district ? `${factory.admin_district} TOP 100` : "동대문구 TOP 100";
-  const secondaryBadge = factory.factory_type ? `${factory.factory_type} 전문` : "샘플 전문";
+  const primaryBadge = factory.admin_district || "지역 정보 확인 중";
+  const secondaryBadge = factory.factory_type ? `${factory.factory_type} 전문` : "업종 정보 없음";
 
   const minOrderText = factory.moq || factory.minOrder ? `${factory.moq || factory.minOrder}pcs` : "-";
   const maxCapaText = factory.monthly_capacity ? `${factory.monthly_capacity}pcs` : "-";
@@ -579,4 +442,4 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
       )}
     </div>
   );
-} 
+}

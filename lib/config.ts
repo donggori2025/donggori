@@ -3,7 +3,6 @@ export const config = {
   // Supabase 설정
   supabase: {
     url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   },
 
@@ -36,12 +35,12 @@ export const config = {
   // OAuth 설정 (환경 변수 기반)
   oauth: {
     naver: {
-      clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || 'i7SHra722KMphfUUcPJX',
+      clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || '',
       clientSecret: process.env.NAVER_CLIENT_SECRET || '',
       redirectUri: getRedirectUri('naver'),
     },
     kakao: {
-      clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '6313ad2150be482d9c9e2936f06439db',
+      clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '',
       clientSecret: process.env.KAKAO_CLIENT_SECRET || '',
       redirectUri: getRedirectUri('kakao'),
     },
@@ -58,6 +57,13 @@ function getRedirectUri(provider: 'naver' | 'kakao'): string {
   // 프로덕션 환경 - 환경 변수에서 가져오거나 기본값 사용
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.donggori.com';
   return `${baseUrl}/api/auth/${provider}/callback`;
+}
+
+export function requireServerEnv(...names: string[]) {
+  const missing = names.filter((name) => !process.env[name]);
+  if (missing.length) {
+    throw new Error(`서버 환경 변수가 설정되지 않았습니다: ${missing.join(', ')}`);
+  }
 }
 
 // 클라이언트 사이드 OAuth 설정 검증 함수
@@ -89,23 +95,7 @@ export function safeValidateOAuthConfig(provider: 'naver' | 'kakao'): {
   isValid: boolean;
   message: string;
 } {
-  const oauthConfigs = {
-    naver: {
-      clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || 'i7SHra722KMphfUUcPJX',
-      isValid: true
-    },
-    kakao: {
-      clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '6313ad2150be482d9c9e2936f06439db',
-      isValid: true
-    }
-  } as const;
-  
-  const c = oauthConfigs[provider];
-  
-  return {
-    isValid: c.isValid,
-    message: c.isValid ? '' : `${provider.charAt(0).toUpperCase() + provider.slice(1)} OAuth 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.`
-  };
+  return validateOAuthConfigClient(provider);
 }
 
 // 환경 변수 검증 (빌드 시에는 실행하지 않음)
@@ -117,7 +107,6 @@ export function validateConfig() {
 
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     'SUPABASE_SERVICE_ROLE_KEY',
     'BLOB_READ_WRITE_TOKEN',
     'NEXT_PUBLIC_NAVER_MAP_CLIENT_ID',
@@ -136,4 +125,4 @@ export function validateConfig() {
 
   console.log('✅ 모든 필수 환경 변수가 설정되었습니다.');
   return true;
-} 
+}

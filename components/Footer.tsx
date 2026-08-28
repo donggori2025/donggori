@@ -11,7 +11,7 @@ const Footer = () => {
   const leftMenu = [
     { href: "/factories", label: "봉제공장 찾기" },
     { href: "/design-request", label: "디자인 의뢰하기" },
-    { href: "/matching", label: "AI 매칭" },
+    { href: "/matching", label: "맞춤 추천" },
     { href: "/notices", label: "공지사항" },
   ];
   const rightMenu = [
@@ -65,4 +65,4 @@ const Footer = () => {
   );
 };
 
-export default Footer; 
+export default Footer;

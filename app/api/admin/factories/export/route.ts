@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
-import { buildFactoriesWorkbook, factoriesExportFilename } from "@/lib/factoryExcelExport";
+import { buildFactoriesCsv, factoriesExportFilename } from "@/lib/factoryExcelExport";
 
 async function fetchAllFactories() {
   const supabase = getServiceSupabase();
@@ -33,18 +33,18 @@ export async function GET() {
 
   try {
     const factories = await fetchAllFactories();
-    const buffer = buildFactoriesWorkbook(factories);
+    const buffer = buildFactoriesCsv(factories);
     const filename = factoriesExportFilename();
 
     return new NextResponse(buffer, {
       headers: {
-        "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`,
         "Cache-Control": "no-store",
       },
     });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "엑셀 생성 실패";
+    const message = e instanceof Error ? e.message : "CSV 생성 실패";
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
