@@ -25,9 +25,9 @@ CREATE INDEX IF NOT EXISTS idx_email_otps_created_at ON public.email_otps(create
 -- RLS (Row Level Security) 정책 설정
 ALTER TABLE public.email_otps ENABLE ROW LEVEL SECURITY;
 
--- 서비스 역할만 접근 가능하도록 설정
-CREATE POLICY "Service role can manage email_otps" ON public.email_otps
-  FOR ALL USING (auth.role() = 'service_role');
+-- service_role은 RLS를 우회한다. 브라우저 역할에는 어떤 정책/권한도 주지 않는다.
+DROP POLICY IF EXISTS "Service role can manage email_otps" ON public.email_otps;
+REVOKE ALL ON TABLE public.email_otps FROM anon, authenticated;
 
 -- 테이블 생성 확인
 SELECT 

@@ -30,8 +30,7 @@ create index if not exists idx_sessions_expires_at on public.sessions(expires_at
 alter table public.sessions enable row level security;
 
 drop policy if exists "Service role can manage sessions" on public.sessions;
-create policy "Service role can manage sessions" on public.sessions
-  for all using (auth.role() = 'service_role');
+revoke all on table public.sessions from anon, authenticated;
 
 -- 2) OTP 검증 시도 횟수 — 6자리 코드 무차별 대입을 5회로 제한하는 데 쓴다.
 alter table public.email_otps

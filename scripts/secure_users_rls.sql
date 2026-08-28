@@ -6,5 +6,5 @@ alter table public.users enable row level security;
 
 revoke all on table public.users from anon, authenticated;
 
--- 기존에 users에 생성된 공개 정책이 있다면 Supabase Dashboard > Authentication > Policies에서 삭제한다.
+-- 과거에 만들어진 정책은 20260828_lock_down_app_tables.sql이 일괄 제거한다.
 -- 이 프로젝트에는 users에 대한 anon/authenticated 정책을 만들지 않는다.

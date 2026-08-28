@@ -33,15 +33,12 @@ CREATE INDEX IF NOT EXISTS idx_notices_active ON public.notices(is_active);
 CREATE INDEX IF NOT EXISTS idx_notices_category ON public.notices(category);
 CREATE INDEX IF NOT EXISTS idx_notices_dates ON public.notices(start_at, end_at);
 
--- RLS (Row Level Security) 설정
+-- 공개 조회도 서버 API가 service_role로 처리한다. 브라우저 역할은 직접 접근하지 않는다.
 ALTER TABLE public.popups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notices ENABLE ROW LEVEL SECURITY;
 
--- 관리자만 접근 가능하도록 정책 설정
-CREATE POLICY "Enable all access for authenticated users" ON public.popups
-    FOR ALL USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Enable all access for authenticated users" ON public.notices
-    FOR ALL USING (auth.role() = 'authenticated');
-
+DROP POLICY IF EXISTS "Enable all access for authenticated users" ON public.popups;
+DROP POLICY IF EXISTS "Enable all access for authenticated users" ON public.notices;
+REVOKE ALL ON TABLE public.popups FROM anon, authenticated;
+REVOKE ALL ON TABLE public.notices FROM anon, authenticated;
 
