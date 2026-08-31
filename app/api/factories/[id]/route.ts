@@ -41,6 +41,7 @@ export async function GET(
     const error = fallback?.error ?? primary.error;
 
     if (error) {
+      console.error("[factories] public detail query failed", { code: error.code, message: error.message });
       return NextResponse.json({ success: false, error: "공장 정보를 불러오지 못했습니다." }, { status: 500 });
     }
     if (!data) {
