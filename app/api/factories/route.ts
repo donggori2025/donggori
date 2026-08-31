@@ -29,7 +29,7 @@ export async function GET() {
       ? await supabase.from("donggori").select("*").order("id", { ascending: true })
       : null;
     const data = fallback?.data ?? primary.data;
-    const error = fallback?.error ?? primary.error;
+    const error = fallback ? fallback.error : primary.error;
 
     if (error) {
       console.error("[factories] public query failed", { code: error.code, message: error.message });

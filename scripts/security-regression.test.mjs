@@ -82,6 +82,7 @@ test("critical auth bypasses stay removed", async () => {
   assert.doesNotMatch(factoryPopup, /Math\.sin|const seed|const hash/);
   assert.match(publicFactories, /select\("\*"\)/);
   assert.match(publicFactories, /mapPublicFactoryRows/);
+  assert.match(publicFactories, /fallback \? fallback\.error : primary\.error/);
   assert.match(publicPopups, /select\("\*"\)/);
   assert.match(publicPopups, /toPublicPopup/);
   assert.match(matchRequests, /\.from\("users"\)/);
