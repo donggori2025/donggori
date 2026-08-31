@@ -55,16 +55,7 @@
 - 로그아웃: `POST /api/admin/logout`
 - 보호: `lib/adminSession.ts` — `requireAdmin()` 미들웨어 패턴
 
-### 3. 공장 사장님 (`factory_session` 쿠키)
-
-- 로그인: `POST /api/factory/login`
-- 정보: `GET /api/factory/me`
-- 환경변수: `FACTORY_SESSION_SECRET` (미설정 시 ADMIN fallback)
-
-### 4. 내부 API
-
-- 헤더: `x-internal-auth: <INTERNAL_API_SECRET>`
-- `lib/internalAuth.ts`
+공장 전용 계정·`factory_session`·내부 공장 API는 제공하지 않는다. 공장 정보는 관리자만 등록·수정하며, 사용자는 일반 사용자 `session`으로 문의한다.
 
 ---
 
@@ -82,7 +73,6 @@
     {
       "id": "...",
       "company_name": "○○패션",
-      "address": "서울특별시 동대문구 ...",
       "business_type": "봉제",
       "images": ["https://..."]
     }
@@ -92,7 +82,7 @@
 
 ### GET `/api/factories/[id]`
 
-단일 업장 상세 (마스킹).
+단일 업장 상세 (마스킹). 연락처·이메일·상세 주소·공장별 카카오 URL은 공개 응답에 포함하지 않는다.
 
 ### GET `/api/notices`
 
@@ -152,7 +142,7 @@ POST /api/auth/login
 | PUT | `/api/admin/factories/[id]` | 수정 |
 | DELETE | `/api/admin/factories/[id]` | 삭제 |
 | GET | `/api/admin/factories/schema` | DB 컬럼 스키마 |
-| GET | `/api/admin/factories/export` | Excel(xlsx) 다운로드 |
+| GET | `/api/admin/factories/export` | UTF-8 CSV 다운로드 |
 | GET | `/api/admin/factories/images` | 이미지 목록 |
 | POST | `/api/admin/factories/upload-image` | 이미지 업로드 |
 | POST | `/api/admin/factories/delete-image` | DB 이미지 필드 삭제 |
@@ -202,36 +192,19 @@ POST /api/admin/popups
 
 ---
 
-## 공장 API (`/api/factory/*`)
-
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/api/factory/login` | 공장 로그인 |
-| GET | `/api/factory/me` | 내 공장 정보 |
-| POST | `/api/factory/update` | 정보 수정 |
-| POST | `/api/factory/change-password` | 비밀번호 변경 |
-
----
-
 ## 매칭·의뢰 API
 
 | Method | Path | 설명 |
 |--------|------|------|
 | POST | `/api/match-requests` | 작업지시서 생성 |
-| GET | `/api/match-requests` | 목록 조회 |
-| PUT | `/api/match-requests` | 상태 변경 |
-| POST | `/api/requests/[id]/notify-factory` | 공장 알림톡/SMS 발송 |
+| GET | `/api/match-requests` | 본인 문의 조회 (관리자는 전체 조회) |
+| PUT | `/api/match-requests` | 관리자 상태 변경 |
 
 ---
 
-## 이미지 API (`/api/factory-images/*`)
+## 공장 이미지 관리
 
-| Method | Path | 설명 |
-|--------|------|------|
-| GET | `/api/factory-images/url` | 이미지 URL 프록시 |
-| GET | `/api/factory-images/list` | 폴더별 목록 |
-| POST | `/api/factory-images/upload` | 업로드 |
-| POST | `/api/factory-images/delete` | 삭제 |
+`/api/factory-images/*` 경로는 모두 제거됐다. 공개 화면은 공장 API의 검증된 `image`/`images` 필드만 사용하고, 관리자는 `/api/admin/factories/*` API에서 이미지를 관리한다.
 
 ---
 

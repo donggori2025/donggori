@@ -2,13 +2,9 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 
-let warnedMissingAdminSessionSecret = false;
 const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || (() => {
-  if (typeof process !== "undefined" && process.env.NODE_ENV === "production") {
-    if (!warnedMissingAdminSessionSecret) {
-      warnedMissingAdminSessionSecret = true;
-      console.error("[SECURITY] ADMIN_SESSION_SECRET 환경변수가 설정되지 않았습니다. 서버 재시작 시 세션이 무효화됩니다.");
-    }
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("ADMIN_SESSION_SECRET 환경변수가 필요합니다.");
   }
   return crypto.randomBytes(32).toString("hex");
 })();

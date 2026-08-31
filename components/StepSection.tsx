@@ -30,7 +30,7 @@ const StepSection = () => (
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-10 items-start">
           <div className="flex-1">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">
-              AI 매칭으로 빠르게 찾는 봉제공장
+              맞춤 추천으로 빠르게 찾는 봉제공장
             </h2>
           </div>
           <div className="flex-1 lg:max-w-[480px]">
@@ -50,7 +50,7 @@ const StepSection = () => (
             <div className="w-full h-44 sm:h-52 md:h-56 bg-gray-50 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
               <Image
                 src={step.image}
-                alt={`AI 매칭 인터페이스 ${idx + 1}`}
+                alt={`맞춤 추천 인터페이스 ${idx + 1}`}
                 width={400}
                 height={300}
                 className="w-full h-full object-contain"

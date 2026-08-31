@@ -53,12 +53,6 @@ export type MainFabric = '다이마루' | '직기' | '토탈' | '기타';
 export const FACTORY_TYPES: FactoryType[] = ['봉제', '샘플', '패턴', '나염', 'QC', '시야게'];
 export const MAIN_FABRICS: MainFabric[] = ['다이마루', '직기', '토탈', '기타'];
 
-export interface FactoryAuth {
-  factoryId: string;
-  factoryName: string;
-  realName?: string;
-}
-
 // 매칭 요청 관련 타입
 export interface MatchRequest {
   id: string;
@@ -86,7 +80,7 @@ export interface UserProfile {
   firstName?: string;
   lastName?: string;
   imageUrl?: string;
-  userType: 'user' | 'factory';
+  userType: 'user';
 }
 
 // API 응답 타입
@@ -168,6 +162,7 @@ export interface NoticeItem {
   image_urls?: string[];
   start_at?: string; // 노출 시작
   end_at?: string;   // 노출 종료
+  is_active?: boolean;
   created_at?: string;
   updated_at?: string;
 }

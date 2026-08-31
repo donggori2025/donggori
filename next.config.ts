@@ -1,13 +1,16 @@
 import type { NextConfig } from "next";
 
+function configuredSupabaseHostname() {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || "https://ulrlltcrqvyutfmhcqyj.supabase.co").hostname;
+  } catch {
+    return "ulrlltcrqvyutfmhcqyj.supabase.co";
+  }
+}
+
 const nextConfig: NextConfig = {
   // 이미지 최적화 설정
   images: {
-    localPatterns: [
-      {
-        pathname: '/api/factory-images/url',
-      },
-    ],
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,7 +18,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'ulrlltcrqvyutfmhcqyj.supabase.co',
+        hostname: configuredSupabaseHostname(),
       },
       {
         protocol: 'https',
@@ -40,49 +43,6 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['@heroicons/react', 'lucide-react'],
   },
 
-  // Turbopack 설정
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
-  },
-
-  // 웹팩 설정 최적화
-  webpack: (config, { dev, isServer }) => {
-    // 프로덕션 빌드 최적화
-    if (!dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            enforce: true,
-          },
-        },
-      };
-    }
-
-    // 특정 경고 무시 (Supabase realtime-js dynamic require 경고 등)
-    config.ignoreWarnings = [
-      {
-        module: /@supabase\/realtime-js\/dist\/main\/RealtimeClient\.js/,
-        message: /Critical dependency: the request of a dependency is an expression/,
-      },
-    ];
-
-    return config;
-  },
-
   // 보안 헤더 설정
   async headers() {
     return [
@@ -99,11 +59,19 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
+            value: 'strict-origin-when-cross-origin',
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), payment=(), usb=()',
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
           },
         ],
       },
@@ -121,22 +89,12 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // 환경 변수 검증
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-  },
-
   // TypeScript 설정
   typescript: {
     // 타입 오류는 빌드에서 잡도록 합니다.
     ignoreBuildErrors: false,
   },
 
-  // ESLint 설정
-  eslint: {
-    // 빌드 시 ESLint 검사를 무시 (경고/오류로 인한 빌드 실패 방지)
-    ignoreDuringBuilds: true,
-  },
 };
 
 export default nextConfig;

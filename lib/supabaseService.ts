@@ -1,4 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
+import "server-only";
+import { requireServerEnv } from "./config";
 
 // Service Role Key를 사용하는 Supabase 클라이언트 (관리자 권한)
 let supabaseService: any;
@@ -51,24 +53,8 @@ export { supabaseService };
 // Service Role 클라이언트를 반환하는 함수
 export function getServiceSupabase() {
   if (!supabaseService) {
-    // 서버 사이드에서만 경고 출력
-    if (typeof window === 'undefined') {
-      console.warn('⚠️ Service Role 클라이언트가 초기화되지 않았습니다. 더미 클라이언트를 반환합니다.');
-    }
-    // 더미 클라이언트 반환 (빌드 시 오류 방지)
-    return {
-      from: () => ({
-        select: () => ({
-          eq: () => ({
-            maybeSingle: () => Promise.resolve({ data: null, error: { message: 'Service Role 클라이언트가 초기화되지 않았습니다.' } }),
-            single: () => Promise.resolve({ data: null, error: { message: 'Service Role 클라이언트가 초기화되지 않았습니다.' } })
-          }),
-          insert: () => Promise.resolve({ data: null, error: { message: 'Service Role 클라이언트가 초기화되지 않았습니다.' } }),
-          update: () => Promise.resolve({ data: null, error: { message: 'Service Role 클라이언트가 초기화되지 않았습니다.' } }),
-          delete: () => Promise.resolve({ data: null, error: { message: 'Service Role 클라이언트가 초기화되지 않았습니다.' } })
-        })
-      })
-    };
+    requireServerEnv("NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY");
+    throw new Error("Supabase service client 초기화에 실패했습니다.");
   }
   return supabaseService;
 }

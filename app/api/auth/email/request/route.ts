@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requestEmailOtp, type OtpPurpose } from '@/lib/emailOtp';
+import { getServiceSupabase } from '@/lib/supabaseService';
 
 export async function POST(req: Request) {
   try {
@@ -18,6 +19,22 @@ export async function POST(req: Request) {
     }
     
     const p: OtpPurpose = purpose || 'signup';
+    if (!['signup', 'login', 'reset'].includes(p)) {
+      return NextResponse.json({ ok: false, error: '지원하지 않는 인증 목적입니다.' }, { status: 400 });
+    }
+    if (p === 'reset') {
+      const { data: user, error } = await getServiceSupabase()
+        .from('users')
+        .select('signupMethod')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+      if (error) {
+        return NextResponse.json({ ok: false, error: '인증 요청을 처리하지 못했습니다.' }, { status: 500 });
+      }
+      if (!user || ['kakao', 'naver', 'google'].includes(user.signupMethod)) {
+        return NextResponse.json({ ok: true });
+      }
+    }
     const result = await requestEmailOtp(normalizedEmail, p);
     return NextResponse.json(result);
   } catch (e: any) {

@@ -35,30 +35,14 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
   const mainFabrics = isFullFactory(factory) ? factory.main_fabrics || "-" : "-";
   const moq = isFullFactory(factory) ? (factory.moq || (factory as any).minOrder || "-") : "-";
 
-  // 태그 색상 정의
-  const tagColors = [
-    { label: '봉제', color: '#0ACF83', bg: 'rgba(10, 207, 131, 0.1)' },
-    { label: '샘플', color: '#08B7FF', bg: 'rgba(8, 183, 255, 0.1)' },
-    { label: '패턴', color: '#FF8308', bg: 'rgba(255, 131, 8, 0.1)' },
-    { label: '나염', color: '#A259FF', bg: 'rgba(162, 89, 255, 0.1)' },
-    { label: '전사', color: '#ED6262', bg: 'rgba(237, 98, 98, 0.1)' },
-  ];
-
-  // 공장 ID 기반으로 태그 선택
-  const seed = String(factory.id || 0);
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-  }
-  
-  const shuffled = [...tagColors].sort((a, b) => {
-    const h1 = Math.abs(Math.sin(hash + a.label.length)) % 1;
-    const h2 = Math.abs(Math.sin(hash + b.label.length)) % 1;
-    return h1 - h2;
-  });
-  
-  const count = (Math.abs(hash) % 2) + 1;
-  const selectedTags = shuffled.slice(0, count);
+  const selectedTags = Array.from(
+    new Set(
+      [isFullFactory(factory) ? factory.factory_type : undefined, factory.business_type]
+        .flatMap((value) => typeof value === "string" ? value.split(",") : [])
+        .map((value) => value.trim())
+        .filter(Boolean)
+    )
+  ).slice(0, 2);
 
   const factoryName = factory.company_name || '공장명 없음';
 
@@ -69,8 +53,7 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
           {/* 이미지 */}
           <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
             {(() => {
-              const name = String(factory.company_name || '');
-              const mainImage = getFactoryMainImage(name);
+              const mainImage = getFactoryMainImage(factory);
               if (mainImage && !mainImage.includes('logo_donggori')) {
                 return (
                   <Image
@@ -97,11 +80,10 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
             <div className="flex flex-wrap gap-1 mb-2">
               {selectedTags.map((tag) => (
                 <span
-                  key={tag.label}
-                  style={{ color: tag.color, background: tag.bg }}
-                  className="rounded-full px-2 py-0.5 text-xs font-semibold"
+                  key={tag}
+                  className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700"
                 >
-                  {tag.label}
+                  {tag}
                 </span>
               ))}
             </div>
@@ -140,4 +122,4 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
       </div>
     </div>
   );
-} 
+}

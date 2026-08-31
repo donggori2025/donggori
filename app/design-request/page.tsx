@@ -3,10 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabaseClient";
-import { getAppUserIdentity, isAppLoggedIn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
+import { DONGGORI_OPEN_KAKAO_CHAT_URL } from "@/lib/site";
 import {
   CalendarDays,
   ClipboardCheck,
@@ -20,7 +19,6 @@ import {
 
 type RequesterType = "기업" | "개인" | "관공서";
 type ProductType = "의류" | "유니폼" | "굿즈" | "기타";
-const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
 
 const REQUESTER_TYPES: RequesterType[] = ["기업", "개인", "관공서"];
 const PRODUCT_TYPES: ProductType[] = ["의류", "유니폼", "굿즈", "기타"];
@@ -83,7 +81,7 @@ function ChipGroup<T extends string>({
 
 export default function DesignRequestPage() {
   const router = useRouter();
-  const { user: authUser } = useAppAuth();
+  const { user: authUser, isSignedIn, isLoaded } = useAppAuth();
   const [requesterType, setRequesterType] = useState<RequesterType>("기업");
   const [productType, setProductType] = useState<ProductType | "">("");
   const [productTypeDetail, setProductTypeDetail] = useState("");
@@ -136,7 +134,8 @@ export default function DesignRequestPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAppLoggedIn() && !authUser) {
+    if (!isLoaded) return;
+    if (!isSignedIn || !authUser) {
       alert("로그인 후 이용 가능합니다.");
       router.push("/sign-in?next=/design-request");
       return;
@@ -156,34 +155,9 @@ export default function DesignRequestPage() {
 
     setSubmitting(true);
     try {
-      const userIdentity = getAppUserIdentity(authUser);
-      if (!userIdentity.id || !userIdentity.email) {
-        alert("사용자 정보 확인에 실패했습니다. 다시 로그인 후 시도해주세요.");
-        return;
-      }
-
-      const uploadedReferenceUrls: string[] = [];
-      for (const file of images) {
-        const safeName = file.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
-        const filePath = `design-requests/${Date.now()}_${safeName}`;
-        const { error: uploadError } = await supabase.storage
-          .from("match-request-files")
-          .upload(filePath, file);
-        if (uploadError) {
-          alert(`레퍼런스 이미지 업로드 실패: ${file.name}`);
-          return;
-        }
-        const { data } = supabase.storage.from("match-request-files").getPublicUrl(filePath);
-        if (data?.publicUrl) uploadedReferenceUrls.push(data.publicUrl);
-      }
-
       const payload = {
-        user_id: userIdentity.id,
-        user_email: userIdentity.email,
         user_name: contactName.trim(),
         factory_id: "design-request",
-        factory_name: "디자인 의뢰",
-        status: "pending",
         items: [productType],
         quantity: 0,
         description,
@@ -199,10 +173,8 @@ export default function DesignRequestPage() {
           contactName,
           email,
           description,
-          referenceImages: uploadedReferenceUrls,
+          referenceFiles: images.map((file) => file.name),
         }),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       };
 
       const res = await fetch("/api/match-requests", {
@@ -215,12 +187,12 @@ export default function DesignRequestPage() {
         throw new Error(json?.error || "의뢰 등록 실패");
       }
 
-      const requestText = generateRequestText(uploadedReferenceUrls);
+      const requestText = generateRequestText([]) + (images.length ? "\n- 레퍼런스 파일: 카카오톡 채팅방에 직접 전송 예정\n" : "");
       await navigator.clipboard.writeText(requestText);
       alert(
         "디자인 의뢰가 접수되었습니다.\n의뢰 내용이 클립보드에 복사되었습니다.\n카카오톡 채팅창에 붙여넣기 후 전송해주세요.\n확인을 누르면 오픈카카오채팅으로 이동합니다."
       );
-      window.open(OPEN_KAKAO_CHAT_URL, "_blank");
+      window.open(DONGGORI_OPEN_KAKAO_CHAT_URL, "_blank");
       setProductType("");
       setProductTypeDetail("");
       setProductName("");
@@ -417,10 +389,10 @@ export default function DesignRequestPage() {
                   className="hidden"
                 />
                 <ImageIcon className="w-10 h-10 text-gray-400" />
-                <p className="text-sm text-gray-600 text-center">
-                  레퍼런스 이미지를 클릭해 업로드
+                  <p className="text-sm text-gray-600 text-center">
+                  레퍼런스 이미지를 미리 선택
                   <br />
-                  <span className="text-xs text-gray-400">최대 10장 · PNG, JPG</span>
+                  <span className="text-xs text-gray-400">접수 후 카카오톡 채팅방에 직접 보내주세요 · 최대 10장</span>
                 </p>
               </label>
 
@@ -453,7 +425,7 @@ export default function DesignRequestPage() {
               <ul className="text-xs text-gray-500 space-y-2 mb-6">
                 <li>· 로그인 후 이용 가능합니다</li>
                 <li>· 필수 항목: 상품 유형, 담당자, 연락처, 요청 내용</li>
-                <li>· 레퍼런스 이미지는 선택 사항입니다</li>
+                <li>· 레퍼런스 파일은 카카오톡 채팅방에 직접 전송합니다</li>
               </ul>
               <Button
                 type="submit"

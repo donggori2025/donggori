@@ -4,9 +4,6 @@ import Image from "next/image";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAppAuth } from "@/contexts/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
-import { getFactoryProfileImage } from "@/lib/factoryAuth";
-import { storage } from "@/lib/utils";
-import type { FactoryAuth } from "@/lib/types";
 import { Sparkles } from "lucide-react";
 
 type NavLinkItem = { type: "link"; href: string; label: string };
@@ -17,11 +14,6 @@ export default function Header() {
   const { user: authUser, isSignedIn, isLoaded } = useAppAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [userType, setUserType] = useState<string | null>(null);
-  const [factoryAuth, setFactoryAuth] = useState<FactoryAuth | null>(null);
-  const [factoryProfileImage, setFactoryProfileImage] = useState<string | null>(null);
-  const [naverUser, setNaverUser] = useState<any>(null);
-  const [kakaoUser, setKakaoUser] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -29,7 +21,7 @@ export default function Header() {
     () => [
       { type: "link", href: "/factories", label: "봉제공장 찾기" },
       { type: "link", href: "/design-request", label: "디자인 의뢰하기" },
-      { type: "link", href: "/matching", label: "AI 매칭" },
+      { type: "link", href: "/matching", label: "맞춤 추천" },
       { type: "link", href: "/notices", label: "공지사항" },
     ],
     []
@@ -46,74 +38,6 @@ export default function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  // 사용자 타입과 공장 인증 정보 로드
-  useEffect(() => {
-    if (!mounted) return;
-    
-    try {
-      // userType은 단순 문자열이므로 직접 localStorage에서 가져옴
-      const storedUserType = localStorage.getItem('userType');
-      const storedFactoryAuth = storage.get<FactoryAuth>('factoryAuth');
-      
-      setUserType(storedUserType);
-      if (storedFactoryAuth) {
-        setFactoryAuth(storedFactoryAuth);
-        
-        // 공장 프로필 이미지 로드
-        if (storedFactoryAuth.factoryId) {
-          console.log('공장 프로필 이미지 로드 시작:', { factoryId: storedFactoryAuth.factoryId });
-          
-          getFactoryProfileImage(storedFactoryAuth.factoryId)
-            .then(image => {
-              console.log('공장 프로필 이미지 로드 성공:', { factoryId: storedFactoryAuth.factoryId, image });
-              setFactoryProfileImage(image);
-            })
-            .catch((error) => {
-              console.error('공장 프로필 이미지 로드 실패:', {
-                factoryId: storedFactoryAuth.factoryId,
-                error: error instanceof Error ? error.message : String(error),
-                fullError: error
-              });
-              setFactoryProfileImage(null);
-            });
-        }
-      }
-
-      // 네이버 사용자 정보 로드
-      const getCookie = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift();
-        return null;
-      };
-
-      const naverUserCookie = getCookie('naver_user');
-      if (naverUserCookie) {
-        try {
-          const userData = JSON.parse(decodeURIComponent(naverUserCookie));
-          setNaverUser(userData);
-          console.log('네이버 사용자 정보 로드:', userData);
-        } catch (error) {
-          console.error('네이버 사용자 정보 파싱 오류:', error);
-        }
-      }
-
-      // 카카오 사용자 정보 로드
-      const kakaoUserCookie = getCookie('kakao_user');
-      if (kakaoUserCookie) {
-        try {
-          const userData = JSON.parse(decodeURIComponent(kakaoUserCookie));
-          setKakaoUser(userData);
-          console.log('카카오 사용자 정보 로드:', userData);
-        } catch (error) {
-          console.error('카카오 사용자 정보 파싱 오류:', error);
-        }
-      }
-    } catch (error) {
-      console.error('Header initialization error:', error);
-    }
-  }, [mounted, isSignedIn]);
 
   // 로그인 버튼 클릭 핸들러
   const handleSignInClick = useCallback(() => {
@@ -278,7 +202,7 @@ export default function Header() {
 
           <div className="flex items-center gap-2">
             {/* 로그인 전: 로그인/회원가입 버튼 */}
-            {(!isLoaded || (!isSignedIn && !factoryAuth && !naverUser && !kakaoUser)) && (
+            {(!isLoaded || !isSignedIn) && (
               <button
                 className={signInButtonClass}
                 onClick={handleSignInClick}
@@ -288,7 +212,7 @@ export default function Header() {
             )}
 
             {/* 일반 로그인 후: 마이페이지 링크 */}
-            {isSignedIn && authUser && !naverUser && !kakaoUser && userType !== "factory" && (
+            {isSignedIn && authUser && (
               <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
                 <Image
                   src={authUser.profileImage || "/logo_donggori.png"}
@@ -300,42 +224,6 @@ export default function Header() {
               </Link>
             )}
 
-            {/* 네이버 로그인 후: 네이버 프로필 이미지 */}
-            {naverUser && (
-              <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
-                <Image
-                  src={naverUser.profileImage || "/logo_donggori.png"}
-                  alt="네이버 프로필 이미지"
-                  width={40}
-                  height={40}
-                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
-                />
-              </Link>
-            )}
-
-            {/* 카카오 로그인 후: 카카오 프로필 이미지 */}
-            {kakaoUser && (
-              <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
-                <img
-                  src={kakaoUser.profileImage || "/logo_donggori.png"}
-                  alt="카카오 프로필 이미지"
-                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
-                />
-              </Link>
-            )}
-
-            {/* 봉제공장 로그인 후: 공장 프로필 이미지 */}
-            {userType === 'factory' && factoryAuth && (
-              <Link href="/factory-my-page" className="flex items-center" aria-label="공장 마이페이지로 이동">
-                <Image
-                  src={factoryProfileImage || "/logo_donggori.png"}
-                  alt="공장 프로필 이미지"
-                  width={40}
-                  height={40}
-                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
-                />
-              </Link>
-            )}
           </div>
         </div>
 
@@ -394,7 +282,7 @@ export default function Header() {
 
                               {/* 로그인/회원가입 또는 프로필 이미지 */}
                 <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-gray-200">
-                  {(!isLoaded || (!isSignedIn && !factoryAuth && !naverUser && !kakaoUser)) && (
+                  {(!isLoaded || !isSignedIn) && (
                     <button
                       className="w-full py-3 px-4 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-[#111111] font-semibold transition-colors"
                       onClick={handleSignInClick}
@@ -404,7 +292,7 @@ export default function Header() {
                   )}
 
                   {/* 일반 로그인 후 모바일 메뉴 */}
-                  {isSignedIn && authUser && !naverUser && !kakaoUser && userType !== "factory" && (
+                  {isSignedIn && authUser && (
                     <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
                       <Image
                         src={authUser.profileImage || "/logo_donggori.png"}
@@ -417,45 +305,6 @@ export default function Header() {
                     </Link>
                   )}
 
-                  {/* 네이버 로그인 후 모바일 메뉴 */}
-                  {naverUser && (
-                    <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
-                      <Image
-                        src={naverUser.profileImage || "/logo_donggori.png"}
-                        alt="네이버 프로필 이미지"
-                        width={40}
-                        height={40}
-                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                      />
-                      <span className="font-medium">마이페이지</span>
-                    </Link>
-                  )}
-
-                  {/* 카카오 로그인 후 모바일 메뉴 */}
-                  {kakaoUser && (
-                    <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
-                      <img
-                        src={kakaoUser.profileImage || "/logo_donggori.png"}
-                        alt="카카오 프로필 이미지"
-                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                      />
-                      <span className="font-medium">마이페이지</span>
-                    </Link>
-                  )}
-
-                  {/* 봉제공장 로그인 후 모바일 메뉴 */}
-                  {userType === 'factory' && factoryAuth && (
-                    <Link href="/factory-my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
-                      <Image
-                        src={factoryProfileImage || "/logo_donggori.png"}
-                        alt="공장 프로필 이미지"
-                        width={40}
-                        height={40}
-                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                      />
-                      <span className="font-medium">공장 마이페이지</span>
-                    </Link>
-                  )}
                 </div>
             </div>
           </div>
@@ -474,4 +323,4 @@ export default function Header() {
       `}</style>
     </header>
   );
-} 
+}

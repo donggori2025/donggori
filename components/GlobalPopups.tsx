@@ -19,7 +19,24 @@ function useIsMobile(breakpoint = 768) {
 function normalizeUrl(url?: string | null): string | undefined {
   const trimmed = url?.trim();
   if (!trimmed) return undefined;
-  return trimmed;
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.toString() : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function normalizeImageUrl(url?: string | null): string | undefined {
+  const trimmed = url?.trim();
+  if (!trimmed) return undefined;
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//") && !/[\r\n]/.test(trimmed)) return trimmed;
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === "https:" ? parsed.toString() : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function resolveLinkUrl(popup: PopupItem, isMobile: boolean): string | undefined {
@@ -67,7 +84,9 @@ export default function GlobalPopups() {
         const res = await fetch('/api/popups');
         const json = await res.json();
         const apiItems = res.ok && json.success ? ((json.data || []) as PopupItem[]) : [];
-        const visible = apiItems.filter((item) => item?.id && (item.image_url || item.title || item.content));
+        const visible = apiItems
+          .map((item) => ({ ...item, image_url: normalizeImageUrl(item.image_url) }))
+          .filter((item) => item?.id && (item.image_url || item.title || item.content));
         setItems(visible);
         setOpen(visible.length > 0);
       } catch {

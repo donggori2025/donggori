@@ -8,9 +8,9 @@ import NoticesSection from "@/components/NoticesSection";
 
 
 export const metadata: Metadata = {
-  title: "동고리 - 의류 봉제·생산 연결 플랫폼",
+  title: { absolute: "동고리 | 봉제공장 찾기·맞춤 추천" },
   description:
-    "동고리는 디자이너와 봉제공장을 연결하는 의류 제작 플랫폼입니다. 소량 제작부터 대량 생산까지, 맞춤형 작업지시서로 빠르고 효율적인 생산을 지원합니다.",
+    "의류 제작 조건에 맞는 봉제공장을 찾고 문의할 수 있는 동고리의 공장 정보·맞춤 추천 서비스입니다.",
 };
 
 // 메인 페이지 컴포넌트

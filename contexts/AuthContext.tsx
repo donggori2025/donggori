@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 export interface AppUser {
   id: string;
@@ -16,7 +16,7 @@ interface AuthContextType {
   isSignedIn: boolean;
   isLoaded: boolean;
   signOut: () => Promise<void>;
-  refresh: () => void;
+  refresh: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -24,107 +24,33 @@ const AuthContext = createContext<AuthContextType>({
   isSignedIn: false,
   isLoaded: false,
   signOut: async () => {},
-  refresh: () => {},
+  refresh: async () => {},
 });
-
-function getCookie(name: string): string | null {
-  if (typeof document === "undefined") return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
-  return null;
-}
-
-function removeCookie(name: string) {
-  if (typeof document === "undefined") return;
-  document.cookie = `${name}=; path=/; max-age=0`;
-}
-
-function loadUserFromSources(): AppUser | null {
-  if (typeof window === "undefined") return null;
-
-  try {
-    const kakao = getCookie("kakao_user");
-    if (kakao) {
-      const u = JSON.parse(decodeURIComponent(kakao));
-      if (u?.id && u?.email) {
-        return {
-          id: u.id,
-          email: u.email,
-          name: u.name || "",
-          phoneNumber: u.phoneNumber,
-          profileImage: u.profileImage,
-          signupMethod: "kakao",
-        };
-      }
-    }
-  } catch {}
-
-  try {
-    const naver = getCookie("naver_user");
-    if (naver) {
-      const u = JSON.parse(decodeURIComponent(naver));
-      if (u?.id && u?.email) {
-        return {
-          id: u.id,
-          email: u.email,
-          name: u.name || "",
-          phoneNumber: u.phoneNumber,
-          profileImage: u.profileImage,
-          signupMethod: "naver",
-        };
-      }
-    }
-  } catch {}
-
-  if (
-    document.cookie.includes("isLoggedIn=true") ||
-    localStorage.getItem("isLoggedIn") === "true"
-  ) {
-    const name = localStorage.getItem("userName") || "";
-    const email = localStorage.getItem("userEmail") || "";
-    const phone = localStorage.getItem("userPhone") || "";
-    const id = localStorage.getItem("userId") || "";
-    if (email || id) {
-      return { id, email, name, phoneNumber: phone, signupMethod: "email" };
-    }
-  }
-
-  return null;
-}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const refresh = useCallback(() => {
-    setUser(loadUserFromSources());
+  const refresh = useCallback(async () => {
+    try {
+      const response = await fetch("/api/auth/me", { cache: "no-store" });
+      const data = await response.json();
+      setUser(response.ok && data.authenticated && data.user ? data.user : null);
+    } catch {
+      setUser(null);
+    } finally {
+      setIsLoaded(true);
+    }
   }, []);
 
   useEffect(() => {
-    refresh();
-    setIsLoaded(true);
+    void refresh();
   }, [refresh]);
 
   const signOut = useCallback(async () => {
-    removeCookie("kakao_user");
-    removeCookie("naver_user");
-    removeCookie("isLoggedIn");
-    removeCookie("userType");
-    removeCookie("access_token");
-    removeCookie("sns_access_token");
-    removeCookie("factory_user");
-    try {
-      localStorage.removeItem("userType");
-      localStorage.removeItem("userName");
-      localStorage.removeItem("userEmail");
-      localStorage.removeItem("userPhone");
-      localStorage.removeItem("userId");
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("factoryAuth");
-    } catch {}
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => null);
     setUser(null);
-    window.location.href = "/";
+    window.location.assign("/");
   }, []);
 
   return (

@@ -9,16 +9,11 @@ export function canAccessMatchRequest(
 
   const userId = String(row.user_id ?? "");
   const userEmail = String(row.user_email ?? "").toLowerCase();
-  const factoryId = String(row.factory_id ?? "");
 
   if (auth.role === "user") {
     if (auth.userId && userId && auth.userId === userId) return true;
     if (auth.email && userEmail && auth.email.toLowerCase() === userEmail) return true;
     return false;
-  }
-
-  if (auth.role === "factory") {
-    return Boolean(auth.userId && factoryId && auth.userId === factoryId);
   }
 
   return false;

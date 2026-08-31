@@ -20,23 +20,29 @@ export async function GET() {
       return NextResponse.json({ success: false, error: "서버 설정 오류" }, { status: 500 });
     }
 
-    const { data, error } = await supabase
+    const primary = await supabase
       .from("donggori")
       .select(PUBLIC_FACTORY_SELECT)
       .order("id", { ascending: true });
 
+    const fallback = primary.error?.code === "42703"
+      ? await supabase.from("donggori").select("*").order("id", { ascending: true })
+      : null;
+    const data = fallback?.data ?? primary.data;
+    const error = fallback ? fallback.error : primary.error;
+
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      console.error("[factories] public query failed", { code: error.code, message: error.message });
+      return NextResponse.json({ success: false, error: "공장 정보를 불러오지 못했습니다." }, { status: 500 });
     }
 
     return NextResponse.json({
       success: true,
       data: mapPublicFactoryRows((data || []) as unknown as Record<string, unknown>[]),
     });
-  } catch (err: unknown) {
-    const error = err as Error;
+  } catch {
     return NextResponse.json(
-      { success: false, error: error?.message || "알 수 없는 오류" },
+      { success: false, error: "공장 정보를 불러오지 못했습니다." },
       { status: 500 }
     );
   }

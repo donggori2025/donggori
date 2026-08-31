@@ -4,21 +4,16 @@ import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowPathIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { List, Map as MapIcon, Search, SlidersHorizontal, Sparkles } from "lucide-react";
-import { factories, fetchFactoriesFromDB, isSelectableRegion, type Factory } from "@/lib/factories";
-import { testSupabaseConnection } from "@/lib/supabaseClient";
+import { fetchFactoriesFromDB, isSelectableRegion, type Factory } from "@/lib/factoryCatalog";
 import { FACTORY_TYPES, MAIN_FABRICS } from "@/lib/types";
 // import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import NaverMap from "@/components/NaverMap";
-import SimpleNaverMap from "@/components/SimpleNaverMap";
-// import { getFactoryLocations } from "@/lib/factoryMap";
 import FactoryInfoPopup from "@/components/FactoryInfoPopup";
-import { getFactoryLocationByName, getDongdaemunCenter } from "@/lib/factoryLocationMapping";
 import { useRouter } from "next/navigation";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 import { useFactoryImages, hasFactoryImages } from "@/lib/hooks/useFactoryImages";
-import { isKnitRelatedQuery, isParkwonKnitFactory, pinParkwonKnitFirst } from "@/lib/factoryMatching";
 
 function getFilterChipClass(isOn: boolean, sm = false) {
   const base = sm
@@ -48,7 +43,7 @@ const EMPTY_FILTERS = {
 
 // 공장 목록 페이지용 이미지 컴포넌트
 function FactoriesPageImage({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory.name || factory.company_name || '');
+  const { images, loading } = useFactoryImages(factory);
   
   if (loading) {
     return (
@@ -188,14 +183,7 @@ export default function FactoriesPage() {
     return [];
   }
 
-  // 필터링 로직 (여러 값 중 하나라도 포함되면 통과, range/검색 포함)
-  const knitQueryActive = useMemo(() => {
-    if (isKnitRelatedQuery(search)) return true;
-    return selected.items.some((item) => isKnitRelatedQuery(item));
-  }, [search, selected.items]);
-
   const filtered = factoriesData.filter(f => {
-    const knitBoost = knitQueryActive && isParkwonKnitFactory(f);
     const itemList = [f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt, f.top_items_bag, f.top_items_fashion_accessory, f.top_items_underwear, f.top_items_sports_leisure, f.top_items_pet];
     // 검색어 필터
     const searchMatch = !search ||
@@ -221,7 +209,7 @@ export default function FactoriesPage() {
     const sewingArr = typeof f.sewing_machines === 'string' ? f.sewing_machines.split(',').map(s => s.trim()) : [];
     const patternArr = typeof f.pattern_machines === 'string' ? f.pattern_machines.split(',').map(s => s.trim()) : [];
     const specialArr = typeof f.special_machines === 'string' ? f.special_machines.split(',').map(s => s.trim()) : [];
-    return knitBoost || (
+    return (
       searchMatch &&
       (selected.admin_district.length === 0 || (typeof f.admin_district === 'string' && selected.admin_district.includes(f.admin_district))) &&
       moqMatch &&
@@ -246,16 +234,12 @@ export default function FactoriesPage() {
     // 필터가 걸려있지 않은 경우에만 정렬 적용
     const hasActiveFilters = Object.values(selected).some(arr => arr.length > 0) || search;
 
-    if (knitQueryActive) {
-      return pinParkwonKnitFirst(filtered);
-    }
-    
     if (!hasActiveFilters) {
       return [...filtered].sort((a, b) => {
         const aName = a.name || a.company_name || "";
         const bName = b.name || b.company_name || "";
-        const aHasImage = hasFactoryImages(aName);
-        const bHasImage = hasFactoryImages(bName);
+        const aHasImage = hasFactoryImages(a);
+        const bHasImage = hasFactoryImages(b);
 
         // 1) 이미지 보유 업장 우선
         if (aHasImage !== bHasImage) return aHasImage ? -1 : 1;
@@ -273,7 +257,22 @@ export default function FactoriesPage() {
     }
     
     return filtered;
-  }, [filtered, selected, search, knitQueryActive]);
+  }, [filtered, selected, search]);
+
+  const mapFactories = useMemo(
+    () =>
+      sortedFiltered.filter(
+        (factory) =>
+          Number.isFinite(factory.lat) &&
+          Number.isFinite(factory.lng) &&
+          factory.lat >= -90 &&
+          factory.lat <= 90 &&
+          factory.lng >= -180 &&
+          factory.lng <= 180 &&
+          (factory.lat !== 0 || factory.lng !== 0)
+      ),
+    [sortedFiltered]
+  );
 
   // 필터 뱃지
   const badges = Object.entries(selected).flatMap(([key, arr]) =>
@@ -294,34 +293,11 @@ export default function FactoriesPage() {
     const loadFactories = async () => {
       setLoading(true);
       try {
-        // Supabase 연결 테스트
-        const connectionTest = await testSupabaseConnection();
-        console.log('Supabase 연결 테스트 결과:', connectionTest);
-        
-        if (!connectionTest.success) {
-          console.error('Supabase 연결에 실패했습니다:', connectionTest.error);
-          setConnectionStatus(connectionTest);
-          setFactoriesData([]); // 연결 실패 시 빈 배열
-          setLoading(false);
-          return;
-        }
-        
-        // Supabase에서 데이터 가져오기 시도
         const dbFactories = await fetchFactoriesFromDB();
-        
-        if (dbFactories.length > 0) {
-          console.log('Supabase에서 데이터를 성공적으로 가져왔습니다:', dbFactories.length);
-          setFactoriesData(dbFactories);
-          setConnectionStatus({ success: true, count: dbFactories.length });
-        } else {
-          console.log('Supabase 데이터가 없어 하드코딩된 데이터를 사용합니다.');
-          setFactoriesData([]); // 데이터가 없으면 빈 배열
-          setConnectionStatus({ success: true, count: 0, message: 'DB에 데이터가 없음' });
-        }
+        setFactoriesData(dbFactories);
+        setConnectionStatus({ success: true, count: dbFactories.length });
       } catch (error) {
-        console.error('데이터 로딩 중 오류가 발생했습니다:', error);
-        console.log('오류로 인해 하드코딩된 데이터를 사용합니다.');
-        setFactoriesData(factories); // 예외 상황에서만 하드코딩 데이터 사용
+        setFactoriesData([]);
         setConnectionStatus({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
       } finally {
         setLoading(false);
@@ -464,15 +440,6 @@ export default function FactoriesPage() {
           });
         }
         
-        // 데이터가 없으면 기본값으로 '봉제' 표시
-        if (chips.length === 0) {
-          chips.push({
-            label: '봉제',
-            color: chipColors['봉제'].color,
-            bg: chipColors['봉제'].bg
-          });
-        }
-        
         return [f.id ?? idx, chips];
       })
     );
@@ -540,7 +507,7 @@ export default function FactoriesPage() {
             href="/matching"
             className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-violet-600 text-white text-sm font-bold hover:bg-violet-700 transition shrink-0"
           >
-            AI 매칭 시작
+            맞춤 추천 시작
           </Link>
         </div>
       </div>
@@ -1271,12 +1238,16 @@ export default function FactoriesPage() {
                       </div>
                     </div>
                   </div>
+                ) : mapFactories.length === 0 ? (
+                  <div className="flex h-full items-center justify-center p-6 text-center text-sm text-gray-500">
+                    위치 정보가 등록된 공장이 없습니다.
+                  </div>
                 ) : (
                   <div className="relative w-full h-full">
                     <NaverMap
-                      center={getDongdaemunCenter()}
+                      center={{ lat: mapFactories[0].lat, lng: mapFactories[0].lng }}
                       level={14}
-                      markers={sortedFiltered.map((factory) => ({
+                      markers={mapFactories.map((factory) => ({
                         id: factory.id,
                         position: { lat: factory.lat, lng: factory.lng },
                         title: factory.name || factory.company_name || '공장명 없음',
@@ -1318,4 +1289,4 @@ export default function FactoriesPage() {
 // - getTagColor 함수로 태그별 색상을 쉽게 관리할 수 있습니다.
 // - 필터 아코디언은 useState로 열림/닫힘 상태를 관리하며, 버튼 클릭 시 토글됩니다.
 // - 카드 내 태그는 map으로 렌더링하며, 공정/나염/자수 등은 색상, 주요 품목은 회색으로 구분합니다.
-// - Tailwind CSS로 스타일을 빠르게 적용할 수 있습니다. 
+// - Tailwind CSS로 스타일을 빠르게 적용할 수 있습니다.

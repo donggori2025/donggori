@@ -3,13 +3,11 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { RotateCcw, Search } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useAppAuth } from "@/contexts/AuthContext";
-import { isSelectableRegion, type Factory } from "@/lib/factories";
-import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
+import { isSelectableRegion, type Factory } from "@/lib/factoryCatalog";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
-import { recommendFactoriesFromPrompt } from "@/lib/factoryMatching";
+import { recommendFactoriesFromPrompt, takeMeaningfulMatches } from "@/lib/factoryMatching";
 import { FACTORY_TYPES, MAIN_FABRICS, type FactoryType, type MainFabric } from "@/lib/types";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
@@ -22,22 +20,9 @@ const moqRanges = [
   { label: "301+", min: 301, max: Infinity },
 ];
 
-function shuffleArray<T>(array: T[]): T[] {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-function pickRandomItems<T>(array: T[], count: number): T[] {
-  return shuffleArray(array).slice(0, Math.min(count, array.length));
-}
-
 // 매칭 페이지용 공장 이미지 컴포넌트
 function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory.name || factory.company_name || '');
+  const { images, loading } = useFactoryImages(factory);
   
   if (loading) {
     return (
@@ -146,83 +131,15 @@ const INTRO_GREETINGS = ["반갑습니다:)", "동고리가 봉제공장을 추�
 const INTRO_MESSAGE_COUNT = INTRO_GREETINGS.length + 1;
 
 export default function MatchingPage() {
-  const { user } = useAppAuth();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isSignedIn } = useAppAuth();
   // 공장 데이터 state
   const [factories, setFactories] = useState<Factory[]>([]);
 
-  // 로그인 상태 확인
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      // 로그인 사용자 확인
-      if (user) {
-        setIsLoggedIn(true);
-        return;
-      }
-
-      // 쿠키에서 로그인 상태 확인
-      const getCookie = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift();
-        return null;
-      };
-
-      const isLoggedInCookie = getCookie('isLoggedIn');
-      const userType = getCookie('userType');
-      const naverUser = getCookie('naver_user');
-      const kakaoUser = getCookie('kakao_user');
-
-      // localStorage에서도 확인
-      const localStorageUserType = localStorage.getItem('userType');
-      const localStorageFactoryAuth = localStorage.getItem('factoryAuth');
-
-      if (isLoggedInCookie === 'true' || userType || naverUser || kakaoUser || localStorageUserType || localStorageFactoryAuth) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkLoginStatus();
-  }, [user]);
-
   useEffect(() => {
     async function fetchFactories() {
-      const { data } = await supabase.from("donggori").select("*");
-      
-      // 이미지 정보를 추가로 처리
-      const factoriesWithImages = (data ?? []).map((factory: any) => {
-        const companyName = factory.company_name || factory.name || '';
-        
-        // 이미지 정보 로깅
-        console.log(`공장 ${companyName} 원본 데이터:`, {
-          id: factory.id,
-          company_name: factory.company_name,
-          name: factory.name,
-          images: factory.images,
-          image: factory.image
-        });
-        
-        // 실제 이미지 정보 가져오기
-        const factoryWithImages = {
-          ...factory,
-          intro: factory.intro_text || factory.intro,
-          description: factory.description || factory.intro_text || factory.intro,
-          image: getFactoryMainImage(companyName),
-          images: getFactoryImages(companyName)
-        };
-        
-        console.log(`공장 ${companyName} 처리된 이미지 데이터:`, {
-          image: factoryWithImages.image,
-          images: factoryWithImages.images,
-          companyName: companyName
-        });
-        
-        return factoryWithImages;
-      });
-      
-      setFactories(factoriesWithImages);
+      const response = await fetch("/api/factories", { cache: "no-store" });
+      const payload = response.ok ? await response.json() : null;
+      setFactories(Array.isArray(payload?.data) ? payload.data : []);
     }
     fetchFactories();
   }, []);
@@ -402,15 +319,6 @@ type ScoredFactory = Factory & { score: number };
           });
         }
         
-        // 데이터가 없으면 기본값으로 '봉제' 표시
-        if (chips.length === 0) {
-          chips.push({
-            label: '봉제',
-            color: chipColors['봉제'].color,
-            bg: chipColors['봉제'].bg
-          });
-        }
-        
         return [f.id ?? idx, chips];
       })
     );
@@ -554,9 +462,9 @@ type ScoredFactory = Factory & { score: number };
     return false;
   };
 
-  // 개선된 AI 매칭 알고리즘: 가중치 기반 점수 계산 시스템
+  // 선택 조건 기반 점수 계산
   const getRecommendedFactories = useCallback((answers: string[]) => {
-    console.log('🔍 AI 매칭 시작 - 사용자 답변:', answers);
+    console.log('🔍 맞춤 추천 시작 - 사용자 답변:', answers);
     
     // 가중치 정의 (중요도 순)
     const weights = {
@@ -606,7 +514,7 @@ type ScoredFactory = Factory & { score: number };
       ];
 
       // 1. 공장 타입 매칭 (가중치: 30)
-      if (selectedFactoryTypes.length > 0 && factoryTypeCandidates.length > 0) {
+      if (selectedFactoryTypes.length > 0) {
         maxPossibleScore += weights.factory_type;
         const { ratio, matched } = matchRatio(selectedFactoryTypes, factoryTypeCandidates);
         if (ratio > 0) {
@@ -616,7 +524,7 @@ type ScoredFactory = Factory & { score: number };
       }
 
       // 2. 주요 원단 매칭 (가중치: 25)
-      if (selectedFabrics.length > 0 && fabricCandidates.length > 0) {
+      if (selectedFabrics.length > 0) {
         maxPossibleScore += weights.main_fabrics;
         const { ratio, matched } = matchRatio(selectedFabrics, fabricCandidates);
         if (ratio > 0) {
@@ -626,7 +534,7 @@ type ScoredFactory = Factory & { score: number };
       }
 
       // 3. 지역 매칭 (가중치: 20)
-      if (selectedDistricts.length > 0 && districtCandidates.length > 0) {
+      if (selectedDistricts.length > 0) {
         maxPossibleScore += weights.admin_district;
         const { ratio, matched } = matchRatio(selectedDistricts, districtCandidates);
         if (ratio > 0) {
@@ -637,9 +545,9 @@ type ScoredFactory = Factory & { score: number };
 
       // 4. MOQ 매칭 (가중치: 15)
       const moqValue = getMoqValue(factory);
-      if (selectedMoqRange && moqValue !== null) {
+      if (selectedMoqRange) {
         maxPossibleScore += weights.moq;
-        const moqMatch = isMoqRangeMatch(selectedMoqRange, moqValue);
+        const moqMatch = moqValue !== null && isMoqRangeMatch(selectedMoqRange, moqValue);
         if (moqMatch) {
           totalScore += weights.moq;
           matchDetails.push(`MOQ: ${moqValue}`);
@@ -674,7 +582,7 @@ type ScoredFactory = Factory & { score: number };
       }
 
       // 6. 품목 매칭 (가중치: 10)
-      if (selectedItems.length > 0 && itemCandidates.length > 0) {
+      if (selectedItems.length > 0) {
         maxPossibleScore += weights.items;
         const { ratio, matched } = matchRatio(selectedItems, itemCandidates);
         if (ratio > 0) {
@@ -706,33 +614,9 @@ type ScoredFactory = Factory & { score: number };
     // 점수순으로 정렬 (높은 점수부터)
     const sortedFactories = scoredFactories.sort((a, b) => b.score - a.score);
     
-    // 지능형 필터링 및 보완 로직
-    let result: typeof scoredFactories = [];
-    
-    // 1단계: 고품질 매칭 (70점 이상)
-    const highQualityMatches = sortedFactories.filter(f => f.score >= 70);
-    if (highQualityMatches.length >= 3) {
-      result = highQualityMatches.slice(0, 3);
-      console.log('🌟 고품질 매칭 3개 이상 발견 - 상위 3개 선택');
-    } else {
-      // 2단계: 중품질 매칭 (50점 이상) + 고품질 매칭
-      const mediumQualityMatches = sortedFactories.filter(f => f.score >= 50 && f.score < 70);
-      result = [...highQualityMatches, ...mediumQualityMatches].slice(0, 3);
-      
-      if (result.length < 3) {
-        // 3단계: 저품질 매칭 (30점 이상)으로 보완
-        const lowQualityMatches = sortedFactories.filter(f => 
-          f.score >= 30 && f.score < 50 && !result.includes(f)
-        );
-        result = [...result, ...lowQualityMatches].slice(0, 3);
-        
-        if (result.length < 3) {
-          // 4단계: 최종 보완 (최고 점수들)
-          const remaining = sortedFactories.filter(f => !result.includes(f));
-          result = [...result, ...remaining].slice(0, 3);
-        }
-      }
-    }
+    // 최소 의미 점수(30점)를 충족한 공장만 추천한다. 결과 개수를 맞추기
+    // 위해 조건 불일치 공장을 섞지 않는다.
+    const result = takeMeaningfulMatches(sortedFactories);
 
     // 매칭 품질 분석
     const qualityAnalysis = {
@@ -757,10 +641,6 @@ type ScoredFactory = Factory & { score: number };
       score: f.score.toFixed(1) + '%',
       matches: f.matchDetails
     })));
-
-    if (result.every((f) => f.score === 0)) {
-      return pickRandomItems(scoredFactories, 3);
-    }
 
     return result;
   }, [factories]);
@@ -809,50 +689,46 @@ type ScoredFactory = Factory & { score: number };
     startTextMatching(promptFromQuery);
   }, [factories.length, startTextMatching]);
 
-  // 사용자 피드백 상태
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [feedbackRatings, setFeedbackRatings] = useState<{[key: number]: number}>({});
 
   // 피드백 제출 함수
   const submitFeedback = async (factoryId: number, rating: number) => {
     try {
-      console.log(`피드백 제출 시도: 공장 ${factoryId}, 평점 ${rating}`);
-      
-      // 즉시 UI 업데이트
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          factory_id: factoryId,
+          rating,
+          user_answers: answers,
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.error || '피드백을 저장하지 못했습니다.');
       setFeedbackRatings(prev => ({ ...prev, [factoryId]: rating }));
-      
-      // 서버에 피드백 전송 (선택적)
-      try {
-        const response = await fetch('/api/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            factory_id: factoryId,
-            rating: rating,
-            user_answers: answers,
-            timestamp: new Date().toISOString()
-          })
-        });
-        
-        if (response.ok) {
-          console.log(`피드백 서버 저장 완료: 공장 ${factoryId}, 평점 ${rating}`);
-        } else {
-          console.warn('피드백 서버 저장 실패, 하지만 UI는 업데이트됨');
-        }
-      } catch (serverError) {
-        console.warn('피드백 서버 전송 실패, 하지만 UI는 업데이트됨:', serverError);
-      }
-      
     } catch (error) {
-      console.error('피드백 처리 중 오류:', error);
+      alert(error instanceof Error ? error.message : '피드백을 저장하지 못했습니다.');
     }
   };
 
   // 추천 결과 카드 UI (공장 정보 상세)
   function renderResultCards() {
+    if (recommended.length === 0) {
+      return (
+        <div className="w-full max-w-xl rounded-2xl border border-gray-200 bg-gray-50 px-6 py-12 text-center">
+          <h2 className="text-xl font-bold text-gray-900">조건에 맞는 공장을 찾지 못했어요</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            조건을 줄여 다시 추천받거나 공장 목록에서 직접 확인해주세요.
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div className="w-full flex flex-col items-center justify-center animate-fade-in">
-        <div className="text-2xl md:text-[40px] font-extrabold text-gray-900 mb-8 text-center px-4">가장 적합한 봉제공장 3곳을 추천드려요!</div>
+        <div className="text-2xl md:text-[40px] font-extrabold text-gray-900 mb-8 text-center px-4">
+          조건에 맞는 봉제공장을 추천드려요!
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 w-full max-w-3xl px-4">
           {recommended.map((f, idx) => {
             const displayName = typeof f.name === 'string' && f.name
@@ -913,7 +789,7 @@ type ScoredFactory = Factory & { score: number };
                   <button
                     className="w-full mt-3 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition text-sm md:text-base"
                     onClick={() => {
-                      if (!isLoggedIn) {
+                      if (!isSignedIn) {
                         alert('로그인 후 이용 가능합니다.');
                         return;
                       }
@@ -1073,7 +949,7 @@ type ScoredFactory = Factory & { score: number };
     <div className="min-h-screen bg-[#f6f7fb]">
       <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-6`}>
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">AI 매칭</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">맞춤 추천</h1>
           <p className="mt-2 text-sm md:text-base text-gray-600">
             몇 가지 정보만 알려주시면 가장 적합한 봉제공장 3곳을 추천해드립니다.
           </p>

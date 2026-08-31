@@ -1,4 +1,3 @@
-import * as XLSX from "xlsx";
 import { getFactoryFieldLabel } from "@/lib/factoryAdminFields";
 
 /** 엑셀 내보내기 컬럼 순서 (DB 필드명) */
@@ -76,25 +75,23 @@ export function factoryToExcelRow(factory: Record<string, unknown>): Record<stri
   return ordered;
 }
 
-export function buildFactoriesWorkbook(factories: Record<string, unknown>[]): Buffer {
+function csvCell(value: string | number) {
+  const text = String(value);
+  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+export function buildFactoriesCsv(factories: Record<string, unknown>[]): Buffer {
   const rows = factories
     .sort((a, b) => Number(a.id) - Number(b.id))
     .map(factoryToExcelRow);
-
-  const ws = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "업장목록");
-
-  if (rows[0]) {
-    ws["!cols"] = Object.keys(rows[0]).map((key) => ({
-      wch: Math.min(48, Math.max(key.length + 2, 12)),
-    }));
-  }
-
-  return Buffer.from(XLSX.write(wb, { type: "buffer", bookType: "xlsx" }));
+  const headers = rows[0] ? Object.keys(rows[0]) : FACTORY_EXPORT_FIELD_ORDER.map(getFactoryFieldLabel);
+  const csv = [headers, ...rows.map((row) => headers.map((header) => row[header] ?? ""))]
+    .map((row) => row.map(csvCell).join(","))
+    .join("\r\n");
+  return Buffer.from(`\uFEFF${csv}`, "utf8");
 }
 
 export function factoriesExportFilename(date = new Date()) {
   const stamp = date.toISOString().slice(0, 10).replace(/-/g, "");
-  return `동고리_업장목록_${stamp}.xlsx`;
+  return `동고리_업장목록_${stamp}.csv`;
 }

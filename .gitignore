@@ -13,6 +13,11 @@ node_modules
 # misc
 .DS_Store
 *.pem
+*.key
+*.p12
+*.pfx
+/.ssh/
+/ghp_*
 
 # debug
 npm-debug.log*
@@ -20,7 +25,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
+.env*
+!.env.example
 
 # vercel
 .vercel

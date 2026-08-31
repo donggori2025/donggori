@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { put } from "@vercel/blob";
 import { requireAdmin } from "@/lib/adminSession";
+import { imageUploadExtension } from "@/lib/adminHelpers";
 
 export async function POST(req: Request) {
   const auth = await requireAdmin();
@@ -14,9 +16,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "파일이 없습니다." }, { status: 400 });
     }
 
-    // 파일 타입 검증
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ success: false, error: "이미지 파일만 업로드 가능합니다." }, { status: 400 });
+    const extension = imageUploadExtension(file.type);
+    if (!extension) {
+      return NextResponse.json({ success: false, error: "JPG, PNG, WEBP, GIF 이미지만 업로드 가능합니다." }, { status: 400 });
     }
 
     // 파일 크기 제한 (10MB)
@@ -25,8 +27,7 @@ export async function POST(req: Request) {
     }
 
     // 파일명 생성 (중복 방지)
-    const timestamp = Date.now();
-    const fileName = `factory-images/${timestamp}-${file.name}`;
+    const fileName = `factory-images/${randomUUID()}.${extension}`;
 
     // Vercel Blob에 업로드
     const blob = await put(fileName, file, {

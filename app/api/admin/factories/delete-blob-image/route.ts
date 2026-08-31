@@ -8,8 +8,17 @@ export async function POST(req: Request) {
 
   try {
     const { url } = await req.json();
-    if (!url) {
+    if (typeof url !== "string") {
       return NextResponse.json({ success: false, error: "url이 필요합니다." }, { status: 400 });
+    }
+
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== "https:" || !parsed.hostname.endsWith(".public.blob.vercel-storage.com")) {
+        return NextResponse.json({ success: false, error: "동고리 Blob 이미지 URL만 삭제할 수 있습니다." }, { status: 400 });
+      }
+    } catch {
+      return NextResponse.json({ success: false, error: "유효하지 않은 URL입니다." }, { status: 400 });
     }
 
     await del(url);

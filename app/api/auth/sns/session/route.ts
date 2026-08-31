@@ -1,64 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { config } from '@/lib/config';
-import { createSessionRecord } from '@/lib/session';
-import { SESSION_DURATIONS } from '@/lib/sessionConfig';
+import { NextResponse } from 'next/server';
 
-// SNS 로그인 이후(카카오/네이버/구글 콜백 시점 또는 가입 완료 시점)에 호출해
-// snsAccessToken 과 isInitialized 를 발급하는 엔드포인트
-export async function POST(req: NextRequest) {
-  try {
-    const { email, externalId, provider, isInitialized } = await req.json();
-    if (!email && !externalId) return NextResponse.json({ error: 'email 또는 externalId 필요' }, { status: 400 });
-
-    // 환경변수 유효성 검사
-    if (!config.supabase.url || !config.supabase.serviceRoleKey || 
-        config.supabase.url === 'your-supabase-url' || 
-        config.supabase.url === 'your-supabase-url/' ||
-        !config.supabase.url.startsWith('http') ||
-        config.supabase.serviceRoleKey.length <= 10) {
-      return NextResponse.json({ error: '데이터베이스 연결 오류' }, { status: 500 });
-    }
-
-    let supabase;
-    try {
-      supabase = createClient(config.supabase.url, config.supabase.serviceRoleKey, { auth: { persistSession: false } });
-    } catch (error) {
-      console.error('Supabase 클라이언트 생성 실패:', error);
-      return NextResponse.json({ error: '데이터베이스 연결 오류' }, { status: 500 });
-    }
-    let user: any = null;
-    if (email) {
-      const u = await supabase.from('users').select('id, email, phoneNumber').eq('email', email).maybeSingle();
-      user = u.data;
-    }
-    if (!user && externalId && provider) {
-      const u = await supabase.from('users').select('id, email, phoneNumber').eq('externalId', externalId).eq('signupMethod', provider).maybeSingle();
-      user = u.data;
-    }
-
-    const init = !!isInitialized || !!user?.phoneNumber; // 전화번호 존재 시 초기화된 것으로 간주
-    const { token } = await createSessionRecord({
-      type: 'sns',
-      userId: user?.id ?? null,
-      userEmail: user?.email ?? email ?? null,
-      externalId: externalId ?? null,
-      provider: provider ?? null,
-      isInitialized: init,
-      ttlSec: SESSION_DURATIONS.SOCIAL
-    });
-
-    const res = NextResponse.json({ success: true, snsAccessToken: token, isInitialized: init });
-    res.cookies.set('sns_access_token', token, { 
-      httpOnly: true, 
-      sameSite: 'lax', 
-      secure: process.env.NODE_ENV === 'production', 
-      maxAge: SESSION_DURATIONS.SOCIAL 
-    });
-    return res;
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'server error' }, { status: 500 });
-  }
+// 세션은 OAuth 콜백과 회원가입 서버 라우트에서만 직접 발급한다.
+// 이 공개 엔드포인트는 이메일만으로 타인 세션을 만들 수 있었으므로 폐기한다.
+export async function POST() {
+  return NextResponse.json({ error: '지원하지 않는 엔드포인트입니다.' }, { status: 410 });
 }
-
 

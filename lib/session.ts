@@ -22,24 +22,15 @@ const supabaseServer =
       })
     : null;
 
-let warnedMissingSessionSecret = false;
-
 function getSessionSecret(): string {
-  const secret =
-    process.env.ADMIN_SESSION_SECRET ||
-    process.env.FACTORY_SESSION_SECRET ||
-    process.env.SESSION_SECRET;
+  const secret = process.env.SESSION_SECRET;
 
   if (secret) return secret;
 
-  if (process.env.NODE_ENV === "production" && !warnedMissingSessionSecret) {
-    warnedMissingSessionSecret = true;
-    console.error(
-      "[SECURITY] ADMIN_SESSION_SECRET 환경변수가 없습니다. 서버 재시작 시 로그인 세션이 무효화됩니다."
-    );
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET 환경변수가 필요합니다.");
   }
 
-  // 개발/비상용. 프로덕션에서는 ADMIN_SESSION_SECRET 을 반드시 설정한다.
   return "donggori-dev-session-secret";
 }
 
@@ -47,6 +38,10 @@ function signPayload(payload: SessionPayload): string {
   const data = Buffer.from(JSON.stringify(payload)).toString("base64url");
   const sig = crypto.createHmac("sha256", getSessionSecret()).update(data).digest("hex");
   return `v1.${data}.${sig}`;
+}
+
+function sessionStorageId(token: string): string {
+  return crypto.createHash("sha256").update(token).digest("hex");
 }
 
 function verifySignedToken(token: string): SessionPayload | null {
@@ -70,8 +65,8 @@ function verifySignedToken(token: string): SessionPayload | null {
 
 /**
  * 로그인 세션 발급.
- * sessions 테이블이 없어도 HMAC 서명 토큰으로 동작한다.
- * 테이블이 있으면 감사/폐기용으로 best-effort INSERT 한다.
+ * HMAC 서명 토큰을 발급하고 sessions 테이블에 저장해 서버에서 폐기할 수 있게 한다.
+ * 개발 환경만 테이블 미구성 상태를 허용한다.
  */
 export async function createSessionRecord(input: {
   type: SessionType;
@@ -98,9 +93,11 @@ export async function createSessionRecord(input: {
   const token = signPayload(payload);
 
   if (supabaseServer) {
+    // 로그인 시 만료 레코드를 가볍게 정리해 별도 cron 없이 무한 누적되지 않게 한다.
+    await supabaseServer.from("sessions").delete().lt("expires_at", new Date(now).toISOString());
     const { error } = await supabaseServer.from("sessions").insert([
       {
-        id: token,
+        id: sessionStorageId(token),
         type: payload.type,
         user_id: payload.user_id,
         user_email: payload.user_email,
@@ -111,8 +108,10 @@ export async function createSessionRecord(input: {
         created_at: new Date(now).toISOString(),
       },
     ]);
-    // 테이블 미존재 등으로 실패해도 로그인 자체는 서명 토큰으로 유지
     if (error) {
+      if (process.env.NODE_ENV === "production") {
+        throw new Error("로그인 세션을 저장하지 못했습니다.");
+      }
       console.warn("[session] sessions INSERT skipped:", error.message);
     }
   }
@@ -134,6 +133,17 @@ export async function verifySessionToken(token: string): Promise<{
 }> {
   const signed = verifySignedToken(token);
   if (signed) {
+    if (supabaseServer) {
+      const { data: stored, error } = await supabaseServer
+        .from("sessions")
+        .select("id")
+        .eq("id", sessionStorageId(token))
+        .maybeSingle();
+      if (error || !stored) {
+        if (process.env.NODE_ENV === "production" || !error) return { valid: false };
+        console.warn("[session] sessions lookup skipped:", error.message);
+      }
+    }
     return {
       valid: true,
       data: {
@@ -148,21 +158,19 @@ export async function verifySessionToken(token: string): Promise<{
     };
   }
 
-  // 구형 UUID 토큰 (sessions 테이블에만 있던 경우) 호환
-  if (!supabaseServer) return { valid: false };
-  try {
-    const { data, error } = await supabaseServer
-      .from("sessions")
-      .select("*")
-      .eq("id", token)
-      .limit(1)
-      .maybeSingle();
-    if (error || !data) return { valid: false };
-    if (data.expires_at && Date.parse(data.expires_at) < Date.now()) {
-      return { valid: false };
-    }
-    return { valid: true, data };
-  } catch {
-    return { valid: false };
+  return { valid: false };
+}
+
+export async function revokeSessionToken(token: string): Promise<void> {
+  if (!supabaseServer || !token) return;
+  const { error } = await supabaseServer.from("sessions").delete().eq("id", sessionStorageId(token));
+  if (error && process.env.NODE_ENV === "production") {
+    throw new Error("로그인 세션을 폐기하지 못했습니다.");
   }
+}
+
+export async function revokeUserSessions(userId: string): Promise<void> {
+  if (!supabaseServer || !userId) return;
+  const { error } = await supabaseServer.from("sessions").delete().eq("user_id", userId);
+  if (error) throw new Error("로그인 세션을 폐기하지 못했습니다.");
 }

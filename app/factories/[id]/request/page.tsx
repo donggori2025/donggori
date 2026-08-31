@@ -1,28 +1,24 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Factory } from "@/lib/factories";
+import { Factory } from "@/lib/factoryCatalog";
 import { useAppAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
-import { isAppLoggedIn, getAppUserIdentity, storage } from "@/lib/utils";
 import type { RequestFormData } from "@/lib/types";
+import { DONGGORI_OPEN_KAKAO_CHAT_URL } from "@/lib/site";
 
-const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
 
 export default function FactoryRequestPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user: authUser } = useAppAuth();
+  const { user: authUser, isSignedIn, isLoaded } = useAppAuth();
   const [factory, setFactory] = useState<Factory | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [factoryId, setFactoryId] = useState<string | null>(null);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [authorized, setAuthorized] = useState(false);
   
   // 폼 상태
   const [formData, setFormData] = useState<RequestFormData>({
@@ -52,11 +48,13 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   }, [params]);
 
   useEffect(() => {
-    if (!factoryId) return;
+    const id = factoryId;
+    if (!id) return;
     async function fetchFactory() {
       setLoading(true);
-      const { data } = await supabase.from("donggori").select("*").eq("id", factoryId).single();
-      setFactory(data);
+      const response = await fetch(`/api/factories/${encodeURIComponent(String(id))}`, { cache: "no-store" });
+      const payload = response.ok ? await response.json() : null;
+      setFactory(payload?.data ?? null);
       setLoading(false);
     }
     fetchFactory();
@@ -64,11 +62,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
   // 진입 시 로그인 강제 체크 (직접 URL 접근 포함)
   useEffect(() => {
-    const loggedIn = Boolean(authUser?.id) || isAppLoggedIn();
-    setAuthorized(loggedIn);
-    setAuthChecked(true);
-
-    if (!loggedIn) {
+    if (!isLoaded || isSignedIn) return;
+    if (!isSignedIn) {
       alert("로그인/회원가입 후 이용 가능합니다.");
       if (typeof window !== "undefined") {
         const nextPath = `${window.location.pathname}${window.location.search || ""}`;
@@ -78,46 +73,18 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       } else {
         router.replace("/sign-in");
       }
-      return;
     }
-  }, [authUser, factoryId, router]);
+  }, [factoryId, isLoaded, isSignedIn, router]);
 
   // 로그인한 유저의 이름을 자동으로 입력
   useEffect(() => {
-    if (!authorized) return;
-
-    const nameFromUrl = searchParams.get("name");
-    const userIdentity = getAppUserIdentity(authUser);
-    
-    // 개발 환경에서만 디버깅 정보 출력
-    if (process.env.NODE_ENV === 'development') {
-      console.log('사용자 정보:', {
-        authUser: authUser ? {
-          id: authUser.id,
-          name: authUser.name,
-          email: authUser.email,
-          phone: authUser.phoneNumber
-        } : null,
-        userIdentity,
-        nameFromUrl
-      });
-    }
-    
+    if (!isSignedIn || !authUser) return;
     setFormData(prev => ({
       ...prev,
-      // URL 파라미터보다는 실제 로그인한 사용자 정보를 우선 사용
-      name: prev.name || userIdentity.name || (nameFromUrl ? decodeURIComponent(nameFromUrl) : ''),
-      contact: prev.contact || userIdentity.phone
+      name: prev.name || authUser.name || "",
+      contact: prev.contact || authUser.phoneNumber || authUser.email,
     }));
-    
-    // 올바른 사용자 정보를 localStorage에 저장 (캐싱)
-    if (userIdentity.name) {
-      storage.set('userName', userIdentity.name);
-    }
-    if (userIdentity.phone) {
-      storage.set('userPhone', userIdentity.phone);
-    }
-  }, [searchParams, authorized, authUser]);
+  }, [isSignedIn, authUser]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
@@ -126,33 +93,6 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }));
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    
-    // 파일 크기 및 형식 검증
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    const allowedTypes = ['.pdf', '.ppt', '.pptx', '.png', '.jpg', '.jpeg'];
-    
-    for (const file of files) {
-      // 파일 크기 검증
-      if (file.size > maxSize) {
-        alert(`${file.name} 파일이 10MB를 초과합니다.`);
-        return;
-      }
-      
-      // 파일 형식 검증
-      const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
-      if (!allowedTypes.includes(fileExtension)) {
-        alert(`${file.name} 파일 형식이 지원되지 않습니다. (지원 형식: PDF, PPT, PNG, JPG)`);
-        return;
-      }
-    }
-    
-    setFormData(prev => ({
-      ...prev,
-      files: [...prev.files, ...files]
-    }));
-  };
 
   const handleAddLink = () => {
     if (newLink.trim()) {
@@ -175,12 +115,6 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     }
   };
 
-  const removeFile = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      files: prev.files.filter((_, i) => i !== index)
-    }));
-  };
 
   const removeLink = (index: number) => {
     setFormData(prev => ({
@@ -190,7 +124,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   };
 
   // 의뢰 내용을 클립보드에 복사할 텍스트 생성
-  const generateRequestText = (fileUrls: string[] = []) => {
+  const generateRequestText = () => {
     const factoryName = factory?.company_name || factory?.name || '공장';
     
     let text = `[${factoryName} 의뢰 문의]\n\n`;
@@ -225,18 +159,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     text += `- 의뢰일: ${new Date().toLocaleDateString('ko-KR')}.\n\n`;
     text += `동고리를 통해 문의드립니다. 감사합니다! 🙏`;
     
-    // 첨부 파일 다운로드 링크 추가
-    if (formData.files.length > 0 && fileUrls.length > 0) {
-      text += `\n\n- 첨부 파일 다운로드:\n`;
-      formData.files.forEach((file, index) => {
-        if (fileUrls[index]) {
-          text += `${index + 1}. ${file.name} -> ${fileUrls[index]}\n`;
-        } else {
-          text += `${index + 1}. ${file.name}\n`;
-        }
-      });
-    }
-    
+    text += `\n첨부 파일은 이 채팅방에 직접 보내겠습니다.`;
     return text;
   };
 
@@ -254,16 +177,16 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   };
 
   // 클립보드 복사 및 카카오톡 연결
-  const copyToClipboardAndOpenKakao = async (fileUrls: string[] = []) => {
+  const copyToClipboardAndOpenKakao = async () => {
     try {
-      const requestText = generateRequestText(fileUrls);
+      const requestText = generateRequestText();
       
       // 클립보드에 복사
       await navigator.clipboard.writeText(requestText);
       
       // 고정 오픈카카오톡 URL로 이동
       alert('의뢰 내용이 클립보드에 복사되었습니다!\n카카오톡 채팅창에 붙여넣기 한 뒤 전송해주세요.\n확인을 누르면 카카오톡으로 이동합니다.');
-      window.open(OPEN_KAKAO_CHAT_URL, '_blank');
+      window.open(DONGGORI_OPEN_KAKAO_CHAT_URL, '_blank');
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('클립보드 복사 오류:', error);
@@ -278,12 +201,12 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       const inquiryText = generateInquiryText();
       await navigator.clipboard.writeText(inquiryText);
       alert('문의 내용이 클립보드에 복사되었습니다!\n카카오톡 채팅창에 붙여넣기 한 뒤 전송해주세요.\n확인을 누르면 카카오톡으로 이동합니다.');
-      window.open(OPEN_KAKAO_CHAT_URL, '_blank');
+      window.open(DONGGORI_OPEN_KAKAO_CHAT_URL, '_blank');
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('문의 클립보드 복사 오류:', error);
       }
-      window.open(OPEN_KAKAO_CHAT_URL, '_blank');
+      window.open(DONGGORI_OPEN_KAKAO_CHAT_URL, '_blank');
     }
   };
 
@@ -324,55 +247,11 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         return;
       }
       
-      // 1. 첨부파일 Supabase Storage 업로드
-      const uploadedFileUrls: string[] = [];
-      if (formData.files.length > 0) {
-        try {
-          for (const file of formData.files) {
-            // Supabase Storage 키는 일부 특수문자를 허용하지 않으므로 안전한 파일명으로 정규화
-            const safeName = file.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
-            // 버킷 내부 경로만 전달 (버킷명 중복 제거)
-            const filePath = `${Date.now()}_${safeName}`;
-            const { error: uploadError } = await supabase.storage.from('match-request-files').upload(filePath, file);
-            if (uploadError) {
-              if (process.env.NODE_ENV === 'development') {
-                console.error('파일 업로드 오류:', uploadError);
-              }
-              setSubmitting(false);
-              alert(`파일 업로드 중 오류가 발생했습니다: ${file.name}\n오류: ${uploadError.message}`);
-              return;
-            }
-            // publicUrl 생성
-            const { data: publicUrlData } = supabase.storage.from('match-request-files').getPublicUrl(filePath);
-            if (publicUrlData?.publicUrl) {
-              uploadedFileUrls.push(publicUrlData.publicUrl);
-            }
-          }
-        } catch (fileError) {
-          if (process.env.NODE_ENV === 'development') {
-            console.error('파일 업로드 중 예외 발생:', fileError);
-          }
-          setSubmitting(false);
-          alert('파일 업로드 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
-          return;
-        }
-      }
-
-      // 서버 API 경유로 의뢰 데이터 저장 (RLS 회피 및 상세 오류 전달)
+      // Attachments are intentionally sent in the central Kakao chat, not public Storage.
       try {
-        const loggedInUser = getAppUserIdentity(authUser);
-        
-        if (process.env.NODE_ENV === 'development') {
-          console.log('의뢰 제출 시 사용자 정보:', loggedInUser);
-        }
-        
         const payload = {
-          user_id: loggedInUser.id || `user_${Date.now()}`,
-          user_email: loggedInUser.email || `${formData.name || 'user'}@example.com`,
           user_name: formData.name,
           factory_id: factoryId,
-          factory_name: factoryName,
-          status: 'pending',
           items: [],
           quantity: 0,
           description: `브랜드: ${formData.brandName || '미입력'}\n연락처: ${formData.contact}`,
@@ -388,11 +267,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             packaging: formData.packaging,
             description: formData.detailDescription,
             request: formData.detailRequest,
-            files: uploadedFileUrls,
             links: formData.links,
-          }),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          })
         } as const;
         
         if (process.env.NODE_ENV === 'development') {
@@ -415,20 +291,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
           return;
         }
 
-        // 성공 시 알림톡 전송 호출
-        const { id: newId } = await res.json();
-        if (newId) {
-          try {
-            await fetch(`/api/requests/${newId}/notify-factory`, { method: 'POST' });
-          } catch (notifyErr) {
-            if (process.env.NODE_ENV === 'development') {
-              console.warn('알림톡 전송 호출 실패(무시):', notifyErr);
-            }
-          }
-        }
-
         // 의뢰 내용을 클립보드에 복사하고 카카오톡으로 연결
-        await copyToClipboardAndOpenKakao(uploadedFileUrls);
+        await copyToClipboardAndOpenKakao();
         
         // 팝업이 뜬 후 제출 상태 해제
         setSubmitting(false);
@@ -504,7 +368,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
     setShowExitConfirm(false);
   };
 
-  if (!authChecked || !authorized) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">로그인 확인 중...</div>;
+  if (!isLoaded || !isSignedIn) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">로그인 확인 중...</div>;
   if (loading) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">로딩 중...</div>;
   if (!factory) return <div className="max-w-xl mx-auto py-10 px-4 text-center text-gray-500">존재하지 않는 공장입니다.</div>;
 
@@ -644,39 +508,9 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">파일</label>
-                  <input
-                    type="file"
-                    multiple
-                    accept=".pdf,.ppt,.pptx,.png,.jpg,.jpeg"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="file-upload"
-                  />
-                  <label htmlFor="file-upload" className="inline-block px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-black focus:border-black">
-                    + 파일 업로드
-                  </label>
-                  <p className="text-xs text-gray-500 mt-1">
-                    지원 형식: PDF, PPT, PNG, JPG (최대 10MB)
-                  </p>
-                  {formData.files.length > 0 && (
-                    <div className="mt-2 space-y-2">
-                      {formData.files.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                          <span className="text-sm">{file.name}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeFile(index)}
-                            className="text-black hover:text-gray-700"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <p className="rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
+                  도면·레퍼런스 파일은 의뢰 접수 후 열리는 동고리 카카오톡 채팅방에 보내주세요.
+                </p>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Faddit 작업지시서</label>
                   <div className="space-y-2">
@@ -833,4 +667,4 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
       )}
     </div>
   );
-} 
+}
