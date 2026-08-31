@@ -8,6 +8,15 @@ alter table public.notices
   add column if not exists start_at date,
   add column if not exists end_at date;
 
+-- ADD COLUMN IF NOT EXISTS does not repair constraints on an existing column.
+update public.notices
+set is_active = true
+where is_active is null;
+
+alter table public.notices
+  alter column is_active set default true,
+  alter column is_active set not null;
+
 create index if not exists idx_notices_visibility
   on public.notices (is_active, start_at, end_at);
 

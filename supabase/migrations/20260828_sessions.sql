@@ -15,6 +15,15 @@ create table if not exists public.sessions (
   created_at timestamptz not null default now()
 );
 
+-- CREATE TABLE IF NOT EXISTS does not repair constraints on an existing table.
+update public.sessions
+set is_initialized = false
+where is_initialized is null;
+
+alter table public.sessions
+  alter column is_initialized set default false,
+  alter column is_initialized set not null;
+
 create index if not exists idx_sessions_user_id on public.sessions(user_id);
 create index if not exists idx_sessions_user_email on public.sessions(user_email);
 create index if not exists idx_sessions_expires_at on public.sessions(expires_at);
