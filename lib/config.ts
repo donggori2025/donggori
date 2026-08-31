@@ -6,27 +6,6 @@ export const config = {
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   },
 
-  // 이미지 서비스 설정
-  imageService: process.env.IMAGE_SERVICE || 'vercel-blob',
-
-  // Vercel Blob 설정
-  vercelBlob: {
-    token: process.env.BLOB_READ_WRITE_TOKEN || '',
-  },
-
-  // AWS S3 설정
-  aws: {
-    region: process.env.AWS_REGION || 'ap-northeast-2',
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    bucketName: process.env.S3_BUCKET_NAME || 'donggori-images',
-  },
-
-  // CloudFront 설정
-  cloudfront: {
-    domain: process.env.CLOUDFRONT_DOMAIN,
-  },
-
   // 네이버맵 설정
   naverMap: {
     clientId: process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID || '',
