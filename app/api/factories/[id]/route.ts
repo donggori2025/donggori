@@ -28,11 +28,17 @@ export async function GET(
       return NextResponse.json({ success: false, error: "서버 설정 오류" }, { status: 500 });
     }
 
-    const { data, error } = await supabase
+    const primary = await supabase
       .from("donggori")
       .select(PUBLIC_FACTORY_SELECT)
       .eq("id", id)
       .maybeSingle();
+
+    const fallback = primary.error?.code === "42703"
+      ? await supabase.from("donggori").select("*").eq("id", id).maybeSingle()
+      : null;
+    const data = fallback?.data ?? primary.data;
+    const error = fallback?.error ?? primary.error;
 
     if (error) {
       return NextResponse.json({ success: false, error: "공장 정보를 불러오지 못했습니다." }, { status: 500 });

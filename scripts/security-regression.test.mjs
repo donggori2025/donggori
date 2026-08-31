@@ -26,7 +26,7 @@ test("OAuth state must match the server cookie", () => {
 });
 
 test("critical auth bypasses stay removed", async () => {
-  const [auth, context, login, sns, signup, signupPage, signupContext, kakaoCallback, naverCallback, signIn, changePassword, resetPassword, emailOtp, session, myPage, factoryDetail, factoryPrivacy, factoryPopup, matchRequests, utils, socialIdentityMigration, lockdown] = await Promise.all([
+  const [auth, context, login, sns, signup, signupPage, signupContext, kakaoCallback, naverCallback, signIn, changePassword, resetPassword, emailOtp, session, myPage, factoryDetail, factoryPrivacy, factoryPopup, publicFactories, publicPopups, matchRequests, utils, socialIdentityMigration, lockdown] = await Promise.all([
     readFile("lib/authHelpers.ts", "utf8"),
     readFile("contexts/AuthContext.tsx", "utf8"),
     readFile("app/api/auth/login/route.ts", "utf8"),
@@ -45,6 +45,8 @@ test("critical auth bypasses stay removed", async () => {
     readFile("app/factories/[id]/page.tsx", "utf8"),
     readFile("lib/factoryPrivacy.ts", "utf8"),
     readFile("components/FactoryInfoPopup.tsx", "utf8"),
+    readFile("app/api/factories/route.ts", "utf8"),
+    readFile("app/api/popups/route.ts", "utf8"),
     readFile("app/api/match-requests/route.ts", "utf8"),
     readFile("lib/utils.ts", "utf8"),
     readFile("supabase/migrations/20260828_social_identity_unique.sql", "utf8"),
@@ -78,6 +80,10 @@ test("critical auth bypasses stay removed", async () => {
   assert.doesNotMatch(factoryDetail, /localStorage|document\.cookie|factory_user|kakao_user|naver_user/);
   assert.match(factoryPrivacy, /Math\.round\(coordinate \* 100\) \/ 100/);
   assert.doesNotMatch(factoryPopup, /Math\.sin|const seed|const hash/);
+  assert.match(publicFactories, /select\("\*"\)/);
+  assert.match(publicFactories, /mapPublicFactoryRows/);
+  assert.match(publicPopups, /select\("\*"\)/);
+  assert.match(publicPopups, /toPublicPopup/);
   assert.match(matchRequests, /\.from\("users"\)/);
   assert.match(matchRequests, /body\.user_id = account\.id/);
   assert.doesNotMatch(utils, /localStorage|document\.cookie|isAppLoggedIn/);

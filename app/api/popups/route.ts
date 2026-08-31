@@ -61,7 +61,7 @@ export async function GET() {
   const { data, error } = await query.order("sort_order", { ascending: true }).order("created_at", { ascending: false });
 
   if (error) {
-    const fallback = await supabase.from("popups").select(PUBLIC_POPUP_SELECT).order("created_at", { ascending: false });
+    const fallback = await supabase.from("popups").select("*").order("created_at", { ascending: false });
     if (fallback.error) {
       console.error("Failed to load public popups", fallback.error);
       return NextResponse.json({ success: false, error: "팝업을 불러오지 못했습니다." }, { status: 500 });
