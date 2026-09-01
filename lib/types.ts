@@ -240,6 +240,7 @@ export interface ProductSpecs {
 }
 
 export type MiscObjectType = "text" | "image" | "arrow" | "note";
+export type MiscArrowStyle = "straight" | "double" | "dashed" | "line" | "curve";
 
 export interface MiscBoxObject {
   id: string;
@@ -250,6 +251,8 @@ export interface MiscBoxObject {
   h: number;
   text?: string;
   fontSize?: number;
+  fontColor?: string;
+  fontFamily?: string;
   src?: string;
 }
 
@@ -260,6 +263,7 @@ export interface MiscArrowObject {
   y: number;
   x2: number;
   y2: number;
+  style?: MiscArrowStyle;
 }
 
 export type MiscObject = MiscBoxObject | MiscArrowObject;

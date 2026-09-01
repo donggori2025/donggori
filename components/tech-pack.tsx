@@ -29,6 +29,7 @@ import {
   X,
 } from "lucide-react";
 import { CompletenessMenu } from "./completeness-bar";
+import { SharePageModal } from "./share-page-modal";
 import { MiniFlat } from "./ui";
 import { NotesEditor } from "./notes-editor";
 import { Mockup2D, Mockup3D } from "./flats";
@@ -1038,8 +1039,8 @@ function ShareMenu({
   onPrint: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [sharePage, setSharePage] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { ensureShareToken } = useWorkspace();
 
   useEffect(() => {
     if (!open) return;
@@ -1059,6 +1060,7 @@ function ShareMenu({
 
   return (
     <div className="relative" ref={ref}>
+      {sharePage && <SharePageModal productId={productId} onClose={() => setSharePage(false)} />}
       <button
         type="button"
         aria-expanded={open}
@@ -1078,8 +1080,8 @@ function ShareMenu({
             type="button"
             role="menuitem"
             onClick={() => {
-              window.open(`${window.location.origin}/share/${ensureShareToken(productId)}`, "_blank", "noreferrer");
               setOpen(false);
+              setSharePage(true);
             }}
             className="flex w-full items-center gap-2.5 rounded-xl px-2 py-2 text-left text-[13px] hover:bg-paper"
           >
@@ -1438,6 +1440,10 @@ function ShareMiscSheet({
                 selectedId={session.selectedId}
                 onPickTool={session.pickTool}
                 onRemove={session.removeSelected}
+                textStyle={session.textStyle}
+                arrowStyle={session.arrowStyle}
+                onTextStyle={session.patchSelectedText}
+                onArrowStyle={session.patchArrowStyle}
               />
             </div>
           </div>

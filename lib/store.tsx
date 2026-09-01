@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -119,6 +120,7 @@ interface WorkspaceApi extends WorkspaceState {
   inviteToProduct: (productId: string, tokens: string[], role: ProductAccessRole) => void;
   inviteToWorkspace: (tokens: string[], role: ProductAccessRole) => void;
   setCollaboratorAccess: (productId: string, userId: string, access: ProductAccessRole) => void;
+  removeCollaborator: (productId: string, userId: string) => void;
   setAnyoneAccess: (productId: string, access: LinkAccess) => void;
   setWorkspaceAccess: (productId: string, access: TeamAccess) => void;
   createProduct: (name: string, options?: { category?: ProductCategory; description?: string }) => string;
@@ -321,6 +323,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     displayAccount: { ...DISPLAY_ACCOUNT, avatar: DEFAULT_AVATAR },
     marketingConsent: false,
   });
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   useEffect(() => {
     try {
@@ -381,15 +385,13 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   );
 
   const ensureShareToken = useCallback((productId: string) => {
-    let token = "";
+    const existing = stateRef.current.products.find((p) => p.id === productId)?.shareToken;
+    if (existing) return existing;
+    const token = `fac-${productId}-${Math.random().toString(36).slice(2, 8)}`;
     setState((s) => {
       const product = s.products.find((p) => p.id === productId);
       if (!product) return s;
-      if (product.shareToken) {
-        token = product.shareToken;
-        return s;
-      }
-      token = `fac-${productId}-${Math.random().toString(36).slice(2, 8)}`;
+      if (product.shareToken) return s;
       return {
         ...s,
         products: s.products.map((p) => (p.id === productId ? { ...p, shareToken: token } : p)),
@@ -750,15 +752,46 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     setState((s) => ({
       ...s,
       products: s.products.map((p) => {
-        if (p.id !== productId || access === "owner") return p;
-        let collaborators = collaboratorsOf(p).map((c) => (c.userId === userId ? { ...c, access } : c));
+        if (p.id !== productId) return p;
+        const current = collaboratorsOf(p);
+        if (!current.some((c) => c.userId === userId)) return p;
+        if (p.ownerId === userId && access !== "owner") return p;
+
+        let collaborators = current.map((c) => (c.userId === userId ? { ...c, access } : c));
+        let ownerId = p.ownerId;
         let designerId = p.designerId;
+
+        if (access === "owner") {
+          ownerId = userId;
+          collaborators = collaborators.map((c) =>
+            c.userId === userId ? { ...c, access: "owner" } : c.access === "owner" ? { ...c, access: "edit" } : c,
+          );
+        }
         if (access === "assignee") {
           collaborators = collaborators.map((c) =>
             c.userId === userId ? c : c.access === "assignee" ? { ...c, access: "edit" } : c,
           );
           designerId = userId;
         }
+        return {
+          ...p,
+          ownerId,
+          designerId,
+          collaborators,
+          collaboratorIds: extraIds({ ...p, ownerId, designerId }, collaborators),
+          updatedAt: "방금",
+        };
+      }),
+    }));
+  }, []);
+
+  const removeCollaborator = useCallback((productId: string, userId: string) => {
+    setState((s) => ({
+      ...s,
+      products: s.products.map((p) => {
+        if (p.id !== productId || p.ownerId === userId) return p;
+        const collaborators = collaboratorsOf(p).filter((c) => c.userId !== userId);
+        const designerId = p.designerId === userId ? p.ownerId : p.designerId;
         return {
           ...p,
           designerId,
@@ -1370,6 +1403,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       inviteToProduct,
       inviteToWorkspace,
       setCollaboratorAccess,
+      removeCollaborator,
       setAnyoneAccess,
       setWorkspaceAccess,
       createProduct,
@@ -1427,6 +1461,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       inviteToProduct,
       inviteToWorkspace,
       setCollaboratorAccess,
+      removeCollaborator,
       setAnyoneAccess,
       setWorkspaceAccess,
       createProduct,

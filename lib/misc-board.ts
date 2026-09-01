@@ -1,4 +1,27 @@
-import type { MiscObject, MiscPage, ProductSpecs } from "./types";
+import type { MiscArrowStyle, MiscObject, MiscPage, ProductSpecs } from "./types";
+
+export const TEXT_FONTS = [
+  { id: "sans", label: "고딕", family: 'Inter, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif' },
+  { id: "serif", label: "명조", family: 'Georgia, "Times New Roman", "Apple Myungjo", serif' },
+  { id: "mono", label: "고정폭", family: 'ui-monospace, "SF Mono", Menlo, monospace' },
+  { id: "script", label: "손글씨", family: '"Segoe Script", "Apple Chancery", cursive' },
+] as const;
+
+export const TEXT_SIZES = [12, 14, 16, 18, 24, 32, 48];
+export const TEXT_COLORS = ["#1a1916", "#6f6c66", "#c4554d", "#3a5a78", "#2f6b57", "#8a4e32", "#ffffff"];
+export const DEFAULT_TEXT_STYLE = {
+  fontSize: 18,
+  fontColor: "#1a1916",
+  fontFamily: TEXT_FONTS[0].family,
+};
+
+export const ARROW_STYLES: { id: MiscArrowStyle; label: string }[] = [
+  { id: "straight", label: "화살표" },
+  { id: "double", label: "양방향" },
+  { id: "dashed", label: "점선" },
+  { id: "line", label: "선" },
+  { id: "curve", label: "곡선" },
+];
 import { htmlToText, specMiscHtml } from "./utils";
 
 export const A4_W = 794;
