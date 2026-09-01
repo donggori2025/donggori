@@ -1,0 +1,259 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --paper: #f4f2ee;
+  --snow: #fffefb;
+  --ink: #1a1916;
+  --stone: #6f6c66;
+  --mist: #e7e4dd;
+  --fog: #d4d0c8;
+  --lilac: #e4dcf3;
+  --lilac-ink: #5d4e7a;
+  --mint: #d3ede3;
+  --mint-ink: #2f6b57;
+  --peach: #f6dfd0;
+  --peach-ink: #8a4e32;
+  --sky: #d7e6f5;
+  --sky-ink: #3a5a78;
+  --butter: #f3ebc7;
+  --butter-ink: #7a6a2a;
+  --rose: #f3d9e2;
+  --rose-ink: #7a4458;
+  --danger: #c4554d;
+  --select: #0d99ff;
+  --select-soft: #e5f3ff;
+  --toggle: #1a1916;
+  --overlay: rgb(26 25 22 / 0.22);
+  --chip: #6b4eff;
+  --chip-muted: #8f7cff;
+  --float-shadow: 0 12px 40px rgba(26, 25, 22, 0.12);
+  color-scheme: light;
+}
+
+html.dark {
+  --paper: #161512;
+  --snow: #22211d;
+  --ink: #f0eeea;
+  --stone: #9c9890;
+  --mist: #2e2c28;
+  --fog: #3d3a35;
+  --lilac: #3a3448;
+  --lilac-ink: #cfc4e4;
+  --mint: #2a3d36;
+  --mint-ink: #b8ddd0;
+  --peach: #3d322c;
+  --peach-ink: #e8c4b0;
+  --sky: #2c3844;
+  --sky-ink: #b8cce0;
+  --butter: #3a3728;
+  --butter-ink: #e0d6a8;
+  --rose: #3d3036;
+  --rose-ink: #e4c0cc;
+  --danger: #e07068;
+  --select: #5eb3ff;
+  --select-soft: #1a3348;
+  --toggle: #1a1916;
+  --overlay: rgb(0 0 0 / 0.55);
+  --chip: #a898ff;
+  --chip-muted: #c4b8ff;
+  --float-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), "Apple SD Gothic Neo", "Noto Sans KR", ui-sans-serif, system-ui, sans-serif;
+
+  --color-paper: var(--paper);
+  --color-snow: var(--snow);
+  --color-ink: var(--ink);
+  --color-stone: var(--stone);
+  --color-mist: var(--mist);
+  --color-fog: var(--fog);
+  --color-lilac: var(--lilac);
+  --color-lilac-ink: var(--lilac-ink);
+  --color-mint: var(--mint);
+  --color-mint-ink: var(--mint-ink);
+  --color-peach: var(--peach);
+  --color-peach-ink: var(--peach-ink);
+  --color-sky: var(--sky);
+  --color-sky-ink: var(--sky-ink);
+  --color-butter: var(--butter);
+  --color-butter-ink: var(--butter-ink);
+  --color-rose: var(--rose);
+  --color-rose-ink: var(--rose-ink);
+  --color-danger: var(--danger);
+  --color-select: var(--select);
+  --color-select-soft: var(--select-soft);
+  --color-toggle: var(--toggle);
+  --color-overlay: var(--overlay);
+  --color-chip: var(--chip);
+  --color-chip-muted: var(--chip-muted);
+
+  --shadow-float: var(--float-shadow);
+
+  --width-drive-file: 19rem;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-inter), "Apple SD Gothic Neo", "Noto Sans KR", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: var(--lilac);
+  color: var(--ink);
+}
+
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+html.dark .grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+}
+
+.canvas-dot {
+  background-image: radial-gradient(circle, var(--fog) 0.8px, transparent 0.9px);
+  background-size: 22px 22px;
+}
+
+.notes-editor .tiptap {
+  outline: none;
+}
+
+.notes-editor .tiptap p.is-editor-empty:first-child::before {
+  color: var(--stone);
+  opacity: 0.4;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.notes-editor .tiptap ul,
+.notes-html ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.notes-editor .tiptap ol,
+.notes-html ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+
+.notes-editor .tiptap img,
+.notes-html img {
+  max-width: 100%;
+  border-radius: 12px;
+}
+
+.notes-editor .tiptap a,
+.notes-html a {
+  text-decoration: underline;
+}
+
+.serif {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.35s ease both;
+}
+
+.drive-file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--width-drive-file), var(--width-drive-file)));
+  gap: 0.75rem;
+}
+
+.drive-file-grid-fill {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--width-drive-file), 1fr));
+  gap: 0.75rem;
+}
+
+@media print {
+  @page {
+    size: 297mm 210mm;
+    margin: 0 !important;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .tech-pack-chrome {
+    display: none !important;
+  }
+}
+
+.workspace-bg-file-input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 2px dashed var(--fog);
+  border-radius: 9999px;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.workspace-bg-file-input:hover {
+  border-color: var(--stone);
+}
+
+.workspace-bg-file-input::-webkit-file-upload-button,
+.workspace-bg-file-input::file-selector-button {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+}
