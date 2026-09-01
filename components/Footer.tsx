@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 // Footer 컴포넌트: 사이트 하단에 고정적으로 표시되는 정보 영역입니다.
@@ -15,8 +16,8 @@ const Footer = () => {
     { href: "/notices", label: "공지사항" },
   ];
   const rightMenu = [
-    { href: "#", label: "고객센터" },
-    { href: "#", label: "제휴문의" },
+    { href: "mailto:donggori2020@gmail.com?subject=동고리 고객센터 문의", label: "고객센터" },
+    { href: "mailto:donggori2020@gmail.com?subject=동고리 제휴 문의", label: "제휴문의" },
     { href: "/terms/service", label: "이용약관" },
     { href: "/terms/privacy", label: "개인정보처리방침" },
   ];
@@ -29,13 +30,13 @@ const Footer = () => {
           {/* 왼쪽 메뉴 그룹 */}
           <div className="flex gap-8 lg:gap-10">
             {leftMenu.map((item) => (
-              <a key={item.label} href={item.href} className="hover:underline">{item.label}</a>
+              <Link key={item.label} href={item.href} className="hover:underline">{item.label}</Link>
             ))}
           </div>
           {/* 오른쪽 메뉴 그룹 */}
           <div className="flex gap-8 lg:gap-10">
             {rightMenu.map((item) => (
-              <a key={item.label} href={item.href} className="hover:underline">{item.label}</a>
+              <Link key={item.label} href={item.href} className="hover:underline">{item.label}</Link>
             ))}
           </div>
         </nav>

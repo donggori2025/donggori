@@ -142,6 +142,13 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
+    if (!email) {
+      const response = NextResponse.redirect(new URL('/sign-in?error=no_email', request.url));
+      clearOAuthStateCookie(response, 'kakao');
+      clearOAuthNextCookie(response, 'kakao');
+      return response;
+    }
+
     // 이메일만 같은 다른 계정에 제공자 ID를 자동 연결하지 않는다.
     if (email && await getUserByEmail(email)) {
       const response = NextResponse.redirect(new URL(`/sign-in?error=account_link_required&provider=kakao&next=${encodeURIComponent(nextPath)}`, request.url));

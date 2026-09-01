@@ -5,6 +5,7 @@ import { fetchFactoriesFromDB, Factory } from "@/lib/factoryCatalog";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 import Link from "next/link";
+import FactoryImagePlaceholder from "@/components/FactoryImagePlaceholder";
 
 function getCardFabricsById(factories: Factory[]) {
   const colors = [
@@ -31,28 +32,24 @@ const VISIBLE_COUNT = 4;
 
 // 공장 이미지 카드 컴포넌트
 function FactoryImageCard({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory);
+  const { images } = useFactoryImages(factory);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const imageSrc = images[0];
   
   return (
     <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
-      {loading ? (
-        <div className="text-gray-400 text-sm font-medium">
-          이미지 로딩 중...
-        </div>
-      ) : images.length > 0 && images[0] !== '/logo_donggori.png' ? (
+      {imageSrc && imageSrc !== '/logo_donggori.png' && failedSrc !== imageSrc ? (
         <Image
-          src={images[0]}
+          src={imageSrc}
           alt={typeof factory.company_name === 'string' ? factory.company_name : '공장 이미지'}
           className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
           width={400}
           height={192}
           priority={idx < 4}
-          unoptimized
+          onError={() => setFailedSrc(imageSrc)}
         />
       ) : (
-        <div className="text-gray-400 text-sm font-medium">
-          이미지 준비 중
-        </div>
+        <FactoryImagePlaceholder />
       )}
     </div>
   );

@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import { DONGGORI_OPEN_KAKAO_CHAT_URL } from "@/lib/site";
+import FactoryImagePlaceholder from "@/components/FactoryImagePlaceholder";
 
 
 export default function FactoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -21,7 +22,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const [majorItemsOverflow, setMajorItemsOverflow] = useState(false);
   
   // 공장 이미지 훅 사용
-  const { images: factoryImages, loading: imagesLoading } = useFactoryImages(factory);
+  const { images: factoryImages } = useFactoryImages(factory);
   const displayImages = useMemo(
     () =>
       factoryImages.filter(
@@ -307,9 +308,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 )}
               </div>
             ) : (
-              <div className="w-full h-[560px] md:h-[620px] lg:h-[640px] xl:h-[660px] bg-[#f3f4f6] rounded-xl flex items-center justify-center text-gray-400">
-                이미지 준비 중
-              </div>
+              <FactoryImagePlaceholder className="h-[560px] rounded-xl md:h-[620px] lg:h-[640px] xl:h-[660px]" />
             )}
           </section>
 

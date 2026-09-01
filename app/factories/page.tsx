@@ -14,6 +14,7 @@ import FactoryInfoPopup from "@/components/FactoryInfoPopup";
 import { useRouter } from "next/navigation";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 import { useFactoryImages, hasFactoryImages } from "@/lib/hooks/useFactoryImages";
+import FactoryImagePlaceholder from "@/components/FactoryImagePlaceholder";
 
 function getFilterChipClass(isOn: boolean, sm = false) {
   const base = sm
@@ -43,20 +44,14 @@ const EMPTY_FILTERS = {
 
 // 공장 목록 페이지용 이미지 컴포넌트
 function FactoriesPageImage({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory);
+  const { images } = useFactoryImages(factory);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const imageSrc = images[0];
   
-  if (loading) {
-    return (
-      <div className="text-gray-400 text-xs sm:text-sm font-medium">
-        이미지 로딩 중...
-      </div>
-    );
-  }
-  
-  if (images.length > 0 && images[0] !== '/logo_donggori.png') {
+  if (imageSrc && imageSrc !== '/logo_donggori.png' && failedSrc !== imageSrc) {
     return (
       <Image
-        src={images[0]}
+        src={imageSrc}
         alt={typeof factory.company_name === 'string' ? factory.company_name : '공장 이미지'}
         className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
         width={400}
@@ -64,15 +59,12 @@ function FactoriesPageImage({ factory, idx }: { factory: Factory; idx: number })
         priority={idx < 6}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         quality={80}
+        onError={() => setFailedSrc(imageSrc)}
       />
     );
   }
   
-  return (
-    <div className="text-gray-400 text-xs sm:text-sm font-medium">
-      이미지 준비 중
-    </div>
-  );
+  return <FactoryImagePlaceholder />;
 }
 
 export default function FactoriesPage() {
@@ -185,6 +177,7 @@ export default function FactoriesPage() {
 
   const filtered = factoriesData.filter(f => {
     const itemList = [f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt, f.top_items_bag, f.top_items_fashion_accessory, f.top_items_underwear, f.top_items_sports_leisure, f.top_items_pet];
+    const itemValues = itemList.flatMap((value) => typeof value === "string" ? value.split(",").map((item) => item.trim()).filter(Boolean) : []);
     // 검색어 필터
     const searchMatch = !search ||
       (typeof f.company_name === 'string' && f.company_name.includes(search)) ||
@@ -209,6 +202,12 @@ export default function FactoriesPage() {
     const sewingArr = typeof f.sewing_machines === 'string' ? f.sewing_machines.split(',').map(s => s.trim()) : [];
     const patternArr = typeof f.pattern_machines === 'string' ? f.pattern_machines.split(',').map(s => s.trim()) : [];
     const specialArr = typeof f.special_machines === 'string' ? f.special_machines.split(',').map(s => s.trim()) : [];
+    const mainFabricsArr = typeof f.main_fabrics === 'string' ? f.main_fabrics.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const processesArr = Array.isArray(f.processes)
+      ? f.processes.flatMap((value) => String(value).split(',').map((item) => item.trim()).filter(Boolean))
+      : typeof f.processes === 'string'
+        ? String(f.processes).split(',').map((item) => item.trim()).filter(Boolean)
+        : [];
     return (
       searchMatch &&
       (selected.admin_district.length === 0 || (typeof f.admin_district === 'string' && selected.admin_district.includes(f.admin_district))) &&
@@ -217,14 +216,14 @@ export default function FactoriesPage() {
       (selected.business_type.length === 0 || businessTypeArr.filter((v): v is string => typeof v === 'string').some(v => selected.business_type.includes(v))) &&
       (selected.distribution.length === 0 || distributionArr.filter((v): v is string => typeof v === 'string').some(v => selected.distribution.includes(v))) &&
       (selected.delivery.length === 0 || deliveryArr.filter((v): v is string => typeof v === 'string').some(v => selected.delivery.includes(v))) &&
-      (selected.items.length === 0 || itemList.filter((i): i is string => typeof i === 'string').some(i => selected.items.includes(i))) &&
+      (selected.items.length === 0 || itemValues.some(i => selected.items.includes(i))) &&
       (selected.equipment.length === 0 || equipmentArr.filter((v): v is string => typeof v === 'string').some(v => selected.equipment.includes(v))) &&
       (selected.sewing_machines.length === 0 || sewingArr.some(v => selected.sewing_machines.includes(v))) &&
       (selected.pattern_machines.length === 0 || patternArr.some(v => selected.pattern_machines.includes(v))) &&
       (selected.special_machines.length === 0 || specialArr.some(v => selected.special_machines.includes(v))) &&
       (selected.factory_type.length === 0 || (typeof f.factory_type === 'string' && selected.factory_type.includes(f.factory_type))) &&
-      (selected.main_fabrics.length === 0 || (typeof f.main_fabrics === 'string' && selected.main_fabrics.includes(f.main_fabrics))) &&
-      (selected.processes.length === 0 || (typeof f.processes === 'string' && selected.processes.includes(f.processes)))
+      (selected.main_fabrics.length === 0 || mainFabricsArr.some(value => selected.main_fabrics.includes(value))) &&
+      (selected.processes.length === 0 || processesArr.some(value => selected.processes.includes(value)))
     );
   });
 

@@ -10,6 +10,7 @@ import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import { recommendFactoriesFromPrompt, takeMeaningfulMatches } from "@/lib/factoryMatching";
 import { FACTORY_TYPES, MAIN_FABRICS, type FactoryType, type MainFabric } from "@/lib/types";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
+import FactoryImagePlaceholder from "@/components/FactoryImagePlaceholder";
 
 
 // factories 데이터에서 옵션 추출 유틸(공장 찾기에서 복사)
@@ -22,22 +23,14 @@ const moqRanges = [
 
 // 매칭 페이지용 공장 이미지 컴포넌트
 function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory);
+  const { images } = useFactoryImages(factory);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const imageSrc = images[0];
   
-  if (loading) {
-    return (
-      <div className="text-gray-400 text-sm font-medium flex items-center justify-center h-full">
-        <div className="text-center">
-          <div>이미지 로딩 중...</div>
-        </div>
-      </div>
-    );
-  }
-  
-  if (images.length > 0 && images[0] !== '/logo_donggori.png') {
+  if (imageSrc && imageSrc !== '/logo_donggori.png' && failedSrc !== imageSrc) {
     return (
       <Image
-        src={images[0]}
+        src={imageSrc}
         alt={typeof factory.company_name === 'string' ? factory.company_name : (typeof factory.name === 'string' ? factory.name : '공장 이미지')}
         className="object-cover w-full h-full rounded-xl group-hover:scale-110 transition-transform duration-300"
         width={400}
@@ -45,29 +38,17 @@ function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number 
         priority={idx < 3}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         quality={80}
-        onError={(e) => {
+        onError={() => {
           if (process.env.NODE_ENV === 'development') {
-            console.warn(`이미지 로드 실패: ${images[0]}`);
+            console.warn(`이미지 로드 실패: ${imageSrc}`);
           }
-          // 이미지 로드 실패 시 대체 UI 표시
-          const imgElement = e.currentTarget;
-          imgElement.style.display = 'none';
-          const fallbackElement = imgElement.nextElementSibling;
-          if (fallbackElement) {
-            fallbackElement.classList.remove('hidden');
-          }
+          setFailedSrc(imageSrc);
         }}
       />
     );
   }
   
-  return (
-    <div className="text-gray-400 text-sm font-medium flex items-center justify-center h-full">
-      <div className="text-center">
-        <div>이미지 준비 중</div>
-      </div>
-    </div>
-  );
+  return <FactoryImagePlaceholder />;
 }
 
 // 채팅 말풍선 컴포넌트 (fade-in + 타이핑 효과)
@@ -672,12 +653,10 @@ type ScoredFactory = Factory & { score: number };
       typingTimer.current = null;
     }
 
-    window.setTimeout(() => {
-      const rec = getRecommendedFactoriesFromPrompt(trimmed);
-      setRecommended(rec);
-      setResultLoading(false);
-      setChat([{ type: "question", text: "분석이 완료되었어요. 추천 결과를 확인해주세요." }]);
-    }, 1800);
+    const rec = getRecommendedFactoriesFromPrompt(trimmed);
+    setRecommended(rec);
+    setResultLoading(false);
+    setChat([{ type: "question", text: "분석이 완료되었어요. 추천 결과를 확인해주세요." }]);
   }, [getRecommendedFactoriesFromPrompt]);
 
   useEffect(() => {
@@ -757,12 +736,6 @@ type ScoredFactory = Factory & { score: number };
                 {/* 이미지 영역 - 데스크톱에서만 표시 */}
                 <div className="hidden md:block w-full h-32 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl group">
                   <MatchingFactoryImage factory={f} idx={idx} />
-                  {/* 이미지 로드 실패 시 표시할 대체 텍스트 */}
-                  <div className="text-gray-400 text-sm font-medium hidden flex items-center justify-center h-full">
-                    <div className="text-center">
-                      <div>이미지 준비 중</div>
-                    </div>
-                  </div>
                 </div>
                 {/* 이미지와 텍스트 사이 gap - 데스크톱에서만 */}
                 <div className="hidden md:block mt-2" />
@@ -893,13 +866,9 @@ type ScoredFactory = Factory & { score: number };
   useEffect(() => {
     if (textMatchMode) return;
     if (answers.length === QUESTIONS.length) {
-      setResultLoading(true);
-      const timer = setTimeout(() => {
-        const rec = getRecommendedFactories(answers.map(a => a.join(", ")));
-        setRecommended(rec);
-        setResultLoading(false);
-      }, 2200); // 2.2초 분석 로딩
-      return () => clearTimeout(timer);
+      const rec = getRecommendedFactories(answers.map(a => a.join(", ")));
+      setRecommended(rec);
+      setResultLoading(false);
     } else {
       setResultLoading(false);
     }

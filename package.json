@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "verify": "npm run test:security && npm run typecheck && npm run build",
     "test:security": "node --experimental-strip-types --test scripts/security-regression.test.mjs",
+    "test:functional": "node --experimental-strip-types --test scripts/functional-regression.test.mjs scripts/factory-matching.test.mjs",
     "export:factories": "node scripts/exportFactoriesToXlsx.js",
     "export:factory-images": "node scripts/exportFactoryImages.js",
     "handover:pdf": "node docs/handover/scripts/generate-pdf-chrome.js",

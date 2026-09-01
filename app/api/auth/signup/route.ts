@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { createSessionRecord, revokeSessionToken } from "@/lib/session";
 import { SESSION_DURATIONS } from "@/lib/sessionConfig";
@@ -9,11 +8,17 @@ export async function POST(request: NextRequest) {
   try {
     const {
       email,
-      password,
       name,
       phoneNumber,
       signupMethod = "email",
     } = await request.json();
+
+    if (signupMethod === "email") {
+      return NextResponse.json(
+        { error: "이메일 회원가입은 현재 운영하지 않습니다. 카카오 또는 네이버를 이용해주세요." },
+        { status: 410 }
+      );
+    }
 
     const normalizedEmail = String(email || "").trim().toLowerCase();
     const normalizedName = String(name || "").trim();
@@ -27,28 +32,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "올바른 이메일 형식을 입력해주세요." }, { status: 400 });
     }
 
-    if (!["email", "kakao", "naver"].includes(signupMethod)) {
+    if (!["kakao", "naver"].includes(signupMethod)) {
       return NextResponse.json({ error: "지원하지 않는 가입 방식입니다." }, { status: 400 });
     }
 
     const proofToken = request.cookies.get("signup_proof")?.value;
     const proof = await readSignupProof(proofToken);
-    const proofMatches = proof?.email === normalizedEmail && (
-      signupMethod === "email"
-        ? proof.type === "local"
-        : proof.type === "sns" && proof.provider === signupMethod && !!proof.externalId
-    );
+    const proofMatches = proof?.email === normalizedEmail
+      && proof.type === "sns"
+      && proof.provider === signupMethod
+      && !!proof.externalId;
     if (!proofMatches) {
       return NextResponse.json(
         { error: "가입 인증 정보가 없거나 만료되었습니다. 인증을 다시 진행해주세요." },
         { status: 401 }
       );
-    }
-
-    if (signupMethod === "email") {
-      if (!password || String(password).length < 10) {
-        return NextResponse.json({ error: "비밀번호는 10자 이상이어야 합니다." }, { status: 400 });
-      }
     }
 
     const supabase = getServiceSupabase();
@@ -65,10 +63,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "이미 가입된 이메일입니다." }, { status: 409 });
     }
 
-    const hashedPassword =
-      signupMethod === "email" && password ? await bcrypt.hash(String(password), 12) : null;
-
-    const verifiedExternalId = signupMethod === "email" ? null : proof.externalId;
+    const verifiedExternalId = proof.externalId;
     if (verifiedExternalId) {
       const { data: existingSocial, error: socialFindError } = await supabase
         .from("users")
@@ -91,7 +86,7 @@ export async function POST(request: NextRequest) {
           email: normalizedEmail,
           name: normalizedName,
           phoneNumber: String(phoneNumber || ""),
-          password: hashedPassword,
+          password: null,
           profileImage: null,
           signupMethod,
           externalId: verifiedExternalId,
@@ -115,18 +110,17 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
 
-    const isSocial = signupMethod !== "email";
-    const ttlSec = isSocial ? SESSION_DURATIONS.SOCIAL : SESSION_DURATIONS.USER;
+    const ttlSec = SESSION_DURATIONS.SOCIAL;
     const { token } = await createSessionRecord({
-      type: isSocial ? "sns" : "local",
+      type: "sns",
       userId: created.id,
       userEmail: created.email,
       externalId: verifiedExternalId,
-      provider: isSocial ? signupMethod : null,
+      provider: signupMethod,
       isInitialized: true,
       ttlSec,
     });
-    response.cookies.set(isSocial ? "sns_access_token" : "access_token", token, {
+    response.cookies.set("sns_access_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
