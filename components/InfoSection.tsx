@@ -35,7 +35,7 @@ function getCardFabricsById(list: Factory[]) {
 }
 
 function FactoryImageCard({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory.name || factory.company_name || "");
+  const { images, loading } = useFactoryImages(factory);
   const fallback = factory.images?.[0] || factory.image;
 
   return (

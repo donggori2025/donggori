@@ -48,7 +48,7 @@ const EMPTY_FILTERS = {
 
 // 공장 목록 페이지용 이미지 컴포넌트
 function FactoriesPageImage({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory.name || factory.company_name || '');
+  const { images, loading } = useFactoryImages(factory);
   
   if (loading) {
     return (
@@ -254,8 +254,8 @@ export default function FactoriesPage() {
       return [...filtered].sort((a, b) => {
         const aName = a.name || a.company_name || "";
         const bName = b.name || b.company_name || "";
-        const aHasImage = hasFactoryImages(aName);
-        const bHasImage = hasFactoryImages(bName);
+        const aHasImage = hasFactoryImages(a);
+        const bHasImage = hasFactoryImages(b);
 
         // 1) 이미지 보유 업장 우선
         if (aHasImage !== bHasImage) return aHasImage ? -1 : 1;
