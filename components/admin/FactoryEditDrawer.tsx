@@ -139,7 +139,7 @@ export default function FactoryEditDrawer({
 
             return (
               <section key={section.title}>
-                <h3 className="text-sm font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+                <h3 className="text-sm font-semibold text-gray-900 mb-4">
                   {section.title}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -151,7 +151,7 @@ export default function FactoryEditDrawer({
 
           {unsectionedFields.length > 0 && (
             <section>
-              <h3 className="text-sm font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">
                 기타
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -162,7 +162,7 @@ export default function FactoryEditDrawer({
 
           {(schemaMap.has("images") || schemaMap.has("image")) && (
             <section>
-              <h3 className="text-sm font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">
                 이미지
               </h3>
               <div className="space-y-6">

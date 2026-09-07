@@ -51,3 +51,8 @@ docs/handover/pdf/08-계정-정보.pdf
 docs/handover/**/08-계정-정보.pdf
 
 scripts/output/
+
+# env secrets (keep local; do not re-add)
+.env
+.env.*
+!.env.example

@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation";
+import MyPageLayout from "@/components/MyPageLayout";
+import InquiryList from "@/components/InquiryList";
 
 export default function MyPageInquiries() {
-  redirect("/my-page");
-}
+  return (
+    <MyPageLayout>
+      <InquiryList />
+    </MyPageLayout>
+  );
+} 

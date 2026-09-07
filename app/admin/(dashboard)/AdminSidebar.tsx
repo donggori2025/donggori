@@ -85,9 +85,9 @@ export default function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+              className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition ${
                 active
-                  ? "bg-gray-900 text-white shadow-sm"
+                  ? "bg-gray-900 text-white"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
@@ -102,7 +102,7 @@ export default function AdminSidebar() {
         <button
           onClick={handleLogout}
           disabled={isLoggingOut}
-          className="w-full rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
+          className="w-full rounded-md px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
         >
           {isLoggingOut ? "로그아웃 중..." : "로그아웃"}
         </button>

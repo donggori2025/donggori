@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
+import { getAppUserIdentity, isAppLoggedIn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
-import { DONGGORI_OPEN_KAKAO_CHAT_URL } from "@/lib/site";
 import {
   CalendarDays,
   ClipboardCheck,
@@ -19,6 +20,7 @@ import {
 
 type RequesterType = "기업" | "개인" | "관공서";
 type ProductType = "의류" | "유니폼" | "굿즈" | "기타";
+const OPEN_KAKAO_CHAT_URL = "https://open.kakao.com/o/sLFYzFki";
 
 const REQUESTER_TYPES: RequesterType[] = ["기업", "개인", "관공서"];
 const PRODUCT_TYPES: ProductType[] = ["의류", "유니폼", "굿즈", "기타"];
@@ -81,7 +83,7 @@ function ChipGroup<T extends string>({
 
 export default function DesignRequestPage() {
   const router = useRouter();
-  const { user: authUser, isSignedIn, isLoaded } = useAppAuth();
+  const { user: authUser } = useAppAuth();
   const [requesterType, setRequesterType] = useState<RequesterType>("기업");
   const [productType, setProductType] = useState<ProductType | "">("");
   const [productTypeDetail, setProductTypeDetail] = useState("");
@@ -134,8 +136,7 @@ export default function DesignRequestPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded) return;
-    if (!isSignedIn || !authUser) {
+    if (!isAppLoggedIn() && !authUser) {
       alert("로그인 후 이용 가능합니다.");
       router.push("/sign-in?next=/design-request");
       return;
@@ -155,9 +156,34 @@ export default function DesignRequestPage() {
 
     setSubmitting(true);
     try {
+      const userIdentity = getAppUserIdentity(authUser);
+      if (!userIdentity.id || !userIdentity.email) {
+        alert("사용자 정보 확인에 실패했습니다. 다시 로그인 후 시도해주세요.");
+        return;
+      }
+
+      const uploadedReferenceUrls: string[] = [];
+      for (const file of images) {
+        const safeName = file.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
+        const filePath = `design-requests/${Date.now()}_${safeName}`;
+        const { error: uploadError } = await supabase.storage
+          .from("match-request-files")
+          .upload(filePath, file);
+        if (uploadError) {
+          alert(`레퍼런스 이미지 업로드 실패: ${file.name}`);
+          return;
+        }
+        const { data } = supabase.storage.from("match-request-files").getPublicUrl(filePath);
+        if (data?.publicUrl) uploadedReferenceUrls.push(data.publicUrl);
+      }
+
       const payload = {
+        user_id: userIdentity.id,
+        user_email: userIdentity.email,
         user_name: contactName.trim(),
         factory_id: "design-request",
+        factory_name: "디자인 의뢰",
+        status: "pending",
         items: [productType],
         quantity: 0,
         description,
@@ -173,8 +199,10 @@ export default function DesignRequestPage() {
           contactName,
           email,
           description,
-          referenceFiles: images.map((file) => file.name),
+          referenceImages: uploadedReferenceUrls,
         }),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
 
       const res = await fetch("/api/match-requests", {
@@ -187,12 +215,12 @@ export default function DesignRequestPage() {
         throw new Error(json?.error || "의뢰 등록 실패");
       }
 
-      const requestText = generateRequestText([]) + (images.length ? "\n- 레퍼런스 파일: 카카오톡 채팅방에 직접 전송 예정\n" : "");
+      const requestText = generateRequestText(uploadedReferenceUrls);
       await navigator.clipboard.writeText(requestText);
       alert(
         "디자인 의뢰가 접수되었습니다.\n의뢰 내용이 클립보드에 복사되었습니다.\n카카오톡 채팅창에 붙여넣기 후 전송해주세요.\n확인을 누르면 오픈카카오채팅으로 이동합니다."
       );
-      window.open(DONGGORI_OPEN_KAKAO_CHAT_URL, "_blank");
+      window.open(OPEN_KAKAO_CHAT_URL, "_blank");
       setProductType("");
       setProductTypeDetail("");
       setProductName("");
@@ -212,10 +240,10 @@ export default function DesignRequestPage() {
   };
 
   const inputClass =
-    "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 transition";
+    "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-500 transition";
 
   return (
-    <div className="min-h-screen bg-[#f6f7fb]">
+    <div className="min-h-screen bg-[#f5f5f3]">
       <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-10`}>
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">디자인 의뢰하기</h1>
@@ -233,9 +261,9 @@ export default function DesignRequestPage() {
             {GUIDE_STEPS.map((item) => (
               <div
                 key={item.step}
-                className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6"
+                className="rounded-lg border border-dg-line bg-white p-5 md:p-6"
               >
-                <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-violet-50 text-violet-700 text-sm font-bold mb-3">
+                <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-900 text-white text-sm font-bold mb-3">
                   {item.step}
                 </div>
                 <p className="text-sm text-gray-700 leading-relaxed">{item.text}</p>
@@ -245,7 +273,7 @@ export default function DesignRequestPage() {
         </section>
 
         {/* 진행 플로우 */}
-        <section className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8">
+        <section className="rounded-lg border border-dg-line bg-white p-6 md:p-8">
           <h2 className="text-lg font-bold text-gray-900 mb-6">진행 플로우</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {FLOW_STEPS.map((step, index) => {
@@ -253,10 +281,10 @@ export default function DesignRequestPage() {
               return (
                 <div key={step.label} className="relative flex flex-col items-center text-center">
                   {index < FLOW_STEPS.length - 1 && (
-                    <div className="hidden md:block absolute top-9 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] h-px bg-gradient-to-r from-violet-200 to-transparent" />
+                    <div className="hidden md:block absolute top-9 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] h-px bg-gradient-to-r from-gray-300 to-transparent" />
                   )}
-                  <div className="w-16 h-16 md:w-[4.5rem] md:h-[4.5rem] rounded-2xl bg-violet-50 border border-violet-100 flex items-center justify-center mb-3">
-                    <Icon className="w-7 h-7 text-violet-600" />
+                  <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-lg border border-dg-line bg-gray-50 md:h-[4.5rem] md:w-[4.5rem]">
+                    <Icon className="w-7 h-7 text-gray-700" />
                   </div>
                   <div className="text-sm font-semibold text-gray-800">{step.label}</div>
                 </div>
@@ -268,9 +296,9 @@ export default function DesignRequestPage() {
         {/* 의뢰 폼 */}
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
           <div className="space-y-6">
-            <section className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-5">
+            <section className="space-y-5 rounded-lg border border-dg-line bg-white p-5 md:p-6">
               <div className="flex items-center gap-2">
-                <Palette className="w-5 h-5 text-violet-600" />
+                <Palette className="w-5 h-5 text-gray-700" />
                 <h2 className="text-lg font-bold text-gray-900">의뢰 정보</h2>
               </div>
 
@@ -356,9 +384,9 @@ export default function DesignRequestPage() {
               </div>
             </section>
 
-            <section className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-4">
+            <section className="space-y-4 rounded-lg border border-dg-line bg-white p-5 md:p-6">
               <div className="flex items-center gap-2">
-                <Send className="w-5 h-5 text-violet-600" />
+                <Send className="w-5 h-5 text-gray-700" />
                 <h2 className="text-lg font-bold text-gray-900">요청 내용</h2>
               </div>
               <textarea
@@ -369,16 +397,16 @@ export default function DesignRequestPage() {
               />
             </section>
 
-            <section className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6">
+            <section className="rounded-lg border border-dg-line bg-white p-5 md:p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Upload className="w-5 h-5 text-violet-600" />
+                <Upload className="w-5 h-5 text-gray-700" />
                 <h2 className="text-lg font-bold text-gray-900">레퍼런스 이미지</h2>
               </div>
               <label
                 className={`flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 cursor-pointer transition ${
                   images.length > 0
-                    ? "border-violet-400 bg-violet-50/40"
-                    : "border-gray-300 hover:border-violet-400 hover:bg-gray-50"
+                    ? "border-gray-500 bg-gray-50"
+                    : "border-gray-300 hover:border-gray-500 hover:bg-gray-50"
                 }`}
               >
                 <input
@@ -389,10 +417,10 @@ export default function DesignRequestPage() {
                   className="hidden"
                 />
                 <ImageIcon className="w-10 h-10 text-gray-400" />
-                  <p className="text-sm text-gray-600 text-center">
-                  레퍼런스 이미지를 미리 선택
+                <p className="text-sm text-gray-600 text-center">
+                  레퍼런스 이미지를 클릭해 업로드
                   <br />
-                  <span className="text-xs text-gray-400">접수 후 카카오톡 채팅방에 직접 보내주세요 · 최대 10장</span>
+                  <span className="text-xs text-gray-400">최대 10장 · PNG, JPG</span>
                 </p>
               </label>
 
@@ -417,7 +445,7 @@ export default function DesignRequestPage() {
           </div>
 
           <aside className="lg:sticky lg:top-24 h-fit">
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6">
+            <div className="rounded-lg border border-dg-line bg-white p-5 md:p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-2">의뢰 접수</h2>
               <p className="text-sm text-gray-600 leading-relaxed mb-5">
                 접수 후 의뢰 내용이 클립보드에 복사되며, 카카오 오픈채팅으로 상담을 이어갈 수 있습니다.
@@ -425,7 +453,7 @@ export default function DesignRequestPage() {
               <ul className="text-xs text-gray-500 space-y-2 mb-6">
                 <li>· 로그인 후 이용 가능합니다</li>
                 <li>· 필수 항목: 상품 유형, 담당자, 연락처, 요청 내용</li>
-                <li>· 레퍼런스 파일은 카카오톡 채팅방에 직접 전송합니다</li>
+                <li>· 레퍼런스 이미지는 선택 사항입니다</li>
               </ul>
               <Button
                 type="submit"

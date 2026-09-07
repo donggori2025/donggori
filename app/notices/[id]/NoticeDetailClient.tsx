@@ -6,8 +6,8 @@ interface Notice {
   id: string;
   title: string;
   content: string;
-  created_at?: string | null;
-  start_at?: string | null;
+  created_at: string;
+  start_at?: string;
   createdAt?: string;
   category?: string;
 }
@@ -54,3 +54,4 @@ export default function NoticeDetailClient({ notice }: NoticeDetailClientProps) 
     </div>
   );
 }
+
