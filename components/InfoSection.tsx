@@ -1,59 +1,55 @@
 "use client";
-
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { factories as fallbackFactories, fetchFactoriesFromDB, type Factory } from "@/lib/factories";
+import { fetchFactoriesFromDB, Factory } from "@/lib/factoryCatalog";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
+import Link from "next/link";
+import FactoryImagePlaceholder from "@/components/FactoryImagePlaceholder";
 
-const CARD_COUNT = 10;
-const VISIBLE = 3.35;
-const GAP_PX = 16;
-
-function getCardFabricsById(list: Factory[]) {
-  const fabricChips = [
-    { label: "봉제", color: "#0ACF83", bg: "rgba(10, 207, 131, 0.1)" },
-    { label: "샘플", color: "#08B7FF", bg: "rgba(8, 183, 255, 0.1)" },
-    { label: "패턴", color: "#FF8308", bg: "rgba(255, 131, 8, 0.1)" },
-    { label: "나염", color: "#A259FF", bg: "rgba(162, 89, 255, 0.1)" },
-    { label: "전사", color: "#ED6262", bg: "rgba(237, 98, 98, 0.1)" },
-  ];
+function getCardFabricsById(factories: Factory[]) {
+  const colors = [
+    { color: '#0ACF83', bg: 'rgba(10, 207, 131, 0.1)' },
+    { color: '#08B7FF', bg: 'rgba(8, 183, 255, 0.1)' },
+  ] as const;
   return Object.fromEntries(
-    list.map((f, idx) => {
-      const seed = String(f.id ?? idx);
-      let hash = 0;
-      for (let i = 0; i < seed.length; i++) hash = (hash << 5) - hash + seed.charCodeAt(i);
-      const shuffled = [...fabricChips].sort((a, b) => {
-        const h1 = Math.abs(Math.sin(hash + a.label.length)) % 1;
-        const h2 = Math.abs(Math.sin(hash + b.label.length)) % 1;
-        return h1 - h2;
-      });
-      return [f.id ?? idx, shuffled.slice(0, (Math.abs(hash) % 2) + 1)];
-    }),
+    factories.map((f, idx) => {
+      const labels = [f.factory_type, f.main_fabrics]
+        .flatMap((value) => typeof value === "string" ? value.split(",") : [])
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .slice(0, 2);
+      return [
+        f.id ?? idx,
+        labels.map((label, chipIndex) => ({ label, ...colors[chipIndex % colors.length] })),
+      ];
+    })
   );
 }
 
-function FactoryImageCard({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory.name || factory.company_name || "");
-  const fallback = factory.images?.[0] || factory.image;
+const CARD_COUNT = 10;
+const VISIBLE_COUNT = 4;
 
+// 공장 이미지 카드 컴포넌트
+function FactoryImageCard({ factory, idx }: { factory: Factory; idx: number }) {
+  const { images } = useFactoryImages(factory);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const imageSrc = images[0];
+  
   return (
-    <div className="group flex h-44 w-full items-center justify-center overflow-hidden bg-gray-100 sm:h-48">
-      {loading && !fallback ? (
-        <div className="text-sm font-medium text-gray-400">이미지 로딩 중...</div>
-      ) : (images[0] && images[0] !== "/logo_donggori.png") || fallback ? (
+    <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
+      {imageSrc && imageSrc !== '/logo_donggori.png' && failedSrc !== imageSrc ? (
         <Image
-          src={(images[0] && images[0] !== "/logo_donggori.png" ? images[0] : fallback) as string}
-          alt={typeof factory.company_name === "string" ? factory.company_name : "공장 이미지"}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          src={imageSrc}
+          alt={typeof factory.company_name === 'string' ? factory.company_name : '공장 이미지'}
+          className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
           width={400}
           height={192}
           priority={idx < 4}
-          unoptimized
+          onError={() => setFailedSrc(imageSrc)}
         />
       ) : (
-        <div className="text-sm font-medium text-gray-400">이미지 준비 중</div>
+        <FactoryImagePlaceholder />
       )}
     </div>
   );
@@ -61,185 +57,182 @@ function FactoryImageCard({ factory, idx }: { factory: Factory; idx: number }) {
 
 const InfoSection = () => {
   const [factories, setFactories] = useState<Factory[]>([]);
-  const [slideIdx, setSlideIdx] = useState(0);
-  const [cardWidth, setCardWidth] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const viewportRef = useRef<HTMLDivElement>(null);
+  const [slideIdx, setSlideIdx] = useState(VISIBLE_COUNT); // 시작은 복제 앞쪽 끝
+  const [isTransitioning, setIsTransitioning] = useState(true);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 무한루프용: 앞뒤로 복제
+  const getLoopedFactories = () => {
+    if (factories.length === 0) return [];
+    return [
+      ...factories.slice(-VISIBLE_COUNT),
+      ...factories,
+      ...factories.slice(0, VISIBLE_COUNT)
+    ];
+  };
+  const loopedFactories = getLoopedFactories();
+  const total = factories.length;
 
   useEffect(() => {
-    fetchFactoriesFromDB()
-      .then((data) => {
-        const withImages = data.filter(
-          (factory) =>
-            (factory.images && factory.images.length > 0 && !factory.images[0].includes("logo_donggori")) ||
-            (factory.image && !String(factory.image).includes("logo_donggori")),
-        );
-        const source = withImages.length > 0 ? withImages : data.length > 0 ? data : fallbackFactories;
-        setFactories(source.slice(0, CARD_COUNT));
-      })
-      .catch(() => {
-        setFactories(fallbackFactories.slice(0, CARD_COUNT));
-      });
+    fetchFactoriesFromDB().then((data) => {
+      // 이미지가 있는 업장들만 필터링 (로고 이미지 제외)
+      const factoriesWithImages = data.filter(factory => 
+        factory.images && 
+        factory.images.length > 0 && 
+        factory.images[0] !== '/logo_donggori.png' &&
+        !factory.images[0].includes('logo_donggori')
+      );
+      
+      // 이미지가 있는 업장이 CARD_COUNT보다 적으면 모든 업장 사용
+      const factoriesToShow = factoriesWithImages.length >= CARD_COUNT 
+        ? factoriesWithImages.slice(0, CARD_COUNT)
+        : data.slice(0, CARD_COUNT);
+      
+      setFactories(factoriesToShow);
+    });
   }, []);
 
+  // 슬라이드 자동 이동
   useEffect(() => {
-    const el = viewportRef.current;
-    if (!el) return;
-    const update = () => {
-      const styles = window.getComputedStyle(el);
-      const padX =
-        (Number.parseFloat(styles.paddingLeft) || 0) +
-        (Number.parseFloat(styles.paddingRight) || 0);
-      setCardWidth((el.clientWidth - padX - GAP_PX * Math.floor(VISIBLE - 1)) / VISIBLE);
+    if (total === 0) return;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setIsTransitioning(true);
+      setSlideIdx((prev) => prev + 1);
+    }, 3000);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
-    update();
-    const observer = new ResizeObserver(update);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [factories.length]);
+  }, [slideIdx, total]);
 
-  const maxIdx = Math.max(0, factories.length - Math.floor(VISIBLE));
-  const fabricsById = getCardFabricsById(factories);
-  const safeIdx = Math.min(slideIdx, maxIdx);
-  const translateX = cardWidth > 0 ? -(safeIdx * (cardWidth + GAP_PX)) : 0;
-
+  // 무한루프 효과: 끝에 도달하면 transition 없이 jump
   useEffect(() => {
-    if (factories.length <= 1 || paused || cardWidth === 0) return;
-    const timer = window.setInterval(() => {
-      setSlideIdx((prev) => (prev >= maxIdx ? 0 : prev + 1));
-    }, 3200);
-    return () => window.clearInterval(timer);
-  }, [factories.length, paused, cardWidth, maxIdx]);
+    if (slideIdx === total + VISIBLE_COUNT) {
+      setTimeout(() => {
+        setIsTransitioning(false); // transition off
+        setSlideIdx(VISIBLE_COUNT);
+      }, 700);
+    } else if (slideIdx === 0) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setSlideIdx(total);
+      }, 700);
+    } else {
+      setIsTransitioning(true); // 항상 이동 시에는 transition on
+    }
+  }, [slideIdx, total]);
+
+  const cardFabricsById = getCardFabricsById(loopedFactories);
+
+  const getTranslateX = () => {
+    return `-${slideIdx * 25}%`;
+  };
 
   return (
-    <section className="dg-section w-full bg-white">
+    <section className="w-full bg-[#f6f7fb] py-10 sm:py-12 md:py-16 lg:py-20">
       <div className={PAGE_CONTAINER_CLASS}>
-        <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-center lg:gap-10 xl:gap-14">
-          <div className="order-2 flex flex-col items-start text-left lg:order-1">
-            <h2 className="dg-section-title">
-              70+ 개의 인증된
+        <div className="flex flex-col lg:grid lg:grid-cols-[minmax(0,360px)_1fr] lg:gap-10 xl:gap-14 lg:items-center">
+          {/* 캐러셀 — 모바일·태블릿 상단, 데스크탑 우측 */}
+          <div className="order-1 lg:order-2 w-full overflow-hidden py-1 lg:py-0">
+            <div className="hidden lg:block overflow-hidden">
+              <div
+                className={`flex gap-4 ${isTransitioning ? "transition-transform duration-700 ease-in-out" : ""}`}
+                style={{ transform: `translateX(${getTranslateX()})` }}
+              >
+                {loopedFactories.map((f, idx) => {
+                  const displayName = typeof f.name === "string" && f.name
+                    ? f.name
+                    : typeof f.company_name === "string" && f.company_name
+                      ? f.company_name
+                      : "이름 없음";
+                  const mainItems = [f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt]
+                    .filter((v) => typeof v === "string" && v.length > 0)
+                    .join(", ") || "-";
+                  const randomFabrics = cardFabricsById[f.id ?? idx] || [];
+                  return (
+                    <Link
+                      href={`/factories/${f.id}`}
+                      key={`${f.id ?? "noid"}-${idx}`}
+                      className="rounded-xl p-0 bg-white overflow-hidden flex flex-col cursor-pointer w-[calc(25%-12px)] flex-shrink-0 border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all"
+                    >
+                      <FactoryImageCard factory={f} idx={idx} />
+                      <div className="flex-1 flex flex-col px-3 sm:px-4 py-4 text-left">
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {randomFabrics.map((chip, chipIndex) => (
+                            <span
+                              key={`fabric-${chipIndex}-${chip.label}`}
+                              style={{ color: chip.color, background: chip.bg }}
+                              className="rounded-full px-2 py-1 text-xs font-semibold"
+                            >
+                              {chip.label}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="font-bold text-sm mb-1 text-left">{displayName}</div>
+                        <div className="text-xs font-bold mb-1 flex items-start text-[#333]/60">
+                          <span className="shrink-0 mr-1">주요품목</span>
+                          <span className="font-normal flex-1 truncate">{mainItems}</span>
+                        </div>
+                        <div className="text-xs font-bold text-left text-[#333]/60">
+                          MOQ{" "}
+                          <span className="font-normal">
+                            {typeof f.moq === "number"
+                              ? f.moq
+                              : typeof f.moq === "string" && !isNaN(Number(f.moq))
+                                ? Number(f.moq)
+                                : typeof f.minOrder === "number"
+                                  ? f.minOrder
+                                  : "-"}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 모바일·태블릿: 가로 스크롤 카드 */}
+            <div className="lg:hidden -mx-4 px-4 overflow-x-auto scrollbar-hide">
+              <div className="flex gap-3 w-max pb-1">
+                {factories.slice(0, 6).map((f, idx) => {
+                  const displayName = f.name || f.company_name || "이름 없음";
+                  return (
+                    <Link
+                      href={`/factories/${f.id}`}
+                      key={f.id}
+                      className="w-[200px] shrink-0 rounded-xl border border-gray-100 overflow-hidden bg-white hover:shadow-md transition-shadow"
+                    >
+                      <FactoryImageCard factory={f} idx={idx} />
+                      <div className="p-3">
+                        <p className="font-bold text-sm text-gray-900 truncate">{displayName}</p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* 텍스트 + CTA — 모바일 하단, 데스크탑 좌측 */}
+          <div className="order-2 lg:order-1 flex flex-col items-start text-left mt-6 lg:mt-0">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight tracking-tight">
+              조건에 맞는
               <br />
-              고퀄리티 봉제공장
+              봉제공장 찾기
             </h2>
-            <p className="mt-3 max-w-sm text-sm leading-relaxed text-gray-500 md:mt-4 md:text-base">
-              동고리는 70개 이상의 봉제공장과 3개 패션봉제협회 품질인증을 통해 고퀄리티 봉제를 약속합니다.
+            <p className="mt-3 md:mt-4 text-sm md:text-base text-gray-500 leading-relaxed max-w-sm">
+              지역, 생산 품목, 최소 주문 수량 등을 비교해 적합한 공장을 찾아보세요.
             </p>
             <Link
               href="/matching"
-              className="mt-6 inline-flex items-center gap-3 rounded-md bg-dg-ink px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-black md:mt-8"
+              className="mt-6 md:mt-8 inline-flex items-center gap-2 bg-[#111] text-white px-6 py-3 rounded-full font-semibold text-sm md:text-base hover:bg-black transition-colors"
             >
               봉제공장 매칭받기
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-sm">→</span>
+              <span className="w-7 h-7 flex items-center justify-center rounded-full bg-white/15">
+                <span className="text-sm">→</span>
+              </span>
             </Link>
-          </div>
-
-          <div className="order-1 w-full min-w-0 lg:order-2">
-            <div
-              ref={viewportRef}
-              className="relative hidden overflow-hidden py-3 md:block"
-              onMouseEnter={() => setPaused(true)}
-              onMouseLeave={() => setPaused(false)}
-            >
-              {factories.length === 0 ? (
-                <div className="grid grid-cols-3 gap-4 px-1">
-                  {Array.from({ length: 3 }).map((_, idx) => (
-                    <div key={idx} className="h-72 animate-pulse rounded-xl bg-gray-50" />
-                  ))}
-                </div>
-              ) : (
-                <div
-                  className="flex px-1 transition-transform duration-700 ease-out"
-                  style={{ gap: GAP_PX, transform: `translateX(${translateX}px)` }}
-                >
-                  {factories.map((factory, idx) => {
-                    const displayName = factory.name || factory.company_name || "이름 없음";
-                    const mainItems =
-                      [factory.top_items_upper, factory.top_items_lower, factory.top_items_outer, factory.top_items_dress_skirt]
-                        .filter((v) => typeof v === "string" && v.length > 0)
-                        .join(", ") || "-";
-                    const chips = fabricsById[factory.id ?? idx] || [];
-                    return (
-                      <Link
-                        key={factory.id ?? idx}
-                        href={`/factories/${factory.id}`}
-                        className="flex shrink-0 flex-col overflow-hidden rounded-xl bg-white shadow-[0_2px_10px_rgba(0,0,0,0.05)] ring-1 ring-black/[0.03] transition-shadow hover:shadow-[0_4px_14px_rgba(0,0,0,0.07)]"
-                        style={{ width: cardWidth || undefined }}
-                      >
-                        <FactoryImageCard factory={factory} idx={idx} />
-                        <div className="flex flex-1 flex-col px-3 py-4 sm:px-4">
-                          <div className="mb-2 flex flex-wrap gap-1">
-                            {chips.map((chip) => (
-                              <span
-                                key={chip.label}
-                                style={{ color: chip.color, background: chip.bg }}
-                                className="rounded-full px-2 py-1 text-xs font-semibold"
-                              >
-                                {chip.label}
-                              </span>
-                            ))}
-                          </div>
-                          <div className="mb-1 text-sm font-bold">{displayName}</div>
-                          <div className="mb-1 flex items-start text-xs font-bold text-[#333]/60">
-                            <span className="mr-1 shrink-0">주요품목</span>
-                            <span className="flex-1 truncate font-normal">{mainItems}</span>
-                          </div>
-                          <div className="text-xs font-bold text-[#333]/60">
-                            MOQ{" "}
-                            <span className="font-normal">
-                              {typeof factory.moq === "number"
-                                ? factory.moq
-                                : typeof factory.minOrder === "number"
-                                  ? factory.minOrder
-                                  : "-"}
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            <div className="-mx-4 overflow-x-auto px-4 py-2 scrollbar-hide md:hidden">
-              <div className="flex w-max gap-3 pb-1">
-                {factories.map((factory, idx) => (
-                  <Link
-                    key={factory.id ?? idx}
-                    href={`/factories/${factory.id}`}
-                    className="w-[72vw] max-w-[250px] shrink-0 overflow-hidden rounded-xl bg-white shadow-[0_2px_10px_rgba(0,0,0,0.05)] ring-1 ring-black/[0.03]"
-                  >
-                    <FactoryImageCard factory={factory} idx={idx} />
-                    <div className="p-3">
-                      <p className="truncate text-sm font-bold text-gray-900">
-                        {factory.name || factory.company_name || "이름 없음"}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {factories.length > 1 && (
-              <div className="mt-5 hidden items-center justify-end gap-2 md:flex">
-                <button
-                  type="button"
-                  aria-label="이전"
-                  onClick={() => setSlideIdx((prev) => (prev <= 0 ? maxIdx : prev - 1))}
-                  className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
-                >
-                  ←
-                </button>
-                <button
-                  type="button"
-                  aria-label="다음"
-                  onClick={() => setSlideIdx((prev) => (prev >= maxIdx ? 0 : prev + 1))}
-                  className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
-                >
-                  →
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
