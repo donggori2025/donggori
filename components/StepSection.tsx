@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 
 const matchingSteps = [
@@ -24,53 +25,61 @@ const matchingSteps = [
 ];
 
 const StepSection = () => (
-  <section className="w-full bg-[#f6f7fb] py-10 sm:py-12 md:py-16 lg:py-20">
+  <section className="dg-section w-full bg-[#f5f5f3]">
     <div className={PAGE_CONTAINER_CLASS}>
-      <div className="mb-8 md:mb-12">
-        <div className="flex flex-col lg:flex-row gap-4 lg:gap-10 items-start">
-          <div className="flex-1">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">
-              맞춤 추천으로 빠르게 찾는 봉제공장
-            </h2>
-          </div>
-          <div className="flex-1 lg:max-w-[480px]">
-            <p className="text-sm md:text-base text-gray-500 leading-relaxed">
-              AI가 봉제공장 데이터를 실시간 분석해 공정 요구사항에 최적화된 공장을 추천합니다.
-            </p>
-          </div>
+      <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.55fr)] lg:items-start lg:gap-10 xl:gap-12">
+        <div className="order-2 grid grid-cols-1 border border-gray-200 bg-white sm:grid-cols-3 lg:order-1">
+          {matchingSteps.map((step, idx) => (
+            <div
+              key={`step-${idx}-${step.title}`}
+              className={`p-5 transition-colors duration-200 hover:bg-gray-50 md:p-6 ${
+                idx < matchingSteps.length - 1 ? "border-b border-gray-200 sm:border-b-0 sm:border-r" : ""
+              }`}
+            >
+              <div className="mb-5 flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-gray-50">
+                <Image
+                  src={step.image}
+                  alt={`AI 매칭 인터페이스 ${idx + 1}`}
+                  width={480}
+                  height={360}
+                  className="h-full w-full object-contain"
+                  unoptimized
+                />
+              </div>
+              <h3 className="mb-2 text-base font-bold text-gray-900 md:text-lg">{step.title}</h3>
+              <p className="mb-3 text-sm leading-relaxed text-gray-500">{step.desc}</p>
+              <div className="space-y-1.5">
+                {step.features.map((feature, featureIdx) => (
+                  <div
+                    key={`feature-${featureIdx}-${feature}`}
+                    className="flex items-center text-xs text-gray-500 sm:text-sm"
+                  >
+                    <div className="ai-spectrum-bg mr-2 h-1.5 w-1.5 shrink-0 rounded-full" />
+                    {feature}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-        {matchingSteps.map((step, idx) => (
-          <div
-            key={`step-${idx}-${step.title}`}
-            className="bg-white rounded-2xl border border-gray-200 p-4 md:p-5 hover:shadow-md transition-shadow duration-300"
+        <div className="order-1 flex flex-col items-start text-left lg:order-2 lg:pt-2">
+          <h2 className="text-3xl font-bold leading-tight tracking-[-0.035em] text-dg-ink break-keep sm:text-4xl">
+            AI 매칭으로
+            <br />
+            빠르게 찾는 봉제공장
+          </h2>
+          <p className="mt-4 text-sm leading-relaxed text-gray-500 md:text-base">
+            AI가 봉제공장 데이터를 실시간 분석해 공정 요구사항에 최적화된 공장을 추천합니다.
+          </p>
+          <Link
+            href="/matching"
+            className="mt-8 inline-flex items-center gap-3 rounded-md bg-dg-ink px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-black"
           >
-            <div className="w-full h-44 sm:h-52 md:h-56 bg-gray-50 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
-              <Image
-                src={step.image}
-                alt={`맞춤 추천 인터페이스 ${idx + 1}`}
-                width={400}
-                height={300}
-                className="w-full h-full object-contain"
-                unoptimized
-              />
-            </div>
-
-            <h3 className="text-base md:text-lg font-bold mb-2 text-gray-900">{step.title}</h3>
-            <p className="text-sm text-gray-500 leading-relaxed mb-3">{step.desc}</p>
-
-            <div className="space-y-1.5">
-              {step.features.map((feature, featureIdx) => (
-                <div key={`feature-${featureIdx}-${feature}`} className="flex items-center text-xs sm:text-sm text-gray-500">
-                  <div className="w-1.5 h-1.5 bg-violet-400 rounded-full mr-2 shrink-0" />
-                  {feature}
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+            AI로 매칭받기
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-sm">→</span>
+          </Link>
+        </div>
       </div>
     </div>
   </section>
