@@ -387,7 +387,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   ].filter((item): item is { label: string; value: string } => Boolean(item));
 
   return (
-    <div className="max-w-[1400px] mx-auto py-10 px-2 md:px-6">
+    <div className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-20">
       {/* 뒤로가기 링크 */}
       <div className="mb-6">
         <button 
@@ -606,7 +606,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
 
         {/* 오른쪽: 업장 요약 */}
         <div className="w-full lg:w-[380px] flex-shrink-0">
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 lg:sticky lg:top-8">
+          <div className="rounded-lg border border-dg-line bg-white p-6 lg:sticky lg:top-24">
             <div className="font-bold text-lg mb-1">{factoryName}</div>
             <div className="text-xs text-gray-500 mb-4">{factoryType}</div>
 

@@ -245,12 +245,12 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-[1250px] mx-auto px-4 lg:px-6 py-8">
+      <div className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6 sm:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-[640px_1fr] gap-8 xl:gap-9 items-start">
           <section>
             {displayImages.length > 0 ? (
               <div className="relative">
-                <div className="relative w-full h-[560px] md:h-[620px] lg:h-[640px] xl:h-[660px] bg-[#f7f7f8] rounded-xl overflow-hidden">
+                <div className="relative h-[560px] w-full overflow-hidden rounded-lg bg-[#f5f5f3] md:h-[620px] lg:h-[640px] xl:h-[660px]">
                   <Image
                     src={displayImages[activeImageIndex]}
                     alt={`${factoryName} 이미지 ${activeImageIndex + 1}`}
@@ -315,7 +315,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           <section className="pt-1 lg:pt-0.5">
             <div className="flex items-start justify-between gap-3 mb-5">
               <div>
-                <h1 className="text-[44px] leading-[1.08] font-extrabold tracking-[-0.02em] text-[#111111]">{factoryName}</h1>
+                <h1 className="text-3xl font-bold leading-[1.08] tracking-[-0.04em] text-[#111111] sm:text-4xl lg:text-[44px]">{factoryName}</h1>
                 <div className="flex items-center gap-2 mt-3">
                   <span className="px-3 py-1 rounded-full bg-[#f1f2f4] text-[12px] font-semibold text-[#555]">{primaryBadge}</span>
                   <span className="px-3 py-1 rounded-full bg-[#fdf0f2] text-[12px] font-semibold text-[#8f5b62]">{secondaryBadge}</span>
@@ -420,7 +420,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
           onClick={() => setShowMajorItemsModal(false)}
         >
           <div
-            className="w-full max-w-2xl rounded-xl bg-white p-5 shadow-xl"
+            className="w-full max-w-2xl rounded-lg border border-dg-line bg-white p-5 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-3">

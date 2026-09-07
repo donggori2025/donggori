@@ -43,7 +43,7 @@ function SignInForm() {
   };
 
   return (
-    <div className="w-full max-w-md rounded-xl bg-white p-8 shadow">
+    <div className="w-full max-w-md rounded-lg border border-dg-line bg-white p-6 sm:p-8">
       <ErrorHandler onError={setError} />
       <h2 className="text-center text-xl font-bold">소셜 계정으로 로그인</h2>
       <p className="mt-2 text-center text-sm text-gray-500">
@@ -85,7 +85,7 @@ function SignInForm() {
 
 export default function SignInPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4">
+    <div className="flex min-h-[70vh] flex-col items-center justify-center bg-white px-4 py-14 sm:py-20">
       <div className="mb-8 flex flex-col items-center text-center">
         <h1 className="mb-2 text-4xl font-extrabold tracking-tight">DONGGORI</h1>
         <p className="text-lg font-semibold text-gray-700">봉제공장이 필요한 순간, 동고리</p>

@@ -102,7 +102,7 @@ export default function AdminSidebar() {
         <button
           onClick={handleLogout}
           disabled={isLoggingOut}
-          className="w-full rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
+          className="w-full rounded-md px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
         >
           {isLoggingOut ? "로그아웃 중..." : "로그아웃"}
         </button>

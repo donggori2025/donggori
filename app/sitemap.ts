@@ -6,6 +6,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.donggori.com';
 
   const staticRoutes: MetadataRoute.Sitemap = [
+    { url: `${baseUrl}/news`, changeFrequency: 'weekly', priority: 0.6 },
+    { url: `${baseUrl}/esg`, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/`, changeFrequency: 'weekly', priority: 1 },
     { url: `${baseUrl}/factories`, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/matching`, changeFrequency: 'monthly', priority: 0.8 },

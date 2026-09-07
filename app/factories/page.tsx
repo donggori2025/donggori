@@ -466,7 +466,7 @@ export default function FactoriesPage() {
   }, [view, filtered, selectedFactory]);
 
   return (
-    <div className="min-h-screen bg-[#f6f7fb]">
+    <div className="min-h-screen bg-[#f5f5f3]">
       <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-6`}>
       {loading && (
         <div className="flex flex-col items-center justify-center py-12 gap-3">
@@ -529,7 +529,7 @@ export default function FactoriesPage() {
 
       <div className="flex flex-row gap-6 lg:gap-8 items-start w-full">
         <aside className="w-72 shrink-0 hidden lg:block sticky top-24">
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-col gap-2">
+          <div className="flex flex-col gap-2 rounded-lg border border-dg-line bg-white p-4">
             <div className="font-bold flex items-center justify-between text-base pb-2">
               <span className="text-gray-900 flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
@@ -814,7 +814,7 @@ export default function FactoriesPage() {
               onClick={() => setShowMobileFilter(false)}
               aria-hidden
             />
-            <div className="relative bg-white rounded-t-2xl sm:rounded-2xl w-full sm:w-[90vw] max-w-md max-h-[85vh] flex flex-col border border-gray-200 shadow-xl">
+            <div className="relative flex max-h-[85vh] w-full max-w-md flex-col rounded-t-lg border border-dg-line bg-white shadow-lg sm:w-[90vw] sm:rounded-lg">
               <div className="p-4 sm:p-6 pb-3 border-b border-gray-200 flex-shrink-0 flex items-center justify-between">
                 <span className="font-bold text-gray-900 flex items-center gap-2">
                   <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
@@ -1098,7 +1098,7 @@ export default function FactoriesPage() {
         )}
         {/* 오른쪽: 검색+카드/지도 */}
         <div className="flex-1 min-w-0 flex flex-col items-stretch">
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-5">
+          <div className="rounded-lg border border-dg-line bg-white p-4 md:p-5">
           <div className="flex flex-col sm:flex-row gap-3 mb-4 items-stretch sm:items-center w-full">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -1179,7 +1179,7 @@ export default function FactoriesPage() {
                       <Link
                         href={`/factories/${f.id}`}
                         key={f.id ?? idx}
-                        className="rounded-xl bg-white overflow-hidden flex flex-col cursor-pointer border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all group"
+                        className="group flex cursor-pointer flex-col overflow-hidden rounded-lg border border-dg-line bg-white transition-colors hover:bg-gray-50"
                       >
                         <div className="w-full h-40 sm:h-44 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden group">
                           <FactoriesPageImage factory={f} idx={idx} />

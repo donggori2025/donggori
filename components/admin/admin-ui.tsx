@@ -54,7 +54,7 @@ export function AdminInput({
     <label className={`flex flex-col gap-1.5 ${className}`}>
       {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
       <input
-        className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 disabled:opacity-60 disabled:cursor-not-allowed transition"
+        className="w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 disabled:opacity-60 disabled:cursor-not-allowed transition"
         {...props}
       />
       {hint && <span className="text-xs text-gray-400">{hint}</span>}
@@ -72,7 +72,7 @@ export function AdminTextarea({
     <label className={`flex flex-col gap-1.5 ${className}`}>
       {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
       <textarea
-        className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 disabled:opacity-60 resize-y min-h-[88px] transition"
+        className="min-h-[88px] w-full resize-y rounded-lg border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 disabled:opacity-60"
         {...props}
       />
       {hint && <span className="text-xs text-gray-400">{hint}</span>}
@@ -144,7 +144,7 @@ export function AdminBadge({
 
 export function AdminEmpty({ message }: { message: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-6 py-16 text-center">
+    <div className="rounded-lg border border-dashed border-gray-200 bg-white px-6 py-16 text-center">
       <p className="text-sm text-gray-500">{message}</p>
     </div>
   );
@@ -174,7 +174,7 @@ export function AdminSearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 py-2.5 text-sm focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+        className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
       />
     </div>
   );
