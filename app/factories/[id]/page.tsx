@@ -23,7 +23,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   const [majorItemsOverflow, setMajorItemsOverflow] = useState(false);
   
   // 공장 이미지 훅 사용
-  const { images: factoryImages, loading: imagesLoading } = useFactoryImages(factory?.name || factory?.company_name || '');
+  const { images: factoryImages, loading: imagesLoading } = useFactoryImages(factory);
   const displayImages = useMemo(
     () =>
       factoryImages.filter(
