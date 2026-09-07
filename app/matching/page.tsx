@@ -37,7 +37,7 @@ function pickRandomItems<T>(array: T[], count: number): T[] {
 
 // 매칭 페이지용 공장 이미지 컴포넌트
 function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory);
+  const { images, loading } = useFactoryImages(factory.name || factory.company_name || '');
   
   if (loading) {
     return (

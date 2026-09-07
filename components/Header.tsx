@@ -4,8 +4,9 @@ import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 import { useAppAuth } from "@/contexts/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
-import { getFactoryProfileImage, type FactoryAuth } from "@/lib/factoryAuth";
+import { getFactoryProfileImage } from "@/lib/factoryAuth";
 import { storage } from "@/lib/utils";
+import type { FactoryAuth } from "@/lib/types";
 import { SITE_NAV_ITEMS } from "@/lib/navigation";
 type NavItem = { type: "link"; href: string; label: string };
 
