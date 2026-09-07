@@ -32,13 +32,13 @@ export default function NewsPage() {
 
   return (
     <PageShell>
-        <header className="mb-10 sm:mb-14">
+        <header className="mb-8 border-b border-dg-line pb-6 sm:mb-10">
           <div className="flex items-center justify-between gap-4">
             <h1 className="dg-page-title">News</h1>
-            <div className="flex shrink-0 items-center gap-2">
-              <label htmlFor="news-sort" className="text-sm text-gray-400">정렬</label>
+            <div className="flex shrink-0 items-center">
               <select
                 id="news-sort"
+                aria-label="정렬"
                 value={sort}
                 onChange={(e) => changeSort(e.target.value as "desc" | "asc")}
                 className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700"

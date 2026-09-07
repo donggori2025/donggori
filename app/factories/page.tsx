@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowPathIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { List, Map as MapIcon, Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { List, Map as MapIcon, PenLine, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import { fetchFactoriesFromDB, isSelectableRegion, type Factory } from "@/lib/factoryCatalog";
 import { FACTORY_TYPES, MAIN_FABRICS } from "@/lib/types";
 // import dynamic from "next/dynamic";
@@ -487,28 +487,45 @@ export default function FactoriesPage() {
       )}
 
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">봉제공장 찾기</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">봉제공장</h1>
         <p className="mt-2 text-sm md:text-base text-gray-600">
           동대문 봉제공장을 검색·필터링하고, 조건에 맞는 업장을 바로 확인하세요.
         </p>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-3 md:p-4 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <p className="text-xs md:text-sm font-semibold text-gray-700 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-[#222222] shrink-0" aria-hidden />
-              AI로 공장 추천받기
-            </p>
-            <p className="text-xs text-gray-500 mt-1">몇 가지 조건만 알려주시면 맞춤 공장 3곳을 추천해드려요</p>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Link href="/matching" className="ai-prompt-composer group block">
+          <div className="flex h-full items-center justify-between gap-3 rounded-[1.15rem] bg-white/97 px-4 py-4 sm:px-5">
+            <div>
+              <p className="flex items-center gap-1.5 text-sm font-semibold text-gray-900">
+                <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
+                AI로 추천받기
+              </p>
+              <p className="mt-1 text-xs leading-5 text-gray-500">
+                몇 가지 조건만 알려주시면 맞춤 공장 3곳을 추천해드려요
+              </p>
+            </div>
+            <span className="inline-flex h-9 shrink-0 items-center rounded-full bg-dg-ink px-3.5 text-xs font-semibold text-white transition group-hover:bg-black">
+              시작
+            </span>
           </div>
-          <Link
-            href="/matching"
-            className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-violet-600 text-white text-sm font-bold hover:bg-violet-700 transition shrink-0"
-          >
-            맞춤 추천 시작
-          </Link>
-        </div>
+        </Link>
+        <Link href="/design-request" className="group block rounded-[1.25rem] border border-gray-200 bg-white">
+          <div className="flex h-full items-center justify-between gap-3 px-4 py-4 sm:px-5">
+            <div>
+              <p className="flex items-center gap-1.5 text-sm font-semibold text-gray-900">
+                <PenLine className="h-4 w-4 shrink-0" aria-hidden />
+                디자인 의뢰하기
+              </p>
+              <p className="mt-1 text-xs leading-5 text-gray-500">
+                상품 정보와 레퍼런스를 남겨주시면 디자인 방향과 제작 흐름을 함께 정리해드립니다
+              </p>
+            </div>
+            <span className="inline-flex h-9 shrink-0 items-center rounded-full bg-dg-ink px-3.5 text-xs font-semibold text-white transition group-hover:bg-black">
+              시작
+            </span>
+          </div>
+        </Link>
       </div>
 
       <div className="lg:hidden">

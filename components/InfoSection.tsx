@@ -77,7 +77,7 @@ export default function InfoSection() {
       <div className={PAGE_CONTAINER_CLASS}>
         <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-center lg:gap-10 xl:gap-14">
           <div className="flex flex-col items-start text-left">
-            <h2 className="dg-section-title">조건에 맞는<br />봉제공장 찾기</h2>
+            <h2 className="dg-section-title">조건에 맞는<br />봉제공장</h2>
             <p className="mt-4 max-w-sm text-sm leading-7 text-gray-500 sm:text-base">
               지역, 생산 품목, 원단과 최소 주문 수량을 비교해 적합한 공장을 찾아보세요.
             </p>
