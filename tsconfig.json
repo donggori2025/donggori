@@ -24,8 +24,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "app/factories/[id]/request/_faddit_b2b/**/*"
-  ]
+  "exclude": ["node_modules"]
 }

@@ -3,15 +3,14 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { RotateCcw, Search } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useAppAuth } from "@/contexts/AuthContext";
-import { isSelectableRegion, type Factory } from "@/lib/factories";
-import { getFactoryMainImage, getFactoryImages } from "@/lib/factoryImages";
+import { isSelectableRegion, type Factory } from "@/lib/factoryCatalog";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
-import { recommendFactoriesFromPrompt } from "@/lib/factoryMatching";
+import { recommendFactoriesFromPrompt, takeMeaningfulMatches } from "@/lib/factoryMatching";
 import { FACTORY_TYPES, MAIN_FABRICS, type FactoryType, type MainFabric } from "@/lib/types";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
+import FactoryImagePlaceholder from "@/components/FactoryImagePlaceholder";
 
 
 // factories 데이터에서 옵션 추출 유틸(공장 찾기에서 복사)
@@ -22,37 +21,16 @@ const moqRanges = [
   { label: "301+", min: 301, max: Infinity },
 ];
 
-function shuffleArray<T>(array: T[]): T[] {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-function pickRandomItems<T>(array: T[], count: number): T[] {
-  return shuffleArray(array).slice(0, Math.min(count, array.length));
-}
-
 // 매칭 페이지용 공장 이미지 컴포넌트
 function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory);
+  const { images } = useFactoryImages(factory);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const imageSrc = images[0];
   
-  if (loading) {
-    return (
-      <div className="text-gray-400 text-sm font-medium flex items-center justify-center h-full">
-        <div className="text-center">
-          <div>이미지 로딩 중...</div>
-        </div>
-      </div>
-    );
-  }
-  
-  if (images.length > 0 && images[0] !== '/logo_donggori.png') {
+  if (imageSrc && imageSrc !== '/logo_donggori.png' && failedSrc !== imageSrc) {
     return (
       <Image
-        src={images[0]}
+        src={imageSrc}
         alt={typeof factory.company_name === 'string' ? factory.company_name : (typeof factory.name === 'string' ? factory.name : '공장 이미지')}
         className="object-cover w-full h-full rounded-xl group-hover:scale-110 transition-transform duration-300"
         width={400}
@@ -60,29 +38,17 @@ function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number 
         priority={idx < 3}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         quality={80}
-        onError={(e) => {
+        onError={() => {
           if (process.env.NODE_ENV === 'development') {
-            console.warn(`이미지 로드 실패: ${images[0]}`);
+            console.warn(`이미지 로드 실패: ${imageSrc}`);
           }
-          // 이미지 로드 실패 시 대체 UI 표시
-          const imgElement = e.currentTarget;
-          imgElement.style.display = 'none';
-          const fallbackElement = imgElement.nextElementSibling;
-          if (fallbackElement) {
-            fallbackElement.classList.remove('hidden');
-          }
+          setFailedSrc(imageSrc);
         }}
       />
     );
   }
   
-  return (
-    <div className="text-gray-400 text-sm font-medium flex items-center justify-center h-full">
-      <div className="text-center">
-        <div>이미지 준비 중</div>
-      </div>
-    </div>
-  );
+  return <FactoryImagePlaceholder />;
 }
 
 // 채팅 말풍선 컴포넌트 (fade-in + 타이핑 효과)
@@ -112,7 +78,7 @@ function ChatBubble({
     return (
       <div className="flex flex-col items-start w-full">
         <div
-          className="max-w-[85%] animate-fade-in rounded-lg border border-dg-line bg-white px-4 py-2.5 text-sm leading-relaxed text-gray-800 md:text-[15px]"
+          className="px-4 py-2.5 rounded-2xl bg-white border border-gray-200 shadow-sm text-sm md:text-[15px] text-gray-800 leading-relaxed animate-fade-in max-w-[85%]"
           style={{ minHeight: 40 }}
         >
           {content}
@@ -124,7 +90,7 @@ function ChatBubble({
   return (
     <div className="flex flex-col items-end w-full">
       <div
-        className="max-w-[85%] animate-fade-in rounded-lg bg-[#111] px-4 py-2.5 text-sm leading-relaxed text-white md:text-[15px]"
+        className="px-4 py-2.5 rounded-2xl bg-[#111] text-white text-sm md:text-[15px] leading-relaxed animate-fade-in max-w-[85%]"
         style={{ minHeight: 40 }}
       >
         {content}
@@ -132,7 +98,7 @@ function ChatBubble({
       {onEdit && (
         <button
           type="button"
-          className="mt-1.5 text-xs text-gray-400 underline hover:text-gray-700"
+          className="mt-1.5 text-xs text-gray-400 underline hover:text-violet-600"
           onClick={onEdit}
         >
           수정
@@ -146,83 +112,15 @@ const INTRO_GREETINGS = ["반갑습니다:)", "동고리가 봉제공장을 추�
 const INTRO_MESSAGE_COUNT = INTRO_GREETINGS.length + 1;
 
 export default function MatchingPage() {
-  const { user } = useAppAuth();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isSignedIn } = useAppAuth();
   // 공장 데이터 state
   const [factories, setFactories] = useState<Factory[]>([]);
 
-  // 로그인 상태 확인
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      // 로그인 사용자 확인
-      if (user) {
-        setIsLoggedIn(true);
-        return;
-      }
-
-      // 쿠키에서 로그인 상태 확인
-      const getCookie = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift();
-        return null;
-      };
-
-      const isLoggedInCookie = getCookie('isLoggedIn');
-      const userType = getCookie('userType');
-      const naverUser = getCookie('naver_user');
-      const kakaoUser = getCookie('kakao_user');
-
-      // localStorage에서도 확인
-      const localStorageUserType = localStorage.getItem('userType');
-      const localStorageFactoryAuth = localStorage.getItem('factoryAuth');
-
-      if (isLoggedInCookie === 'true' || userType || naverUser || kakaoUser || localStorageUserType || localStorageFactoryAuth) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkLoginStatus();
-  }, [user]);
-
   useEffect(() => {
     async function fetchFactories() {
-      const { data } = await supabase.from("donggori").select("*");
-      
-      // 이미지 정보를 추가로 처리
-      const factoriesWithImages = (data ?? []).map((factory: any) => {
-        const companyName = factory.company_name || factory.name || '';
-        
-        // 이미지 정보 로깅
-        console.log(`공장 ${companyName} 원본 데이터:`, {
-          id: factory.id,
-          company_name: factory.company_name,
-          name: factory.name,
-          images: factory.images,
-          image: factory.image
-        });
-        
-        // 실제 이미지 정보 가져오기
-        const factoryWithImages = {
-          ...factory,
-          intro: factory.intro_text || factory.intro,
-          description: factory.description || factory.intro_text || factory.intro,
-          image: getFactoryMainImage(companyName),
-          images: getFactoryImages(companyName)
-        };
-        
-        console.log(`공장 ${companyName} 처리된 이미지 데이터:`, {
-          image: factoryWithImages.image,
-          images: factoryWithImages.images,
-          companyName: companyName
-        });
-        
-        return factoryWithImages;
-      });
-      
-      setFactories(factoriesWithImages);
+      const response = await fetch("/api/factories", { cache: "no-store" });
+      const payload = response.ok ? await response.json() : null;
+      setFactories(Array.isArray(payload?.data) ? payload.data : []);
     }
     fetchFactories();
   }, []);
@@ -402,15 +300,6 @@ type ScoredFactory = Factory & { score: number };
           });
         }
         
-        // 데이터가 없으면 기본값으로 '봉제' 표시
-        if (chips.length === 0) {
-          chips.push({
-            label: '봉제',
-            color: chipColors['봉제'].color,
-            bg: chipColors['봉제'].bg
-          });
-        }
-        
         return [f.id ?? idx, chips];
       })
     );
@@ -554,9 +443,9 @@ type ScoredFactory = Factory & { score: number };
     return false;
   };
 
-  // 개선된 AI 매칭 알고리즘: 가중치 기반 점수 계산 시스템
+  // 선택 조건 기반 점수 계산
   const getRecommendedFactories = useCallback((answers: string[]) => {
-    console.log('🔍 AI 매칭 시작 - 사용자 답변:', answers);
+    console.log('🔍 맞춤 추천 시작 - 사용자 답변:', answers);
     
     // 가중치 정의 (중요도 순)
     const weights = {
@@ -606,7 +495,7 @@ type ScoredFactory = Factory & { score: number };
       ];
 
       // 1. 공장 타입 매칭 (가중치: 30)
-      if (selectedFactoryTypes.length > 0 && factoryTypeCandidates.length > 0) {
+      if (selectedFactoryTypes.length > 0) {
         maxPossibleScore += weights.factory_type;
         const { ratio, matched } = matchRatio(selectedFactoryTypes, factoryTypeCandidates);
         if (ratio > 0) {
@@ -616,7 +505,7 @@ type ScoredFactory = Factory & { score: number };
       }
 
       // 2. 주요 원단 매칭 (가중치: 25)
-      if (selectedFabrics.length > 0 && fabricCandidates.length > 0) {
+      if (selectedFabrics.length > 0) {
         maxPossibleScore += weights.main_fabrics;
         const { ratio, matched } = matchRatio(selectedFabrics, fabricCandidates);
         if (ratio > 0) {
@@ -626,7 +515,7 @@ type ScoredFactory = Factory & { score: number };
       }
 
       // 3. 지역 매칭 (가중치: 20)
-      if (selectedDistricts.length > 0 && districtCandidates.length > 0) {
+      if (selectedDistricts.length > 0) {
         maxPossibleScore += weights.admin_district;
         const { ratio, matched } = matchRatio(selectedDistricts, districtCandidates);
         if (ratio > 0) {
@@ -637,9 +526,9 @@ type ScoredFactory = Factory & { score: number };
 
       // 4. MOQ 매칭 (가중치: 15)
       const moqValue = getMoqValue(factory);
-      if (selectedMoqRange && moqValue !== null) {
+      if (selectedMoqRange) {
         maxPossibleScore += weights.moq;
-        const moqMatch = isMoqRangeMatch(selectedMoqRange, moqValue);
+        const moqMatch = moqValue !== null && isMoqRangeMatch(selectedMoqRange, moqValue);
         if (moqMatch) {
           totalScore += weights.moq;
           matchDetails.push(`MOQ: ${moqValue}`);
@@ -674,7 +563,7 @@ type ScoredFactory = Factory & { score: number };
       }
 
       // 6. 품목 매칭 (가중치: 10)
-      if (selectedItems.length > 0 && itemCandidates.length > 0) {
+      if (selectedItems.length > 0) {
         maxPossibleScore += weights.items;
         const { ratio, matched } = matchRatio(selectedItems, itemCandidates);
         if (ratio > 0) {
@@ -706,33 +595,9 @@ type ScoredFactory = Factory & { score: number };
     // 점수순으로 정렬 (높은 점수부터)
     const sortedFactories = scoredFactories.sort((a, b) => b.score - a.score);
     
-    // 지능형 필터링 및 보완 로직
-    let result: typeof scoredFactories = [];
-    
-    // 1단계: 고품질 매칭 (70점 이상)
-    const highQualityMatches = sortedFactories.filter(f => f.score >= 70);
-    if (highQualityMatches.length >= 3) {
-      result = highQualityMatches.slice(0, 3);
-      console.log('🌟 고품질 매칭 3개 이상 발견 - 상위 3개 선택');
-    } else {
-      // 2단계: 중품질 매칭 (50점 이상) + 고품질 매칭
-      const mediumQualityMatches = sortedFactories.filter(f => f.score >= 50 && f.score < 70);
-      result = [...highQualityMatches, ...mediumQualityMatches].slice(0, 3);
-      
-      if (result.length < 3) {
-        // 3단계: 저품질 매칭 (30점 이상)으로 보완
-        const lowQualityMatches = sortedFactories.filter(f => 
-          f.score >= 30 && f.score < 50 && !result.includes(f)
-        );
-        result = [...result, ...lowQualityMatches].slice(0, 3);
-        
-        if (result.length < 3) {
-          // 4단계: 최종 보완 (최고 점수들)
-          const remaining = sortedFactories.filter(f => !result.includes(f));
-          result = [...result, ...remaining].slice(0, 3);
-        }
-      }
-    }
+    // 최소 의미 점수(30점)를 충족한 공장만 추천한다. 결과 개수를 맞추기
+    // 위해 조건 불일치 공장을 섞지 않는다.
+    const result = takeMeaningfulMatches(sortedFactories);
 
     // 매칭 품질 분석
     const qualityAnalysis = {
@@ -757,10 +622,6 @@ type ScoredFactory = Factory & { score: number };
       score: f.score.toFixed(1) + '%',
       matches: f.matchDetails
     })));
-
-    if (result.every((f) => f.score === 0)) {
-      return pickRandomItems(scoredFactories, 3);
-    }
 
     return result;
   }, [factories]);
@@ -792,12 +653,10 @@ type ScoredFactory = Factory & { score: number };
       typingTimer.current = null;
     }
 
-    window.setTimeout(() => {
-      const rec = getRecommendedFactoriesFromPrompt(trimmed);
-      setRecommended(rec);
-      setResultLoading(false);
-      setChat([{ type: "question", text: "분석이 완료되었어요. 추천 결과를 확인해주세요." }]);
-    }, 1800);
+    const rec = getRecommendedFactoriesFromPrompt(trimmed);
+    setRecommended(rec);
+    setResultLoading(false);
+    setChat([{ type: "question", text: "분석이 완료되었어요. 추천 결과를 확인해주세요." }]);
   }, [getRecommendedFactoriesFromPrompt]);
 
   useEffect(() => {
@@ -809,50 +668,46 @@ type ScoredFactory = Factory & { score: number };
     startTextMatching(promptFromQuery);
   }, [factories.length, startTextMatching]);
 
-  // 사용자 피드백 상태
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [feedbackRatings, setFeedbackRatings] = useState<{[key: number]: number}>({});
 
   // 피드백 제출 함수
   const submitFeedback = async (factoryId: number, rating: number) => {
     try {
-      console.log(`피드백 제출 시도: 공장 ${factoryId}, 평점 ${rating}`);
-      
-      // 즉시 UI 업데이트
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          factory_id: factoryId,
+          rating,
+          user_answers: answers,
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.error || '피드백을 저장하지 못했습니다.');
       setFeedbackRatings(prev => ({ ...prev, [factoryId]: rating }));
-      
-      // 서버에 피드백 전송 (선택적)
-      try {
-        const response = await fetch('/api/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            factory_id: factoryId,
-            rating: rating,
-            user_answers: answers,
-            timestamp: new Date().toISOString()
-          })
-        });
-        
-        if (response.ok) {
-          console.log(`피드백 서버 저장 완료: 공장 ${factoryId}, 평점 ${rating}`);
-        } else {
-          console.warn('피드백 서버 저장 실패, 하지만 UI는 업데이트됨');
-        }
-      } catch (serverError) {
-        console.warn('피드백 서버 전송 실패, 하지만 UI는 업데이트됨:', serverError);
-      }
-      
     } catch (error) {
-      console.error('피드백 처리 중 오류:', error);
+      alert(error instanceof Error ? error.message : '피드백을 저장하지 못했습니다.');
     }
   };
 
   // 추천 결과 카드 UI (공장 정보 상세)
   function renderResultCards() {
+    if (recommended.length === 0) {
+      return (
+        <div className="w-full max-w-xl rounded-2xl border border-gray-200 bg-gray-50 px-6 py-12 text-center">
+          <h2 className="text-xl font-bold text-gray-900">조건에 맞는 공장을 찾지 못했어요</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            조건을 줄여 다시 추천받거나 공장 목록에서 직접 확인해주세요.
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div className="w-full flex flex-col items-center justify-center animate-fade-in">
-        <div className="text-2xl md:text-[40px] font-extrabold text-gray-900 mb-8 text-center px-4">가장 적합한 봉제공장 3곳을 추천드려요!</div>
+        <div className="text-2xl md:text-[40px] font-extrabold text-gray-900 mb-8 text-center px-4">
+          조건에 맞는 봉제공장을 추천드려요!
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 w-full max-w-3xl px-4">
           {recommended.map((f, idx) => {
             const displayName = typeof f.name === 'string' && f.name
@@ -881,12 +736,6 @@ type ScoredFactory = Factory & { score: number };
                 {/* 이미지 영역 - 데스크톱에서만 표시 */}
                 <div className="hidden md:block w-full h-32 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl group">
                   <MatchingFactoryImage factory={f} idx={idx} />
-                  {/* 이미지 로드 실패 시 표시할 대체 텍스트 */}
-                  <div className="text-gray-400 text-sm font-medium hidden flex items-center justify-center h-full">
-                    <div className="text-center">
-                      <div>이미지 준비 중</div>
-                    </div>
-                  </div>
                 </div>
                 {/* 이미지와 텍스트 사이 gap - 데스크톱에서만 */}
                 <div className="hidden md:block mt-2" />
@@ -913,7 +762,7 @@ type ScoredFactory = Factory & { score: number };
                   <button
                     className="w-full mt-3 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition text-sm md:text-base"
                     onClick={() => {
-                      if (!isLoggedIn) {
+                      if (!isSignedIn) {
                         alert('로그인 후 이용 가능합니다.');
                         return;
                       }
@@ -1017,13 +866,9 @@ type ScoredFactory = Factory & { score: number };
   useEffect(() => {
     if (textMatchMode) return;
     if (answers.length === QUESTIONS.length) {
-      setResultLoading(true);
-      const timer = setTimeout(() => {
-        const rec = getRecommendedFactories(answers.map(a => a.join(", ")));
-        setRecommended(rec);
-        setResultLoading(false);
-      }, 2200); // 2.2초 분석 로딩
-      return () => clearTimeout(timer);
+      const rec = getRecommendedFactories(answers.map(a => a.join(", ")));
+      setRecommended(rec);
+      setResultLoading(false);
     } else {
       setResultLoading(false);
     }
@@ -1070,10 +915,10 @@ type ScoredFactory = Factory & { score: number };
 
   // 왼쪽: 질문/선택지 or 결과 카드 or 로딩
   return (
-    <div className="min-h-screen bg-[#f5f5f3]">
+    <div className="min-h-screen bg-[#f6f7fb]">
       <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-6`}>
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">AI 매칭</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">맞춤 추천</h1>
           <p className="mt-2 text-sm md:text-base text-gray-600">
             몇 가지 정보만 알려주시면 가장 적합한 봉제공장 3곳을 추천해드립니다.
           </p>
@@ -1081,13 +926,11 @@ type ScoredFactory = Factory & { score: number };
 
         <div className="flex flex-col lg:flex-row gap-4 items-stretch justify-center flex-1 transition-opacity duration-700 min-h-[78vh]">
         {/* 왼쪽: 질문/선택지 or 결과 카드 or 로딩 */}
-        <div className="flex min-h-[620px] w-full flex-col rounded-lg border border-dg-line bg-white p-4 md:min-h-[700px] md:p-6 lg:max-h-[860px] lg:min-h-[760px] lg:flex-[2]">
+        <div className="w-full lg:flex-[2] bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6 flex flex-col min-h-[620px] md:min-h-[700px] lg:min-h-[760px] lg:max-h-[860px]">
           {isResultStage ? (
             resultLoading ? (
               <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] animate-fade-in">
-                <div className="w-16 h-16 rounded-full ai-spectrum-bg p-1 animate-spin mb-6">
-                  <div className="h-full w-full rounded-full bg-white" />
-                </div>
+                <div className="w-16 h-16 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin mb-6" />
                 <div className="text-lg font-semibold text-gray-800">분석 중입니다...</div>
                 <p className="text-sm text-gray-500 mt-2">가장 적합한 공장을 찾고 있어요</p>
               </div>
@@ -1124,9 +967,9 @@ type ScoredFactory = Factory & { score: number };
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-6">
               <p className="text-sm text-gray-500">동고리가 맞춤 공장을 찾고 있어요...</p>
               <div className="flex gap-1">
-                <span className="w-2 h-2 rounded-full bg-sky-500 animate-bounce [animation-delay:0ms]" />
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce [animation-delay:150ms]" />
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-bounce [animation-delay:300ms]" />
+                <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:0ms]" />
+                <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:150ms]" />
+                <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:300ms]" />
               </div>
             </div>
           ) : (
@@ -1148,7 +991,7 @@ type ScoredFactory = Factory & { score: number };
                         }
                       }}
                       placeholder="예: 여성 니트 상의 소량 생산 가능한 공장을 찾고 싶어요"
-                      className="w-full h-10 md:h-11 rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-900"
+                      className="w-full h-10 md:h-11 rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400"
                     />
                     <button
                       type="button"
@@ -1156,7 +999,7 @@ type ScoredFactory = Factory & { score: number };
                       disabled={!quickInput.trim()}
                       className={`h-10 md:h-11 px-4 rounded-lg text-sm font-bold whitespace-nowrap transition ${
                         quickInput.trim()
-                          ? "bg-[#222222] text-white hover:bg-black"
+                          ? "bg-violet-600 text-white hover:bg-violet-700"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     >
@@ -1167,10 +1010,10 @@ type ScoredFactory = Factory & { score: number };
                 <hr className="my-4 border-gray-200" />
                 <div className="flex gap-2 mb-6">
                   {QUESTIONS.map((_, idx) => (
-                    <div key={idx} className={`h-1 w-8 md:w-12 rounded-full ${idx <= step ? "ai-spectrum-bg" : "bg-gray-200"}`}></div>
+                    <div key={idx} className={`h-1 w-8 md:w-12 rounded-full ${idx <= step ? "bg-violet-600" : "bg-gray-200"}`}></div>
                   ))}
                 </div>
-                <div className="text-xs md:text-sm font-semibold ai-matching-glow mb-2">
+                <div className="text-xs md:text-sm font-semibold text-violet-600 mb-2">
                   {step + 1} / {QUESTIONS.length}
                 </div>
                 <div className="text-lg md:text-xl font-bold mb-6 text-gray-900">{QUESTIONS[step].question}</div>
@@ -1181,10 +1024,10 @@ type ScoredFactory = Factory & { score: number };
                     <button
                       key={option}
                       type="button"
-                      className={`flex items-center justify-center rounded-lg border border-gray-200 bg-white py-4 text-xs font-medium transition md:py-8 md:text-[15px]
+                      className={`rounded-xl bg-white shadow-sm text-xs md:text-[15px] font-medium py-4 md:py-8 transition border border-gray-200 flex items-center justify-center
                         ${selectedOptions.includes(option)
-                          ? "border-gray-900 ring-2 ring-gray-200"
-                          : "hover:border-gray-400"}
+                          ? "border-violet-500 ring-2 ring-violet-200"
+                          : "hover:border-violet-300"}
                       `}
                       onClick={() => handleOptionToggle(option)}
                     >
@@ -1200,7 +1043,7 @@ type ScoredFactory = Factory & { score: number };
                 <div className="flex gap-2">
                   <Button variant="ghost" className="text-[#333333] text-sm md:text-base px-4 md:px-6 py-2 md:py-3" onClick={handleSkip}>건너뛰기</Button>
                   <Button
-                    className="bg-[#222222] hover:bg-black text-white rounded-lg px-6 md:px-8 py-2 md:py-3 font-bold text-sm md:text-base"
+                    className="bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-6 md:px-8 py-2 md:py-3 font-bold text-sm md:text-base"
                     onClick={handleConfirm}
                     disabled={selectedOptions.length === 0}
                   >
@@ -1212,7 +1055,7 @@ type ScoredFactory = Factory & { score: number };
           )}
         </div>
         {/* 오른쪽: 채팅 UI */}
-        <div className="flex max-h-[44vh] min-h-[280px] w-full flex-col overflow-hidden rounded-lg border border-dg-line bg-white md:max-h-[50vh] md:min-h-[340px] lg:max-h-[860px] lg:min-h-[760px] lg:flex-[1]">
+        <div className="w-full lg:flex-[1] bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col min-h-[280px] md:min-h-[340px] lg:min-h-[760px] lg:max-h-[860px] max-h-[44vh] md:max-h-[50vh] lg:max-h-none">
           <div className="px-4 py-3 border-b border-gray-200 bg-white shrink-0">
             <p className="font-bold text-sm text-gray-900">동고리 매칭 도우미</p>
             <p className="text-xs text-gray-500 mt-0.5">질문에 답하면 최적의 공장을 추천해드려요</p>
@@ -1260,7 +1103,7 @@ type ScoredFactory = Factory & { score: number };
       {/* 로그인 필요 모달 */}
       {showLoginModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="w-full max-w-xs rounded-lg border border-dg-line bg-white p-8 text-center shadow-lg">
+          <div className="bg-white rounded-xl shadow-lg p-8 max-w-xs w-full text-center border border-gray-200">
             <div className="text-lg font-bold mb-2">로그인 후 이용 가능합니다</div>
             <div className="text-gray-500 mb-4">의뢰하기는 로그인 후 이용하실 수 있습니다.</div>
             <Button className="w-full mb-2" onClick={() => router.push("/sign-in")}>로그인 화면으로 이동</Button>

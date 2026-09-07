@@ -3,22 +3,18 @@
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowPathIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { ArrowRight, List, Map as MapIcon, PenLine, Search, SlidersHorizontal, Sparkles } from "lucide-react";
-import { factories, fetchFactoriesFromDB, isSelectableRegion, type Factory } from "@/lib/factories";
-import { testSupabaseConnection } from "@/lib/supabaseClient";
+import { List, Map as MapIcon, Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { fetchFactoriesFromDB, isSelectableRegion, type Factory } from "@/lib/factoryCatalog";
 import { FACTORY_TYPES, MAIN_FABRICS } from "@/lib/types";
 // import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import NaverMap from "@/components/NaverMap";
-import SimpleNaverMap from "@/components/SimpleNaverMap";
-// import { getFactoryLocations } from "@/lib/factoryMap";
 import FactoryInfoPopup from "@/components/FactoryInfoPopup";
-import { getFactoryLocationByName, getDongdaemunCenter } from "@/lib/factoryLocationMapping";
 import { useRouter } from "next/navigation";
 import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
 import { useFactoryImages, hasFactoryImages } from "@/lib/hooks/useFactoryImages";
-import { isKnitRelatedQuery, isParkwonKnitFactory, pinParkwonKnitFirst } from "@/lib/factoryMatching";
+import FactoryImagePlaceholder from "@/components/FactoryImagePlaceholder";
 
 function getFilterChipClass(isOn: boolean, sm = false) {
   const base = sm
@@ -48,20 +44,14 @@ const EMPTY_FILTERS = {
 
 // 공장 목록 페이지용 이미지 컴포넌트
 function FactoriesPageImage({ factory, idx }: { factory: Factory; idx: number }) {
-  const { images, loading } = useFactoryImages(factory);
+  const { images } = useFactoryImages(factory);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const imageSrc = images[0];
   
-  if (loading) {
-    return (
-      <div className="text-gray-400 text-xs sm:text-sm font-medium">
-        이미지 로딩 중...
-      </div>
-    );
-  }
-  
-  if (images.length > 0 && images[0] !== '/logo_donggori.png') {
+  if (imageSrc && imageSrc !== '/logo_donggori.png' && failedSrc !== imageSrc) {
     return (
       <Image
-        src={images[0]}
+        src={imageSrc}
         alt={typeof factory.company_name === 'string' ? factory.company_name : '공장 이미지'}
         className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
         width={400}
@@ -69,15 +59,12 @@ function FactoriesPageImage({ factory, idx }: { factory: Factory; idx: number })
         priority={idx < 6}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         quality={80}
+        onError={() => setFailedSrc(imageSrc)}
       />
     );
   }
   
-  return (
-    <div className="text-gray-400 text-xs sm:text-sm font-medium">
-      이미지 준비 중
-    </div>
-  );
+  return <FactoryImagePlaceholder />;
 }
 
 export default function FactoriesPage() {
@@ -188,15 +175,9 @@ export default function FactoriesPage() {
     return [];
   }
 
-  // 필터링 로직 (여러 값 중 하나라도 포함되면 통과, range/검색 포함)
-  const knitQueryActive = useMemo(() => {
-    if (isKnitRelatedQuery(search)) return true;
-    return selected.items.some((item) => isKnitRelatedQuery(item));
-  }, [search, selected.items]);
-
   const filtered = factoriesData.filter(f => {
-    const knitBoost = knitQueryActive && isParkwonKnitFactory(f);
     const itemList = [f.top_items_upper, f.top_items_lower, f.top_items_outer, f.top_items_dress_skirt, f.top_items_bag, f.top_items_fashion_accessory, f.top_items_underwear, f.top_items_sports_leisure, f.top_items_pet];
+    const itemValues = itemList.flatMap((value) => typeof value === "string" ? value.split(",").map((item) => item.trim()).filter(Boolean) : []);
     // 검색어 필터
     const searchMatch = !search ||
       (typeof f.company_name === 'string' && f.company_name.includes(search)) ||
@@ -221,7 +202,13 @@ export default function FactoriesPage() {
     const sewingArr = typeof f.sewing_machines === 'string' ? f.sewing_machines.split(',').map(s => s.trim()) : [];
     const patternArr = typeof f.pattern_machines === 'string' ? f.pattern_machines.split(',').map(s => s.trim()) : [];
     const specialArr = typeof f.special_machines === 'string' ? f.special_machines.split(',').map(s => s.trim()) : [];
-    return knitBoost || (
+    const mainFabricsArr = typeof f.main_fabrics === 'string' ? f.main_fabrics.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const processesArr = Array.isArray(f.processes)
+      ? f.processes.flatMap((value) => String(value).split(',').map((item) => item.trim()).filter(Boolean))
+      : typeof f.processes === 'string'
+        ? String(f.processes).split(',').map((item) => item.trim()).filter(Boolean)
+        : [];
+    return (
       searchMatch &&
       (selected.admin_district.length === 0 || (typeof f.admin_district === 'string' && selected.admin_district.includes(f.admin_district))) &&
       moqMatch &&
@@ -229,14 +216,14 @@ export default function FactoriesPage() {
       (selected.business_type.length === 0 || businessTypeArr.filter((v): v is string => typeof v === 'string').some(v => selected.business_type.includes(v))) &&
       (selected.distribution.length === 0 || distributionArr.filter((v): v is string => typeof v === 'string').some(v => selected.distribution.includes(v))) &&
       (selected.delivery.length === 0 || deliveryArr.filter((v): v is string => typeof v === 'string').some(v => selected.delivery.includes(v))) &&
-      (selected.items.length === 0 || itemList.filter((i): i is string => typeof i === 'string').some(i => selected.items.includes(i))) &&
+      (selected.items.length === 0 || itemValues.some(i => selected.items.includes(i))) &&
       (selected.equipment.length === 0 || equipmentArr.filter((v): v is string => typeof v === 'string').some(v => selected.equipment.includes(v))) &&
       (selected.sewing_machines.length === 0 || sewingArr.some(v => selected.sewing_machines.includes(v))) &&
       (selected.pattern_machines.length === 0 || patternArr.some(v => selected.pattern_machines.includes(v))) &&
       (selected.special_machines.length === 0 || specialArr.some(v => selected.special_machines.includes(v))) &&
       (selected.factory_type.length === 0 || (typeof f.factory_type === 'string' && selected.factory_type.includes(f.factory_type))) &&
-      (selected.main_fabrics.length === 0 || (typeof f.main_fabrics === 'string' && selected.main_fabrics.includes(f.main_fabrics))) &&
-      (selected.processes.length === 0 || (typeof f.processes === 'string' && selected.processes.includes(f.processes)))
+      (selected.main_fabrics.length === 0 || mainFabricsArr.some(value => selected.main_fabrics.includes(value))) &&
+      (selected.processes.length === 0 || processesArr.some(value => selected.processes.includes(value)))
     );
   });
 
@@ -246,10 +233,6 @@ export default function FactoriesPage() {
     // 필터가 걸려있지 않은 경우에만 정렬 적용
     const hasActiveFilters = Object.values(selected).some(arr => arr.length > 0) || search;
 
-    if (knitQueryActive) {
-      return pinParkwonKnitFirst(filtered);
-    }
-    
     if (!hasActiveFilters) {
       return [...filtered].sort((a, b) => {
         const aName = a.name || a.company_name || "";
@@ -273,7 +256,22 @@ export default function FactoriesPage() {
     }
     
     return filtered;
-  }, [filtered, selected, search, knitQueryActive]);
+  }, [filtered, selected, search]);
+
+  const mapFactories = useMemo(
+    () =>
+      sortedFiltered.filter(
+        (factory) =>
+          Number.isFinite(factory.lat) &&
+          Number.isFinite(factory.lng) &&
+          factory.lat >= -90 &&
+          factory.lat <= 90 &&
+          factory.lng >= -180 &&
+          factory.lng <= 180 &&
+          (factory.lat !== 0 || factory.lng !== 0)
+      ),
+    [sortedFiltered]
+  );
 
   // 필터 뱃지
   const badges = Object.entries(selected).flatMap(([key, arr]) =>
@@ -294,34 +292,11 @@ export default function FactoriesPage() {
     const loadFactories = async () => {
       setLoading(true);
       try {
-        // Supabase 연결 테스트
-        const connectionTest = await testSupabaseConnection();
-        console.log('Supabase 연결 테스트 결과:', connectionTest);
-        
-        if (!connectionTest.success) {
-          console.error('Supabase 연결에 실패했습니다:', connectionTest.error);
-          setConnectionStatus(connectionTest);
-          setFactoriesData([]); // 연결 실패 시 빈 배열
-          setLoading(false);
-          return;
-        }
-        
-        // Supabase에서 데이터 가져오기 시도
         const dbFactories = await fetchFactoriesFromDB();
-        
-        if (dbFactories.length > 0) {
-          console.log('Supabase에서 데이터를 성공적으로 가져왔습니다:', dbFactories.length);
-          setFactoriesData(dbFactories);
-          setConnectionStatus({ success: true, count: dbFactories.length });
-        } else {
-          console.log('Supabase 데이터가 없어 하드코딩된 데이터를 사용합니다.');
-          setFactoriesData([]); // 데이터가 없으면 빈 배열
-          setConnectionStatus({ success: true, count: 0, message: 'DB에 데이터가 없음' });
-        }
+        setFactoriesData(dbFactories);
+        setConnectionStatus({ success: true, count: dbFactories.length });
       } catch (error) {
-        console.error('데이터 로딩 중 오류가 발생했습니다:', error);
-        console.log('오류로 인해 하드코딩된 데이터를 사용합니다.');
-        setFactoriesData(factories); // 예외 상황에서만 하드코딩 데이터 사용
+        setFactoriesData([]);
         setConnectionStatus({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
       } finally {
         setLoading(false);
@@ -464,15 +439,6 @@ export default function FactoriesPage() {
           });
         }
         
-        // 데이터가 없으면 기본값으로 '봉제' 표시
-        if (chips.length === 0) {
-          chips.push({
-            label: '봉제',
-            color: chipColors['봉제'].color,
-            bg: chipColors['봉제'].bg
-          });
-        }
-        
         return [f.id ?? idx, chips];
       })
     );
@@ -500,7 +466,7 @@ export default function FactoriesPage() {
   }, [view, filtered, selectedFactory]);
 
   return (
-    <div className="min-h-screen bg-[#f5f5f3]">
+    <div className="min-h-screen bg-[#f6f7fb]">
       <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-6`}>
       {loading && (
         <div className="flex flex-col items-center justify-center py-12 gap-3">
@@ -522,48 +488,27 @@ export default function FactoriesPage() {
 
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">봉제공장 찾기</h1>
+        <p className="mt-2 text-sm md:text-base text-gray-600">
+          동대문 봉제공장을 검색·필터링하고, 조건에 맞는 업장을 바로 확인하세요.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-        <Link
-          href="/matching"
-          className="ai-prompt-card group transition-colors duration-200"
-        >
-          <div className="relative flex h-full items-center gap-4 overflow-hidden bg-white p-5 md:p-6">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-800">
-              <Sparkles className="h-5 w-5" aria-hidden />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-base font-bold text-gray-900">AI 매칭</p>
-              <p className="mt-1 text-xs md:text-sm leading-relaxed text-gray-500">
-                조건에 꼭 맞는 봉제공장 3곳을 빠르게 추천해드려요
-              </p>
-            </div>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-700 transition-all group-hover:translate-x-1 group-hover:bg-gray-100">
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </span>
+      <div className="rounded-xl border border-gray-200 bg-white p-3 md:p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <p className="text-xs md:text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-[#222222] shrink-0" aria-hidden />
+              AI로 공장 추천받기
+            </p>
+            <p className="text-xs text-gray-500 mt-1">몇 가지 조건만 알려주시면 맞춤 공장 3곳을 추천해드려요</p>
           </div>
-        </Link>
-
-        <Link
-          href="/design-request"
-          className="group relative overflow-hidden rounded-lg border border-dg-line bg-white p-5 transition-colors duration-200 hover:bg-gray-50 md:p-6"
-        >
-          <div className="relative flex items-center gap-4">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#222222] text-white">
-              <PenLine className="h-5 w-5" aria-hidden />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-base font-bold text-gray-900">디자인 의뢰</p>
-              <p className="mt-1 text-xs md:text-sm leading-relaxed text-gray-500">
-                상품 정보를 남겨주시면 디자인과 제작 방향을 안내해드려요
-              </p>
-            </div>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-gray-700 ring-1 ring-gray-200 transition-transform group-hover:translate-x-1">
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </span>
-          </div>
-        </Link>
+          <Link
+            href="/matching"
+            className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-violet-600 text-white text-sm font-bold hover:bg-violet-700 transition shrink-0"
+          >
+            맞춤 추천 시작
+          </Link>
+        </div>
       </div>
 
       <div className="lg:hidden">
@@ -584,7 +529,7 @@ export default function FactoriesPage() {
 
       <div className="flex flex-row gap-6 lg:gap-8 items-start w-full">
         <aside className="w-72 shrink-0 hidden lg:block sticky top-24">
-          <div className="flex flex-col gap-2 rounded-lg border border-dg-line bg-white p-4">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-col gap-2">
             <div className="font-bold flex items-center justify-between text-base pb-2">
               <span className="text-gray-900 flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
@@ -869,7 +814,7 @@ export default function FactoriesPage() {
               onClick={() => setShowMobileFilter(false)}
               aria-hidden
             />
-            <div className="relative flex max-h-[85vh] w-full max-w-md flex-col rounded-t-lg border border-dg-line bg-white shadow-lg sm:w-[90vw] sm:rounded-lg">
+            <div className="relative bg-white rounded-t-2xl sm:rounded-2xl w-full sm:w-[90vw] max-w-md max-h-[85vh] flex flex-col border border-gray-200 shadow-xl">
               <div className="p-4 sm:p-6 pb-3 border-b border-gray-200 flex-shrink-0 flex items-center justify-between">
                 <span className="font-bold text-gray-900 flex items-center gap-2">
                   <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
@@ -1153,7 +1098,7 @@ export default function FactoriesPage() {
         )}
         {/* 오른쪽: 검색+카드/지도 */}
         <div className="flex-1 min-w-0 flex flex-col items-stretch">
-          <div className="rounded-lg border border-dg-line bg-white p-4 md:p-5">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-5">
           <div className="flex flex-col sm:flex-row gap-3 mb-4 items-stretch sm:items-center w-full">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -1234,7 +1179,7 @@ export default function FactoriesPage() {
                       <Link
                         href={`/factories/${f.id}`}
                         key={f.id ?? idx}
-                        className="group flex cursor-pointer flex-col overflow-hidden rounded-lg border border-dg-line bg-white transition-colors hover:bg-gray-50"
+                        className="rounded-xl bg-white overflow-hidden flex flex-col cursor-pointer border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all group"
                       >
                         <div className="w-full h-40 sm:h-44 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden group">
                           <FactoriesPageImage factory={f} idx={idx} />
@@ -1292,12 +1237,16 @@ export default function FactoriesPage() {
                       </div>
                     </div>
                   </div>
+                ) : mapFactories.length === 0 ? (
+                  <div className="flex h-full items-center justify-center p-6 text-center text-sm text-gray-500">
+                    위치 정보가 등록된 공장이 없습니다.
+                  </div>
                 ) : (
                   <div className="relative w-full h-full">
                     <NaverMap
-                      center={getDongdaemunCenter()}
+                      center={{ lat: mapFactories[0].lat, lng: mapFactories[0].lng }}
                       level={14}
-                      markers={sortedFiltered.map((factory) => ({
+                      markers={mapFactories.map((factory) => ({
                         id: factory.id,
                         position: { lat: factory.lat, lng: factory.lng },
                         title: factory.name || factory.company_name || '공장명 없음',
@@ -1339,4 +1288,4 @@ export default function FactoriesPage() {
 // - getTagColor 함수로 태그별 색상을 쉽게 관리할 수 있습니다.
 // - 필터 아코디언은 useState로 열림/닫힘 상태를 관리하며, 버튼 클릭 시 토글됩니다.
 // - 카드 내 태그는 map으로 렌더링하며, 공정/나염/자수 등은 색상, 주요 품목은 회색으로 구분합니다.
-// - Tailwind CSS로 스타일을 빠르게 적용할 수 있습니다. 
+// - Tailwind CSS로 스타일을 빠르게 적용할 수 있습니다.

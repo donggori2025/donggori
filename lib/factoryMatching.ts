@@ -1,4 +1,4 @@
-import type { Factory } from "@/lib/factories";
+import type { Factory } from "@/lib/factoryCatalog";
 
 /** 프롬프트에서 제외할 불용어 */
 const STOP_WORDS = new Set([
@@ -29,32 +29,6 @@ const HIGH_VALUE_KEYWORDS = new Set([
   "아동복", "여성복", "남성복", "운동복", "자켓", "셔츠", "니트", "원단", "봉제", "패턴",
 ]);
 
-export const PARKWON_KNIT_FACTORY_NAME = "박원니트";
-
-const KNIT_SEARCH_KEYWORDS = ["니트", "knit", "스웨터", "sweater", "편물", "가디건", "knitwear"];
-
-export function isParkwonKnitFactory(factory: Factory | Record<string, unknown>): boolean {
-  const f = factory as Record<string, unknown>;
-  const name = normalizeToken(String(f.company_name || f.name || ""));
-  return name.includes(normalizeToken(PARKWON_KNIT_FACTORY_NAME));
-}
-
-/** 검색창·필터 등 사용자 입력이 니트 관련인지 판별 */
-export function isKnitRelatedQuery(text: string): boolean {
-  const normalized = normalizeText(text);
-  if (!normalized) return false;
-  return KNIT_SEARCH_KEYWORDS.some((keyword) => normalized.includes(normalizeToken(keyword)));
-}
-
-export function promptRequestsKnit(prompt: string): boolean {
-  return isKnitRelatedQuery(prompt) || extractPromptKeywords(prompt).includes("니트");
-}
-
-export function pinParkwonKnitFirst<T extends Factory | Record<string, unknown>>(factories: T[]): T[] {
-  const parkwon = factories.find(isParkwonKnitFactory);
-  if (!parkwon) return factories;
-  return [parkwon, ...factories.filter((factory) => !isParkwonKnitFactory(factory))];
-}
 
 function normalizeText(value: string): string {
   return String(value || "").toLowerCase().replace(/\s+/g, " ").trim();
@@ -251,12 +225,6 @@ export function scoreFactoryForPrompt(
     matchDetails.push("상의 품목");
   }
 
-  if (promptRequestsKnit(prompt) && isParkwonKnitFactory(factory)) {
-    score = Math.max(score, 100);
-    hitKeywords.push("니트");
-    matchDetails.push("니트 전문(박원니트)");
-  }
-
   return {
     score: Math.min(100, score),
     hitKeywords,
@@ -314,51 +282,17 @@ export function recommendFactoriesFromPrompt<T extends Factory | Record<string, 
 
     if (loose.length > 0) {
       const looseResults = loose.slice(0, count) as Array<T & { score: number; hitKeywords: string[] }>;
-      if (promptRequestsKnit(prompt)) {
-        return pinParkwonKnitFirst(ensureParkwonKnitInPromptResults(looseResults, factories, prompt)).slice(
-          0,
-          count
-        ) as Array<T & { score: number; hitKeywords: string[] }>;
-      }
       return looseResults;
     }
-    if (promptRequestsKnit(prompt)) {
-      return pinParkwonKnitFirst(ensureParkwonKnitInPromptResults(candidates, factories, prompt)).slice(
-        0,
-        count
-      ) as Array<T & { score: number; hitKeywords: string[]; matchDetails?: string[] }>;
-    }
-    return candidates.slice(0, count);
+    return [];
   }
-
-  const results = candidates.slice(0, count);
-  if (!promptRequestsKnit(prompt)) return results;
-
-  return pinParkwonKnitFirst(ensureParkwonKnitInPromptResults(results, factories, prompt)).slice(
-    0,
-    count
-  ) as Array<T & { score: number; hitKeywords: string[]; matchDetails?: string[] }>;
+  return candidates.filter((factory) => factory.score > 0).slice(0, count);
 }
 
-function ensureParkwonKnitInPromptResults<T extends Factory | Record<string, unknown>>(
-  results: Array<T & { score: number; hitKeywords: string[]; matchDetails?: string[] }>,
-  allFactories: T[],
-  prompt: string
-): Array<T & { score: number; hitKeywords: string[]; matchDetails?: string[] }> {
-  if (!promptRequestsKnit(prompt)) return results;
-  if (results.some(isParkwonKnitFactory)) return results;
-
-  const parkwon = allFactories.find(isParkwonKnitFactory);
-  if (!parkwon) return results;
-
-  const boosted = {
-    ...parkwon,
-    score: 100,
-    hitKeywords: ["니트", ...(extractPromptKeywords(prompt).includes("니트") ? [] : ["박원니트"])],
-    matchDetails: ["니트 전문 업장"],
-  };
-
-  return [boosted, ...results].slice(0, results.length) as Array<
-    T & { score: number; hitKeywords: string[]; matchDetails?: string[] }
-  >;
+export function takeMeaningfulMatches<T extends { score: number }>(
+  scoredFactories: T[],
+  count = 3,
+  minimumScore = 30,
+): T[] {
+  return scoredFactories.filter((factory) => factory.score >= minimumScore).slice(0, count);
 }

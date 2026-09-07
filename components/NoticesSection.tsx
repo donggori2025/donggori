@@ -44,7 +44,7 @@ const NoticesSection = () => {
 
   if (loading) {
     return (
-      <section className="dg-section w-full bg-white">
+      <section className="w-full bg-[#f6f7fb] py-10 sm:py-12 md:py-16">
         <div className={`w-full ${PAGE_CONTAINER_CLASS}`}>
           <div className="text-center text-gray-500 text-sm">공지사항을 불러오는 중...</div>
         </div>
@@ -53,11 +53,11 @@ const NoticesSection = () => {
   }
 
   return (
-    <section className="dg-section w-full bg-white">
+    <section className="w-full bg-[#f6f7fb] py-10 sm:py-12 md:py-16 lg:py-20 pb-16">
       <div className={`w-full ${PAGE_CONTAINER_CLASS}`}>
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 md:mb-8 gap-3">
           <div>
-            <h2 className="dg-section-title">공지사항</h2>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">공지사항</h2>
             <p className="text-sm text-gray-500 mt-2">동고리의 다양한 소식을 확인해보세요.</p>
           </div>
           <Link
@@ -68,7 +68,7 @@ const NoticesSection = () => {
           </Link>
         </div>
 
-        <div>
+        <div className="bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
           {notices.length === 0 ? (
             <div className="text-center text-gray-500 py-8">등록된 공지사항이 없습니다.</div>
           ) : (
@@ -76,12 +76,16 @@ const NoticesSection = () => {
               <Link
                 key={notice.id}
                 href={`/notices/${notice.id}`}
-                className="block border-b border-gray-300/70 py-5 transition-colors hover:bg-white/60 sm:py-6"
+                className="block px-4 sm:px-5 py-4 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 md:gap-0">
                   <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 md:gap-3 mb-1 sm:mb-2">
-                      <span className="text-xs font-semibold text-gray-400">
+                      <span className={`inline-block px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-bold ${
+                        notice.category === '공지' ? 'bg-red-100 text-red-700' : 
+                        notice.category === '채용공고' ? 'bg-blue-100 text-blue-700' : 
+                        'bg-gray-100 text-gray-600'
+                      }`}>
                         {notice.category}
                       </span>
                       <h3 className="font-medium text-gray-900 truncate text-xs sm:text-sm md:text-base">{notice.title}</h3>

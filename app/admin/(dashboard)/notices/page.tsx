@@ -20,7 +20,7 @@ const CATEGORIES: NoticeCategory[] = ["공지", "일반", "채용공고"];
 export default function AdminNoticesPage() {
   const [items, setItems] = useState<NoticeItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<Partial<NoticeItem>>({ category: "일반" });
+  const [form, setForm] = useState<Partial<NoticeItem>>({ category: "일반", is_active: true });
   const [addToPopup, setAddToPopup] = useState(false);
   const [editingAddToPopup, setEditingAddToPopup] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +73,7 @@ export default function AdminNoticesPage() {
         }
       }
 
-      setForm({ category: "일반" });
+      setForm({ category: "일반", is_active: true });
       setAddToPopup(false);
       await load();
     } catch (e: any) {
@@ -140,6 +140,7 @@ export default function AdminNoticesPage() {
       image_urls: editingItem.image_urls,
       start_at: editingItem.start_at,
       end_at: editingItem.end_at,
+      is_active: editingItem.is_active,
     };
     
     await update(editingItem.id, updatedData);
@@ -206,6 +207,9 @@ export default function AdminNoticesPage() {
           <ImageUpload onImagesChange={handleFormImagesChange} currentImages={form.image_urls || []} multiple />
         </div>
         <div className="mt-5">
+          <AdminToggle checked={form.is_active !== false} onChange={(is_active) => setForm((v) => ({ ...v, is_active }))} label="노출 활성화" />
+        </div>
+        <div className="mt-5">
           <AdminToggle checked={addToPopup} onChange={setAddToPopup} label="팝업에도 추가" />
         </div>
         <div className="mt-6">
@@ -241,6 +245,7 @@ export default function AdminNoticesPage() {
                   <AdminTextarea label="내용" className="md:col-span-2" rows={4} value={editingItem.content ?? ""} onChange={(e) => setEditingItem({ ...editingItem, content: e.target.value })} />
                 </div>
                 <ImageUpload onImagesChange={handleEditImagesChange} currentImages={editingItem.image_urls || []} multiple />
+                <AdminToggle checked={editingItem.is_active !== false} onChange={(is_active) => setEditingItem({ ...editingItem, is_active })} label="노출 활성화" />
                 <AdminToggle checked={editingAddToPopup} onChange={setEditingAddToPopup} label="팝업에도 추가" />
                 <div className="flex gap-2">
                   <AdminButton onClick={saveEdit} disabled={loading}>{loading ? "저장 중..." : "저장"}</AdminButton>
@@ -253,6 +258,7 @@ export default function AdminNoticesPage() {
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className="font-semibold text-gray-900">{item.title}</span>
                     <AdminBadge>{item.category}</AdminBadge>
+                    {item.is_active === false && <AdminBadge tone="warning">비노출</AdminBadge>}
                   </div>
                   <div className="text-sm text-gray-500">기간: {item.start_at || "—"} ~ {item.end_at || "—"}</div>
                   <div className="text-sm text-gray-600 whitespace-pre-wrap mt-2">{item.content}</div>

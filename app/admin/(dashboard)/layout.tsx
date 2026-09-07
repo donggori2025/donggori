@@ -13,7 +13,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f3]">
+    <div className="min-h-screen bg-[#f6f7fb]">
       <AdminSidebar />
       <div className="pl-64 min-h-screen flex flex-col">
         <header className="sticky top-0 z-20 h-14 bg-white/90 backdrop-blur-md border-b border-gray-200/80 px-8 flex items-center justify-between">
