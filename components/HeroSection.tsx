@@ -28,7 +28,7 @@ export default function HeroSection() {
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="dg-display text-[1.7rem] sm:text-5xl lg:text-7xl">
             <span className="sr-only">옷을 만드는 사람과 잘 만드는 공장을 잇습니다.</span>
-            <span aria-hidden="true" className="flex flex-col items-center gap-[0.5em]">
+            <span aria-hidden="true" className="flex flex-col items-center gap-[0.22em]">
               <span className="whitespace-nowrap">
                 <span className="inline-block bg-dg-ink px-[0.16em] text-white">옷을 만드는 사람</span>과 잘 만드는
               </span>
