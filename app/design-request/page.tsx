@@ -215,7 +215,7 @@ export default function DesignRequestPage() {
     "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 transition";
 
   return (
-    <div className="min-h-screen bg-[#f6f7fb]">
+    <div className="min-h-screen bg-[#f5f5f3]">
       <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-10`}>
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">디자인 의뢰하기</h1>
@@ -233,9 +233,9 @@ export default function DesignRequestPage() {
             {GUIDE_STEPS.map((item) => (
               <div
                 key={item.step}
-                className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6"
+                className="rounded-lg border border-dg-line bg-white p-5 md:p-6"
               >
-                <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-violet-50 text-violet-700 text-sm font-bold mb-3">
+                <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-900 text-white text-sm font-bold mb-3">
                   {item.step}
                 </div>
                 <p className="text-sm text-gray-700 leading-relaxed">{item.text}</p>
@@ -245,7 +245,7 @@ export default function DesignRequestPage() {
         </section>
 
         {/* 진행 플로우 */}
-        <section className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8">
+        <section className="rounded-lg border border-dg-line bg-white p-6 md:p-8">
           <h2 className="text-lg font-bold text-gray-900 mb-6">진행 플로우</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {FLOW_STEPS.map((step, index) => {
@@ -253,7 +253,7 @@ export default function DesignRequestPage() {
               return (
                 <div key={step.label} className="relative flex flex-col items-center text-center">
                   {index < FLOW_STEPS.length - 1 && (
-                    <div className="hidden md:block absolute top-9 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] h-px bg-gradient-to-r from-violet-200 to-transparent" />
+                    <div className="hidden md:block absolute top-9 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] h-px bg-gradient-to-r from-gray-300 to-transparent" />
                   )}
                   <div className="w-16 h-16 md:w-[4.5rem] md:h-[4.5rem] rounded-2xl bg-violet-50 border border-violet-100 flex items-center justify-center mb-3">
                     <Icon className="w-7 h-7 text-violet-600" />
@@ -268,9 +268,9 @@ export default function DesignRequestPage() {
         {/* 의뢰 폼 */}
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
           <div className="space-y-6">
-            <section className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-5">
+            <section className="space-y-5 rounded-lg border border-dg-line bg-white p-5 md:p-6">
               <div className="flex items-center gap-2">
-                <Palette className="w-5 h-5 text-violet-600" />
+                <Palette className="w-5 h-5 text-gray-700" />
                 <h2 className="text-lg font-bold text-gray-900">의뢰 정보</h2>
               </div>
 
@@ -356,9 +356,9 @@ export default function DesignRequestPage() {
               </div>
             </section>
 
-            <section className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-4">
+            <section className="space-y-4 rounded-lg border border-dg-line bg-white p-5 md:p-6">
               <div className="flex items-center gap-2">
-                <Send className="w-5 h-5 text-violet-600" />
+                <Send className="w-5 h-5 text-gray-700" />
                 <h2 className="text-lg font-bold text-gray-900">요청 내용</h2>
               </div>
               <textarea
@@ -369,9 +369,9 @@ export default function DesignRequestPage() {
               />
             </section>
 
-            <section className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6">
+            <section className="rounded-lg border border-dg-line bg-white p-5 md:p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Upload className="w-5 h-5 text-violet-600" />
+                <Upload className="w-5 h-5 text-gray-700" />
                 <h2 className="text-lg font-bold text-gray-900">레퍼런스 이미지</h2>
               </div>
               <label
@@ -417,7 +417,7 @@ export default function DesignRequestPage() {
           </div>
 
           <aside className="lg:sticky lg:top-24 h-fit">
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6">
+            <div className="rounded-lg border border-dg-line bg-white p-5 md:p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-2">의뢰 접수</h2>
               <p className="text-sm text-gray-600 leading-relaxed mb-5">
                 접수 후 의뢰 내용이 클립보드에 복사되며, 카카오 오픈채팅으로 상담을 이어갈 수 있습니다.

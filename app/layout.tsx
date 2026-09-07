@@ -1,9 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import GlobalPopups from "@/components/GlobalPopups";
+import SiteFrame from "@/components/SiteFrame";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -40,12 +38,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className="antialiased bg-toss-gray min-h-screen flex flex-col">
         <AuthProvider>
-          <GlobalPopups />
-          <Header />
-          <main className="w-full flex-1">
-            {children}
-          </main>
-          <Footer />
+          <SiteFrame>{children}</SiteFrame>
         </AuthProvider>
         <Analytics />
       </body>

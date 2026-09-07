@@ -16,24 +16,12 @@ export const metadata: Metadata = {
 // 메인 페이지 컴포넌트
 export default function HomePage() {
   return (
-    <main className="bg-[#f6f7fb]">
-      <section className="sr-only">
-        <h1>동고리, 디자이너와 봉제공장을 잇다</h1>
-        <p>
-          동고리는 의류 제작 과정을 혁신적으로 단축시키는 봉제·생산 연결 플랫폼입니다. 디지털 작업지시서를 통해 의사소통 오류를 줄이고 생산 효율을 높입니다.
-        </p>
-      </section>
+    <div className="bg-white">
       <HeroSection />
       <InfoSection />
       <StepSection />
       <RecommendSection />
       <NoticesSection />
-      {/* 추가 섹션 예시: */}
-      {/* 
-      <section className="w-full bg-gray-50 py-16">
-        <div className="max-w-[1200px] mx-auto px-10">여기에 다른 콘텐츠</div>
-      </section> 
-      */}
-    </main>
+    </div>
   );
 }

@@ -1,326 +1,59 @@
 "use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
 import { useAppAuth } from "@/contexts/AuthContext";
-import { usePathname, useRouter } from "next/navigation";
-import { Sparkles } from "lucide-react";
-
-type NavLinkItem = { type: "link"; href: string; label: string };
-type NavItem = NavLinkItem;
+import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
+import { SITE_NAV_ITEMS, SERVICE_LINKS } from "@/lib/navigation";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user: authUser, isSignedIn, isLoaded } = useAppAuth();
-  const router = useRouter();
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  const navMenu = useMemo<NavItem[]>(
-    () => [
-      { type: "link", href: "/factories", label: "봉제공장 찾기" },
-      { type: "link", href: "/design-request", label: "디자인 의뢰하기" },
-      { type: "link", href: "/matching", label: "맞춤 추천" },
-      { type: "link", href: "/notices", label: "공지사항" },
-    ],
-    []
-  );
-
-  // 컴포넌트 마운트 확인
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 10);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // 로그인 버튼 클릭 핸들러
-  const handleSignInClick = useCallback(() => {
-    router.push("/sign-in");
-  }, [router]);
-
-  // 메뉴 토글 핸들러
-  const toggleMenu = useCallback(() => {
-    setMenuOpen(prev => !prev);
-  }, []);
-
-  // 메뉴 닫기 핸들러
-  const closeMenu = useCallback(() => {
-    setMenuOpen(false);
-  }, []);
-
-  // 서버 사이드 렌더링 시 기본 UI만 표시
-  const isHome = pathname === "/";
-  const isTransparentMode = isHome && !isScrolled && !menuOpen;
-  const positionClass = isHome ? "fixed top-0 left-0 right-0" : "sticky top-0";
-  const headerClass = isTransparentMode
-    ? `w-full bg-transparent border-b border-transparent px-4 sm:px-6 ${positionClass} z-[9999] transition-colors duration-300`
-    : `w-full bg-white border-b px-4 sm:px-6 ${positionClass} z-[9999] transition-colors duration-300`;
-  const navTextClass = isTransparentMode ? "text-white" : "text-[#222222]";
-  const navHoverClass = isTransparentMode ? "hover:text-white/90" : "hover:text-[#222222]";
-  const logoClass = isTransparentMode
-    ? "w-24 sm:w-28 md:w-[113px] h-auto min-h-[32px] brightness-0 invert"
-    : "w-24 sm:w-28 md:w-[113px] h-auto min-h-[32px]";
-  const signInButtonClass = isTransparentMode
-    ? "text-sm lg:text-base font-semibold text-[#111111] border border-white/70 bg-white px-2 lg:px-3 py-1 rounded hover:bg-white/90 transition-colors"
-    : "text-sm lg:text-base font-semibold text-white bg-[#222222] px-2 lg:px-3 py-1 rounded hover:bg-[#444] transition-colors";
-  const mobileMenuButtonClass = isTransparentMode
-    ? "p-2 rounded hover:bg-white/10 focus:outline-none text-white"
-    : "p-2 rounded hover:bg-gray-100 focus:outline-none";
-
-  const aiMatchingIconClass = isTransparentMode ? "text-violet-300" : "text-violet-500";
-
-  const renderDesktopNavItem = (item: NavItem) => {
-    if (item.href === "/matching") {
-      return (
-        <Link
-          key={item.href}
-          href={item.href}
-          className="inline-flex items-center gap-1.5 font-bold transition-opacity hover:opacity-90"
-        >
-          <Sparkles className={`w-4 h-4 shrink-0 ${aiMatchingIconClass}`} aria-hidden />
-          <span className="ai-model-fit-glow">{item.label}</span>
-        </Link>
-      );
-    }
-
-    const isActive = pathname === item.href;
-    return (
-      <Link
-        key={item.href}
-        href={item.href}
-        className={`${navHoverClass} hover:font-bold transition-colors ${isActive ? "font-bold" : ""}`}
-      >
-        {item.label}
-      </Link>
-    );
-  };
-
-  const renderMobileNavItem = (item: NavItem) => {
-    if (item.href === "/matching") {
-      return (
-        <Link
-          key={item.href}
-          href={item.href}
-          className="py-3 px-4 rounded-lg hover:bg-gray-100 inline-flex items-center gap-2 font-bold text-lg transition-colors"
-          onClick={closeMenu}
-        >
-          <Sparkles className="w-5 h-5 shrink-0 text-violet-500" aria-hidden />
-          <span className="ai-model-fit-glow">{item.label}</span>
-        </Link>
-      );
-    }
-
-    const isActive = pathname === item.href;
-    return (
-      <Link
-        key={item.href}
-        href={item.href}
-        className={`py-3 px-4 rounded-lg hover:bg-gray-100 font-medium text-lg transition-colors text-gray-800 ${
-          isActive ? "bg-gray-100 font-bold" : ""
-        }`}
-        onClick={closeMenu}
-      >
-        {item.label}
-      </Link>
-    );
-  };
-
-  if (!mounted) {
-    return (
-      <header className={headerClass}>
-        <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-3 sm:py-4">
-          {/* 로고 */}
-          <Link href="/" className="select-none flex-shrink-0" aria-label="동고리 홈">
-            <Image
-              src="/logo_donggori.svg"
-              alt="동고리 로고"
-              width={113}
-              height={47}
-              priority
-              className={logoClass}
-              style={{ height: 'auto', minHeight: '32px' }}
-            />
-          </Link>
-
-          {/* 데스크탑 메뉴 */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-10">
-            <nav className={`flex gap-6 lg:gap-8 text-sm lg:text-base font-semibold ${navTextClass}`}>
-              {navMenu.map((item) => renderDesktopNavItem(item))}
-            </nav>
-            {/* SSR 초기 렌더에서도 로그인 버튼 노출 (하이드레이션 후 상태에 따라 교체됨) */}
-            <Link
-              href="/sign-in"
-              className={signInButtonClass}
-            >
-              로그인/회원가입
-            </Link>
-          </div>
-
-          {/* 모바일 햄버거 버튼 */}
-          <div className="md:hidden flex items-center">
-            <button
-              aria-label="메뉴 열기"
-              className={mobileMenuButtonClass}
-            >
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </header>
-    );
-  }
+  const closeMenu = () => setMenuOpen(false);
+  const accountHref = isLoaded && isSignedIn ? "/my-page" : "/sign-in";
+  const accountLabel = isLoaded && isSignedIn ? "마이페이지" : "로그인/회원가입";
 
   return (
-    <header className={headerClass}>
-      <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between px-0 py-3 sm:py-4">
-        {/* 로고 */}
-        <Link href="/" className="select-none flex-shrink-0" aria-label="동고리 홈">
-          <Image
-            src="/logo_donggori.svg"
-            alt="동고리 로고"
-            width={113}
-            height={47}
-            priority
-            className={logoClass}
-            style={{ height: 'auto', minHeight: '32px' }}
-          />
+    <header className="sticky top-0 z-40 w-full border-b border-dg-line bg-white/95 backdrop-blur-sm">
+      <div className={`${PAGE_CONTAINER_CLASS} grid grid-cols-[1fr_auto] items-center gap-4 py-4 md:grid-cols-[1fr_auto_1fr]`}>
+        <Link href="/" onClick={closeMenu} className="justify-self-start" aria-label="동고리 홈">
+          <Image src="/logo_donggori.svg" alt="동고리 로고" width={113} height={47} priority className="h-auto w-24 sm:w-28" />
         </Link>
-
-        {/* 데스크탑 메뉴 */}
-        <div className="hidden md:flex items-center gap-8 lg:gap-10">
-          <nav className={`flex gap-6 lg:gap-8 text-sm lg:text-base font-semibold ${navTextClass}`}>
-            {navMenu.map((item) => renderDesktopNavItem(item))}
-          </nav>
-
-          <div className="flex items-center gap-2">
-            {/* 로그인 전: 로그인/회원가입 버튼 */}
-            {(!isLoaded || !isSignedIn) && (
-              <button
-                className={signInButtonClass}
-                onClick={handleSignInClick}
-              >
-                로그인/회원가입
-              </button>
-            )}
-
-            {/* 일반 로그인 후: 마이페이지 링크 */}
-            {isSignedIn && authUser && (
-              <Link href="/my-page" className="flex items-center" aria-label="마이페이지로 이동">
-                <Image
-                  src={authUser.profileImage || "/logo_donggori.png"}
-                  alt="프로필 이미지"
-                  width={40}
-                  height={40}
-                  className="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-gray-200 hover:shadow-md transition-shadow"
-                />
-              </Link>
-            )}
-
-          </div>
-        </div>
-
-        {/* 모바일 햄버거 버튼 */}
-        <div className="md:hidden flex items-center">
-          <button
-            aria-label="메뉴 열기"
-            className={mobileMenuButtonClass}
-            onClick={toggleMenu}
-          >
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+        <nav aria-label="주 메뉴" className="hidden items-center gap-6 text-sm font-semibold md:flex lg:gap-8">
+          {SITE_NAV_ITEMS.map((item) => (
+            <Link key={item.href} href={item.href} aria-current={pathname === item.href ? "page" : undefined}
+              className={`transition-colors hover:text-black ${pathname.startsWith(item.href) ? "text-black" : "text-gray-500"}`}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2 justify-self-end">
+          <Link href={accountHref} onClick={closeMenu} aria-label={accountLabel}
+            className="inline-flex min-h-10 items-center justify-center rounded-md bg-dg-ink px-3 text-xs font-semibold text-white transition hover:bg-black sm:text-sm">
+            {isLoaded && isSignedIn && authUser ? "마이페이지" : "로그인/회원가입"}
+          </Link>
+          <button type="button" onClick={() => setMenuOpen((open) => !open)}
+            aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"} aria-expanded={menuOpen} aria-controls="mobile-navigation"
+            className="rounded-md p-2 text-gray-800 hover:bg-gray-100 md:hidden">
+            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
-
-        {/* 모바일 드로어 메뉴 */}
-        {menuOpen && (
-            <div className="fixed inset-0 z-50 flex items-start justify-end md:hidden">
-            {/* 오버레이 */}
-            <div
-              className="absolute inset-0 bg-black/20"
-              onClick={closeMenu}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  closeMenu();
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              aria-label="오버레이 클릭 시 메뉴 닫기"
-            />
-            
-            {/* 사이드 드로어 메뉴 */}
-            <div className="relative w-80 max-w-[85vw] bg-white h-full shadow-xl p-6 animate-slide-in-right flex flex-col gap-6">
-              {/* 닫기 버튼 */}
-              <button
-                className="absolute top-4 right-4 p-2 rounded hover:bg-gray-100"
-                aria-label="메뉴 닫기"
-                onClick={closeMenu}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    closeMenu();
-                  }
-                }}
-              >
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-
-              {/* 메뉴 그룹 */}
-              <div className="flex flex-col gap-4 mt-8">
-                {navMenu.map((item) => renderMobileNavItem(item))}
-              </div>
-
-                              {/* 로그인/회원가입 또는 프로필 이미지 */}
-                <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-gray-200">
-                  {(!isLoaded || !isSignedIn) && (
-                    <button
-                      className="w-full py-3 px-4 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-[#111111] font-semibold transition-colors"
-                      onClick={handleSignInClick}
-                    >
-                      로그인/회원가입
-                    </button>
-                  )}
-
-                  {/* 일반 로그인 후 모바일 메뉴 */}
-                  {isSignedIn && authUser && (
-                    <Link href="/my-page" className="flex items-center justify-center gap-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 px-4 transition-colors">
-                      <Image
-                        src={authUser.profileImage || "/logo_donggori.png"}
-                        alt="프로필 이미지"
-                        width={40}
-                        height={40}
-                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                      />
-                      <span className="font-medium">마이페이지</span>
-                    </Link>
-                  )}
-
-                </div>
-            </div>
-          </div>
-        )}
       </div>
-
-      {/* 사이드 드로어 애니메이션 */}
-      <style>{`
-        @keyframes slide-in-right {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-        .animate-slide-in-right {
-          animation: slide-in-right 0.3s ease-out;
-        }
-      `}</style>
+      {menuOpen && (
+        <nav id="mobile-navigation" aria-label="모바일 메뉴" onKeyDown={(event) => { if (event.key === "Escape") closeMenu(); }}
+          className="max-h-[75dvh] overflow-y-auto border-t border-dg-line px-4 py-4 md:hidden">
+          {[...SITE_NAV_ITEMS, ...SERVICE_LINKS.filter((item) => !SITE_NAV_ITEMS.some((nav) => nav.href === item.href))].map((item) => (
+            <Link key={item.href} href={item.href} onClick={closeMenu} aria-current={pathname === item.href ? "page" : undefined}
+              className="block rounded-md px-3 py-3 font-medium text-gray-700 hover:bg-gray-50">
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      )}
     </header>
   );
 }
