@@ -56,6 +56,41 @@ test("esg page keeps directional copy without unverified claims", async () => {
   assert.doesNotMatch(source, /전국 9개|특구|AI 매칭|온실가스 배출량 측정/);
 });
 
+test("interactive UI uses neutral accents while preserving the print category color", async () => {
+  const paths = [
+    "app/my-page/page.tsx",
+    "app/matching/page.tsx",
+    "app/design-request/page.tsx",
+    "app/factories/[id]/page.tsx",
+    "components/FactoryImagePlaceholder.tsx",
+  ];
+  for (const path of paths) {
+    const source = await readFile(path, "utf8");
+    assert.doesNotMatch(source, /(?:violet|purple|fuchsia)-\d|#(?:fff7fb|fff0f7|a73370|fdf0f2|8f5b62)/i, path);
+    assert.match(source, /(?:bg|text|border)-dg-ink/, path);
+  }
+  for (const path of ["app/factories/page.tsx", "app/matching/page.tsx"]) {
+    const source = await readFile(path, "utf8");
+    assert.match(source, /'나염': \{ color: '#A259FF', bg: 'rgba\(162, 89, 255, 0\.1\)' \}/, path);
+  }
+  for (const path of ["app/my-page/page.tsx", "app/design-request/page.tsx"]) {
+    const source = await readFile(path, "utf8");
+    assert.match(source, /focus:ring-2/);
+    assert.match(source, /focus:border-dg-ink/);
+  }
+  const matching = await readFile("app/matching/page.tsx", "utf8");
+  assert.match(matching, /selectedOptions\.includes\(option\)[\s\S]*?\? "border-dg-ink ring-2 ring-gray-200"\s*: "border-gray-200 hover:border-gray-400"/);
+  assert.doesNotMatch(matching, /transition border border-gray-200 flex items-center justify-center/);
+});
+
+test("signup reuses the current logo without changing social provider colors", async () => {
+  const source = await readFile("app/sign-up/page.tsx", "utf8");
+  assert.match(source, /src="\/logo_donggori\.svg"/);
+  assert.doesNotMatch(source, /logo_0624/);
+  assert.match(source, /#FEE500/);
+  assert.match(source, /#03C75A/);
+});
+
 test("favicon is a real square ICO with the new blue symbol and matching public fallback", async () => {
   const ico = await readFile("app/favicon.ico");
   assert.deepEqual(ico, await readFile("public/favicon.ico"));

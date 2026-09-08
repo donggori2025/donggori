@@ -930,7 +930,7 @@ type ScoredFactory = Factory & { score: number };
           {isResultStage ? (
             resultLoading ? (
               <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] animate-fade-in">
-                <div className="w-16 h-16 border-4 border-violet-100 border-t-violet-600 rounded-full animate-spin mb-6" />
+                <div className="w-16 h-16 border-4 border-gray-200 border-t-dg-ink rounded-full animate-spin mb-6" />
                 <div className="text-lg font-semibold text-gray-800">분석 중입니다...</div>
                 <p className="text-sm text-gray-500 mt-2">가장 적합한 공장을 찾고 있어요</p>
               </div>
@@ -967,9 +967,9 @@ type ScoredFactory = Factory & { score: number };
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-6">
               <p className="text-sm text-gray-500">동고리가 맞춤 공장을 찾고 있어요...</p>
               <div className="flex gap-1">
-                <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:0ms]" />
-                <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:150ms]" />
-                <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce [animation-delay:300ms]" />
+                <span className="w-2 h-2 rounded-full bg-dg-ink animate-bounce [animation-delay:0ms]" />
+                <span className="w-2 h-2 rounded-full bg-dg-ink animate-bounce [animation-delay:150ms]" />
+                <span className="w-2 h-2 rounded-full bg-dg-ink animate-bounce [animation-delay:300ms]" />
               </div>
             </div>
           ) : (
@@ -999,7 +999,7 @@ type ScoredFactory = Factory & { score: number };
                       disabled={!quickInput.trim()}
                       className={`h-10 md:h-11 px-4 rounded-lg text-sm font-bold whitespace-nowrap transition ${
                         quickInput.trim()
-                          ? "bg-violet-600 text-white hover:bg-violet-700"
+                          ? "bg-dg-ink text-white hover:bg-black"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     >
@@ -1010,7 +1010,7 @@ type ScoredFactory = Factory & { score: number };
                 <hr className="my-4 border-gray-200" />
                 <div className="flex gap-2 mb-6">
                   {QUESTIONS.map((_, idx) => (
-                    <div key={idx} className={`h-1 w-8 md:w-12 rounded-full ${idx <= step ? "bg-violet-600" : "bg-gray-200"}`}></div>
+                    <div key={idx} className={`h-1 w-8 md:w-12 rounded-full ${idx <= step ? "bg-dg-ink" : "bg-gray-200"}`}></div>
                   ))}
                 </div>
                 <div className="text-xs md:text-sm font-semibold ai-matching-glow mb-2">
@@ -1024,10 +1024,10 @@ type ScoredFactory = Factory & { score: number };
                     <button
                       key={option}
                       type="button"
-                      className={`rounded-xl bg-white shadow-sm text-xs md:text-[15px] font-medium py-4 md:py-8 transition border border-gray-200 flex items-center justify-center
+                      className={`rounded-xl bg-white shadow-sm text-xs md:text-[15px] font-medium py-4 md:py-8 transition border flex items-center justify-center
                         ${selectedOptions.includes(option)
-                          ? "border-violet-500 ring-2 ring-violet-200"
-                          : "hover:border-violet-300"}
+                          ? "border-dg-ink ring-2 ring-gray-200"
+                          : "border-gray-200 hover:border-gray-400"}
                       `}
                       onClick={() => handleOptionToggle(option)}
                     >
