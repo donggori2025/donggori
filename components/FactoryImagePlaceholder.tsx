@@ -5,7 +5,7 @@ export default function FactoryImagePlaceholder({ className }: { className?: str
   return (
     <div
       className={cn(
-        "flex h-full w-full items-center justify-center bg-gradient-to-br from-[#fff7fb] via-white to-[#f3f5f8]",
+        "flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100",
         className
       )}
       role="img"
@@ -19,7 +19,7 @@ export default function FactoryImagePlaceholder({ className }: { className?: str
           height={47}
           className="h-auto w-28 opacity-80 sm:w-36"
         />
-        <span className="rounded-full bg-[#fff0f7] px-3 py-1 text-[11px] font-semibold tracking-wide text-[#a73370]">
+        <span className="rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold tracking-wide text-dg-ink">
           동고리 등록 공장
         </span>
       </div>

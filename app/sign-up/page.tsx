@@ -161,7 +161,7 @@ export default function SignUpPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-white">
       <div className={`${PAGE_CONTAINER_CLASS} flex flex-col items-center py-12`}>
         <div className="mb-8 flex flex-col items-center text-center">
-          <Image src="/logo_0624.svg" alt="동고리 로고" width={80} height={80} className="mb-2" />
+          <Image src="/logo_donggori.svg" alt="동고리 로고" width={113} height={47} className="mb-2 h-auto w-28" />
           <h1 className="text-4xl font-extrabold tracking-tight">DONGGORI</h1>
           <p className="mt-2 text-sm text-gray-500">이미 계정이 있으신가요? <Link href="/sign-in" className="font-semibold text-blue-500">로그인</Link></p>
         </div>

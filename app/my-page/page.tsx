@@ -122,7 +122,7 @@ export default function MyPage() {
   if (!isLoaded || !isSignedIn || !user) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-7 w-7 animate-spin text-violet-600" aria-label="로그인 정보 확인 중" />
+        <Loader2 className="h-7 w-7 animate-spin text-dg-ink" aria-label="로그인 정보 확인 중" />
       </div>
     );
   }
@@ -131,7 +131,7 @@ export default function MyPage() {
     <main className={`${PAGE_CONTAINER_CLASS} py-10 md:py-14`}>
       <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-sm font-semibold text-violet-600">MY DONGGORI</p>
+          <p className="text-sm font-semibold text-dg-ink">MY DONGGORI</p>
           <h1 className="mt-1 text-3xl font-bold text-gray-900">마이페이지</h1>
           <p className="mt-2 text-sm text-gray-500">프로필과 내가 등록한 의뢰를 관리합니다.</p>
         </div>
@@ -155,7 +155,7 @@ export default function MyPage() {
               type="button"
               onClick={() => setMenu(value)}
               className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${
-                menu === value ? "bg-violet-600 text-white" : "text-gray-700 hover:bg-gray-50"
+                menu === value ? "bg-dg-ink text-white" : "text-gray-700 hover:bg-gray-50"
               }`}
             >
               {label}
@@ -166,7 +166,7 @@ export default function MyPage() {
         {menu === "profile" ? (
           <section className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
             <div className="mb-7 flex items-center gap-4 border-b border-gray-100 pb-7">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-violet-100 text-xl font-bold text-violet-700">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-xl font-bold text-dg-ink">
                 {(user.name || user.email).slice(0, 1).toUpperCase()}
               </div>
               <div className="min-w-0">
@@ -183,7 +183,7 @@ export default function MyPage() {
                   maxLength={50}
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-violet-500"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-dg-ink focus:ring-2 focus:ring-gray-200"
                 />
               </label>
               <label className="block text-sm font-medium text-gray-700">
@@ -201,7 +201,7 @@ export default function MyPage() {
                   value={phoneNumber}
                   onChange={(event) => setPhoneNumber(formatPhone(event.target.value))}
                   placeholder="010-1234-5678"
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-violet-500"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-dg-ink focus:ring-2 focus:ring-gray-200"
                 />
               </label>
               {profileMessage && (
@@ -210,7 +210,7 @@ export default function MyPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-violet-700 disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-lg bg-dg-ink px-5 py-2.5 text-sm font-bold text-white hover:bg-black disabled:opacity-50"
               >
                 {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
                 저장하기
@@ -224,7 +224,7 @@ export default function MyPage() {
               </p>
               <a
                 href={`mailto:donggori2020@gmail.com?subject=${encodeURIComponent("동고리 계정 탈퇴 요청")}`}
-                className="mt-3 inline-block text-sm font-semibold text-violet-700 underline"
+                className="mt-3 inline-block text-sm font-semibold text-dg-ink underline"
               >
                 donggori2020@gmail.com
               </a>
@@ -244,7 +244,7 @@ export default function MyPage() {
 
             {requestsLoading ? (
               <div className="flex min-h-48 items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-violet-600" />
+                <Loader2 className="h-6 w-6 animate-spin text-dg-ink" />
               </div>
             ) : requestsError ? (
               <div className="rounded-xl bg-red-50 px-4 py-8 text-center text-sm text-red-700">{requestsError}</div>

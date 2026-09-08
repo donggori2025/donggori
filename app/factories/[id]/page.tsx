@@ -318,7 +318,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 <h1 className="text-3xl font-bold leading-[1.08] tracking-[-0.04em] text-[#111111] sm:text-4xl lg:text-[44px]">{factoryName}</h1>
                 <div className="flex items-center gap-2 mt-3">
                   <span className="px-3 py-1 rounded-full bg-[#f1f2f4] text-[12px] font-semibold text-[#555]">{primaryBadge}</span>
-                  <span className="px-3 py-1 rounded-full bg-[#fdf0f2] text-[12px] font-semibold text-[#8f5b62]">{secondaryBadge}</span>
+                  <span className="px-3 py-1 rounded-full bg-gray-100 text-[12px] font-semibold text-dg-ink">{secondaryBadge}</span>
                 </div>
               </div>
               <button

@@ -212,7 +212,7 @@ export default function DesignRequestPage() {
   };
 
   const inputClass =
-    "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-400 transition";
+    "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-dg-ink transition";
 
   return (
     <div className="min-h-screen bg-[#f5f5f3]">
@@ -377,8 +377,8 @@ export default function DesignRequestPage() {
               <label
                 className={`flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 cursor-pointer transition ${
                   images.length > 0
-                    ? "border-violet-400 bg-violet-50/40"
-                    : "border-gray-300 hover:border-violet-400 hover:bg-gray-50"
+                    ? "border-dg-ink bg-gray-50"
+                    : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
                 }`}
               >
                 <input
