@@ -26,8 +26,16 @@ export default function HeroSection() {
     <section className="bg-white pb-8 pt-16 sm:pb-12 sm:pt-24 lg:pt-28">
       <div className={PAGE_CONTAINER_CLASS}>
         <div className="mx-auto max-w-3xl text-center">
-          <h1 className="dg-display">
-            옷을 만드는 사람과 잘 만드는 공장을 잇습니다.
+          <h1 className="dg-display text-[1.7rem] sm:text-5xl lg:text-7xl">
+            <span className="sr-only">옷을 만드는 사람과 잘 만드는 공장을 잇습니다.</span>
+            <span aria-hidden="true" className="flex flex-col items-center gap-[0.22em]">
+              <span className="whitespace-nowrap">
+                <span className="inline-block bg-dg-ink px-[0.16em] text-white">옷을 만드는 사람</span>과 잘 만드는
+              </span>
+              <span className="whitespace-nowrap">
+                <span className="inline-block bg-dg-ink px-[0.16em] text-white">공장</span>을 잇습니다.
+              </span>
+            </span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-dg-muted sm:text-base">
             동대문의 생산 경험과 새로운 브랜드의 아이디어가 더 빠르고 정확하게 만나는 의류 생산 연결 플랫폼입니다.
@@ -57,10 +65,7 @@ export default function HeroSection() {
                 placeholder="어떤 옷을 만들고 싶으신가요? 품목, 수량, 원단을 알려주세요."
                 className="min-h-[72px] w-full resize-none bg-transparent px-1 py-1 text-[15px] leading-6 text-gray-900 outline-none placeholder:text-gray-400 sm:min-h-[84px] sm:text-base sm:leading-7"
               />
-              <div className="mt-3 flex items-center justify-between gap-3">
-                <p className="text-[11px] text-gray-400 sm:text-xs">
-                  Enter로 시작 · Shift+Enter 줄바꿈
-                </p>
+              <div className="mt-3 flex items-center justify-end gap-3">
                 <button
                   type="submit"
                   disabled={!trimmedPrompt}

@@ -255,8 +255,8 @@ export default function DesignRequestPage() {
                   {index < FLOW_STEPS.length - 1 && (
                     <div className="hidden md:block absolute top-9 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] h-px bg-gradient-to-r from-gray-300 to-transparent" />
                   )}
-                  <div className="w-16 h-16 md:w-[4.5rem] md:h-[4.5rem] rounded-2xl bg-violet-50 border border-violet-100 flex items-center justify-center mb-3">
-                    <Icon className="w-7 h-7 text-violet-600" />
+                  <div className="w-16 h-16 md:w-[4.5rem] md:h-[4.5rem] rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-center mb-3">
+                    <Icon className="w-7 h-7 text-gray-800" />
                   </div>
                   <div className="text-sm font-semibold text-gray-800">{step.label}</div>
                 </div>

@@ -45,18 +45,23 @@ export default function NoticesPage() {
           title="공지사항"
           description="동고리의 새로운 소식과 주요 안내를 확인하세요."
         />
-        <div className="mb-4 flex gap-2">
+        <div className="flex border-b border-gray-200">
           {TABS.map((t) => (
             <button
               key={t.key}
-              className={`px-6 py-3 font-bold text-base transition-all ${tab === t.key ? "text-black" : "text-gray-400 hover:text-black"}`}
+              type="button"
+              className={`px-5 py-3 text-base font-bold transition-colors sm:px-6 ${
+                tab === t.key
+                  ? "-mb-px border-b-2 border-black text-black"
+                  : "text-gray-400 hover:text-black"
+              }`}
               onClick={() => setTab(t.key)}
             >
               {t.label}
             </button>
           ))}
         </div>
-        <div className="grid grid-cols-12 py-4 text-sm font-bold text-gray-400">
+        <div className="grid grid-cols-12 border-b border-gray-200 py-4 text-sm font-bold text-gray-400">
           <div className="col-span-1 text-center">번호</div>
           <div className="col-span-2 text-center">카테고리</div>
           <div className="col-span-7">제목/내용</div>

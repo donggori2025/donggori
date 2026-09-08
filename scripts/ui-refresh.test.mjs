@@ -44,3 +44,13 @@ test("new content extends rather than replaces existing search discovery", async
   assert.match(layout, /metadataBase/);
   assert.match(layout, /openGraph/);
 });
+
+test("esg page keeps directional copy without unverified claims", async () => {
+  const source = await readFile("app/esg/EsgContent.tsx", "utf8");
+  assert.match(source, /복합지원센터/);
+  assert.match(source, /지역상생/);
+  assert.match(source, /투명한 운영/);
+  assert.match(source, /자세히 보기/);
+  assert.match(source, /ESG 운영 방침/);
+  assert.doesNotMatch(source, /전국 9개|특구|AI 매칭|온실가스 배출량 측정/);
+});

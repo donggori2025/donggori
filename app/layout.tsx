@@ -10,7 +10,7 @@ const siteUrl = new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.donggor
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: {
-    default: "동고리 | 봉제공장 찾기",
+    default: "동고리 | 봉제공장",
     template: "%s | 동고리",
   },
   description: "필요한 조건에 맞는 봉제공장을 찾고 문의할 수 있는 동고리입니다.",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     url: "/",
     siteName: "동고리",
-    title: "동고리 | 봉제공장 찾기",
+    title: "동고리 | 봉제공장",
     description: "필요한 조건에 맞는 봉제공장을 찾고 문의할 수 있는 동고리입니다.",
   },
   twitter: { card: "summary" },
