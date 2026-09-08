@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
+import sharp from "sharp";
 import { getPressArticles } from "../lib/press-news.ts";
 
 test("press articles have unique IDs, valid links and local image assets", async () => {
@@ -53,4 +54,38 @@ test("esg page keeps directional copy without unverified claims", async () => {
   assert.match(source, /자세히 보기/);
   assert.match(source, /ESG 운영 방침/);
   assert.doesNotMatch(source, /전국 9개|특구|AI 매칭|온실가스 배출량 측정/);
+});
+
+test("favicon is a real square ICO with the new blue symbol and matching public fallback", async () => {
+  const ico = await readFile("app/favicon.ico");
+  assert.deepEqual(ico, await readFile("public/favicon.ico"));
+  assert.equal(ico.readUInt16LE(0), 0);
+  assert.equal(ico.readUInt16LE(2), 1, "must be ICO, not a renamed PNG");
+  const sizes = [96, 48, 32, 16];
+  assert.equal(ico.readUInt16LE(4), sizes.length);
+  let offset = 6 + 16 * sizes.length;
+  for (const [index, size] of sizes.entries()) {
+    const entry = 6 + 16 * index;
+    assert.equal(ico[entry], size);
+    assert.equal(ico[entry + 1], size);
+    assert.equal(ico.readUInt32LE(entry + 12), offset);
+    const length = ico.readUInt32LE(entry + 8);
+    const frame = ico.subarray(offset, offset + length);
+    const metadata = await sharp(frame).metadata();
+    assert.equal(metadata.format, "png");
+    assert.equal(metadata.width, size);
+    assert.equal(metadata.height, size);
+    if (size === 96) {
+      const pixels = await sharp(frame).removeAlpha().raw().toBuffer();
+      assert.deepEqual([...pixels.subarray(0, 3)], [255, 255, 255]);
+      let brandPixels = 0;
+      for (let i = 0; i < pixels.length; i += 3) {
+        // Resampling the SVG's raster mask produces antialiased color variations.
+        if (Math.abs(pixels[i] - 43) <= 8 && Math.abs(pixels[i + 1] - 74) <= 8 && Math.abs(pixels[i + 2] - 120) <= 8) brandPixels++;
+      }
+      assert.ok(brandPixels > 1000, "must contain the approved #2B4A78 symbol");
+    }
+    offset += length;
+  }
+  assert.equal(offset, ico.length);
 });
