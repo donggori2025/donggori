@@ -11,10 +11,11 @@ const Footer = () => {
           <div>
             <Link href="/" className="inline-block select-none" aria-label="동고리 홈">
               <Image
-                src="/logo_donggori.svg"
+                src="/logo_donggori_0914.jpg"
                 alt="동고리 로고"
-                width={113}
-                height={47}
+                width={798}
+                height={266}
+                sizes="(min-width: 640px) 112px, 96px"
                 className="h-auto w-24 sm:w-28"
                 style={{ height: "auto" }}
               />

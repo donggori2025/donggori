@@ -85,10 +85,25 @@ test("interactive UI uses neutral accents while preserving the print category co
 
 test("signup reuses the current logo without changing social provider colors", async () => {
   const source = await readFile("app/sign-up/page.tsx", "utf8");
-  assert.match(source, /src="\/logo_donggori\.svg"/);
+  assert.match(source, /src="\/logo_donggori_0914\.jpg"/);
   assert.doesNotMatch(source, /logo_0624/);
   assert.match(source, /#FEE500/);
   assert.match(source, /#03C75A/);
+});
+
+test("all visible brand logos use the September 14 JPEG at its original aspect ratio", async () => {
+  const metadata = await sharp("public/logo_donggori_0914.jpg").metadata();
+  assert.equal(metadata.format, "jpeg");
+  assert.equal(metadata.width, 798);
+  assert.equal(metadata.height, 266);
+  for (const path of ["components/Header.tsx", "components/Footer.tsx", "components/FactoryImagePlaceholder.tsx", "app/sign-up/page.tsx"]) {
+    const source = await readFile(path, "utf8");
+    assert.match(source, /src="\/logo_donggori_0914\.jpg"/, path);
+    assert.match(source, /width=\{798\}/, path);
+    assert.match(source, /height=\{266\}/, path);
+    assert.match(source, /h-auto/, path);
+    assert.doesNotMatch(source, /src="\/logo_(?:donggori\.(?:svg|png)|0624\.svg)"/, path);
+  }
 });
 
 test("favicon is a real square ICO with the new blue symbol and matching public fallback", async () => {

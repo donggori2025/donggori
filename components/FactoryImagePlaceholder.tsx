@@ -13,10 +13,11 @@ export default function FactoryImagePlaceholder({ className }: { className?: str
     >
       <div className="flex flex-col items-center gap-3 rounded-2xl border border-white bg-white/75 px-6 py-5 shadow-sm backdrop-blur-sm">
         <Image
-          src="/logo_donggori.png"
+          src="/logo_donggori_0914.jpg"
           alt=""
-          width={148}
-          height={47}
+          width={798}
+          height={266}
+          sizes="(min-width: 640px) 144px, 112px"
           className="h-auto w-28 opacity-80 sm:w-36"
         />
         <span className="rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold tracking-wide text-dg-ink">
