@@ -177,7 +177,15 @@ const LEGACY_FACTORY_IMAGES: Record<string, [folder: string, files: string[]]> =
   "라인스": [
     "라인스",
     [
-      "20250709_105019.jpg"
+      "20250709_105019.jpg",
+      "20250709_105048.jpg",
+      "20250709_105110.jpg",
+      "20250709_105138.jpg",
+      "20250709_105408.jpg",
+      "KakaoTalk_20250716_162926303.jpg",
+      "KakaoTalk_20250716_162926303_01.jpg",
+      "KakaoTalk_20250716_162926303_02.jpg",
+      "KakaoTalk_20250716_162926303_03.jpg"
     ]
   ],
   "백산실업": [
@@ -388,7 +396,15 @@ const LEGACY_FACTORY_IMAGES: Record<string, [folder: string, files: string[]]> =
   "우정샘플": [
     "우정샘플",
     [
-      "20250714_111200.jpg"
+      "20250714_111200.jpg",
+      "20250714_111228.jpg",
+      "20250714_111415.jpg",
+      "20250714_111424.jpg",
+      "20250714_111438.jpg",
+      "KakaoTalk_20250716_094918963.jpg",
+      "KakaoTalk_20250716_094918963_01.jpg",
+      "KakaoTalk_20250716_094918963_02.jpg",
+      "KakaoTalk_20250716_094918963_03.jpg"
     ]
   ],
   "우정패션": [
@@ -881,14 +897,32 @@ function strings(value: unknown): string[] {
 /** Prefer administered image URLs and preserve verified legacy galleries as a fallback. */
 export function getFactoryImages(value: unknown): string[] {
   const row = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
-  const storedImages = Array.from(new Set([...strings(row.images), ...strings(row.image)]))
-    .filter((url) => url !== FALLBACK_IMAGE);
-  if (storedImages.length > 0) return storedImages;
-
   const companyName = String(row.company_name || row.name || "").trim();
   const legacyImage = LEGACY_FACTORY_IMAGES[companyName];
-  if (legacyImage) return legacyImage[1].map((file) => `${LEGACY_BLOB_BASE}/${encodeURIComponent(legacyImage[0])}/${encodeURIComponent(file)}`);
-  return [];
+  const legacyImages = legacyImage
+    ? legacyImage[1].map((file) => `${LEGACY_BLOB_BASE}/${encodeURIComponent(legacyImage[0])}/${encodeURIComponent(file)}`)
+    : [];
+  const storedImages = Array.from(new Set([...strings(row.images), ...strings(row.image)]))
+    .filter((url) => url !== FALLBACK_IMAGE)
+    .map((url) => {
+      // Older DB rows still contain the retired image proxy. Resolve only files
+      // belonging to this factory's verified catalog, never guessed paths.
+      if (!url.startsWith("/api/factory-images/url?")) return url;
+      const params = new URLSearchParams(url.slice(url.indexOf("?") + 1));
+      const folder = params.get("folder");
+      const file = params.get("file");
+      if (legacyImage && file && (folder === companyName || folder === legacyImage[0]) && legacyImage[1].includes(file)) {
+        return `${LEGACY_BLOB_BASE}/${encodeURIComponent(legacyImage[0])}/${encodeURIComponent(file)}`;
+      }
+      return url;
+    });
+
+  // A migrated single legacy thumbnail is a cover, not a complete gallery.
+  // Keep its cover order; explicitly managed custom images/galleries still win.
+  if (storedImages.length === 1 && legacyImages.includes(storedImages[0])) {
+    return Array.from(new Set([...storedImages, ...legacyImages]));
+  }
+  return storedImages.length > 0 ? storedImages : legacyImages;
 }
 
 export function getFactoryMainImage(value: unknown): string {

@@ -13,6 +13,12 @@ test("factory images prefer DB values and restore complete legacy galleries", ()
   assert.equal(getFactoryImages({ name: "우진모피" }).length, 46);
   assert.equal(getFactoryImages({ name: "제훈사 (구 아이템)" }).length, 4);
   assert.equal(getFactoryImages({ name: "실루엣컴퍼니" }).length, 11);
+  assert.equal(getFactoryImages({ name: "라인스" }).length, 9);
+  assert.equal(getFactoryImages({ name: "박원니트", image: "/api/factory-images/url?folder=%EB%B0%95%EC%9B%90%EB%8B%88%ED%8A%B8&file=20250711_102529.jpg" }).length, 20);
+  const legacyCover = gallery[1];
+  const restored = getFactoryImages({ name: "강훈무역", images: [legacyCover] });
+  assert.equal(restored.length, 11);
+  assert.equal(restored[0], legacyCover);
   assert.deepEqual(getFactoryImages({ name: "희망사" }), []);
   assert.deepEqual(getFactoryImages({ company_name: "강훈무역", images: '["https://example.com/new.jpg"]', image: "https://example.com/new.jpg" }), ["https://example.com/new.jpg"]);
   assert.deepEqual(getFactoryImages({ company_name: "이미지없는공장", images: [] }), []);
