@@ -13,7 +13,7 @@ export default function FactoryImagePlaceholder({ className }: { className?: str
     >
       <div className="flex flex-col items-center gap-3 rounded-2xl border border-white bg-white/75 px-6 py-5 shadow-sm backdrop-blur-sm">
         <Image
-          src="/logo_donggori_0914.jpg"
+          src="/logo_donggori_0914_transparent.svg"
           alt=""
           width={798}
           height={266}

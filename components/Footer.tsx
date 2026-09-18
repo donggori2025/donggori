@@ -11,7 +11,7 @@ const Footer = () => {
           <div>
             <Link href="/" className="inline-block select-none" aria-label="동고리 홈">
               <Image
-                src="/logo_donggori_0914.jpg"
+                src="/logo_donggori_0914_transparent.svg"
                 alt="동고리 로고"
                 width={798}
                 height={266}

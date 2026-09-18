@@ -85,20 +85,20 @@ test("interactive UI uses neutral accents while preserving the print category co
 
 test("signup reuses the current logo without changing social provider colors", async () => {
   const source = await readFile("app/sign-up/page.tsx", "utf8");
-  assert.match(source, /src="\/logo_donggori_0914\.jpg"/);
+  assert.match(source, /src="\/logo_donggori_0914_transparent\.svg"/);
   assert.doesNotMatch(source, /logo_0624/);
   assert.match(source, /#FEE500/);
   assert.match(source, /#03C75A/);
 });
 
-test("all visible brand logos use the September 14 JPEG at its original aspect ratio", async () => {
-  const metadata = await sharp("public/logo_donggori_0914.jpg").metadata();
-  assert.equal(metadata.format, "jpeg");
+test("all visible brand logos use the transparent SVG at its original aspect ratio", async () => {
+  const metadata = await sharp("public/logo_donggori_0914_transparent.svg").metadata();
+  assert.equal(metadata.format, "svg");
   assert.equal(metadata.width, 798);
   assert.equal(metadata.height, 266);
   for (const path of ["components/Header.tsx", "components/Footer.tsx", "components/FactoryImagePlaceholder.tsx", "app/sign-up/page.tsx"]) {
     const source = await readFile(path, "utf8");
-    assert.match(source, /src="\/logo_donggori_0914\.jpg"/, path);
+    assert.match(source, /src="\/logo_donggori_0914_transparent\.svg"/, path);
     assert.match(source, /width=\{798\}/, path);
     assert.match(source, /height=\{266\}/, path);
     assert.match(source, /h-auto/, path);

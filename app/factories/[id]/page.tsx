@@ -60,31 +60,13 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
 
   // 현재 이미지가 변경될 때 썸네일 영역을 자동으로 스크롤
   useEffect(() => {
-    if (thumbnailRef.current && displayImages && displayImages.length > 0) {
-      // 화면 크기에 따른 썸네일 크기 계산
-      const isMobile = window.innerWidth < 640; // sm breakpoint
-      const isTablet = window.innerWidth < 768; // md breakpoint
-      
-      let thumbnailWidth = 80; // w-20 (mobile)
-      if (!isMobile && isTablet) {
-        thumbnailWidth = 96; // w-24 (tablet)
-      } else if (!isTablet) {
-        thumbnailWidth = 112; // w-28 (desktop)
-      }
-      
-      // lg 브레이크포인트 추가
-      if (window.innerWidth >= 1024) {
-        thumbnailWidth = 128; // w-32 (large desktop)
-      }
-      
-      const gap = 8; // gap-2
-      const scrollPosition = currentImageIndex * (thumbnailWidth + gap);
-      
-      thumbnailRef.current.scrollTo({
-        left: scrollPosition,
-        behavior: 'smooth'
-      });
-    }
+    const strip = thumbnailRef.current;
+    const thumbnail = strip?.children[currentImageIndex];
+    if (!strip || !thumbnail) return;
+    strip.scrollTo({
+      left: strip.scrollLeft + thumbnail.getBoundingClientRect().left - strip.getBoundingClientRect().left,
+      behavior: "smooth",
+    });
   }, [currentImageIndex, displayImages.length]);
 
   useEffect(() => {
@@ -263,12 +245,14 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                   {displayImages.length > 1 && (
                     <>
                       <button
+                        aria-label="이전 사진"
                         onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? displayImages.length - 1 : prev - 1))}
                         className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/75 text-white flex items-center justify-center"
                       >
                         ‹
                       </button>
                       <button
+                        aria-label="다음 사진"
                         onClick={() => setCurrentImageIndex((prev) => (prev === displayImages.length - 1 ? 0 : prev + 1))}
                         className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/75 text-white flex items-center justify-center"
                       >
@@ -287,12 +271,14 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                       {displayImages.map((image, index) => (
                         <button
                           key={index}
+                          aria-label={`${index + 1}번 사진 보기`}
+                          aria-current={index === activeImageIndex ? "true" : undefined}
                           onClick={() => setCurrentImageIndex(index)}
                           className={`relative w-[66px] h-[66px] shrink-0 snap-start rounded-md overflow-hidden border ${
                             index === activeImageIndex ? "border-black" : "border-gray-200"
                           }`}
                         >
-                          <Image src={image} alt={`${factoryName} 썸네일 ${index + 1}`} fill className="object-cover" />
+                          <Image src={image} alt={`${factoryName} 썸네일 ${index + 1}`} fill sizes="66px" className="object-cover" />
                         </button>
                       ))}
                     </div>
