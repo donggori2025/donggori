@@ -21,7 +21,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 w-full border-b border-dg-line bg-white/95 backdrop-blur-sm">
       <div className={`${PAGE_CONTAINER_CLASS} grid grid-cols-[1fr_auto] items-center gap-4 py-4 md:grid-cols-[1fr_auto_1fr]`}>
         <Link href="/" onClick={closeMenu} className="justify-self-start" aria-label="동고리 홈">
-          <Image src="/logo_donggori_0914.jpg" alt="동고리 로고" width={798} height={266} sizes="(min-width: 640px) 112px, 96px" priority className="h-auto w-24 sm:w-28" />
+          <Image src="/logo_donggori_0914_transparent.svg" alt="동고리 로고" width={798} height={266} sizes="(min-width: 640px) 112px, 96px" priority className="h-auto w-24 sm:w-28" />
         </Link>
         <nav aria-label="주 메뉴" className="hidden items-center gap-6 text-sm font-semibold md:flex lg:gap-8">
           {SITE_NAV_ITEMS.map((item) => (
