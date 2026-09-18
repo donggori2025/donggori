@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { deleteImageFromBlob } from "@/lib/vercelBlobConfig";
 import { requireAdmin } from "@/lib/adminSession";
+import { getStoredFactoryImages } from "@/lib/factoryImages";
+import { writeFactoryImages } from "@/lib/factoryImageStorage";
 
 export async function POST(req: Request) {
   const auth = await requireAdmin();
@@ -22,7 +24,7 @@ export async function POST(req: Request) {
     // 1. 현재 업장의 이미지 정보 가져오기
     const { data: factory, error: fetchError } = await supabase
       .from("donggori")
-      .select("images")
+      .select("*")
       .eq("id", factoryId)
       .single();
 
@@ -34,14 +36,14 @@ export async function POST(req: Request) {
     }
 
     // 2. 이미지 배열에서 해당 이미지 제거
-    const currentImages = factory.images || [];
+    const currentImages = getStoredFactoryImages(factory);
     const updatedImages = currentImages.filter((img: string) => img !== imageUrl);
 
     // 3. DB 업데이트
-    const { error: updateError } = await supabase
-      .from("donggori")
-      .update({ images: updatedImages })
-      .eq("id", factoryId);
+    const { error: updateError } = await writeFactoryImages(
+      { images: updatedImages, image: updatedImages[0] || null },
+      async (data) => supabase.from("donggori").update(data).eq("id", factoryId)
+    );
 
     if (updateError) {
       return NextResponse.json(

@@ -894,6 +894,12 @@ function strings(value: unknown): string[] {
   return [value.trim()];
 }
 
+export function getStoredFactoryImages(value: unknown): string[] {
+  const row = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  return Array.from(new Set([...strings(row.images), ...strings(row.image)]))
+    .filter((url) => url !== FALLBACK_IMAGE);
+}
+
 /** Prefer administered image URLs and preserve verified legacy galleries as a fallback. */
 export function getFactoryImages(value: unknown): string[] {
   const row = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -902,8 +908,7 @@ export function getFactoryImages(value: unknown): string[] {
   const legacyImages = legacyImage
     ? legacyImage[1].map((file) => `${LEGACY_BLOB_BASE}/${encodeURIComponent(legacyImage[0])}/${encodeURIComponent(file)}`)
     : [];
-  const storedImages = Array.from(new Set([...strings(row.images), ...strings(row.image)]))
-    .filter((url) => url !== FALLBACK_IMAGE)
+  const storedImages = getStoredFactoryImages(row)
     .map((url) => {
       // Older DB rows still contain the retired image proxy. Resolve only files
       // belonging to this factory's verified catalog, never guessed paths.
