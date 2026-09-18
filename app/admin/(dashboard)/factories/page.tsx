@@ -22,6 +22,7 @@ import {
   LONG_TEXT_FACTORY_FIELDS,
   READONLY_FACTORY_FIELDS,
   getFactoryFieldLabel,
+  buildFactoryPatch,
 } from "@/lib/factoryAdminFields";
 
 export default function AdminFactoriesPage() {
@@ -174,8 +175,8 @@ export default function AdminFactoriesPage() {
   };
 
   const handleSaveChanges = () => {
-    if (!selected) return;
-    const formData = Object.fromEntries(Object.entries(selected).filter(([k]) => !k.startsWith("__")));
+    if (!selected || !originalSelected) return;
+    const formData = buildFactoryPatch(selected, originalSelected);
     update(selected.id, formData as FactoryForm);
   };
 
