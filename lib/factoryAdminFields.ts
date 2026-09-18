@@ -128,3 +128,16 @@ export const LONG_TEXT_FACTORY_FIELDS = new Set([
 export function getFactoryFieldLabel(columnName: string): string {
   return FACTORY_FIELD_LABELS[columnName] ?? columnName;
 }
+
+export function buildFactoryPatch(current: Record<string, unknown>, original: Record<string, unknown>): Record<string, unknown> {
+  const patch = Object.fromEntries(Object.entries(current).filter(([key, value]) =>
+    !key.startsWith("__") && !READONLY_FACTORY_FIELDS.has(key)
+    && JSON.stringify(value) !== JSON.stringify(original[key])
+  ));
+  // The API validates coordinates as a pair, even when only one was edited.
+  if ("lat" in patch || "lng" in patch) {
+    patch.lat = current.lat;
+    patch.lng = current.lng;
+  }
+  return patch;
+}

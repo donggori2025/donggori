@@ -2,6 +2,17 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { getFactoryImages } from "../lib/factoryImages.ts";
+import { buildFactoryPatch } from "../lib/factoryAdminFields.ts";
+
+test("photo-only updates omit unchanged legacy fields and preserve coordinate pairs", () => {
+  const original = { id: "1", phone_number: 1012345678, company_name: "테스트공장", images: [], lat: 37.5, lng: 127 };
+  assert.deepEqual(buildFactoryPatch({ ...original, images: ["https://example.com/photo.jpg"] }, original), {
+    images: ["https://example.com/photo.jpg"],
+  });
+  assert.deepEqual(buildFactoryPatch({ ...original, lat: 37.6 }, original), { lat: 37.6, lng: 127 });
+  assert.deepEqual(buildFactoryPatch({ ...original, id: "999", __draft: true }, original), {});
+  assert.deepEqual(buildFactoryPatch({ ...original, images: [] }, { ...original, images: ["https://example.com/photo.jpg"] }), { images: [] });
+});
 
 test("factory images prefer DB values and restore complete legacy galleries", () => {
   assert.deepEqual(getFactoryImages({ company_name: "신규공장", images: ["https://example.com/a.jpg"] }), ["https://example.com/a.jpg"]);
