@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
 import { validateFactoryPatch } from "@/lib/adminHelpers";
+import { writeFactoryImages } from "@/lib/factoryImageStorage";
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin();
@@ -11,10 +12,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (!validated.ok) return NextResponse.json({ success: false, error: validated.error }, { status: 400 });
   const { id } = await params;
   const supabase = getServiceSupabase();
-  const { error } = await supabase
-    .from("donggori")
-    .update(validated.data)
-    .eq("id", id);
+  const { error } = await writeFactoryImages(validated.data, async (data) =>
+    supabase.from("donggori").update(data).eq("id", id)
+  );
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }
@@ -28,4 +28,3 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }
-

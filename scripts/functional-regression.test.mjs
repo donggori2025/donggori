@@ -1,8 +1,38 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { getFactoryImages } from "../lib/factoryImages.ts";
+import { getFactoryImages, getStoredFactoryImages } from "../lib/factoryImages.ts";
 import { buildFactoryPatch } from "../lib/factoryAdminFields.ts";
+import { writeFactoryImages } from "../lib/factoryImageStorage.ts";
+
+test("legacy image-only tables preserve photo lists without retrying unrelated failures", async () => {
+  const photos = ["https://example.com/a.jpg", "https://example.com/b.jpg"];
+  const attempts = [];
+  const result = await writeFactoryImages({ images: photos, company_name: "테스트공장" }, async (patch) => {
+    attempts.push(patch);
+    return attempts.length === 1
+      ? { error: { code: "PGRST204", message: "Could not find the 'images' column" } }
+      : { error: null };
+  });
+  assert.equal(result.error, null);
+  assert.equal(attempts.length, 2);
+  assert.deepEqual(attempts[1], { company_name: "테스트공장", image: JSON.stringify(photos) });
+  assert.deepEqual(getStoredFactoryImages(attempts[1]), photos);
+  assert.deepEqual(getFactoryImages(attempts[1]), photos);
+  for (const selected of [[photos[0]], []]) {
+    let stored;
+    await writeFactoryImages({ images: selected }, async (patch) => {
+      if ("images" in patch) return { error: { code: "42703", message: 'column "images" does not exist' } };
+      stored = patch;
+      return { error: null };
+    });
+    assert.deepEqual(getStoredFactoryImages(stored), selected);
+  }
+  let calls = 0;
+  const failure = { error: { code: "42501", message: "permission denied for images" } };
+  assert.equal(await writeFactoryImages({ images: photos }, async () => { calls++; return failure; }), failure);
+  assert.equal(calls, 1);
+});
 
 test("photo-only updates omit unchanged legacy fields and preserve coordinate pairs", () => {
   const original = { id: "1", phone_number: 1012345678, company_name: "테스트공장", images: [], lat: 37.5, lng: 127 };

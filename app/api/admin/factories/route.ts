@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
 import { validateFactoryPatch } from "@/lib/adminHelpers";
+import { writeFactoryImages } from "@/lib/factoryImageStorage";
 
 export async function GET() {
   const auth = await requireAdmin();
@@ -66,11 +67,12 @@ export async function POST(req: Request) {
     const validated = validateFactoryPatch(body, true);
     if (!validated.ok) return NextResponse.json({ success: false, error: validated.error }, { status: 400 });
     const supabase = getServiceSupabase();
-    const { error } = await supabase.from("donggori").insert(validated.data);
+    const { error } = await writeFactoryImages(validated.data, async (data) =>
+      supabase.from("donggori").insert(data)
+    );
     if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     return NextResponse.json({ success: true });
   } catch (e) {
     return NextResponse.json({ success: false, error: "서버 오류" }, { status: 500 });
   }
 }
-

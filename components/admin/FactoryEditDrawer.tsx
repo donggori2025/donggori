@@ -3,6 +3,7 @@
 import ImageUpload from "@/components/ImageUpload";
 import FactoryImageManager from "@/components/FactoryImageManager";
 import FactoryBlobImageManager from "@/components/FactoryBlobImageManager";
+import { getStoredFactoryImages } from "@/lib/factoryImages";
 import { Factory, ColumnSchema } from "@/lib/types";
 import {
   FACTORY_FIELD_SECTIONS,
@@ -93,12 +94,7 @@ export default function FactoryEditDrawer({
     .map((c) => c.column_name)
     .filter((name) => !assignedFields.has(name) && !IMAGE_FACTORY_FIELDS.has(name));
 
-  const images = factory.images || [];
-  const hasImage = typeof factory.image === "string" ? factory.image : "";
-  const displayImages = [...images];
-  if (hasImage && !displayImages.includes(hasImage)) {
-    displayImages.unshift(hasImage);
-  }
+  const displayImages = getStoredFactoryImages(factory);
 
   return (
     <>
@@ -170,8 +166,7 @@ export default function FactoryEditDrawer({
                   <p className="text-sm font-medium text-gray-700 mb-3">새 이미지 업로드</p>
                   <ImageUpload
                     onImagesChange={(newImages) => {
-                      const currentImages = factory.images || [];
-                      handleFieldChangeImages(onFieldChange, currentImages, newImages);
+                      handleFieldChangeImages(onFieldChange, displayImages, newImages);
                     }}
                     currentImages={[]}
                     multiple
@@ -183,7 +178,7 @@ export default function FactoryEditDrawer({
                   <FactoryBlobImageManager
                     folder={factory.company_name || ""}
                     selectedImages={displayImages}
-                    onImagesAdded={(urls) => handleFieldChangeImages(onFieldChange, factory.images || [], urls)}
+                    onImagesAdded={(urls) => handleFieldChangeImages(onFieldChange, displayImages, urls)}
                   />
                 </div>
 
@@ -195,7 +190,10 @@ export default function FactoryEditDrawer({
                     <FactoryImageManager
                       factoryId={factory.id}
                       images={displayImages}
-                      onImagesChange={(updatedImages) => onFieldChange("images", updatedImages)}
+                      onImagesChange={(updatedImages) => {
+                        onFieldChange("images", updatedImages);
+                        onFieldChange("image", updatedImages[0] || null);
+                      }}
                       isEditing
                     />
                   </div>
