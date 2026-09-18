@@ -180,7 +180,11 @@ export default function FactoryEditDrawer({
 
                 <div className="rounded-xl border border-gray-100 bg-gray-50/50 p-4">
                   <p className="text-sm font-medium text-gray-700 mb-3">Blob 이미지 관리</p>
-                  <FactoryBlobImageManager folder={factory.company_name || ""} />
+                  <FactoryBlobImageManager
+                    folder={factory.company_name || ""}
+                    selectedImages={displayImages}
+                    onImagesAdded={(urls) => handleFieldChangeImages(onFieldChange, factory.images || [], urls)}
+                  />
                 </div>
 
                 {displayImages.length > 0 && (
@@ -224,5 +228,5 @@ function handleFieldChangeImages(
   currentImages: string[],
   newImages: string[]
 ) {
-  onFieldChange("images", [...currentImages, ...newImages]);
+  onFieldChange("images", Array.from(new Set([...currentImages, ...newImages])));
 }

@@ -11,9 +11,11 @@ type BlobImage = {
 
 interface FactoryBlobImageManagerProps {
   folder: string; // Blob prefix (일반적으로 업장명)
+  selectedImages: string[];
+  onImagesAdded: (urls: string[]) => void;
 }
 
-export default function FactoryBlobImageManager({ folder }: FactoryBlobImageManagerProps) {
+export default function FactoryBlobImageManager({ folder, selectedImages, onImagesAdded }: FactoryBlobImageManagerProps) {
   const [images, setImages] = useState<BlobImage[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -51,6 +53,7 @@ export default function FactoryBlobImageManager({ folder }: FactoryBlobImageMana
     if (!files || files.length === 0) return;
 
     setUploading(true);
+    const uploadedUrls: string[] = [];
     try {
       for (const file of Array.from(files)) {
         const form = new FormData();
@@ -62,11 +65,13 @@ export default function FactoryBlobImageManager({ folder }: FactoryBlobImageMana
           console.warn("업로드 실패:", json.error);
           continue;
         }
+        uploadedUrls.push(json.url);
       }
       await loadImages();
     } catch (err) {
       console.error("업로드 중 오류", err);
     } finally {
+      if (uploadedUrls.length > 0) onImagesAdded(uploadedUrls);
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
@@ -115,6 +120,8 @@ export default function FactoryBlobImageManager({ folder }: FactoryBlobImageMana
         </div>
       </div>
 
+      <p className="text-xs text-gray-500">사진을 선택한 뒤 ‘변경사항 저장’을 누르면 업체 페이지에 표시됩니다.</p>
+
       {loading ? (
         <div className="text-gray-500 text-sm">목록을 불러오는 중...</div>
       ) : images.length === 0 ? (
@@ -124,6 +131,14 @@ export default function FactoryBlobImageManager({ folder }: FactoryBlobImageMana
           {images.map((img, idx) => (
             <div key={img.url} className="relative group">
               <img src={img.url} alt={`blob-${idx}`} className="w-full h-32 object-cover rounded border" />
+              <button
+                type="button"
+                onClick={() => onImagesAdded([img.url])}
+                disabled={selectedImages.includes(img.url)}
+                className="mt-2 w-full rounded border px-2 py-1.5 text-sm disabled:bg-gray-100 disabled:text-gray-500"
+              >
+                {selectedImages.includes(img.url) ? "선택된 사진" : "업체 사진으로 사용"}
+              </button>
               <button
                 onClick={() => onDelete(img.url)}
                 className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100"
