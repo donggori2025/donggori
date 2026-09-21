@@ -8,7 +8,6 @@ import {
   Layers,
   Minus,
   MousePointer2,
-  PanelLeft,
   PenTool,
   Pencil,
   Plus,
@@ -20,11 +19,13 @@ import {
   Scan,
   Trash2,
 } from "lucide-react";
-import { DesignSidebar } from "./design-sidebar";
 import { Mockup2D, Mockup3D, SelectableFlat, partsForCategory } from "./flats";
+import { MiniFlat } from "./ui";
+import { svgPairsOf } from "@/lib/generate-board";
 import { useWorkspace } from "@/lib/store";
 import type { CanvasNode, CanvasNodeType, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { SpecAssignChip } from "./spec-role-hint";
 
 const TOOLS = [
   { id: "select", icon: MousePointer2, label: "Select" },
@@ -53,6 +54,21 @@ const ADD_ITEMS: { type: CanvasNodeType; label: string; hint: string }[] = [
 const PLUS_SIZE = 40;
 const PLUS_GAP = 36;
 const CARD_TITLE = 28;
+/** Left layers rail width (icon rail 56 + panel 248). */
+export const DESIGN_LEFT_RAIL_W = 304;
+/** Right collab rail (속성 / 코멘트 / 버전). */
+export const DESIGN_RIGHT_RAIL_W = 320;
+/** Viewport inset matching `top-3` / `left-3` / `right-3`. */
+export const DESIGN_FLOAT_INSET = 12;
+/** Gap between stacked floating cards (title ↔ sidebar, share ↔ properties). */
+export const DESIGN_FLOAT_GAP = 12;
+const SIDEBAR_SHIFT = DESIGN_LEFT_RAIL_W;
+
+export function designChromeSideOffsets(opts: { sidebarOpen?: boolean; railOpen?: boolean }) {
+  const left = DESIGN_FLOAT_INSET + (opts.sidebarOpen ? DESIGN_LEFT_RAIL_W + DESIGN_FLOAT_GAP : 0);
+  const right = DESIGN_FLOAT_INSET + (opts.railOpen ? DESIGN_RIGHT_RAIL_W + DESIGN_FLOAT_GAP : 0);
+  return { left, right };
+}
 
 function nodeSize(node: CanvasNode) {
   const fallback =
@@ -69,19 +85,23 @@ export function DesignCanvas({
   selectedTarget,
   onSelectTarget,
   readOnly = false,
+  railOpen = false,
+  sidebarOpen = true,
 }: {
   product: Product;
   selectedTarget: { id: string; label: string } | null;
   onSelectTarget: (t: { id: string; label: string } | null) => void;
   readOnly?: boolean;
+  railOpen?: boolean;
+  sidebarOpen?: boolean;
 }) {
-  const { addNode, moveNode, deleteNode, hideNodePart, comments } = useWorkspace();
+  const { addNode, moveNode, deleteNode, hideNodePart, comments, setSpecArtboard } = useWorkspace();
   const [tool, setTool] = useState("select");
   const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 40, y: 24 });
+  const [pan, setPan] = useState({ x: 40 + SIDEBAR_SHIFT, y: 72 });
   const [addOpenId, setAddOpenId] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const sidebarOpenRef = useRef(sidebarOpen);
   const [overTrash, setOverTrash] = useState(false);
   const [spaceHeld, setSpaceHeld] = useState(false);
   const [panning, setPanning] = useState(false);
@@ -94,6 +114,7 @@ export function DesignCanvas({
   const commented = comments
     .filter((c) => c.productId === product.id && c.context.mode === "design")
     .map((c) => c.context.target);
+  const chrome = designChromeSideOffsets({ sidebarOpen, railOpen });
   const visibleNodes = product.nodes.filter((n) => n.type !== "label");
   const flats = visibleNodes.filter((n) => n.type === "flat");
   const plusByFlat = flats.map((node) => {
@@ -108,8 +129,20 @@ export function DesignCanvas({
     };
   });
   const linkedFocus = visibleNodes.find(
-    (n) => n.linkedTo && (n.id === selectedTarget?.id || n.id === draggingId),
+    (n) =>
+      n.linkedTo &&
+      n.generate?.kind !== "svg" &&
+      (n.id === selectedTarget?.id || n.id === draggingId),
   );
+  const svgPairs = svgPairsOf(visibleNodes);
+  const focusedPair = svgPairs.find(
+    (pair) =>
+      pair.source.id === selectedTarget?.id ||
+      pair.svg.id === selectedTarget?.id ||
+      pair.source.id === draggingId ||
+      pair.svg.id === draggingId,
+  );
+  const pairFocusId = focusedPair?.svg.id ?? null;
 
   const typingTarget = (t: EventTarget | null) => {
     const el = t as HTMLElement | null;
@@ -186,76 +219,18 @@ export function DesignCanvas({
     };
   }, [selectedTarget, removeSelected]);
 
+  useEffect(() => {
+    if (sidebarOpenRef.current === sidebarOpen) return;
+    sidebarOpenRef.current = sidebarOpen;
+    setPan((p) => ({ ...p, x: p.x + (sidebarOpen ? SIDEBAR_SHIFT : -SIDEBAR_SHIFT) }));
+  }, [sidebarOpen]);
+
   return (
-    <div className="flex h-full overflow-hidden bg-paper">
-      {sidebarOpen && (
-        <DesignSidebar
-          product={product}
-          selectedTarget={selectedTarget}
-          onSelectTarget={onSelectTarget}
-          onCollapse={() => setSidebarOpen(false)}
-        />
-      )}
-      <div className="relative min-h-0 min-w-0 flex-1 overflow-hidden">
-      {!sidebarOpen && (
-        <button
-          type="button"
-          title="사이드바 펼치기"
-          aria-label="사이드바 펼치기"
-          onClick={(e) => {
-            e.stopPropagation();
-            setSidebarOpen(true);
-          }}
-          onMouseDown={(e) => e.stopPropagation()}
-          className="absolute top-3 left-3 z-30 flex max-w-[220px] items-center gap-1.5 rounded-lg border border-mist bg-snow py-1.5 pr-2.5 pl-1.5 shadow-float"
-        >
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center text-stone">
-            <PanelLeft size={14} strokeWidth={1.8} />
-          </span>
-          <span className="truncate text-[12px] font-medium tracking-tight text-ink">{product.name}</span>
-        </button>
-      )}
-      <aside className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-mist bg-snow/95 p-1.5 shadow-[0_8px_30px_rgba(26,25,22,0.06)]">
-        {TOOLS.map((t) => {
-          const Icon = t.icon;
-          return (
-            <button
-              key={t.id}
-              title={t.label}
-              onClick={() => setTool(t.id)}
-              className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-full",
-                tool === t.id ? "bg-ink text-snow" : "text-stone hover:bg-paper hover:text-ink",
-              )}
-            >
-              <Icon size={15} strokeWidth={1.7} />
-            </button>
-          );
-        })}
-        <div className="mx-1 h-5 w-px bg-mist" />
-        {MORE.map((t) => {
-          const Icon = t.icon;
-          return (
-            <button key={t.id} title={t.label} className="flex h-8 w-8 items-center justify-center rounded-full text-stone hover:bg-paper hover:text-ink">
-              <Icon size={15} strokeWidth={1.7} />
-            </button>
-          );
-        })}
-      </aside>
-
-      {selectedTarget && (
-        <div className="absolute top-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full border border-mist bg-snow/95 px-3 py-1.5 text-[12px] shadow-sm">
-          <span className="text-stone">Selected</span>
-          <span className="font-medium">{selectedTarget.label}</span>
-          <span className="text-mist">·</span>
-          <span className="text-stone">Stroke 1.5 · Fill none</span>
-        </div>
-      )}
-
+    <div className="relative h-full overflow-hidden bg-paper">
       <div
         ref={wrap}
         className={cn(
-          "canvas-dot h-full w-full",
+          "canvas-dot absolute inset-0 h-full w-full",
           spaceHeld && "cursor-grab [&_*]:!cursor-grab",
           panning && "cursor-grabbing [&_*]:!cursor-grabbing",
         )}
@@ -299,7 +274,9 @@ export function DesignCanvas({
             {plusByFlat.length > 0 && (
               <svg className="pointer-events-none absolute inset-0 overflow-visible" width="1800" height="1200">
                 {plusByFlat.map((plus) => {
-                  const children = visibleNodes.filter((n) => n.linkedTo === plus.id);
+                  const children = visibleNodes.filter(
+                    (n) => n.linkedTo === plus.id && n.generate?.kind !== "svg",
+                  );
                   const focused = children.find((n) => n.id === linkedFocus?.id);
                   const showHub = Boolean(!readOnly && (addOpenId === plus.id || focused));
                   if (!showHub && !focused) return null;
@@ -332,6 +309,43 @@ export function DesignCanvas({
                     </g>
                   );
                 })}
+                {svgPairs.map(({ source, svg }) => {
+                  const src = nodeSize(source);
+                  const dst = nodeSize(svg);
+                  const plus = plusByFlat.find((p) => p.id === source.id);
+                  const active = pairFocusId === svg.id;
+                  const x1 = source.x + src.w;
+                  const y1 = source.y + CARD_TITLE + src.h / 2;
+                  const x2 = svg.x;
+                  const y2 = svg.y + CARD_TITLE + dst.h / 2;
+                  const hubX = plus ? plus.left + PLUS_SIZE / 2 : x1;
+                  const hubY = plus ? plus.top + PLUS_SIZE / 2 : y1;
+                  const stroke = active ? "#0d99ff" : "#a8a39b";
+                  return (
+                    <g key={`${source.id}:${svg.id}`}>
+                      <line
+                        x1={x1}
+                        y1={y1}
+                        x2={hubX}
+                        y2={hubY}
+                        stroke={stroke}
+                        strokeWidth="3.25"
+                        strokeLinecap="round"
+                        strokeDasharray="0 9"
+                      />
+                      <line
+                        x1={hubX}
+                        y1={hubY}
+                        x2={x2}
+                        y2={y2}
+                        stroke={stroke}
+                        strokeWidth="3.25"
+                        strokeLinecap="round"
+                        strokeDasharray="0 9"
+                      />
+                    </g>
+                  );
+                })}
               </svg>
             )}
             {visibleNodes.map((node) => (
@@ -340,8 +354,12 @@ export function DesignCanvas({
                 node={node}
                 product={product}
                 selected={selectedTarget}
+                paired={Boolean(
+                  focusedPair && (focusedPair.source.id === node.id || focusedPair.svg.id === node.id),
+                )}
                 commented={commented}
                 onSelectTarget={onSelectTarget}
+                onSetSpec={readOnly ? undefined : (id) => setSpecArtboard(product.id, id)}
                 onDragStart={(e) => {
                   if (readOnly || space.current) return;
                   e.stopPropagation();
@@ -423,29 +441,82 @@ export function DesignCanvas({
         </div>
       </div>
 
-      {draggingId && (
+      {selectedTarget && (
         <div
-          ref={trashRef}
-          className={cn(
-            "absolute bottom-20 left-1/2 z-30 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full border shadow-sm transition",
-            overTrash
-              ? "scale-110 border-danger bg-danger text-snow"
-              : "border-dashed border-fog bg-snow text-stone",
-          )}
+          className="pointer-events-none absolute top-16 z-20 flex justify-center"
+          style={{ left: chrome.left, right: chrome.right }}
         >
-          <Trash2 size={18} strokeWidth={1.7} />
+          <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-mist bg-snow/95 px-3 py-1.5 text-[12px] shadow-sm">
+            <span className="text-stone">Selected</span>
+            <span className="font-medium">{selectedTarget.label}</span>
+            <span className="text-mist">·</span>
+            <span className="text-stone">Stroke 1.5 · Fill none</span>
+          </div>
         </div>
       )}
 
-      <div className="absolute right-4 bottom-4 z-20 flex items-center gap-1 rounded-full border border-mist bg-snow/95 px-1.5 py-1 shadow-sm">
-        <button onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))} className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-paper">
-          <Minus size={12} />
-        </button>
-        <span className="w-10 text-center text-[11px] tabular-nums">{Math.round(zoom * 100)}%</span>
-        <button onClick={() => setZoom((z) => Math.min(1.8, z + 0.1))} className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-paper">
-          <Plus size={12} />
-        </button>
-      </div>
+      {draggingId && (
+        <div
+          className="pointer-events-none absolute bottom-20 z-30 flex justify-center"
+          style={{ left: chrome.left, right: chrome.right }}
+        >
+          <div
+            ref={trashRef}
+            className={cn(
+              "flex h-12 w-12 items-center justify-center rounded-full border shadow-sm transition",
+              overTrash
+                ? "scale-110 border-danger bg-danger text-snow"
+                : "border-dashed border-fog bg-snow text-stone",
+            )}
+          >
+            <Trash2 size={18} strokeWidth={1.7} />
+          </div>
+        </div>
+      )}
+
+      <div
+        className="pointer-events-none absolute bottom-4 z-20 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center"
+        style={{ left: chrome.left, right: chrome.right }}
+      >
+        <div />
+        <aside className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-mist bg-snow/95 p-1.5 shadow-[0_8px_30px_rgba(26,25,22,0.06)]">
+          {TOOLS.map((t) => {
+            const Icon = t.icon;
+            return (
+              <button
+                key={t.id}
+                title={t.label}
+                onClick={() => setTool(t.id)}
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-full",
+                  tool === t.id ? "bg-ink text-snow" : "text-stone hover:bg-paper hover:text-ink",
+                )}
+              >
+                <Icon size={15} strokeWidth={1.7} />
+              </button>
+            );
+          })}
+          <div className="mx-1 h-5 w-px bg-mist" />
+          {MORE.map((t) => {
+            const Icon = t.icon;
+            return (
+              <button key={t.id} title={t.label} className="flex h-8 w-8 items-center justify-center rounded-full text-stone hover:bg-paper hover:text-ink">
+                <Icon size={15} strokeWidth={1.7} />
+              </button>
+            );
+          })}
+        </aside>
+        <div className="pointer-events-auto flex justify-end">
+          <div className="flex items-center gap-1 rounded-full border border-mist bg-snow/95 px-1.5 py-1 shadow-sm">
+            <button onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))} className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-paper">
+              <Minus size={12} />
+            </button>
+            <span className="w-10 text-center text-[11px] tabular-nums">{Math.round(zoom * 100)}%</span>
+            <button onClick={() => setZoom((z) => Math.min(1.8, z + 0.1))} className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-paper">
+              <Plus size={12} />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -455,18 +526,24 @@ function CanvasCard({
   node,
   product,
   selected,
+  paired,
   commented,
   onSelectTarget,
+  onSetSpec,
   onDragStart,
 }: {
   node: CanvasNode;
   product: Product;
   selected: { id: string; label: string } | null;
+  paired?: boolean;
   commented: string[];
   onSelectTarget: (t: { id: string; label: string } | null) => void;
+  onSetSpec?: (nodeId: string) => void;
   onDragStart: (e: React.MouseEvent) => void;
 }) {
   const nodeSelected = selected?.id === node.id;
+  const generated = Boolean(node.generate);
+  const svgBoard = node.generate?.kind === "svg";
   return (
     <div
       className="absolute"
@@ -477,25 +554,58 @@ function CanvasCard({
         onSelectTarget({ id: node.id, label: node.title });
       }}
     >
-      <div className="mb-2 flex items-center justify-between px-1">
-        <p className="text-[11px] tracking-wide text-stone">{node.title}</p>
-        <span className="rounded-full bg-mist px-2 py-0.5 text-[9px] tracking-wider text-stone uppercase">
-          {node.type === "flat" ? "Flat" : node.type === "mockup2d" ? "2D" : "3D"}
+      <div className="mb-2 flex items-center justify-between gap-2 px-1">
+        <p className="min-w-0 truncate text-[11px] tracking-wide text-stone">
+          {node.title}
+          {node.generate?.revised ? <span className="ml-1 text-[9px] font-medium text-select">수정됨</span> : null}
+        </p>
+        <span className="flex shrink-0 items-center gap-0.5">
+          {svgBoard ? (
+            <span className="rounded bg-ink px-1.5 py-0.5 text-[9px] font-semibold tracking-wider text-snow">SVG</span>
+          ) : node.type === "flat" ? (
+            <SpecAssignChip
+              isSpec={node.boardKind === "specs"}
+              onAssign={onSetSpec ? () => onSetSpec(node.id) : undefined}
+            />
+          ) : (
+            <span className="rounded-full bg-mist px-2 py-0.5 text-[9px] tracking-wider text-stone uppercase">
+              {node.type === "mockup2d" ? "2D" : "3D"}
+            </span>
+          )}
         </span>
       </div>
       <div
         className={cn(
-          "rounded-2xl p-4 shadow-[0_8px_30px_rgba(26,25,22,0.04)]",
+          "relative overflow-hidden p-4 shadow-[0_8px_30px_rgba(26,25,22,0.04)]",
           nodeSelected && "ring-2 ring-[#0d99ff]",
+          paired && !nodeSelected && "ring-1 ring-[#0d99ff]/45",
         )}
         style={{
-          background: node.fill ?? "rgba(255,254,251,0.8)",
+          background: node.fill ?? (svgBoard ? "#fbfaf7" : "rgba(255,254,251,0.8)"),
           border: `${node.strokeWidth ?? 1}px solid ${node.stroke ?? "#e7e4dd"}`,
           width: node.w,
           height: node.h,
         }}
       >
-        {node.type === "flat" && (
+        {svgBoard && (
+          <span className="absolute top-2 right-2 z-[1] h-[18px] rounded px-1.5 text-[9px] font-semibold tracking-wider leading-[18px] text-snow bg-ink">
+            SVG
+          </span>
+        )}
+        {node.imageSrc ? (
+          svgBoard ? (
+            <svg viewBox="0 0 374 400" className="h-full w-full" aria-hidden>
+              <image href={node.imageSrc} width="374" height="400" preserveAspectRatio="xMidYMid meet" />
+            </svg>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={node.imageSrc} alt="" className="h-full w-full object-contain" />
+          )
+        ) : generated ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <MiniFlat category={product.category} className="h-[86%] w-[70%]" />
+          </div>
+        ) : node.type === "flat" ? (
           <SelectableFlat
             category={product.category}
             selected={selected?.id ?? null}
@@ -503,7 +613,7 @@ function CanvasCard({
             hiddenParts={node.hiddenParts}
             onSelect={(id, label) => onSelectTarget({ id, label })}
           />
-        )}
+        ) : null}
         {node.type === "mockup2d" && <Mockup2D category={product.category} />}
         {node.type === "mockup3d" && <Mockup3D />}
       </div>

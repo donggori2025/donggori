@@ -1,5 +1,4 @@
 import type { Product } from "@/lib/types";
-import { miscCompleteness } from "@/lib/misc-board";
 
 export type CompletenessAreaId =
   | "basic"
@@ -10,7 +9,7 @@ export type CompletenessAreaId =
   | "files"
   | "schedule";
 
-export type SpecTabId = "basic" | "fabric" | "size" | "notes" | "misc" | "print";
+export type SpecTabId = "basic" | "fabric" | "size" | "notes" | "print";
 
 export type AreaFill = "empty" | "partial" | "complete";
 
@@ -103,9 +102,6 @@ export function areaFill(product: Product, area: CompletenessAreaId): AreaFill {
 }
 
 export function specTabFill(product: Product, tab: SpecTabId): AreaFill {
-  if (tab === "misc") {
-    return miscCompleteness(product.specs) ? "complete" : "empty";
-  }
   if (tab === "basic") return areaFill(product, "basic");
   if (tab === "fabric") return areaFill(product, "fabric");
   if (tab === "size") return areaFill(product, "size");

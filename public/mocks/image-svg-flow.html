@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Faddit · 생성 탭 목업</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f4f2ee;
+      --snow: #fffefb;
+      --ink: #1a1916;
+      --stone: #6f6c66;
+      --mist: #e7e4dd;
+      --fog: #d4d0c8;
+      --lilac: #e4dcf3;
+      --lilac-ink: #5d4e7a;
+      --mint: #d3ede3;
+      --mint-ink: #2f6b57;
+      --peach: #f6dfd0;
+      --sky: #d7e6f5;
+      --select: #0d99ff;
+      --select-soft: #e5f3ff;
+      --float: 0 12px 40px rgba(26, 25, 22, 0.12);
+      --left-w: 304px;
+      --right-w: 320px;
+      --inset: 12px;
+      --gap: 12px;
+      --chip-h: 44px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: Inter, "Apple SD Gothic Neo", "Noto Sans KR", ui-sans-serif, system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; border: 0; background: none; }
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.45;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+    .proto {
+      position: relative;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 36px;
+      padding: 6px 14px;
+      background: var(--ink);
+      color: var(--snow);
+      font-size: 11px;
+      letter-spacing: 0.02em;
+    }
+    .proto strong { font-weight: 600; }
+    .proto-steps { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .proto-steps button {
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      color: rgba(255,254,251,0.55);
+      font-size: 11px;
+    }
+    .proto-steps button[aria-current="page"] {
+      background: var(--snow);
+      color: var(--ink);
+    }
+    .workspace {
+      position: relative;
+      height: calc(100% - 36px);
+      overflow: hidden;
+      background: var(--paper);
+      background-image: radial-gradient(circle, var(--fog) 0.8px, transparent 0.9px);
+      background-size: 22px 22px;
+    }
+    .float-left, .float-right, .mode-switch {
+      position: absolute;
+      z-index: 20;
+    }
+    .float-left {
+      top: var(--inset);
+      left: var(--inset);
+      bottom: var(--inset);
+      width: var(--left-w);
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+    .float-right {
+      top: var(--inset);
+      right: var(--inset);
+      bottom: var(--inset);
+      width: var(--right-w);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: var(--gap);
+    }
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: var(--chip-h);
+      padding: 6px;
+      border: 1px solid var(--mist);
+      border-radius: 16px;
+      background: var(--snow);
+      box-shadow: 0 1px 2px rgba(26,25,22,0.04);
+    }
+    .icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      color: var(--stone);
+    }
+    .icon-btn:hover { background: var(--paper); }
+    .title-block { min-width: 0; flex: 1; }
+    .title-block p:first-child {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .title-block p:last-child {
+      margin: 2px 0 0;
+      font-size: 11px;
+      color: var(--stone);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ver { font-size: 11px; color: var(--stone); font-weight: 400; }
+    .sidebar {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      overflow: hidden;
+      border: 1px solid var(--mist);
+      border-radius: 16px;
+      background: var(--snow);
+      box-shadow: 0 1px 2px rgba(26,25,22,0.04);
+      font-size: 11px;
+    }
+    .rail {
+      width: 56px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding-top: 8px;
+      background: var(--paper);
+    }
+    .rail-btn {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 6px 4px;
+      color: var(--stone);
+    }
+    .rail-btn .ico {
+      display: flex;
+      width: 32px;
+      height: 32px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+    .rail-btn span.lbl {
+      width: 100%;
+      text-align: center;
+      font-size: 9px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .rail-btn[aria-pressed="true"] { color: var(--ink); }
+    .rail-btn[aria-pressed="true"] .ico { background: var(--mist); }
+    .rail-btn[aria-pressed="true"]::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 4px;
+      bottom: 4px;
+      width: 3px;
+      border-radius: 0 2px 2px 0;
+      background: var(--ink);
+    }
+    .rail-btn.is-new { color: var(--ink); }
+    .rail-btn.is-new .lbl { font-weight: 600; }
+    .rail-btn.is-new .ico {
+      background: var(--mint);
+      color: var(--ink);
+    }
+    .rail-btn.is-new[aria-pressed="true"] .ico { background: var(--mist); }
+    .panel {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--mist);
+      background: var(--snow);
+      overflow: hidden;
+    }
+    .panel-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 12px 12px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .thread {
+      display: flex;
+      flex-direction: column;
+      flex: 0 1 auto;
+      min-height: 0;
+      max-height: min(220px, 38%);
+      margin: 0 0 10px;
+    }
+    .thread-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 0 0 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+    }
+    .thread-head .thread-sub {
+      font-weight: 400;
+      color: var(--stone);
+    }
+    .thread-head .thread-n {
+      font-weight: 400;
+      color: var(--stone);
+    }
+    .thread-all {
+      height: 20px;
+      padding: 0 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--select);
+      background: var(--select-soft);
+      box-shadow: inset 0 0 0 1px rgba(13,153,255,0.28);
+    }
+    .thread-all:hover { background: #d7ecff; }
+    .thread-all[hidden] { display: none; }
+    .thread-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 0;
+      overflow: auto;
+      padding: 1px;
+    }
+    .thread-empty {
+      padding: 8px 4px;
+      color: var(--stone);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .thread-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: var(--paper);
+      border: 1px solid transparent;
+    }
+    .thread-item:hover { border-color: var(--mist); background: #f1eee8; }
+    .thread-text {
+      font-size: 11px;
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .thread-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 10px;
+      color: var(--stone);
+    }
+    .thread-act {
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    .thread-tag {
+      color: var(--select);
+      font-weight: 600;
+    }
+    .composer {
+      display: flex;
+      flex-direction: column;
+      padding: 8px 10px 8px;
+      border: 1px solid var(--mist);
+      border-radius: 16px;
+      background: var(--snow);
+      box-shadow: 0 1px 2px rgba(26,25,22,0.04);
+    }
+    .composer:focus-within {
+      border-color: var(--fog);
+      box-shadow: 0 0 0 3px rgba(26,25,22,0.045);
+    }
+    .ref-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;
+      padding: 0 10px 0 6px;
+      border: 1px solid var(--mist);
+      border-radius: 999px;
+      background: var(--snow);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+    .ref-pill:hover { background: var(--paper); }
+    .ref-pill .plus {
+      display: flex;
+      width: 16px;
+      height: 16px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--fog);
+      border-radius: 999px;
+      color: var(--stone);
+    }
+    body[data-attached="true"] .ref-pill { display: none; }
+    .attach-chip {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      width: max-content;
+      max-width: 100%;
+      padding: 2px 4px 2px 2px;
+      border: 1px solid var(--mist);
+      border-radius: 999px;
+      background: var(--paper);
+    }
+    body[data-attached="true"] .attach-chip { display: inline-flex; }
+    .attach-chip .thumb {
+      width: 20px;
+      height: 24px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--snow);
+      border: 1px solid var(--mist);
+      flex-shrink: 0;
+    }
+    .attach-chip .thumb svg { width: 100%; height: 100%; display: block; }
+    .attach-chip .meta { min-width: 0; }
+    .attach-chip strong {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 108px;
+    }
+    .attach-chip .x {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      color: var(--stone);
+    }
+    .attach-chip .x:hover { background: var(--mist); color: var(--ink); }
+    .composer-mid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 0;
+    }
+    .mention-chip {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      width: max-content;
+      max-width: 100%;
+      padding: 2px 4px 2px 2px;
+      border: 1px solid rgba(13, 153, 255, 0.28);
+      border-radius: 999px;
+      background: var(--select-soft);
+    }
+    body[data-tagged="true"] .mention-chip { display: inline-flex; }
+    .mention-chip .thumb {
+      width: 18px;
+      height: 22px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--snow);
+      border: 1px solid rgba(13, 153, 255, 0.22);
+      flex-shrink: 0;
+    }
+    .mention-chip .thumb svg { width: 100%; height: 100%; display: block; }
+    .mention-chip .meta {
+      min-width: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      padding-right: 2px;
+    }
+    .mention-chip strong {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+    .mention-chip .handle {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--select);
+    }
+    .mention-chip .x {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      color: var(--stone);
+    }
+    .mention-chip .x:hover { background: #fff; color: var(--ink); }
+    .composer textarea {
+      width: 100%;
+      min-height: 52px;
+      resize: none;
+      border: 0;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      line-height: 1.55;
+      padding: 0 2px;
+    }
+    .composer textarea::placeholder { color: var(--stone); opacity: 0.72; }
+    .composer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 2px;
+      padding: 0 2px;
+    }
+    .send {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-left: auto;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--snow);
+    }
+    .send:hover { opacity: 0.92; }
+    .send:disabled { opacity: 0.28; cursor: default; }
+    .hist-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 2px 0 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .thread + .hist-head { margin-top: 12px; }
+    .hist-head span { font-weight: 400; color: var(--stone); }
+    .hist-empty {
+      padding: 10px 4px;
+      color: var(--stone);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .hist-list { display: flex; flex-direction: column; gap: 4px; }
+    .hist-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      text-align: left;
+      padding: 5px 6px;
+      border-radius: 10px;
+    }
+    .hist-item:hover { background: var(--paper); }
+    .hist-item[aria-current="true"] {
+      background: var(--select-soft);
+      box-shadow: inset 0 0 0 1px rgba(13,153,255,0.35);
+    }
+    .hist-item .mini {
+      width: 28px;
+      height: 34px;
+      border-radius: 5px;
+      overflow: hidden;
+      background: var(--paper);
+      border: 1px solid var(--mist);
+      flex-shrink: 0;
+    }
+    .hist-item .mini svg { width: 100%; height: 100%; display: block; }
+    .hist-item .nm { font-size: 11px; font-weight: 500; letter-spacing: -0.02em; }
+    .hist-item .kd { font-size: 10px; color: var(--stone); }
+    .badge-tag {
+      margin-left: auto;
+      height: 16px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--select);
+      font-size: 9px;
+      font-weight: 600;
+      line-height: 16px;
+      box-shadow: inset 0 0 0 1px rgba(13,153,255,0.35);
+    }
+    .hist-item .badge-svg { margin-left: 6px; }
+    .hist-item .badge-svg:first-of-type { margin-left: auto; }
+    .at-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      background: var(--select);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 600;
+    }
+    .badge-svg {
+      margin-left: auto;
+      height: 16px;
+      padding: 0 5px;
+      border-radius: 4px;
+      background: var(--ink);
+      color: var(--snow);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      line-height: 16px;
+    }
+    .panel-dock {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 12px 12px;
+      background: var(--snow);
+      border-top: 1px solid var(--mist);
+    }
+    .extract-box {
+      display: none;
+      padding: 10px 0 0;
+      background: transparent;
+    }
+    body[data-tagged="true"] .extract-box { display: block; }
+    .pill-dark, .pill-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 34px;
+      width: 100%;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .pill-dark { background: var(--ink); color: var(--snow); }
+    .pill-dark:hover { opacity: 0.92; }
+    .pill-dark:disabled { opacity: 0.3; cursor: default; }
+    .pill-ghost {
+      border: 1px solid var(--mist);
+      background: var(--snow);
+      margin-top: 6px;
+    }
+    .pill-ghost:hover { border-color: var(--fog); }
+    .mode-switch {
+      top: var(--inset);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      height: 40px;
+      padding: 4px;
+      border: 1px solid var(--mist);
+      border-radius: 999px;
+      background: var(--snow);
+      box-shadow: 0 1px 2px rgba(26,25,22,0.04);
+    }
+    .mode-switch button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--stone);
+    }
+    .mode-switch button[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--snow);
+    }
+    .avatars { display: flex; padding-right: 2px; }
+    .avatars i {
+      width: 24px;
+      height: 24px;
+      margin-left: -6px;
+      border-radius: 999px;
+      border: 2px solid var(--snow);
+      display: block;
+    }
+    .avatars i:first-child { margin-left: 0; }
+    .share-chip { width: max-content; padding-right: 8px; padding-left: 10px; }
+    .right-card {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--mist);
+      border-radius: 16px;
+      background: var(--snow);
+      box-shadow: 0 1px 2px rgba(26,25,22,0.04);
+    }
+    .rtabs {
+      display: flex;
+      gap: 2px;
+      padding: 8px 8px 0;
+      border-bottom: 1px solid var(--mist);
+    }
+    .rtabs span {
+      padding: 6px 10px 8px;
+      font-size: 12px;
+      color: var(--stone);
+    }
+    .rtabs span.on {
+      color: var(--ink);
+      font-weight: 500;
+      box-shadow: inset 0 -1px 0 var(--ink);
+    }
+    .rbody { padding: 12px; font-size: 12px; flex: 1; }
+    .rbody h3 { margin: 0 0 4px; font-size: 13px; font-weight: 600; letter-spacing: -0.02em; }
+    .muted { color: var(--stone); font-size: 11px; }
+    .prop-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 0;
+      border-top: 1px solid var(--mist);
+      font-size: 11px;
+    }
+    .export-note {
+      padding: 12px;
+      border-top: 1px solid var(--mist);
+    }
+    .export-note p { margin: 0 0 8px; font-size: 11px; font-weight: 500; color: var(--stone); }
+    .stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 64px 340px 36px 324px;
+      overflow: auto;
+    }
+    .boards {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      justify-content: center;
+      gap: 22px 20px;
+      width: 100%;
+      padding: 12px 0 8px;
+    }
+    body[data-scene="empty"] .boards { display: none; }
+    .idle-hint {
+      display: none;
+      text-align: center;
+      color: var(--stone);
+      font-size: 12px;
+      line-height: 1.55;
+      pointer-events: none;
+    }
+    .idle-hint b { display: block; color: var(--ink); font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+    body[data-scene="empty"] .idle-hint { display: block; }
+    .board-card {
+      width: 196px;
+      cursor: pointer;
+      animation: pop 280ms ease;
+    }
+    .boards[data-n="1"] .board-card { width: 268px; }
+    @keyframes pop {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to { opacity: 1; transform: none; }
+    }
+    .board-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 22px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--stone);
+    }
+    .board-card.is-selected .board-name { color: var(--select); }
+    .artboard {
+      position: relative;
+      aspect-ratio: 3 / 3.55;
+      border: 1px solid var(--mist);
+      border-radius: 4px;
+      background: #f7f5f1;
+      box-shadow: var(--float);
+      overflow: hidden;
+    }
+    .board-card.is-svg .artboard { background: #fbfaf7; }
+    .board-card.is-selected .artboard {
+      box-shadow: 0 0 0 1.5px var(--select), var(--float);
+    }
+    .board-card.is-selected .sel-tag {
+      display: block;
+    }
+    .sel-tag {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 18px;
+      padding: 0 7px;
+      background: var(--select);
+      color: #fff;
+      font-size: 10px;
+      line-height: 18px;
+      border-radius: 0 0 4px 0;
+      z-index: 2;
+    }
+    .svg-mark {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 2;
+      height: 18px;
+      padding: 0 6px;
+      border-radius: 4px;
+      background: var(--ink);
+      color: var(--snow);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      line-height: 18px;
+    }
+    .garment {
+      position: absolute;
+      inset: 12% 16% 10%;
+    }
+    .garment svg { width: 100%; height: 100%; display: block; }
+    .note-toast {
+      position: absolute;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      display: none;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--snow);
+      font-size: 11px;
+      z-index: 30;
+      white-space: nowrap;
+    }
+    .note-toast.show { display: block; }
+    @media (max-width: 1100px) {
+      .float-right { display: none; }
+      .stage { padding-right: 24px; }
+    }
+  </style>
+</head>
+<body data-scene="empty" data-attached="false" data-tagged="false">
+  <div class="grain"></div>
+  <div class="proto">
+    <span><strong>프로토타입 · 승인 전 목업</strong> · API·모델 미연결 · 보드 태깅으로 수정 · Design 좌측 레일 「생성」</span>
+    <nav class="proto-steps" aria-label="화면 이동">
+      <button type="button" data-demo="empty" aria-current="page">빈 대지</button>
+      <button type="button" data-demo="gen1">생성 1</button>
+      <button type="button" data-demo="gen2">생성 2</button>
+      <button type="button" data-demo="svg">SVG 변환</button>
+    </nav>
+  </div>
+
+  <div class="workspace">
+    <div class="note-toast" id="noteToast" role="status"></div>
+
+    <div class="stage">
+      <div class="idle-hint">
+        <b>대지가 비어 있습니다</b>
+        왼쪽 생성 바에서 보내면<br />디자인 보드가 여기에 올라갑니다.
+      </div>
+      <div class="boards" id="boards" data-n="0"></div>
+    </div>
+
+    <aside class="float-left">
+      <div class="chip">
+        <button type="button" class="icon-btn" aria-label="뒤로" id="backHome">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="title-block">
+          <p>Hoodie 26FW <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6f6c66" stroke-width="1.8"><path d="M6 9l6 6 6-6"/></svg> <span class="ver" id="headerVer">—</span></p>
+          <p>Atelier North · FD-26-041</p>
+        </div>
+        <button type="button" class="icon-btn" aria-label="사이드바" title="사이드바">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+        </button>
+      </div>
+
+      <div class="sidebar">
+        <nav class="rail" aria-label="디자인 레일">
+          <button type="button" class="rail-btn" data-tab="layers" title="레이어">
+            <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>
+            <span class="lbl">레이어</span>
+          </button>
+          <button type="button" class="rail-btn is-new" data-tab="generate" title="생성" aria-pressed="true">
+            <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" fill-opacity="0.22" stroke="currentColor" stroke-width="1.9"><path d="M12 3l1.2 4.2L17 8.5l-3.8 1.3L12 14l-1.2-4.2L7 8.5l3.8-1.3L12 3z"/><path d="M18 14l.6 2.1L20.5 17l-1.9.6L18 19.5l-.6-1.9L15.5 17l1.9-.9L18 14z"/></svg></span>
+            <span class="lbl">생성</span>
+          </button>
+          <button type="button" class="rail-btn" data-tab="templates" title="템플릿">
+            <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+            <span class="lbl">템플릿</span>
+          </button>
+          <button type="button" class="rail-btn" data-tab="fabrics" title="원단">
+            <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6c4 0 4 4 8 4s4-4 8-4"/><path d="M4 12c4 0 4 4 8 4s4-4 8-4"/><path d="M4 18c4 0 4 4 8 4s4-4 8-4"/></svg></span>
+            <span class="lbl">원단</span>
+          </button>
+          <button type="button" class="rail-btn" data-tab="assets" title="에셋">
+            <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></span>
+            <span class="lbl">에셋</span>
+          </button>
+          <button type="button" class="rail-btn" data-tab="upload" title="업로드">
+            <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M20 16v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3"/></svg></span>
+            <span class="lbl">업로드</span>
+          </button>
+          <button type="button" class="rail-btn" data-tab="favorites" title="즐겨찾기">
+            <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l2.4 6.8H21l-5.4 4.2 2 6.8L12 17.2 6.4 20.8l2-6.8L3 9.8h6.6L12 3z"/></svg></span>
+            <span class="lbl">즐겨찾기</span>
+          </button>
+        </nav>
+
+        <div class="panel">
+          <div class="panel-scroll">
+            <h2>생성</h2>
+
+            <section class="thread" id="thread" aria-label="프롬프트 히스토리">
+              <div class="thread-head">
+                <span>히스토리 <span class="thread-n" id="threadCount">0</span></span>
+              </div>
+              <p class="thread-empty" id="threadEmpty">보드를 고르면 이 보드의 생성·수정 프롬프트가 여기에 보입니다.</p>
+              <div class="thread-list" id="threadList" role="list"></div>
+            </section>
+
+            <div class="hist-head">대지 보드 <span id="histCount">0</span></div>
+            <div class="hist-empty" id="histEmpty">아직 없습니다. 보내면 여기에 목록이 쌓입니다. 본문은 대지입니다.</div>
+            <div class="hist-list" id="histList"></div>
+          </div>
+          <div class="panel-dock">
+            <div class="composer">
+              <div class="composer-mid">
+                <div class="mention-chip" id="mentionChip">
+                  <div class="thumb" id="mentionThumb"></div>
+                  <div class="meta">
+                    <strong id="mentionLabel">디자인 보드 · v3</strong>
+                    <span class="handle" id="mentionHandle">@v3</span>
+                  </div>
+                  <button type="button" class="x" id="untagBtn" aria-label="태그 제거">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                  </button>
+                </div>
+                <textarea id="promptText" rows="3" placeholder="오버사이즈 후드, 드롭숄더, 골지 1x1. 정면 도식화."></textarea>
+              </div>
+              <div class="composer-bar">
+                <button type="button" class="ref-pill" id="attachBtn" title="참조 이미지" aria-label="참조 이미지">
+                  <span class="plus" aria-hidden="true">
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+                  </span>
+                  참조
+                </button>
+                <div class="attach-chip" id="attachChip">
+                  <div class="thumb" id="attachThumb"></div>
+                  <div class="meta">
+                    <strong>lookbook-hoodie-26fw.jpg</strong>
+                  </div>
+                  <button type="button" class="x" id="detachBtn" aria-label="첨부 제거">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                  </button>
+                </div>
+                <button type="button" class="send" id="sendBtn" aria-label="보내기">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="extract-box" id="extractBox">
+              <button type="button" class="pill-dark" id="extractBtn">SVG로 변환하기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="mode-switch" role="tablist" aria-label="작업 모드">
+      <button type="button" aria-pressed="true">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#cfc4e4" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+        Design
+      </button>
+      <button type="button" id="techPackBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5a8a78" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        Tech Pack
+      </button>
+    </div>
+
+    <aside class="float-right">
+      <div class="chip share-chip">
+        <div class="avatars" aria-hidden="true">
+          <i style="background:#5d4e7a"></i>
+          <i style="background:#2f6b57"></i>
+          <i style="background:#8a4e32"></i>
+        </div>
+        <button type="button" class="icon-btn" title="공유" aria-label="공유">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4"/><path d="M15.4 6.5l-6.8 4"/></svg>
+        </button>
+        <button type="button" class="icon-btn" title="협업 패널">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg>
+        </button>
+      </div>
+      <div class="right-card">
+        <div class="rtabs">
+          <span class="on">속성</span>
+          <span>코멘트</span>
+          <span>버전</span>
+        </div>
+        <div class="rbody" id="propBody">
+          <h3>보드를 고르세요</h3>
+          <p class="muted">생성한 이미지는 사이드가 아니라 대지의 디자인 보드로 올라갑니다.</p>
+        </div>
+        <div class="export-note">
+          <p>보드 액션</p>
+          <button type="button" class="pill-dark" id="propExtract" disabled>SVG로 변환하기</button>
+          <button type="button" class="pill-ghost" id="saveAsset" style="display:none">에셋에 저장</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const LOOKS = [
+      { body: "#ece7df", hood: "#e2dbd1", rib: "#d4cdc3", pocket: "#e8e2d8", cave: "#f4f0ea", stroke: "#5e5850", stitch: "#7a746c", line: "#1a1916" },
+      { body: "#d7e6f5", hood: "#c5d8ec", rib: "#b7cce4", pocket: "#cfe0f2", cave: "#eef4fa", stroke: "#4a6580", stitch: "#5a7a98", line: "#2f4f6e" },
+      { body: "#d3ede3", hood: "#bfe0d2", rib: "#a8d0c0", pocket: "#c8e6d9", cave: "#eef7f3", stroke: "#2f6b57", stitch: "#3d7a66", line: "#1f4d3d" },
+      { body: "#f0d6c6", hood: "#e4c4ae", rib: "#d7b39a", pocket: "#ebcbb8", cave: "#f8ece4", stroke: "#8a4e32", stitch: "#a06048", line: "#6a3824" }
+    ];
+
+    const hoodie = (ver, style, look = 0) => {
+      const pal = LOOKS[look % LOOKS.length];
+      const short = (ver === "1" ? 0 : ver === "2" ? 16 : 24) + (look === 1 ? 10 : look === 2 ? -6 : look === 3 ? 12 : 0);
+      const cuffY = Math.max(118, Math.min(168, 154 - short));
+      const rib = ver === "3" || look === 2;
+      const fillBody = style === "line" ? "none" : pal.body;
+      const fillHood = style === "line" ? "none" : pal.hood;
+      const fillRib = style === "line" ? "none" : pal.rib;
+      const fillPocket = style === "line" ? "none" : pal.pocket;
+      const fillInner = style === "line" ? "none" : pal.cave;
+      const stroke = style === "line" ? pal.line : pal.stroke;
+      const sw = style === "line" ? (look ? 1.45 : 1.25) : 0.95;
+      const inner = style === "line" ? pal.line : pal.stitch;
+      const join = `stroke-linejoin="round" stroke-linecap="round"`;
+      const ribLines = rib
+        ? `<path d="M64 178.5 h32 M66 181.5 h28" stroke="${inner}" stroke-width="0.55"/>
+           <path d="M22 ${cuffY + 4} h12 M126 ${cuffY + 4} h12" stroke="${inner}" stroke-width="0.55"/>
+           <path d="M70 46 h20 M72 49 h16" stroke="${inner}" stroke-width="0.5"/>`
+        : "";
+      const lookMarks = look
+        ? `<path d="M68 108 h24" stroke="${inner}" stroke-width="0.7" opacity=".7"/>
+           <circle cx="80" cy="72" r="3.2" fill="none" stroke="${inner}" stroke-width="0.7"/>`
+        : "";
+      return `<svg viewBox="0 0 160 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 36 C52 18 108 18 110 36 L122 62 L80 78 L38 62 Z" fill="${fillHood}" stroke="${stroke}" stroke-width="${sw}" ${join}/>
+        <path d="M62 38 C64 28 96 28 98 38 L94 58 H66 Z" fill="${fillInner}" stroke="${inner}" stroke-width="0.7" ${join}/>
+        <path d="M74 36 v12 M86 36 v12" stroke="${inner}" stroke-width="0.7"/>
+        <path d="M38 62 L24 78 L18 ${cuffY} L38 ${cuffY} L48 86 L50 68 Z" fill="${fillBody}" stroke="${stroke}" stroke-width="${sw}" ${join}/>
+        <path d="M122 62 L136 78 L142 ${cuffY} L122 ${cuffY} L112 86 L110 68 Z" fill="${fillBody}" stroke="${stroke}" stroke-width="${sw}" ${join}/>
+        <path d="M18 ${cuffY} h20 v11 H18 Z" fill="${fillRib}" stroke="${stroke}" stroke-width="${sw}" ${join}/>
+        <path d="M122 ${cuffY} h20 v11 h-20 Z" fill="${fillRib}" stroke="${stroke}" stroke-width="${sw}" ${join}/>
+        <path d="M48 68 L38 62 L42 170 C44 180 116 180 118 170 L122 62 L110 68 L80 82 Z" fill="${fillBody}" stroke="${stroke}" stroke-width="${sw}" ${join}/>
+        <path d="M58 176 h44 v11 H58 Z" fill="${fillRib}" stroke="${stroke}" stroke-width="${sw}" ${join}/>
+        <path d="M56 116 h48 v26 h-14 l-10 9-10-9 H56 Z" fill="${fillPocket}" stroke="${inner}" stroke-width="0.75" ${join}/>
+        <path d="M80 82 v34" stroke="${inner}" stroke-width="0.5" stroke-dasharray="2 1.6"/>
+        <path d="M48 86 C52 118 52 140 50 168" stroke="${inner}" stroke-width="0.5" opacity=".55"/>
+        <path d="M112 86 C108 118 108 140 110 168" stroke="${inner}" stroke-width="0.5" opacity=".55"/>
+        ${ribLines}
+        ${lookMarks}
+      </svg>`;
+    };
+
+    const ITERATE = [
+      "오버사이즈 후드, 드롭숄더, 힙라인 기장. 본체 기모 플리스, 캡·커프·밑단 1×1 골지. 정면, 배경 없음.",
+      "같은 실루엣, 소매 기장 짧게. 골지 1×1 유지, 캥거루 포켓 입구만 좁히기.",
+      "기장 힙라인 유지, 캡 골지 두 단. 봉제선 강조, 도식화 조명."
+    ];
+
+    const PLACE_CREATE = "오버사이즈 후드, 드롭숄더, 골지 1x1. 정면 도식화.";
+    const PLACE_EDIT = "오버사이즈 후드, 드롭숄더, 골지 1x1. 정면 도식화.";
+
+    const state = {
+      boards: [],
+      prompts: [],
+      selectedId: null,
+      taggedId: null,
+      attached: false,
+      genCount: 0,
+      promptSeq: 0
+    };
+
+    const promptEl = document.getElementById("promptText");
+    const boardsEl = document.getElementById("boards");
+    const histList = document.getElementById("histList");
+    const histEmpty = document.getElementById("histEmpty");
+    const histCount = document.getElementById("histCount");
+    const threadList = document.getElementById("threadList");
+    const threadCount = document.getElementById("threadCount");
+    const threadEmpty = document.getElementById("threadEmpty");
+    const extractBtn = document.getElementById("extractBtn");
+    const propExtract = document.getElementById("propExtract");
+    const saveAsset = document.getElementById("saveAsset");
+    const propBody = document.getElementById("propBody");
+
+    const selected = () => state.boards.find((b) => b.id === state.selectedId) || null;
+    const tagged = () => state.boards.find((b) => b.id === state.taggedId) || null;
+
+    const verMark = (b) => {
+      const prime = b.editCount ? "′" : "";
+      return b.kind === "svg" ? "svg" + prime : "v" + b.ver + prime;
+    };
+
+    const boardLabel = (b) => {
+      if (b.kind === "svg") return "디자인 보드 · SVG" + (b.editCount ? "′" : "");
+      return "디자인 보드 · v" + b.ver + (b.editCount ? "′" : "");
+    };
+
+    const mentionAt = (b) => "@" + verMark(b);
+
+    const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+
+    const relTime = (ts) => {
+      const s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+      if (s < 45) return "방금";
+      if (s < 3600) return Math.round(s / 60) + "분 전";
+      return new Date(ts).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false });
+    };
+
+    const promptAct = (p) => {
+      const mark = p.kind === "svg" ? "svg" : "v" + p.ver;
+      return p.action === "edit" ? mark + " 수정" : mark + " 생성";
+    };
+
+    const recordPrompt = (text, board, action, at) => {
+      if (!board) return;
+      state.promptSeq += 1;
+      state.prompts.push({
+        id: "p" + state.promptSeq,
+        text,
+        boardId: board.id,
+        ver: board.ver,
+        kind: board.kind,
+        action,
+        tag: mentionAt(board),
+        at: at || Date.now()
+      });
+    };
+
+    const garment = (b) => hoodie(b.ver, b.kind === "svg" ? "line" : "raster", b.look || 0);
+
+    const sceneName = () => {
+      const rasters = state.boards.filter((b) => b.kind === "raster").length;
+      const hasSvg = state.boards.some((b) => b.kind === "svg");
+      if (hasSvg) return "svg";
+      if (rasters >= 2) return "gen2";
+      if (rasters === 1) return "gen1";
+      return "empty";
+    };
+
+    const toast = (msg) => {
+      const el = document.getElementById("noteToast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+    };
+
+    const canConvert = (b) => {
+      return !!(b && b.kind === "raster" && !state.boards.some((x) => x.sourceId === b.id));
+    };
+
+    const render = () => {
+      const scene = sceneName();
+      document.body.dataset.scene = scene === "empty" ? "empty" : "boards";
+      document.body.dataset.attached = state.attached ? "true" : "false";
+      document.body.dataset.tagged = state.taggedId ? "true" : "false";
+      document.querySelectorAll(".proto-steps [data-demo]").forEach((b) => {
+        b.setAttribute("aria-current", b.dataset.demo === scene ? "page" : "false");
+      });
+      history.replaceState(null, "", "#" + scene);
+
+      const n = state.boards.length;
+      boardsEl.dataset.n = String(n);
+      boardsEl.innerHTML = state.boards.map((b) => {
+        const on = b.id === state.selectedId;
+        const isTag = b.id === state.taggedId;
+        return `<article class="board-card${on ? " is-selected" : ""}${b.kind === "svg" ? " is-svg" : ""}" data-id="${b.id}">
+          <div class="board-name">${isTag ? '<span class="at-mark">@</span>' : ""}${b.label}</div>
+          <div class="artboard">
+            <span class="sel-tag">${isTag ? mentionAt(b) + " · " : ""}${b.label}</span>
+            ${b.kind === "svg" ? '<span class="svg-mark">SVG</span>' : ""}
+            <div class="garment">${garment(b)}</div>
+          </div>
+        </article>`;
+      }).join("");
+
+      histCount.textContent = String(n);
+      histEmpty.hidden = n > 0;
+      const shown = state.taggedId
+        ? state.prompts.filter((p) => p.boardId === state.taggedId)
+        : [];
+      threadCount.textContent = String(shown.length);
+      threadEmpty.hidden = shown.length > 0;
+      threadEmpty.textContent = state.taggedId
+        ? "이 보드의 생성·수정 프롬프트가 아직 없습니다."
+        : "보드를 고르면 이 보드의 생성·수정 프롬프트가 여기에 보입니다.";
+      threadList.innerHTML = shown.map((p) => {
+        return `<button type="button" class="thread-item" data-prompt-id="${p.id}" role="listitem">
+          <div class="thread-text">${escapeHtml(p.text)}</div>
+          <div class="thread-meta">
+            <span class="thread-act">${escapeHtml(promptAct(p))}</span>
+            ${p.action === "edit" ? '<span class="thread-tag">' + escapeHtml(p.tag) + "</span>" : ""}
+            <span>${relTime(p.at)}</span>
+          </div>
+        </button>`;
+      }).join("");
+      if (shown.length) threadList.scrollTop = threadList.scrollHeight;
+
+      histList.innerHTML = state.boards.map((b) => {
+        const on = b.id === state.selectedId;
+        const isTag = b.id === state.taggedId;
+        return `<button type="button" class="hist-item" data-id="${b.id}" aria-current="${on ? "true" : "false"}">
+          <div class="mini">${garment(b)}</div>
+          <div>
+            <div class="nm">${b.label}</div>
+            <div class="kd">${b.kind === "svg" ? "라인 SVG" : "래스터"}${b.editCount ? " · 수정됨" : ""}</div>
+          </div>
+          ${isTag ? '<span class="badge-tag">' + mentionAt(b) + "</span>" : ""}
+          ${b.kind === "svg" ? '<span class="badge-svg">SVG</span>' : ""}
+        </button>`;
+      }).join("");
+
+      const b = selected();
+      const t = tagged();
+      const dockOk = canConvert(t);
+      const propOk = canConvert(b);
+      extractBtn.disabled = !dockOk;
+      propExtract.disabled = !propOk;
+      saveAsset.style.display = b && b.kind === "svg" ? "inline-flex" : "none";
+      document.getElementById("headerVer").textContent = b ? (b.kind === "svg" ? "SVG" : "V" + b.ver + (b.editCount ? "′" : "")) : "—";
+      promptEl.placeholder = t ? PLACE_EDIT : PLACE_CREATE;
+
+      if (t) {
+        document.getElementById("mentionLabel").textContent = t.label;
+        document.getElementById("mentionHandle").textContent = mentionAt(t);
+        document.getElementById("mentionThumb").innerHTML = garment(t);
+      }
+
+      if (!b) {
+        propBody.innerHTML = `<h3>보드를 고르세요</h3><p class="muted">생성한 이미지는 사이드가 아니라 대지의 디자인 보드로 올라갑니다. 보드를 누르면 프롬프트에 태깅됩니다.</p>`;
+      } else if (b.kind === "svg") {
+        propBody.innerHTML = `<h3>${b.label}</h3><p class="muted">라인 SVG · 794 × 1123</p>
+          <div class="prop-row"><span>종류</span><span>벡터 라인</span></div>
+          <div class="prop-row"><span>원본</span><span>디자인 보드 · v${b.ver}</span></div>
+          <p class="muted" style="margin-top:12px;line-height:1.45">래스터 옆에 올린 형제 보드입니다. 태깅한 뒤 보내면 이 SVG가 제자리에서 수정됩니다.</p>`;
+      } else {
+        propBody.innerHTML = `<h3>${b.label}</h3><p class="muted">래스터 · 794 × 1123</p>
+          <div class="prop-row"><span>종류</span><span>생성 이미지</span></div>
+          <div class="prop-row"><span>버전</span><span>v${b.ver}${b.editCount ? "′" : ""}</span></div>
+          <p class="muted" style="margin-top:12px;line-height:1.45">프롬프트에 태깅한 뒤 보내면 이 보드가 수정됩니다. 확정되면 SVG로 변환합니다.</p>`;
+      }
+
+      document.getElementById("attachThumb").innerHTML = hoodie("1", "raster");
+    };
+
+    const selectBoard = (id) => {
+      state.selectedId = id;
+      state.taggedId = id;
+      render();
+      promptEl.focus();
+    };
+
+    const clearTag = () => {
+      state.taggedId = null;
+      promptEl.placeholder = PLACE_CREATE;
+      render();
+    };
+
+    const addRaster = (silent) => {
+      if (state.genCount >= 3) {
+        toast("이 목업은 세 장까지입니다");
+        return false;
+      }
+      state.genCount += 1;
+      const id = "r" + state.genCount;
+      const board = {
+        id,
+        kind: "raster",
+        ver: String(state.genCount),
+        look: 0,
+        editCount: 0,
+        label: "디자인 보드 · v" + state.genCount
+      };
+      board.label = boardLabel(board);
+      state.boards.push(board);
+      state.selectedId = id;
+      state.taggedId = null;
+      const next = ITERATE[Math.min(state.genCount, ITERATE.length - 1)];
+      promptEl.value = next;
+      promptEl.placeholder = PLACE_CREATE;
+      render();
+      if (!silent) toast("디자인 보드 v" + state.genCount + "를 대지에 올렸습니다");
+      return true;
+    };
+
+    const editTagged = () => {
+      const b = tagged();
+      if (!b) return false;
+      b.look = ((b.look || 0) + 1) % LOOKS.length;
+      b.editCount = (b.editCount || 0) + 1;
+      b.label = boardLabel(b);
+      state.selectedId = b.id;
+      promptEl.value = "";
+      promptEl.placeholder = PLACE_EDIT;
+      render();
+      toast(b.kind === "svg"
+        ? "태깅된 SVG 보드를 수정했습니다"
+        : b.label + "를 수정했습니다");
+      return true;
+    };
+
+    const sendPrompt = () => {
+      const typed = promptEl.value.trim();
+      if (state.taggedId) {
+        const b = tagged();
+        const text = typed || "이 보드를 다듬기";
+        if (!editTagged()) return;
+        recordPrompt(text, b, "edit");
+        render();
+        return;
+      }
+      const text = typed || ITERATE[Math.min(state.genCount, ITERATE.length - 1)];
+      if (!addRaster(false)) return;
+      recordPrompt(text, selected(), "create");
+      render();
+    };
+
+    const extractSvg = (silent) => {
+      const b = tagged() || selected();
+      if (!b || b.kind !== "raster") {
+        toast("래스터 보드를 고른 뒤 변환합니다");
+        return;
+      }
+      if (state.boards.some((x) => x.sourceId === b.id)) {
+        toast("이 보드의 SVG는 이미 대지에 있습니다");
+        return;
+      }
+      const id = "svg-" + b.id;
+      const idx = state.boards.findIndex((x) => x.id === b.id);
+      state.boards.splice(idx + 1, 0, {
+        id,
+        kind: "svg",
+        ver: b.ver,
+        look: 0,
+        editCount: 0,
+        label: "디자인 보드 · SVG",
+        sourceId: b.id
+      });
+      state.selectedId = id;
+      render();
+      if (!silent) toast("SVG 보드를 옆에 올렸습니다");
+    };
+
+    const applyDemo = (name) => {
+      state.boards = [];
+      state.prompts = [];
+      state.promptSeq = 0;
+      state.selectedId = null;
+      state.taggedId = null;
+      state.genCount = 0;
+      state.attached = name !== "empty";
+      const now = Date.now();
+      if (name === "empty") {
+        promptEl.value = "";
+        promptEl.placeholder = PLACE_CREATE;
+        render();
+        return;
+      }
+      addRaster(true);
+      recordPrompt(ITERATE[0], selected(), "create", now - 180000);
+      if (name === "gen1") {
+        promptEl.value = ITERATE[1];
+        render();
+        return;
+      }
+      addRaster(true);
+      recordPrompt(ITERATE[1], selected(), "create", now - 90000);
+      if (name === "gen2") {
+        promptEl.value = ITERATE[2];
+        render();
+        return;
+      }
+      extractSvg(true);
+      render();
+    };
+
+    document.getElementById("sendBtn").addEventListener("click", sendPrompt);
+    promptEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        sendPrompt();
+      }
+    });
+    document.getElementById("attachBtn").addEventListener("click", () => {
+      state.attached = true;
+      render();
+      toast("참조 이미지를 프롬프트에 붙였습니다");
+    });
+    document.getElementById("detachBtn").addEventListener("click", () => {
+      state.attached = false;
+      render();
+    });
+    document.getElementById("untagBtn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      clearTag();
+    });
+    extractBtn.addEventListener("click", () => extractSvg(false));
+    propExtract.addEventListener("click", () => extractSvg(false));
+    saveAsset.addEventListener("click", () => toast("에셋에 저장했습니다 · 목업"));
+    boardsEl.addEventListener("click", (e) => {
+      const card = e.target.closest("[data-id]");
+      if (card) selectBoard(card.dataset.id);
+    });
+    histList.addEventListener("click", (e) => {
+      const item = e.target.closest("[data-id]");
+      if (item) selectBoard(item.dataset.id);
+    });
+    threadList.addEventListener("click", (e) => {
+      const item = e.target.closest("[data-prompt-id]");
+      if (!item) return;
+      const prompt = state.prompts.find((p) => p.id === item.dataset.promptId);
+      if (!prompt) return;
+      promptEl.value = prompt.text;
+      promptEl.focus();
+    });
+    document.querySelectorAll("[data-demo]").forEach((b) => {
+      b.addEventListener("click", () => applyDemo(b.dataset.demo));
+    });
+    document.getElementById("techPackBtn").addEventListener("click", () => {
+      toast("이 기능은 Design · 생성 탭입니다. Tech Pack이 아닙니다.");
+    });
+    document.querySelectorAll(".rail-btn").forEach((b) => {
+      b.addEventListener("click", () => {
+        if (b.dataset.tab === "generate") {
+          document.querySelectorAll(".rail-btn").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+          return;
+        }
+        toast("목업 — 생성 탭만 동작합니다");
+      });
+    });
+    document.getElementById("backHome").addEventListener("click", () => applyDemo("empty"));
+
+    const hash = location.hash.replace("#", "");
+    if (["empty", "gen1", "gen2", "svg"].includes(hash)) applyDemo(hash);
+    else render();
+    window.addEventListener("hashchange", () => {
+      const next = location.hash.replace("#", "");
+      if (["empty", "gen1", "gen2", "svg"].includes(next)) applyDemo(next);
+    });
+  </script>
+</body>
+</html>

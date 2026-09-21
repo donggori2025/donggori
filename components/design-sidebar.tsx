@@ -11,22 +11,22 @@ import {
   LayoutGrid,
   LayoutTemplate,
   Layers,
-  PanelLeftClose,
   PenTool,
-  Ruler,
+  Plus,
+  Sparkles,
   Star,
   SwatchBook,
   Type,
   Upload,
 } from "lucide-react";
-import { collections } from "@/lib/data";
 import { readFilesAsProductFiles } from "@/lib/product-files";
 import { useWorkspace } from "@/lib/store";
 import type { CanvasNode, CanvasNodeType, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { partsForCategory } from "./flats";
+import { GeneratePanel } from "./generate-panel";
 
-type RailId = "layers" | "templates" | "fabrics" | "assets" | "upload" | "favorites";
+type RailId = "layers" | "templates" | "fabrics" | "assets" | "generate" | "upload" | "favorites";
 type LayerKind = "page" | "frame" | "group" | "text" | "image" | "vector";
 
 type LayerRow = {
@@ -34,11 +34,14 @@ type LayerRow = {
   name: string;
   kind: LayerKind;
   target: { id: string; label: string };
+  spec?: boolean;
+  canSpec?: boolean;
   children?: LayerRow[];
 };
 
-const RAIL: { id: RailId; label: string; icon: typeof Layers }[] = [
+const RAIL: { id: RailId; label: string; icon: typeof Layers; accent?: boolean }[] = [
   { id: "layers", label: "레이어", icon: Layers },
+  { id: "generate", label: "생성", icon: Sparkles, accent: true },
   { id: "templates", label: "템플릿", icon: LayoutTemplate },
   { id: "fabrics", label: "원단", icon: SwatchBook },
   { id: "assets", label: "에셋", icon: LayoutGrid },
@@ -92,6 +95,8 @@ function buildLayerTree(product: Product): LayerRow[] {
     id: node.id,
     name: node.title,
     kind: "frame" as const,
+    spec: node.type === "flat" && node.boardKind === "specs",
+    canSpec: node.type === "flat",
     target: { id: node.id, label: node.title },
     children: nodeChildren(node, product.category),
   }));
@@ -110,15 +115,15 @@ function KindIcon({ kind }: { kind: LayerKind }) {
 export function DesignSidebar({
   product,
   selectedTarget,
+  selectRev = 0,
   onSelectTarget,
-  onCollapse,
 }: {
   product: Product;
   selectedTarget: { id: string; label: string } | null;
+  selectRev?: number;
   onSelectTarget: (t: { id: string; label: string } | null) => void;
-  onCollapse: () => void;
 }) {
-  const { assets, addNode, createAsset, updateSpecsField } = useWorkspace();
+  const { assets, addNode, createAsset, updateSpecsField, setSpecArtboard, useOnArtboard } = useWorkspace();
   const [tab, setTab] = useState<RailId>("layers");
   const [query, setQuery] = useState("");
   const [starred, setStarred] = useState<Set<string>>(new Set());
@@ -126,7 +131,6 @@ export function DesignSidebar({
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const collection = collections.find((c) => c.id === product.collectionId);
   const tree = useMemo(() => buildLayerTree(product), [product]);
   const productAssets = assets.filter((a) => a.workspaceId === product.workspaceId || a.uploaded);
   const designAssets = productAssets.filter((a) => a.group === "design");
@@ -172,11 +176,12 @@ export function DesignSidebar({
   };
 
   return (
-    <aside className="flex h-full shrink-0 border-r border-mist bg-paper text-[11px] text-ink">
-      <nav className="flex w-[56px] shrink-0 flex-col items-center gap-0.5 pt-2">
+    <aside className="flex h-full min-h-0 overflow-hidden rounded-2xl border border-mist bg-snow text-[11px] text-ink shadow-sm">
+      <nav className="flex w-[56px] shrink-0 flex-col items-center gap-0.5 bg-paper pt-2">
         {RAIL.map((item) => {
           const Icon = item.icon;
           const active = tab === item.id;
+          const accent = Boolean(item.accent);
           return (
             <button
               key={item.id}
@@ -190,15 +195,24 @@ export function DesignSidebar({
               <span
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-[8px]",
-                  active ? "bg-mist text-ink" : "text-stone hover:bg-snow/80",
+                  active
+                    ? "bg-mist text-ink"
+                    : accent
+                      ? "bg-mint/70 text-ink hover:bg-mint"
+                      : "text-stone hover:bg-snow/80",
                 )}
               >
-                <Icon size={16} strokeWidth={1.7} />
+                <Icon
+                  size={16}
+                  strokeWidth={accent ? 1.9 : 1.7}
+                  fill={accent ? "currentColor" : "none"}
+                  className={accent ? "[fill-opacity:0.22]" : undefined}
+                />
               </span>
               <span
                 className={cn(
                   "w-full text-center text-[9px] leading-[1.15] tracking-tight",
-                  active ? "font-medium text-ink" : "text-stone",
+                  active ? "font-medium text-ink" : accent ? "font-semibold text-ink" : "text-stone",
                 )}
               >
                 {item.label}
@@ -208,28 +222,17 @@ export function DesignSidebar({
         })}
       </nav>
 
-      <div className="flex w-[248px] min-w-0 flex-col border-l border-mist bg-snow">
-          <div className="flex h-11 shrink-0 items-center gap-2 border-b border-mist px-3">
-            <div className="min-w-0 flex-1">
-              <p className="flex items-center gap-1 truncate text-[12px] font-medium leading-none">
-                {product.name}
-                <ChevronDown size={12} className="shrink-0 text-stone/50" />
-              </p>
-              <p className="mt-1 truncate text-[10px] text-stone">
-                {collection?.name ?? "Workspace"} · {product.code}
-              </p>
+      <div className="flex w-[248px] min-w-0 min-h-0 flex-col border-l border-mist bg-snow">
+          {tab === "generate" ? (
+            <div className="flex min-h-0 flex-1 flex-col">
+            <GeneratePanel
+              product={product}
+              selectedTarget={selectedTarget}
+              selectRev={selectRev}
+              onSelectTarget={onSelectTarget}
+            />
             </div>
-            <button
-              type="button"
-              title="사이드바 접기"
-              aria-label="사이드바 접기"
-              onClick={onCollapse}
-              className="flex h-7 w-7 items-center justify-center rounded-md text-stone hover:bg-paper"
-            >
-              <PanelLeftClose size={14} />
-            </button>
-          </div>
-
+          ) : (
           <div className="min-h-0 flex-1 overflow-auto">
             {tab === "layers" && (
               <LayersPanel
@@ -249,12 +252,8 @@ export function DesignSidebar({
                 }
                 onSelect={onSelectTarget}
                 onStar={toggleStar}
-                onCreateBoard={(kind) =>
-                  addNode(product.id, "flat", {
-                    boardKind: kind,
-                    title: kind === "specs" ? "Specs용 도식화" : "일반 도식화",
-                  })
-                }
+                onCreateBoard={() => addNode(product.id, "flat", { boardKind: "general" })}
+                onSetSpec={(id) => setSpecArtboard(product.id, id)}
               />
             )}
             {tab === "templates" && (
@@ -262,7 +261,7 @@ export function DesignSidebar({
                 extras={templateAssets.map((a) => a.name)}
                 onInsert={(type) => {
                   if (type === "flat") {
-                    addNode(product.id, "flat", { boardKind: "general", title: "일반 도식화" });
+                    addNode(product.id, "flat", { boardKind: "general" });
                     return;
                   }
                   const host =
@@ -273,7 +272,14 @@ export function DesignSidebar({
               />
             )}
             {tab === "fabrics" && (
-              <FabricsPanel materials={product.specs.materials} library={fabricAssets} />
+              <FabricsPanel
+                product={product}
+                library={fabricAssets}
+                onUse={(field, itemId) => {
+                  const host = product.nodes.find((n) => n.type === "flat" && n.boardKind === "specs");
+                  if (host) useOnArtboard(product.id, host.id, field, itemId);
+                }}
+              />
             )}
             {tab === "assets" && <AssetsPanel items={designAssets} />}
             {tab === "upload" && (
@@ -293,35 +299,28 @@ export function DesignSidebar({
               />
             )}
           </div>
+          )}
         </div>
     </aside>
   );
 }
 
-function CreateBoard({ onCreate }: { onCreate: (kind: "general" | "specs") => void }) {
+function CreateBoard({ onCreate }: { onCreate: () => void }) {
   return (
-    <div className="flex flex-col gap-1.5 px-2 pt-3">
-      {(
-        [
-          { kind: "general" as const, title: "일반 도식화", hint: "작업용 · Tech Pack", Icon: PenTool },
-          { kind: "specs" as const, title: "spec용 도식화", hint: "스펙 연동", Icon: Ruler },
-        ] as const
-      ).map((item) => (
-        <button
-          key={item.kind}
-          type="button"
-          onClick={() => onCreate(item.kind)}
-          className="flex w-full items-center gap-2.5 rounded-2xl border border-dashed border-fog bg-snow px-2.5 py-2.5 text-left hover:border-stone"
-        >
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-paper text-ink">
-            <item.Icon size={14} strokeWidth={1.7} />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-[12px] font-semibold tracking-tight text-ink">{item.title}</span>
-            <span className="mt-0.5 block text-[10px] leading-tight text-stone">{item.hint}</span>
-          </span>
-        </button>
-      ))}
+    <div className="px-2 pt-3">
+      <button
+        type="button"
+        onClick={onCreate}
+        aria-label="디자인 보드 추가"
+        title="디자인 보드 추가"
+        className="flex w-full items-center gap-2.5 rounded-2xl border border-dashed border-fog bg-snow px-2.5 py-2.5 text-left hover:border-stone"
+      >
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-paper text-ink">
+          <Frame size={14} strokeWidth={1.7} />
+        </span>
+        <span className="min-w-0 flex-1 text-[12px] font-semibold tracking-tight text-ink">디자인 보드</span>
+        <Plus size={14} strokeWidth={1.8} className="shrink-0 text-stone" />
+      </button>
     </div>
   );
 }
@@ -337,6 +336,7 @@ function LayersPanel({
   onSelect,
   onStar,
   onCreateBoard,
+  onSetSpec,
 }: {
   tree: LayerRow[];
   query: string;
@@ -347,7 +347,8 @@ function LayersPanel({
   onToggle: (id: string) => void;
   onSelect: (t: { id: string; label: string }) => void;
   onStar: (id: string) => void;
-  onCreateBoard: (kind: "general" | "specs") => void;
+  onCreateBoard: () => void;
+  onSetSpec: (nodeId: string) => void;
 }) {
   return (
     <div>
@@ -376,6 +377,7 @@ function LayersPanel({
             onToggle={onToggle}
             onSelect={onSelect}
             onStar={onStar}
+            onSetSpec={onSetSpec}
           />
         ))}
       </div>
@@ -393,6 +395,7 @@ function LayerBranch({
   onToggle,
   onSelect,
   onStar,
+  onSetSpec,
 }: {
   row: LayerRow;
   depth: number;
@@ -403,6 +406,7 @@ function LayerBranch({
   onToggle: (id: string) => void;
   onSelect: (t: { id: string; label: string }) => void;
   onStar: (id: string) => void;
+  onSetSpec?: (nodeId: string) => void;
 }) {
   const hasKids = Boolean(row.children?.length);
   const open = !collapsed.has(row.id);
@@ -432,6 +436,22 @@ function LayerBranch({
         </button>
         <KindIcon kind={row.kind} />
         <span className="ml-1.5 min-w-0 flex-1 truncate text-[11px] leading-none">{row.name}</span>
+        {row.canSpec && onSetSpec && (
+          <button
+            type="button"
+            title={row.spec ? "spec용 도식화" : "spec용 도식화로 지정"}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!row.spec) onSetSpec(row.id);
+            }}
+            className={cn(
+              "mr-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-medium",
+              row.spec ? "bg-sky text-sky-ink" : "text-stone hover:bg-mist hover:text-ink",
+            )}
+          >
+            {row.spec ? "spec" : "spec으로"}
+          </button>
+        )}
         <button
           type="button"
           title="즐겨찾기"
@@ -460,6 +480,7 @@ function LayerBranch({
             onToggle={onToggle}
             onSelect={onSelect}
             onStar={onStar}
+            onSetSpec={onSetSpec}
           />
         ))}
     </div>
@@ -511,26 +532,93 @@ function TemplatesPanel({ extras, onInsert }: { extras: string[]; onInsert: (typ
 }
 
 function FabricsPanel({
-  materials,
+  product,
   library,
+  onUse,
 }: {
-  materials: Product["specs"]["materials"];
+  product: Product;
   library: { id: string; name: string; meta: string }[];
+  onUse: (
+    field: "usedMaterialIds" | "usedTrimIds" | "usedMeasurementPoms",
+    itemId: string,
+  ) => void;
 }) {
+  const host = product.nodes.find((n) => n.type === "flat" && n.boardKind === "specs");
+  const usedMats = new Set(host?.usedMaterialIds ?? []);
+  const usedTrims = new Set(host?.usedTrimIds ?? []);
+  const usedPoms = new Set(host?.usedMeasurementPoms ?? []);
   return (
     <div className="space-y-3 p-3">
-      <p className="text-[11px] font-medium text-stone">제품 원단</p>
-      {materials.length === 0 && <p className="text-[11px] text-stone">등록된 원단이 없습니다.</p>}
-      {materials.map((m) => (
-        <div key={m.id} className="flex items-center gap-2 rounded-lg border border-mist px-2 py-2">
+      <p className="text-[11px] font-medium text-stone">spec 도식화에 쓰는 항목</p>
+      {!host && (
+        <p className="text-[11px] leading-relaxed text-stone">레이어에서 spec용 도식화를 먼저 지정하세요. 지정한 항목이 작업지시서에 채워집니다.</p>
+      )}
+      <p className="text-[11px] font-medium text-stone">원단</p>
+      {product.specs.materials.length === 0 && <p className="text-[11px] text-stone">등록된 원단이 없습니다.</p>}
+      {product.specs.materials.map((m) => (
+        <button
+          key={m.id}
+          type="button"
+          disabled={!host}
+          onClick={() => onUse("usedMaterialIds", m.id)}
+          className={cn(
+            "flex w-full items-center gap-2 rounded-lg border px-2 py-2 text-left disabled:opacity-50",
+            usedMats.has(m.id) ? "border-ink bg-paper" : "border-mist hover:border-fog",
+          )}
+        >
           <span className="h-8 w-8 shrink-0 rounded-md border border-mist" style={{ background: m.color }} />
           <div className="min-w-0">
             <p className="truncate font-medium">{m.name}</p>
             <p className="truncate text-[10px] text-stone">
               {m.composition} · {m.weight}
+              {usedMats.has(m.id) ? " · 사용 중" : ""}
             </p>
           </div>
-        </div>
+        </button>
+      ))}
+      <p className="pt-1 text-[11px] font-medium text-stone">부자재</p>
+      {product.specs.trims.length === 0 && <p className="text-[11px] text-stone">등록된 부자재가 없습니다.</p>}
+      {product.specs.trims.map((t) => (
+        <button
+          key={t.id}
+          type="button"
+          disabled={!host}
+          onClick={() => onUse("usedTrimIds", t.id)}
+          className={cn(
+            "flex w-full items-center gap-2 rounded-lg border px-2 py-2 text-left disabled:opacity-50",
+            usedTrims.has(t.id) ? "border-ink bg-paper" : "border-mist hover:border-fog",
+          )}
+        >
+          <div className="min-w-0">
+            <p className="truncate font-medium">{t.name}</p>
+            <p className="truncate text-[10px] text-stone">
+              {[t.type, t.color].filter(Boolean).join(" · ")}
+              {usedTrims.has(t.id) ? " · 사용 중" : ""}
+            </p>
+          </div>
+        </button>
+      ))}
+      <p className="pt-1 text-[11px] font-medium text-stone">측정</p>
+      {product.specs.measurements.length === 0 && <p className="text-[11px] text-stone">등록된 측정 항목이 없습니다.</p>}
+      {product.specs.measurements.map((row) => (
+        <button
+          key={row.pom}
+          type="button"
+          disabled={!host}
+          onClick={() => onUse("usedMeasurementPoms", row.pom)}
+          className={cn(
+            "flex w-full items-center gap-2 rounded-lg border px-2 py-2 text-left disabled:opacity-50",
+            usedPoms.has(row.pom) ? "border-ink bg-paper" : "border-mist hover:border-fog",
+          )}
+        >
+          <div className="min-w-0">
+            <p className="truncate font-medium">{row.label || row.pom}</p>
+            <p className="truncate text-[10px] text-stone">
+              POM {row.pom}
+              {usedPoms.has(row.pom) ? " · 사용 중" : ""}
+            </p>
+          </div>
+        </button>
       ))}
       {library.length > 0 && (
         <div>

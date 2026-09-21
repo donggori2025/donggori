@@ -23,7 +23,8 @@ export function CollabRail({
   onViewVersion: (id: string | null) => void;
 }) {
   const { comments, addComment, currentUserId } = useWorkspace();
-  const [tab, setTab] = useState<CollabTab>(mode === "design" ? "properties" : "comments");
+  const isPack = mode !== "design";
+  const [tab, setTab] = useState<CollabTab>(isPack ? "comments" : "properties");
   const [draft, setDraft] = useState("");
 
   useEffect(() => {
@@ -31,40 +32,50 @@ export function CollabRail({
   }, [mode]);
 
   const productComments = comments.filter((c) => c.productId === product.id);
-  const tabs =
-    mode === "design"
+  const tabs = (
+    isPack
       ? ([
-          ["properties", "속성"],
           ["comments", "코멘트"],
           ["versions", "버전"],
         ] as const)
       : ([
+          ["properties", "속성"],
           ["comments", "코멘트"],
           ["versions", "버전"],
-        ] as const);
+        ] as const)
+  );
+
+  const tabsBar = (
+    <div className="flex gap-5 border-b border-mist px-4">
+      {tabs.map(([id, label]) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => setTab(id)}
+          className={cn(
+            "-mb-px border-b-2 py-3 text-[13px] tracking-tight",
+            tab === id ? "border-ink font-medium text-ink" : "border-transparent text-stone",
+          )}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (tab === "properties" && !isPack) {
+    return (
+      <div className="flex h-full min-h-0 w-full flex-col">
+        <PropertiesPanel product={product} selectedTarget={selectedTarget} tabs={tabsBar} />
+      </div>
+    );
+  }
 
   return (
-    <aside className="flex h-full w-[320px] shrink-0 flex-col border-l border-mist bg-snow">
-      <div className="flex gap-5 border-b border-mist px-4">
-        {tabs.map(([id, label]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setTab(id)}
-            className={cn(
-              "-mb-px border-b-2 py-3 text-[13px] tracking-tight",
-              tab === id ? "border-ink font-medium text-ink" : "border-transparent text-stone",
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+    <aside className="flex h-full min-h-0 w-full shrink-0 flex-col overflow-hidden rounded-2xl border border-mist bg-snow shadow-sm">
+      {tabsBar}
 
-      {tab === "properties" ? (
-        <PropertiesPanel product={product} selectedTarget={selectedTarget} />
-      ) : (
-        <div className="min-h-0 flex-1 overflow-auto p-3">
+      <div className="min-h-0 flex-1 overflow-auto p-3">
         {tab === "comments" && (
           <div className="space-y-3">
             {selectedTarget && (
@@ -100,7 +111,6 @@ export function CollabRail({
         )}
 
       </div>
-      )}
 
       {tab === "comments" && (
         <form

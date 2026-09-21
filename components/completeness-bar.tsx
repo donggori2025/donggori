@@ -2,36 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
-import {
-  jumpSectionOf,
-  productCompleteness,
-  STAGE_META,
-  type CompletenessStage,
-} from "@/lib/product-readiness";
+import { jumpSectionOf, productCompleteness } from "@/lib/product-readiness";
 import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
-
-export function CompletenessBadge({
-  stage,
-  size = "sm",
-}: {
-  stage: CompletenessStage;
-  size?: "sm" | "md";
-}) {
-  const meta = STAGE_META[stage];
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full font-medium tracking-tight",
-        meta.tone,
-        meta.ink,
-        size === "sm" ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-[11px]",
-      )}
-    >
-      {meta.label}
-    </span>
-  );
-}
 
 export function CompletenessBar({
   percent,

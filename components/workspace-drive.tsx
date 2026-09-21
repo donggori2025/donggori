@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { FileText, Folder, Palette, Search, Upload } from "lucide-react";
-import { CompletenessBadge } from "@/components/completeness-bar";
+import { FileText, Folder, Search, Upload } from "lucide-react";
 import { CreateMenu } from "@/components/create-menu";
 import { DriveChips } from "@/components/drive-chips";
 import { DriveFileMenu } from "@/components/drive-file-menu";
 import { InviteTrigger, AVATAR_SIZE } from "@/components/invite-modal";
 import { NewProductModal } from "@/components/new-product-modal";
-import { WorkspaceBackdrop, WorkspaceBackgroundModal } from "@/components/workspace-backdrop";
+import { WorkspaceBackdrop } from "@/components/workspace-backdrop";
 import { collections, userById } from "@/lib/data";
 import { DRIVE_CHIP_LABEL, assetDriveChip, type DriveChipId } from "@/lib/drive";
 import { productCompleteness } from "@/lib/product-readiness";
@@ -56,7 +55,6 @@ export function WorkspaceDrive() {
   const [query, setQuery] = useState("");
   const [dialog, setDialog] = useState<"folder" | "techpack" | "gdrive" | null>(null);
   const [name, setName] = useState("");
-  const [bgOpen, setBgOpen] = useState(false);
 
   const items = useMemo<DriveItem[]>(() => {
     const customFolders: DriveItem[] = (currentWorkspace.folders ?? []).map((f) => ({
@@ -151,14 +149,6 @@ export function WorkspaceDrive() {
                 </span>
               </div>
             )}
-            <button
-              type="button"
-              onClick={() => setBgOpen(true)}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-mist bg-snow/90 px-3 text-[13px] text-ink hover:bg-snow"
-            >
-              <Palette size={14} />
-              배경
-            </button>
             <CreateMenu
               onFolder={() => {
                 setName("");
@@ -252,10 +242,7 @@ export function WorkspaceDrive() {
                                   <p className="truncate text-[11px] text-stone">{item.collection}</p>
                                 )}
                                 {item.completeness && (
-                                  <p className="mt-1 flex items-center gap-1.5 text-[11px] text-stone">
-                                    <CompletenessBadge stage={item.completeness.stage} />
-                                    {item.completeness.percent}%
-                                  </p>
+                                  <p className="mt-1 truncate text-[11px] text-stone">{item.completeness.percent}%</p>
                                 )}
                                 <p className="mt-0.5 truncate text-[11px] text-stone">
                                   {[item.people, item.updatedAt].filter(Boolean).join(" · ")}
@@ -422,9 +409,6 @@ export function WorkspaceDrive() {
             </div>
           </div>
         </div>
-      )}
-      {bgOpen && (
-        <WorkspaceBackgroundModal workspace={currentWorkspace} onClose={() => setBgOpen(false)} />
       )}
     </WorkspaceBackdrop>
   );

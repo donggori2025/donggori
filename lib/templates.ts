@@ -81,6 +81,38 @@ export function templateMatchesGroup(category: ProductCategory | undefined, grou
   return CATEGORY_GROUP[category] === group;
 }
 
+export function garmentTemplates() {
+  return serviceTemplates.filter((t) => t.category && !t.asset);
+}
+
+const QUERY_HINTS: { test: RegExp; categories?: ProductCategory[]; groups?: Exclude<TemplateGroupFilterId, "all">[] }[] = [
+  { test: /여름|아웃핏/, categories: ["tee", "pants", "skirt"] },
+  { test: /티셔츠|그래픽\s*티|\btee\b/, categories: ["tee"] },
+  { test: /코트|재킷|자켓|아우터|stadium/, categories: ["jacket"], groups: ["outer"] },
+  { test: /스커트|롱스커트|a라인/, categories: ["skirt"] },
+  { test: /원피스|드레스|dress/, groups: ["dress"] },
+  { test: /후디|후드|hoodie/, categories: ["hoodie"] },
+  { test: /팬츠|카고|바지/, categories: ["pants"] },
+  { test: /셔츠|옥스포드/, categories: ["shirt"] },
+  { test: /베스트|조끼|니트/, categories: ["vest", "knit"] },
+  { test: /상의/, groups: ["tops"] },
+  { test: /하의/, groups: ["bottoms"] },
+];
+
+export function templatesMatchingQuery(query: string, templates = garmentTemplates()) {
+  const q = query.trim().toLowerCase();
+  if (!q) return templates;
+  const hinted = QUERY_HINTS.filter((hint) => hint.test.test(q));
+  return templates.filter((t) => {
+    const blob = `${t.name} ${t.description} ${t.meta} ${t.category ?? ""}`.toLowerCase();
+    if (blob.includes(q)) return true;
+    return hinted.some((hint) => {
+      if (hint.categories && t.category && hint.categories.includes(t.category)) return true;
+      return Boolean(hint.groups?.some((group) => templateMatchesGroup(t.category, group)));
+    });
+  });
+}
+
 export interface ServiceTemplate {
   id: string;
   name: string;
@@ -147,6 +179,14 @@ export const serviceTemplates: ServiceTemplate[] = [
     category: "vest",
     description: "V넥 니트 베스트. 게이지와 넥 립 스펙을 바로 복제할 수 있습니다.",
     meta: "의류 · 베스트",
+  },
+  {
+    id: "tpl-skirt",
+    name: "Long A-line Skirt",
+    kind: "garment",
+    category: "skirt",
+    description: "A라인 롱스커트 도식화. 웨이스트와 헴 기준선이 들어 있습니다.",
+    meta: "의류 · 스커트",
   },
   {
     id: "tpl-main-label",

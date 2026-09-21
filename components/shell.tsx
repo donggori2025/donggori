@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from "react";
 import { LayoutGrid, LayoutTemplate, Library, PanelLeft, PanelLeftClose, Search, Trash2 } from "lucide-react";
 import { useWorkspace } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { StatusBadge } from "./ui";
 import { UserMenu } from "./user-menu";
 import { WorkspacePanel } from "./workspace-switcher";
 
@@ -69,9 +68,10 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
 
   const hideChrome =
     pathname === "/" || pathname.startsWith("/products/") || pathname.startsWith("/share/");
+  const fillViewport = pathname.startsWith("/products/");
 
   return (
-    <div className="grain flex h-screen overflow-hidden bg-paper text-ink">
+    <div className="grain flex h-full overflow-hidden bg-paper text-ink">
       {!hideChrome && (
         <aside
           className={cn(
@@ -129,7 +129,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             </button>
           </header>
         )}
-        <main className="min-h-0 flex-1 overflow-auto">{children}</main>
+        <main className={cn("min-h-0 flex-1", fillViewport ? "overflow-hidden" : "overflow-auto")}>{children}</main>
       </div>
 
       {searchOpen && (
@@ -166,7 +166,6 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                     <p className="text-[13px] font-medium">{p.name}</p>
                     <p className="text-[11px] text-stone">{p.code}</p>
                   </div>
-                  <StatusBadge status={p.status} size="sm" />
                 </button>
               ))}
             </div>

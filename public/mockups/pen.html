@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Faddit — Pen Drive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@380;450;560;680&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1c1c1c;
+      --mute: #6f6b66;
+      --line: #e6e1da;
+      --paper: #f6f4f1;
+      --snow: #fffcf9;
+      --orange: #ff5a3c;
+      --soft: #ffe8e3;
+      --file: 304px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: Outfit, "Apple SD Gothic Neo", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      overflow: hidden;
+    }
+    button, input { font: inherit; }
+    .app { display: flex; height: 100%; }
+    aside.rail {
+      width: 228px;
+      flex-shrink: 0;
+      background: var(--snow);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 8px;
+      padding: 18px 18px 8px;
+      font-weight: 680;
+      letter-spacing: -.05em;
+      font-size: 22px;
+    }
+    .profile {
+      display: flex; align-items: center; gap: 10px;
+      margin: 8px 14px 4px;
+      padding: 8px;
+      border-radius: 20px;
+    }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff8a73, #ff5a3c);
+      color: #fff;
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 560;
+      flex-shrink: 0;
+    }
+    .avatar.s { width: 28px; height: 28px; font-size: 11px; border: 2px solid var(--snow); margin-left: -8px; }
+    .avatar.s:first-child { margin-left: 0; }
+    .avatar.min { background: linear-gradient(135deg, #f3d6ff, #c9b6ff); color: #4a3d6b; }
+    .avatar.park { background: linear-gradient(135deg, #d8f3e8, #8ed9b6); color: #1f5c40; }
+    .avatar.kim { background: linear-gradient(135deg, #ffe7c2, #ffc978); color: #6a4a16; }
+    .who strong { display: block; font-size: 14px; font-weight: 560; letter-spacing: -.02em; }
+    .who span { font-size: 11px; color: var(--mute); }
+    nav { padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+    nav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--mute);
+      font-size: 13px;
+      font-weight: 450;
+      position: relative;
+    }
+    nav a.on {
+      background: var(--soft);
+      color: var(--ink);
+    }
+    nav a.on::before {
+      content: "";
+      position: absolute;
+      left: 6px; top: 10px; bottom: 10px;
+      width: 3px;
+      border-radius: 99px;
+      background: var(--orange);
+    }
+    .ws {
+      margin: 8px 16px 0;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: var(--paper);
+      font-size: 13px;
+      font-weight: 560;
+    }
+    .ws small { display: block; margin-top: 2px; color: var(--mute); font-weight: 450; font-size: 11px; }
+    .collapse {
+      margin: auto 16px 16px;
+      width: 36px; height: 36px;
+      border: 0; border-radius: 50%;
+      background: var(--paper);
+      color: var(--mute);
+      cursor: pointer;
+    }
+    .main { min-width: 0; flex: 1; display: flex; flex-direction: column; position: relative; }
+    .curve {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      opacity: .28;
+    }
+    .topbar {
+      height: 58px;
+      display: flex; align-items: center;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,252,249,.82);
+      z-index: 2;
+    }
+    .search {
+      display: flex; align-items: center; gap: 8px;
+      width: 300px; height: 36px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--mute);
+      font-size: 12px;
+    }
+    .search kbd {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 8px;
+      background: #ece7e1;
+    }
+    .back { margin-left: auto; color: var(--mute); text-decoration: none; font-size: 12px; }
+    .canvas { flex: 1; overflow: auto; z-index: 1; }
+    .inner { max-width: 1280px; margin: 0 auto; padding: 36px 32px 48px; }
+    .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+    .kicker { margin: 0; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); }
+    h1 { margin: 8px 0 0; font-size: 40px; letter-spacing: -.045em; font-weight: 680; line-height: 1; }
+    .sub { margin: 10px 0 0; color: var(--mute); font-size: 14px; }
+    .actions { display: flex; align-items: center; gap: 8px; }
+    .stack { display: flex; align-items: center; }
+    .round {
+      height: 36px; border-radius: 999px; cursor: pointer; font-size: 13px;
+    }
+    .ghost {
+      border: 1px solid var(--line);
+      background: rgba(255,252,249,.9);
+      padding: 0 14px;
+      color: var(--ink);
+    }
+    .plus {
+      width: 28px; height: 28px;
+      border: 1px solid var(--line);
+      background: var(--snow);
+      font-size: 18px;
+      margin-left: -4px;
+    }
+    .create {
+      border: 0;
+      background: var(--orange);
+      color: #fff;
+      padding: 0 16px;
+      font-weight: 560;
+    }
+    .find { position: relative; margin-top: 22px; }
+    .find svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--mute); }
+    .find input {
+      width: 100%; height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--snow);
+      padding: 0 18px 0 42px;
+      outline: none;
+      font-size: 13px;
+    }
+    .find input:focus { border-color: var(--orange); }
+    .chips { display: flex; gap: 8px; margin-top: 16px; overflow-x: auto; }
+    .chips button {
+      height: 32px; padding: 0 16px;
+      border: 0; border-radius: 999px;
+      background: var(--snow);
+      color: var(--ink);
+      font-size: 13px; font-weight: 450;
+      cursor: pointer;
+    }
+    .chips button.on { background: var(--ink); color: #fff; }
+    .layout { display: flex; gap: 22px; margin-top: 22px; }
+    .files { min-width: 0; flex: 1; }
+    .folders, .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(var(--file), var(--file)));
+      gap: 14px;
+    }
+    .folder, .card {
+      background: var(--snow);
+      border-radius: 28px;
+      box-shadow: 0 18px 50px rgba(28,28,28,.05);
+    }
+    .folder {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px;
+    }
+    .folder .ico {
+      width: 48px; height: 48px; border-radius: 18px;
+      background: linear-gradient(180deg, #fff4ef, #f3eee6);
+      display: grid; place-items: center;
+      color: var(--orange);
+    }
+    .folder p, .card p { margin: 0; font-size: 13px; font-weight: 560; letter-spacing: -.02em; }
+    .folder small, .card small { display: block; font-size: 11px; color: var(--mute); font-weight: 450; }
+    .section { margin-bottom: 18px; }
+    .card { width: var(--file); padding: 14px 14px 16px; }
+    .thumb {
+      height: 132px;
+      border-radius: 22px;
+      background: #f3eee6;
+      display: grid; place-items: center;
+    }
+    .thumb.lavender { background: linear-gradient(180deg, #efe7ff, #f7f4ff); }
+    .meta { margin-top: 12px; }
+    .badge {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+    .side { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
+    .panel {
+      background: var(--snow);
+      border-radius: 24px;
+      padding: 16px 18px;
+      box-shadow: 0 18px 50px rgba(28,28,28,.05);
+    }
+    .panel h2 { margin: 0 0 10px; font-size: 13px; font-weight: 560; }
+    .task { display: flex; gap: 10px; padding: 8px 0; }
+    .task p { margin: 0; font-size: 12px; }
+    .task small { font-size: 11px; color: var(--mute); }
+    .create-wrap { position: relative; }
+    .create-menu {
+      display: none;
+      position: absolute; right: 0; top: 44px;
+      width: 220px;
+      padding: 8px;
+      background: var(--snow);
+      border-radius: 20px;
+      box-shadow: 0 18px 50px rgba(28,28,28,.1);
+      z-index: 20;
+    }
+    .create-menu.open { display: block; }
+    .create-menu button {
+      display: block; width: 100%;
+      border: 0; background: none;
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .create-menu button:hover { background: var(--soft); }
+    @media (max-width: 1100px) { .side { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail">
+      <div class="brand">
+        <svg width="28" height="28" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <path d="M18 52 C18 28 22 12 40 12 C52 12 56 20 56 28" stroke="#ff5a3c" stroke-width="9" stroke-linecap="round"/>
+          <path d="M22 32 H52" stroke="#ff5a3c" stroke-width="9" stroke-linecap="round"/>
+        </svg>
+        faddit
+      </div>
+      <div class="profile">
+        <span class="avatar">한</span>
+        <div class="who"><strong>김한재</strong><span>jay@faddit.co.kr</span></div>
+      </div>
+      <nav>
+        <a class="on" href="#">대시보드</a>
+        <a href="#">템플릿</a>
+        <a href="#">라이브러리</a>
+        <a href="#">휴지통</a>
+      </nav>
+      <div class="ws">Atelier North<small>선이 이어지는 팀 공간</small></div>
+      <button class="collapse" type="button">‹</button>
+    </aside>
+    <div class="main">
+      <svg class="curve" viewBox="0 0 1200 800" preserveAspectRatio="none">
+        <path d="M-20 520 C 220 480, 280 220, 540 260 S 880 520, 1220 300" fill="none" stroke="#ff5a3c" stroke-width="1.2"/>
+        <path d="M-20 140 C 300 80, 480 240, 760 160 S 1100 40, 1220 90" fill="none" stroke="#1c1c1c" stroke-width=".8" opacity=".35"/>
+      </svg>
+      <header class="topbar">
+        <div class="search">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+          제품, 원단, 담당자 검색
+          <kbd>⌘K</kbd>
+        </div>
+        <a class="back" href="./index.html">컨셉 비교</a>
+      </header>
+      <div class="canvas">
+        <div class="inner">
+          <div class="head">
+            <div>
+              <p class="kicker">Team Workspace</p>
+              <h1>Atelier North</h1>
+              <p class="sub">4 Products · 5 Members</p>
+            </div>
+            <div class="actions">
+              <div class="stack">
+                <span class="avatar s min">민</span>
+                <span class="avatar s park">박</span>
+                <span class="avatar s kim">김</span>
+              </div>
+              <button class="round plus" type="button">+</button>
+              <button class="round ghost" type="button">배경</button>
+              <div class="create-wrap">
+                <button class="round create" id="createBtn" type="button">+ 생성하기</button>
+                <div class="create-menu" id="createMenu">
+                  <button type="button">폴더</button>
+                  <button type="button">제품 / Tech Pack</button>
+                  <button type="button">업로드</button>
+                  <button type="button">Google Drive</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="find">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+            <input placeholder="워크스페이스 검색" />
+          </div>
+          <div class="chips" id="chips">
+            <button class="on" data-chip="all" type="button">전체</button>
+            <button data-chip="techpack" type="button">제품</button>
+            <button data-chip="label" type="button">라벨</button>
+            <button data-chip="fabric" type="button">원단</button>
+            <button data-chip="print" type="button">인쇄물</button>
+            <button data-chip="trim" type="button">부자재</button>
+            <button data-chip="upload" type="button">업로드</button>
+          </div>
+          <div class="layout">
+            <div class="files">
+              <div class="section folders" id="folders">
+                <article class="folder">
+                  <div class="ico">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h6l2 2h10v10H3z"/></svg>
+                  </div>
+                  <div><p>26SS Collection</p><small>SS · 2026</small></div>
+                </article>
+                <article class="folder">
+                  <div class="ico">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h6l2 2h10v10H3z"/></svg>
+                  </div>
+                  <div><p>Core Basics</p><small>FW · 2025</small></div>
+                </article>
+              </div>
+              <div class="grid" id="grid">
+                <article class="card" data-kind="techpack">
+                  <div class="thumb">
+                    <svg width="120" height="132" viewBox="0 0 160 180" fill="none">
+                      <path d="M30 42 C 48 24, 70 28, 80 32 C 90 28, 112 24, 130 42 C 122 58, 116 56, 112 58 L 112 152 C 112 160, 48 160, 48 152 L 48 58 C 44 56, 38 58, 30 42 Z" fill="#f6efe4" stroke="#1c1c1c" stroke-width="1.4" stroke-linejoin="round"/>
+                      <path d="M62 84 C 70 80, 90 80, 98 84 L 98 108 C 90 112, 70 112, 62 108 Z" fill="none" stroke="#ff5a3c" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div class="meta">
+                    <p>Graphic Tee #03</p>
+                    <small>26SS-TS-03 · 26SS Collection</small>
+                    <span class="badge">Path · 62%</span>
+                  </div>
+                </article>
+                <article class="card" data-kind="techpack">
+                  <div class="thumb lavender">
+                    <svg width="90" height="110" viewBox="0 0 90 110" fill="none">
+                      <path d="M22 28 C 34 16, 56 16, 68 28 C 62 38, 60 38, 58 40 V 96 C 58 102, 32 102, 32 96 V 40 C 30 38, 28 38, 22 28 Z" fill="#efe7ff" stroke="#1c1c1c" stroke-width="1.3"/>
+                      <path d="M38 18 C 45 12, 52 18, 52 24" stroke="#ff5a3c" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div class="meta">
+                    <p>Atelier Hoodie</p>
+                    <small>26SS-HD-01 · 26SS Collection</small>
+                    <span class="badge">Review · 84%</span>
+                  </div>
+                </article>
+                <article class="card" data-kind="fabric">
+                  <div class="thumb">
+                    <div style="width:72px;height:72px;border-radius:28px;background:linear-gradient(135deg,#f3ebe0,#e7d3bf)"></div>
+                  </div>
+                  <div class="meta">
+                    <p>Cotton Jersey 240g</p>
+                    <small>원단 · 스와치</small>
+                  </div>
+                </article>
+                <article class="card" data-kind="print">
+                  <div class="thumb">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6f6b66" stroke-width="1.4"><path d="M14 3H6v18h12V8z"/><path d="M14 3v5h5"/></svg>
+                  </div>
+                  <div class="meta">
+                    <p>컬러웨이 보드.jpg</p>
+                    <small>인쇄물 · 이미지 · 1.4MB</small>
+                  </div>
+                </article>
+              </div>
+            </div>
+            <aside class="side">
+              <section class="panel">
+                <h2>My Tasks</h2>
+                <div class="task">
+                  <span class="avatar s min" style="margin:0">민</span>
+                  <div>
+                    <p>Graphic Tee #03</p>
+                    <small>인쇄 위치 확인 부탁드려요</small>
+                  </div>
+                </div>
+              </section>
+              <section class="panel">
+                <h2>Recent Activity</h2>
+                <div class="task">
+                  <span class="avatar s" style="margin:0">한</span>
+                  <div>
+                    <p>김한재가 원단을 추가했습니다</p>
+                    <small>2시간 전</small>
+                  </div>
+                </div>
+                <div class="task">
+                  <span class="avatar s park" style="margin:0">박</span>
+                  <div>
+                    <p>박프로가 코멘트를 남겼습니다</p>
+                    <small>어제</small>
+                  </div>
+                </div>
+              </section>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.getElementById("chips").addEventListener("click", (e) => {
+      const t = e.target.closest("button");
+      if (!t) return;
+      document.querySelectorAll("#chips button").forEach((b) => b.classList.remove("on"));
+      t.classList.add("on");
+      const chip = t.dataset.chip;
+      document.getElementById("folders").style.display = chip === "all" ? "grid" : "none";
+      document.querySelectorAll("#grid .card").forEach((card) => {
+        card.style.display = chip === "all" || card.dataset.kind === chip ? "" : "none";
+      });
+    });
+    const createBtn = document.getElementById("createBtn");
+    const createMenu = document.getElementById("createMenu");
+    createBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      createMenu.classList.toggle("open");
+    });
+    document.addEventListener("click", () => createMenu.classList.remove("open"));
+  </script>
+</body>
+</html>

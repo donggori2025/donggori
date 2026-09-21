@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Faddit — 드라이브 컨셉 목업</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --ink:#161616; --paper:#f3f1ee; --orange:#ff5a3c; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: Outfit, "Apple SD Gothic Neo", sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 40px 28px 64px; }
+    .kicker { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: #7a7670; }
+    h1 { margin: 8px 0 10px; font-size: 36px; letter-spacing: -.04em; }
+    .lead { max-width: 680px; color: #5e5a54; line-height: 1.55; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 36px; }
+    a.card {
+      display: block; text-decoration: none; color: inherit;
+      border-radius: 28px; overflow: hidden; background: #fff;
+      box-shadow: 0 18px 50px rgba(22,22,22,.08);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    a.card:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(22,22,22,.12); }
+    .preview { height: 320px; overflow: hidden; position: relative; }
+    .preview iframe {
+      width: 1600px; height: 1000px; border: 0;
+      transform: scale(.4); transform-origin: top left; pointer-events: none;
+    }
+    .meta { padding: 22px 24px 24px; }
+    .meta h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.03em; }
+    .meta p { margin: 0; color: #6a6660; font-size: 14px; line-height: 1.5; }
+    .tag {
+      display: inline-block; margin-bottom: 10px; padding: 4px 10px;
+      border-radius: 999px; font-size: 11px; font-weight: 600;
+    }
+    .voxel .tag { background: #d1d4f9; }
+    .pen .tag { background: #ffd4cc; color: #c2412d; }
+    .voxel .preview { background: #f4f2ee; }
+    .pen .preview { background: #f6f4f1; }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="kicker">Faddit concept mockups · Drive</p>
+    <h1>드라이브 두 가지 방향</h1>
+    <p class="lead">같은 Atelier North 드라이브 화면입니다. 하나는 프로필 얼굴 만들기처럼 보셀 아바타·드롭다운·컬러칩으로 맞추고, 다른 하나는 새 로고의 펜 곡선처럼 부드럽게 갑니다. 노란 스터드나 브릭 그림자는 뺐습니다.</p>
+    <div class="grid">
+      <a class="card voxel" href="./voxel.html">
+        <div class="preview"><iframe src="./voxel.html" title="보셀 드라이브 미리보기"></iframe></div>
+        <div class="meta">
+          <span class="tag">Concept A</span>
+          <h2>Voxel Profile</h2>
+          <p>드라이브를 얼굴 메이커처럼 씁니다. 가운데 캐릭터에 상의·아우터·원단을 부품으로 끼우고, 오른쪽에서 색과 종류를 고릅니다.</p>
+        </div>
+      </a>
+      <a class="card pen" href="./pen.html">
+        <div class="preview"><iframe src="./pen.html" title="펜 드라이브 미리보기"></iframe></div>
+        <div class="meta">
+          <span class="tag">Concept B</span>
+          <h2>Pen Curve</h2>
+          <p>오렌지 F와 베지어 배경, 큰 라운드 카드. 로고처럼 선이 이어지는 드라이브입니다.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

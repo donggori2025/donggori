@@ -32,12 +32,14 @@ import { DEFAULT_AVATAR, type VoxelAvatarConfig } from "./dicebear-avatar";
 import { printShareFiles } from "./product-files";
 import type {
   Activity,
+  AddNodeOptions,
   CanvasNode,
   CanvasNodeType,
   Comment,
   LibraryAsset,
   LinkAccess,
   Mode,
+  PackExtra,
   Product,
   ProductAccessRole,
   ProductCategory,
@@ -54,6 +56,7 @@ import type {
   Workspace,
   WorkspaceSticker,
 } from "./types";
+import { emptyPackExtra, ensureSpecArtboard, seedUsageFromSpecs, uniquifyPackExtraTitles } from "./spec-artboard";
 
 interface WorkspaceState {
   products: Product[];
@@ -134,7 +137,7 @@ interface WorkspaceApi extends WorkspaceState {
   }) => void;
   updateAsset: (id: string, patch: Partial<Pick<LibraryAsset, "name" | "meta" | "kind" | "data">>) => void;
   deleteAsset: (id: string) => void;
-  duplicateProduct: (id: string) => void;
+  duplicateProduct: (id: string) => string;
   deleteProduct: (id: string) => void;
   renameVersion: (versionId: string, title: string) => void;
   restoreVersion: (productId: string, versionId: string) => void;
@@ -149,11 +152,20 @@ interface WorkspaceApi extends WorkspaceState {
   addComment: (comment: Omit<Comment, "id" | "createdAt" | "authorId"> & { authorId?: string }) => void;
   convertToTask: (commentId: string, assigneeId: string) => void;
   setTaskStatus: (commentId: string, status: TaskStatus) => void;
-  addNode: (
+  addNode: (productId: string, type: CanvasNodeType, options?: AddNodeOptions) => string | undefined;
+  addGeneratePrompt: (
     productId: string,
-    type: CanvasNodeType,
-    options?: { linkedTo?: string; boardKind?: "general" | "specs"; title?: string },
+    entry: { text: string; boardId: string; action: "create" | "edit" },
   ) => void;
+  setSpecArtboard: (productId: string, nodeId: string) => void;
+  useOnArtboard: (
+    productId: string,
+    nodeId: string,
+    field: "usedMaterialIds" | "usedTrimIds" | "usedMeasurementPoms",
+    itemId: string,
+  ) => void;
+  addPackExtra: (productId: string, kind: PackExtra["kind"]) => string;
+  removePackExtra: (productId: string, extraId: string) => void;
   moveNode: (productId: string, nodeId: string, x: number, y: number) => void;
   updateNode: (productId: string, nodeId: string, patch: Partial<CanvasNode>) => void;
   deleteNode: (productId: string, nodeId: string) => void;
@@ -308,7 +320,7 @@ function stickersOfWorkspace(w: Workspace): WorkspaceSticker[] {
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WorkspaceState>({
-    products: seedProducts,
+    products: seedProducts.map((p) => ensureSpecArtboard(p)),
     comments: seedComments,
     versions: seedVersions,
     activities: seedActivities,
@@ -820,6 +832,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const createProduct = useCallback((name: string, options?: { category?: ProductCategory; description?: string }) => {
     const id = `p-${++seq}`;
     setState((s) => {
+      const specs = emptySpecs(options?.description ?? "");
       const product: Product = {
         id,
         name,
@@ -841,8 +854,13 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         productionReady: 0,
         completed: [],
         missing: ["Design", "Main Fabric", "Size Spec"],
-        specs: emptySpecs(options?.description ?? ""),
-        nodes: [{ id: `n-${seq}`, type: "flat", title: `${name} Flat`, x: 80, y: 40 }],
+        specs,
+        nodes: [
+          seedUsageFromSpecs(
+            { id: `n-${seq}`, type: "flat", title: "spec용 도식화", x: 80, y: 40, boardKind: "specs" },
+            specs,
+          ),
+        ],
       };
       return {
         ...s,
@@ -937,21 +955,28 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const duplicateProduct = useCallback((id: string) => {
+    let extraId = "";
     setState((s) => {
       const item = s.products.find((p) => p.id === id);
       if (!item) return s;
       const newId = `p-${++seq}`;
+      extraId = newId;
       const copy: Product = {
         ...item,
         id: newId,
         name: `${item.name} 복사본`,
         code: `WS-${String(seq).slice(-3)}`,
         updatedAt: "방금",
-        nodes: item.nodes.map((n) => ({ ...n, id: `${n.id}-${seq}` })),
+        nodes: ensureSpecArtboard({
+          ...item,
+          id: newId,
+          nodes: item.nodes.map((n) => ({ ...n, id: `${n.id}-${seq}` })),
+        }).nodes,
         files: item.files?.map((f) => ({ ...f, id: `file-${++seq}` })),
       };
       return { ...s, products: [copy, ...s.products] };
     });
+    return extraId;
   }, []);
 
   const renameVersion = useCallback((versionId: string, title: string) => {
@@ -976,17 +1001,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       const nextN = maxN + 1;
       return {
         ...s,
-        products: s.products.map((p) =>
-          p.id !== productId
-            ? p
-            : {
-                ...p,
-                nodes: snap.nodes,
-                specs: snap.specs,
-                version: nextN,
-                updatedAt: "방금",
-              },
-        ),
+        products: s.products.map((p) => {
+          if (p.id !== productId) return p;
+          const restored = ensureSpecArtboard({ ...p, nodes: snap.nodes, specs: snap.specs });
+          return {
+            ...p,
+            nodes: restored.nodes,
+            specs: restored.specs,
+            version: nextN,
+            updatedAt: "방금",
+          };
+        }),
         versions: [
           ...s.versions,
           {
@@ -1028,7 +1053,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         code: `WS-${String(seq).slice(-3)}`,
         version: 1,
         updatedAt: "방금",
-        nodes: snap.nodes.map((n) => ({ ...n, id: `${n.id}-${seq}` })),
+        nodes: ensureSpecArtboard({
+          ...product,
+          id: newId,
+          nodes: snap.nodes.map((n) => ({ ...n, id: `${n.id}-${seq}` })),
+          specs: snap.specs,
+        }).nodes,
         specs: snap.specs,
         files: product.files?.map((f) => ({ ...f, id: `file-${++seq}` })),
       };
@@ -1242,18 +1272,14 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
-  const addNode = useCallback(
-    (
-      productId: string,
-      type: CanvasNodeType,
-      options?: { linkedTo?: string; boardKind?: "general" | "specs"; title?: string },
-    ) => {
+  const addNode = useCallback((productId: string, type: CanvasNodeType, options?: AddNodeOptions) => {
     const titles: Record<CanvasNodeType, string> = {
       flat: options?.boardKind === "specs" ? "Specs용 도식화" : options?.title ?? "일반 도식화",
       label: "Label",
       mockup2d: "2D Mockup",
       mockup3d: "3D Mockup",
     };
+    const createdId = `n-${++seq}`;
     setState((s) => ({
       ...s,
       products: s.products.map((p) => {
@@ -1262,14 +1288,27 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
           const flats = p.nodes.filter((n) => n.type === "flat");
           const last = flats[flats.length - 1];
           const lastH = last?.h ?? 400;
-          const node: CanvasNode = {
-            id: `n-${++seq}`,
+          const hasSpec = flats.some((n) => n.boardKind === "specs");
+          const asSpec = options?.generate ? false : options?.boardKind === "specs" || !hasSpec;
+          let node: CanvasNode = {
+            id: createdId,
             type,
-            title: options?.title ?? titles.flat,
-            x: last?.x ?? 80,
-            y: last ? last.y + 28 + lastH + 96 : 40,
-            boardKind: options?.boardKind ?? "general",
+            title: options?.title ?? (asSpec ? "spec용 도식화" : `아트보드 ${flats.length + 1}`),
+            x: options?.x ?? last?.x ?? 80,
+            y: options?.y ?? (last ? last.y + 28 + lastH + 96 : 40),
+            boardKind: asSpec ? "specs" : "general",
           };
+          if (options?.w) node.w = options.w;
+          if (options?.h) node.h = options.h;
+          if (options?.imageSrc) node.imageSrc = options.imageSrc;
+          if (options?.generate) {
+            node.generate = options.generate;
+            node.w = options.w ?? 374;
+            node.h = options.h ?? 400;
+            node.boardKind = "general";
+          }
+          if (options?.linkedTo) node.linkedTo = options.linkedTo;
+          if (asSpec) node = seedUsageFromSpecs(node, p.specs);
           return { ...p, nodes: [...p.nodes, node], updatedAt: "방금" };
         }
         const parent = options?.linkedTo ? p.nodes.find((n) => n.id === options.linkedTo && n.type === "flat") : undefined;
@@ -1277,7 +1316,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         const parentW = parent.w ?? 374;
         const siblings = p.nodes.filter((n) => n.linkedTo === parent.id);
         const node: CanvasNode = {
-          id: `n-${++seq}`,
+          id: createdId,
           type,
           title: titles[type],
           x: parent.x + parentW + 100,
@@ -1287,8 +1326,115 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         return { ...p, nodes: [...p.nodes, node], updatedAt: "방금" };
       }),
     }));
-  },
-  []);
+    return createdId;
+  }, []);
+
+  const addGeneratePrompt = useCallback(
+    (productId: string, entry: { text: string; boardId: string; action: "create" | "edit" }) => {
+      setState((s) => ({
+        ...s,
+        products: s.products.map((p) => {
+          if (p.id !== productId) return p;
+          return {
+            ...p,
+            generatePrompts: [
+              ...(p.generatePrompts ?? []),
+              {
+                id: `gp-${++seq}`,
+                text: entry.text,
+                boardId: entry.boardId,
+                action: entry.action,
+                createdAt: new Date().toISOString(),
+              },
+            ],
+            updatedAt: "방금",
+          };
+        }),
+      }));
+    },
+    [],
+  );
+
+  const setSpecArtboard = useCallback((productId: string, nodeId: string) => {
+    setState((s) => ({
+      ...s,
+      products: s.products.map((p) => {
+        if (p.id !== productId) return p;
+        const target = p.nodes.find((n) => n.id === nodeId && n.type === "flat");
+        if (!target) return p;
+        if (target.boardKind === "specs") return p;
+        const nodes = p.nodes.map((n) => {
+          if (n.type !== "flat") return n;
+          if (n.id === nodeId) return seedUsageFromSpecs(n, p.specs);
+          if (n.boardKind === "specs") return { ...n, boardKind: "general" as const };
+          return n;
+        });
+        return { ...p, nodes, updatedAt: "방금" };
+      }),
+    }));
+  }, []);
+
+  const useOnArtboard = useCallback(
+    (
+      productId: string,
+      nodeId: string,
+      field: "usedMaterialIds" | "usedTrimIds" | "usedMeasurementPoms",
+      itemId: string,
+    ) => {
+      setState((s) => ({
+        ...s,
+        products: s.products.map((p) => {
+          if (p.id !== productId) return p;
+          return {
+            ...p,
+            nodes: p.nodes.map((n) => {
+              if (n.id !== nodeId || n.type !== "flat") return n;
+              const cur = n[field] ?? [];
+              return {
+                ...n,
+                [field]: cur.includes(itemId) ? cur.filter((id) => id !== itemId) : [...cur, itemId],
+              };
+            }),
+            updatedAt: "방금",
+          };
+        }),
+      }));
+    },
+    [],
+  );
+
+  const addPackExtra = useCallback((productId: string, kind: PackExtra["kind"]) => {
+    let extraId = "";
+    setState((s) => ({
+      ...s,
+      products: s.products.map((p) => {
+        if (p.id !== productId) return p;
+        const extras = uniquifyPackExtraTitles(p.specs.packExtras ?? []);
+        const extra = emptyPackExtra(kind, extras);
+        extraId = extra.id;
+        return {
+          ...p,
+          specs: { ...p.specs, packExtras: [...extras, extra] },
+          updatedAt: "방금",
+        };
+      }),
+    }));
+    return extraId;
+  }, []);
+
+  const removePackExtra = useCallback((productId: string, extraId: string) => {
+    setState((s) => ({
+      ...s,
+      products: s.products.map((p) => {
+        if (p.id !== productId) return p;
+        return {
+          ...p,
+          specs: { ...p.specs, packExtras: (p.specs.packExtras ?? []).filter((e) => e.id !== extraId) },
+          updatedAt: "방금",
+        };
+      }),
+    }));
+  }, []);
 
   const moveNode = useCallback((productId: string, nodeId: string, x: number, y: number) => {
     setState((s) => ({
@@ -1315,9 +1461,18 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const deleteNode = useCallback((productId: string, nodeId: string) => {
     setState((s) => ({
       ...s,
-      products: s.products.map((p) =>
-        p.id !== productId ? p : { ...p, nodes: p.nodes.filter((n) => n.id !== nodeId), updatedAt: "방금" },
-      ),
+      products: s.products.map((p) => {
+        if (p.id !== productId) return p;
+        const target = p.nodes.find((n) => n.id === nodeId);
+        if (target?.type === "flat" && target.boardKind === "specs") {
+          const otherFlats = p.nodes.filter((n) => n.type === "flat" && n.id !== nodeId);
+          if (!otherFlats.length) return p;
+        }
+        return ensureSpecArtboard(
+          { ...p, nodes: p.nodes.filter((n) => n.id !== nodeId), updatedAt: "방금" },
+          () => `n-${++seq}`,
+        );
+      }),
     }));
   }, []);
 
@@ -1427,6 +1582,11 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       convertToTask,
       setTaskStatus,
       addNode,
+      addGeneratePrompt,
+      setSpecArtboard,
+      useOnArtboard,
+      addPackExtra,
+      removePackExtra,
       moveNode,
       updateNode,
       deleteNode,
@@ -1485,6 +1645,11 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       convertToTask,
       setTaskStatus,
       addNode,
+      addGeneratePrompt,
+      setSpecArtboard,
+      useOnArtboard,
+      addPackExtra,
+      removePackExtra,
       moveNode,
       updateNode,
       deleteNode,

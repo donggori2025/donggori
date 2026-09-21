@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Faddit — Voxel Studio</title>
+  <style>
+    :root {
+      --paper: #f4f2ee;
+      --snow: #fffefb;
+      --ink: #1a1916;
+      --stone: #6f6c66;
+      --mist: #e7e4dd;
+      --lilac: #d1d4f9;
+      --pink: #ffd5dc;
+      --sky: #b6e3f4;
+      --peach: #ffdfbf;
+      --violet: #c0aede;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: "Apple SD Gothic Neo", "Pretendard", -apple-system, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      overflow: hidden;
+    }
+    button, input, select { font: inherit; }
+    .app { display: flex; flex-direction: column; height: 100%; }
+    header {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--mist);
+      background: var(--snow);
+      z-index: 5;
+    }
+    .profile-btn {
+      display: flex; align-items: center; gap: 8px;
+      border: 0; background: none; cursor: pointer; padding: 0;
+    }
+    .face {
+      width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
+      background: var(--lilac); box-shadow: 0 0 0 1px rgba(0,0,0,.05); flex-shrink: 0;
+    }
+    .face.sm { width: 40px; height: 40px; }
+    .face.xs { width: 22px; height: 22px; }
+    .face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .profile-btn strong { font-size: 13px; font-weight: 700; }
+    .brand-dot { color: var(--stone); font-size: 12px; }
+    .brand-dot b { color: var(--ink); font-weight: 600; }
+    .search {
+      display: flex; align-items: center; gap: 8px;
+      width: 240px; height: 32px; margin-left: 8px;
+      padding: 0 12px; border: 1px solid var(--mist); border-radius: 999px;
+      background: var(--paper); color: var(--stone); font-size: 12px;
+    }
+    .back { margin-left: auto; font-size: 12px; color: var(--stone); text-decoration: none; }
+    .body { display: flex; min-height: 0; flex: 1; }
+    .identity {
+      width: 220px; flex-shrink: 0;
+      border-right: 1px solid var(--mist);
+      background: var(--snow);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 20px 16px 16px;
+    }
+    .pad {
+      width: 168px; height: 168px; border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--mist); background: var(--lilac);
+    }
+    .pad img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .rand {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 32px; margin-top: 12px; padding: 0 12px;
+      border: 1px solid var(--mist); border-radius: 999px;
+      background: var(--snow); font-size: 12px; cursor: pointer;
+    }
+    .identity h1 {
+      margin: 16px 0 0; font-size: 16px; letter-spacing: -.03em; font-weight: 700; text-align: center;
+    }
+    .identity .sub { margin: 4px 0 0; font-size: 11px; color: var(--stone); text-align: center; }
+    .crew { display: flex; margin-top: 14px; }
+    .crew .face { margin-left: -8px; border: 2px solid var(--snow); }
+    .crew .face:first-child { margin-left: 0; }
+    .plus {
+      width: 22px; height: 22px; margin-left: -6px; border-radius: 50%;
+      border: 1px solid var(--mist); background: var(--snow);
+      font-size: 14px; line-height: 1; cursor: pointer;
+    }
+    nav {
+      width: 100%; margin-top: 18px; display: flex; flex-direction: column; gap: 6px;
+    }
+    nav a {
+      display: block; text-decoration: none; color: var(--ink);
+      font-size: 13px;
+    }
+    nav label {
+      display: block; margin-bottom: 6px;
+      font-size: 11px; font-weight: 500; color: var(--stone);
+    }
+    nav select, .field select, .find input {
+      width: 100%; height: 36px;
+      border: 1px solid var(--mist); border-radius: 12px;
+      background: var(--paper); padding: 0 12px; font-size: 13px; outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%236f6c66' fill='none' stroke-width='1.4'/></svg>");
+      background-repeat: no-repeat; background-position: right 12px center;
+    }
+    .stage {
+      flex: 1; min-width: 0; position: relative;
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgba(26,25,22,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,25,22,.04) 1px, transparent 1px);
+      background-size: 16px 16px;
+      overflow: auto;
+    }
+    .studio {
+      min-height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 220px 1fr;
+      grid-template-rows: auto auto auto auto;
+      align-content: center;
+      align-items: center;
+      justify-items: center;
+      padding: 32px 28px 20px;
+      gap: 10px 24px;
+    }
+    .slot { text-align: center; }
+    .slot span {
+      display: block; margin-bottom: 8px;
+      font-size: 11px; font-weight: 500; color: var(--stone);
+    }
+    .piece {
+      width: 168px; height: 168px; padding: 0; cursor: pointer;
+      border: 1px solid var(--mist); border-radius: 16px;
+      background: var(--snow);
+      display: grid; place-items: center;
+      transition: box-shadow .15s ease, transform .15s ease;
+    }
+    .piece:hover { transform: translateY(-2px); }
+    .piece.on {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+      border-color: transparent;
+    }
+    .piece.empty {
+      border-style: dashed;
+      background: rgba(255,254,251,.4);
+      color: var(--stone);
+      font-size: 28px;
+    }
+    .piece small {
+      display: block; margin-top: 8px; font-size: 11px; color: var(--stone); font-weight: 400;
+    }
+    .hero {
+      grid-column: 2; grid-row: 2;
+      width: 220px; height: 220px; border-radius: 24px; overflow: hidden;
+      border: 1px solid var(--mist); background: var(--lilac);
+      box-shadow: 0 0 0 8px rgba(209,212,249,.35);
+    }
+    .hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .north { grid-column: 2; grid-row: 1; }
+    .west { grid-column: 1; grid-row: 2; justify-self: end; }
+    .east { grid-column: 3; grid-row: 2; justify-self: start; }
+    .south { grid-column: 2; grid-row: 3; }
+    .tray {
+      grid-column: 1 / -1; grid-row: 4; justify-self: stretch;
+      display: flex; align-items: center; gap: 8px;
+      padding-top: 8px;
+    }
+    .tray b { font-size: 11px; font-weight: 500; color: var(--stone); width: 36px; }
+    .dotc, .chip {
+      height: 24px; border-radius: 999px; border: 1px solid var(--mist);
+      cursor: pointer; padding: 0;
+    }
+    .dotc { width: 24px; }
+    .dotc.on { box-shadow: 0 0 0 2px var(--ink), 0 0 0 3px var(--paper); }
+    .chip {
+      padding: 0 8px; font-size: 10px; background: var(--ink); color: var(--snow);
+    }
+    .chip.ghost { background: var(--paper); color: var(--stone); }
+    .inspector {
+      width: 280px; flex-shrink: 0;
+      border-left: 1px solid var(--mist);
+      background: var(--snow);
+      padding: 18px 16px 16px;
+      overflow: auto;
+    }
+    .inspector h2 { margin: 0 0 4px; font-size: 15px; font-weight: 700; letter-spacing: -.02em; }
+    .inspector .hint { margin: 0 0 16px; font-size: 12px; color: var(--stone); }
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block; margin-bottom: 6px;
+      font-size: 11px; font-weight: 500; color: var(--stone);
+    }
+    .colors { display: flex; flex-wrap: wrap; gap: 6px; }
+    .create {
+      width: 100%; height: 36px; margin-top: 8px;
+      border: 0; border-radius: 999px;
+      background: var(--ink); color: var(--snow);
+      font-size: 13px; cursor: pointer;
+    }
+    .menu {
+      display: none; position: absolute; z-index: 40; top: 48px; left: 12px;
+      width: 248px; background: var(--snow); border: 1px solid var(--mist);
+      border-radius: 16px; box-shadow: 0 16px 40px rgba(26,25,22,.12); overflow: hidden;
+    }
+    .menu.open { display: block; }
+    .menu .who { padding: 14px 16px; }
+    .menu .who p { margin: 0; font-size: 14px; font-weight: 600; }
+    .menu .who span { font-size: 12px; color: var(--stone); }
+    .menu button.row {
+      display: block; width: 100%; border: 0; background: none;
+      text-align: left; padding: 8px 16px; font-size: 13px; cursor: pointer;
+    }
+    .menu button.row:hover { background: var(--paper); }
+    .menu hr { border: 0; border-top: 1px solid var(--mist); margin: 0; }
+    .overlay {
+      display: none; position: fixed; inset: 0; z-index: 80;
+      background: rgba(26,25,22,.4);
+      align-items: center; justify-content: center; padding: 32px 16px;
+    }
+    .overlay.open { display: flex; }
+    .maker {
+      width: 560px; max-height: 84vh; display: flex; flex-direction: column;
+      overflow: hidden; background: var(--snow); border: 1px solid var(--mist);
+      border-radius: 16px; box-shadow: 0 20px 60px rgba(26,25,22,.16);
+    }
+    .maker-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 20px; border-bottom: 1px solid var(--mist);
+    }
+    .maker-head p { margin: 0; font-size: 15px; font-weight: 600; }
+    .maker-head span { font-size: 12px; color: var(--stone); }
+    .x { width: 32px; height: 32px; border: 0; border-radius: 50%; background: none; cursor: pointer; }
+    .maker-body {
+      display: grid; grid-template-columns: 180px 1fr; gap: 20px;
+      padding: 20px; min-height: 0; overflow: auto;
+    }
+    .preview-col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .maker-foot {
+      display: flex; justify-content: flex-end; gap: 8px;
+      padding: 12px 20px; border-top: 1px solid var(--mist);
+    }
+    .maker-foot .cancel { border: 0; background: none; color: var(--stone); padding: 8px 12px; cursor: pointer; }
+    .maker-foot .apply {
+      border: 0; background: var(--ink); color: var(--snow);
+      border-radius: 999px; padding: 8px 16px; font-size: 13px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <button class="profile-btn" id="profileBtn" type="button">
+        <span class="face"><img src="./avatars/jay-64.svg" alt="" /></span>
+        <strong>김한재</strong>
+      </button>
+      <span class="brand-dot">· <b>Atelier North</b> 를 조립 중</span>
+      <div class="search">워크스페이스 검색</div>
+      <a class="back" href="./index.html">컨셉 비교</a>
+      <div class="menu" id="profileMenu">
+        <div class="who"><p>김한재</p><span>jay@faddit.co.kr</span></div>
+        <hr />
+        <button class="row" data-open-maker type="button">마이 프로필</button>
+        <button class="row" type="button">플랜 및 결제</button>
+        <button class="row" type="button">로그아웃</button>
+      </div>
+    </header>
+
+    <div class="body">
+      <aside class="identity">
+        <button class="pad" id="identityPad" type="button" title="프로필 얼굴 만들기">
+          <img id="studioFace" src="./avatars/jay-168.svg" alt="워크스페이스 얼굴" />
+        </button>
+        <span class="face sm"><img id="miniFace" src="./avatars/jay-64.svg" alt="" /></span>
+        <button class="rand" id="shuffleStudio" type="button">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20l16-16"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+          랜덤
+        </button>
+        <h1>Atelier North</h1>
+        <p class="sub">시즌을 입히는 팀 얼굴</p>
+        <div class="crew">
+          <span class="face xs"><img src="./avatars/min-40.svg" alt="" /></span>
+          <span class="face xs"><img src="./avatars/park-40.svg" alt="" /></span>
+          <span class="face xs"><img src="./avatars/kim-40.svg" alt="" /></span>
+          <span class="face xs"><img src="./avatars/lee-40.svg" alt="" /></span>
+          <button class="plus" type="button">+</button>
+        </div>
+        <nav>
+          <div>
+            <label>공간</label>
+            <select>
+              <option>대시보드</option>
+              <option>템플릿</option>
+              <option>라이브러리</option>
+              <option>휴지통</option>
+            </select>
+          </div>
+          <div>
+            <label>시즌</label>
+            <select>
+              <option>랜덤</option>
+              <option>26SS</option>
+              <option>26FW</option>
+              <option>25SS</option>
+            </select>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="stage">
+        <div class="studio">
+          <div class="slot west">
+            <span>원단</span>
+            <button class="piece" data-id="fabric" type="button" style="background:#ffdfbf">
+              <svg width="72" height="72" viewBox="0 0 9 9" shape-rendering="crispEdges">
+                <rect width="9" height="9" fill="#eab890"/>
+                <rect x="1" y="1" width="7" height="7" fill="#dda878"/>
+                <rect x="2" y="2" width="5" height="5" fill="#c99062"/>
+                <rect x="3" y="3" width="3" height="3" fill="#f5d0b0"/>
+              </svg>
+            </button>
+          </div>
+          <div class="slot north">
+            <span>상의</span>
+            <button class="piece on" data-id="tee" type="button" style="background:#d1d4f9">
+              <svg width="88" height="96" viewBox="0 0 22 24" shape-rendering="crispEdges">
+                <rect x="7" y="2" width="8" height="2" fill="#1a1916"/>
+                <rect x="4" y="4" width="14" height="2" fill="#1a1916"/>
+                <rect x="2" y="6" width="4" height="5" fill="#1a1916"/>
+                <rect x="16" y="6" width="4" height="5" fill="#1a1916"/>
+                <rect x="6" y="6" width="10" height="15" fill="#f4efe6"/>
+                <rect x="8" y="10" width="6" height="4" fill="#ff8a73"/>
+              </svg>
+            </button>
+          </div>
+          <div class="hero"><img src="./avatars/jayAlt-256.svg" alt="" /></div>
+          <div class="slot east">
+            <span>아우터</span>
+            <button class="piece" data-id="hoodie" type="button" style="background:#ffd5dc">
+              <svg width="88" height="96" viewBox="0 0 22 24" shape-rendering="crispEdges">
+                <rect x="7" y="1" width="8" height="3" fill="#3b2f2f"/>
+                <rect x="4" y="4" width="14" height="17" fill="#5a6b82"/>
+                <rect x="2" y="6" width="4" height="6" fill="#5a6b82"/>
+                <rect x="16" y="6" width="4" height="6" fill="#5a6b82"/>
+                <rect x="8" y="10" width="6" height="5" fill="#d1d4f9"/>
+              </svg>
+            </button>
+          </div>
+          <div class="slot south">
+            <span>인쇄</span>
+            <button class="piece empty" data-id="print" type="button">+</button>
+          </div>
+          <div class="tray">
+            <b>시즌</b>
+            <button class="chip" type="button">랜덤</button>
+            <button class="dotc on" style="background:#d1d4f9" type="button"></button>
+            <button class="dotc" style="background:#c0aede" type="button"></button>
+            <button class="dotc" style="background:#b6e3f4" type="button"></button>
+            <button class="dotc" style="background:#ffd5dc" type="button"></button>
+            <button class="dotc" style="background:#ffdfbf" type="button"></button>
+            <span style="flex:1"></span>
+            <button class="chip ghost" type="button">부자재 없음</button>
+          </div>
+        </div>
+      </main>
+
+      <aside class="inspector">
+        <h2 id="partTitle">Graphic Tee #03</h2>
+        <p class="hint" id="partHint">얼굴에 입힐 상의 · 26SS-TS-03</p>
+        <div class="field">
+          <label>종류</label>
+          <select><option>랜덤</option><option>티셔츠</option><option>후디</option><option>팬츠</option></select>
+        </div>
+        <div class="field">
+          <label>컬러웨이</label>
+          <select><option>랜덤</option><option>Ivory / Coral</option><option>Navy</option></select>
+        </div>
+        <div class="field">
+          <label>원단</label>
+          <select><option>랜덤</option><option>Cotton Jersey 240g</option><option>Fleece 420g</option></select>
+        </div>
+        <div class="field">
+          <label>인쇄</label>
+          <select><option>없음</option><option>랜덤</option><option>프론트 그래픽</option></select>
+        </div>
+        <div class="field">
+          <label>배경</label>
+          <div class="colors" id="bgColors">
+            <button class="chip" type="button">랜덤</button>
+            <button class="dotc" style="background:#b6e3f4" type="button"></button>
+            <button class="dotc" style="background:#c0aede" type="button"></button>
+            <button class="dotc on" style="background:#d1d4f9" type="button"></button>
+            <button class="dotc" style="background:#ffd5dc" type="button"></button>
+            <button class="dotc" style="background:#ffdfbf" type="button"></button>
+          </div>
+        </div>
+        <div class="field">
+          <label>옷 색</label>
+          <div class="colors" id="shirtColors">
+            <button class="chip ghost" type="button">랜덤</button>
+            <button class="dotc" style="background:#e64980" type="button"></button>
+            <button class="dotc on" style="background:#f76707" type="button"></button>
+            <button class="dotc" style="background:#fab005" type="button"></button>
+            <button class="dotc" style="background:#40c057" type="button"></button>
+            <button class="dotc" style="background:#228be6" type="button"></button>
+            <button class="dotc" style="background:#7950f2" type="button"></button>
+            <button class="dotc" style="background:#495057" type="button"></button>
+          </div>
+        </div>
+        <button class="create" type="button">이 부품으로 생성</button>
+      </aside>
+    </div>
+  </div>
+
+  <div class="overlay" id="maker">
+    <div class="maker">
+      <div class="maker-head">
+        <div>
+          <p>프로필 얼굴 만들기</p>
+          <span>DiceBear Voxel Art · CC0 1.0</span>
+        </div>
+        <button class="x" type="button" data-close>×</button>
+      </div>
+      <div class="maker-body">
+        <div class="preview-col">
+          <div class="pad"><img id="bigFace" src="./avatars/jay-168.svg" alt="미리보기" /></div>
+          <span class="face sm"><img id="smallFace" src="./avatars/jay-64.svg" alt="" /></span>
+          <button class="rand" id="shuffle" type="button">랜덤</button>
+        </div>
+        <div>
+          <div class="field"><label>머리</label><select><option>랜덤</option><option>캡</option><option>단발</option></select></div>
+          <div class="field"><label>눈</label><select><option>랜덤</option><option>뜬 눈</option></select></div>
+          <div class="field"><label>옷</label><select><option>랜덤</option><option>무지</option><option>후디</option></select></div>
+          <div class="field"><label>수염</label><select><option>랜덤</option><option>콧수염</option></select></div>
+          <div class="field">
+            <label>배경</label>
+            <div class="colors">
+              <button class="chip ghost" type="button">랜덤</button>
+              <button class="dotc on" style="background:#d1d4f9" type="button"></button>
+              <button class="dotc" style="background:#ffd5dc" type="button"></button>
+              <button class="dotc" style="background:#b6e3f4" type="button"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="maker-foot">
+        <button class="cancel" type="button" data-close>취소</button>
+        <button class="apply" type="button" data-close>적용</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const faces = ["./avatars/jay-168.svg", "./avatars/jayAlt-168.svg", "./avatars/min-168.svg", "./avatars/park-168.svg", "./avatars/kim-168.svg"];
+    let faceI = 0;
+    const parts = {
+      tee: { title: "Graphic Tee #03", hint: "얼굴에 입힐 상의 · 26SS-TS-03" },
+      hoodie: { title: "Atelier Hoodie", hint: "아우터 슬롯 · 26SS-HD-01" },
+      fabric: { title: "Cotton Jersey 240g", hint: "원단 슬롯 · 스와치" },
+      print: { title: "인쇄 없음", hint: "빈 슬롯 · 그래픽을 끼우세요" },
+    };
+    const menu = document.getElementById("profileMenu");
+    document.getElementById("profileBtn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      menu.classList.toggle("open");
+    });
+    document.addEventListener("click", () => menu.classList.remove("open"));
+    const openMaker = () => document.getElementById("maker").classList.add("open");
+    document.querySelectorAll("[data-open-maker]").forEach((btn) => btn.addEventListener("click", () => { openMaker(); menu.classList.remove("open"); }));
+    document.getElementById("identityPad").addEventListener("click", openMaker);
+    document.querySelectorAll("[data-close]").forEach((btn) => btn.addEventListener("click", () => document.getElementById("maker").classList.remove("open")));
+    document.getElementById("maker").addEventListener("click", (e) => { if (e.target.id === "maker") e.currentTarget.classList.remove("open"); });
+    function setFace(src) {
+      document.getElementById("studioFace").src = src;
+      document.getElementById("miniFace").src = src.replace("168", "64");
+      document.getElementById("bigFace").src = src;
+      document.getElementById("smallFace").src = src.replace("168", "64");
+    }
+    document.getElementById("shuffleStudio").addEventListener("click", () => {
+      faceI = (faceI + 1) % faces.length;
+      setFace(faces[faceI]);
+    });
+    document.getElementById("shuffle").addEventListener("click", () => {
+      faceI = (faceI + 1) % faces.length;
+      setFace(faces[faceI]);
+    });
+    document.querySelectorAll(".piece").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".piece").forEach((b) => b.classList.remove("on"));
+        btn.classList.add("on");
+        const part = parts[btn.dataset.id];
+        document.getElementById("partTitle").textContent = part.title;
+        document.getElementById("partHint").textContent = part.hint;
+      });
+    });
+    document.querySelectorAll(".colors, .tray").forEach((row) => {
+      row.addEventListener("click", (e) => {
+        const t = e.target.closest(".dotc, .chip");
+        if (!t || !row.contains(t)) return;
+        if (t.classList.contains("dotc")) {
+          row.querySelectorAll(".dotc").forEach((b) => b.classList.remove("on"));
+          t.classList.add("on");
+          const on = document.querySelector(".piece.on");
+          if (on && t.classList.contains("dotc")) on.style.background = t.style.background;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   AlignCenter,
   AlignLeft,
@@ -14,6 +14,7 @@ import { FlatThumb } from "./flats";
 import { useWorkspace } from "@/lib/store";
 import type { CanvasNode, CanvasNodeType, Product, ProductCategory } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { SpecRoleHint } from "./spec-role-hint";
 
 const ARTBOARD = { w: 1100, h: 720 };
 const PAGE_BG = "#f4f2ee";
@@ -138,15 +139,98 @@ function exportTarget(
   );
 }
 
-export function PropertiesPanel({
+type PageDims = { name: string; w: number; h: number; fill: string };
+
+export function PropertiesExportFooter({
   product,
   selectedTarget,
+  page,
+  objectStyle,
 }: {
   product: Product;
   selectedTarget: { id: string; label: string } | null;
+  page?: PageDims;
+  objectStyle?: { w: number; h: number; fill: string; stroke: string; strokeWidth: number };
 }) {
-  const { updateNode } = useWorkspace();
   const [exportFmt, setExportFmt] = useState<ExportFmt>("png");
+  const node = product.nodes.find((n) => n.id === selectedTarget?.id);
+  const isPage = !selectedTarget || selectedTarget.id === "page-1";
+  const pageDims = page ?? { name: product.name, w: ARTBOARD.w, h: ARTBOARD.h, fill: PAGE_BG };
+  const exportName = isPage ? pageDims.name : selectedTarget?.label ?? product.name;
+  const style = objectStyle ?? {
+    w: isPage ? pageDims.w : defaultsFor(node).w,
+    h: isPage ? pageDims.h : defaultsFor(node).h,
+    fill: isPage ? pageDims.fill : defaultsFor(node).fill,
+    stroke: defaultsFor(node).stroke,
+    strokeWidth: defaultsFor(node).strokeWidth,
+  };
+
+  return (
+    <div className="shrink-0 border-t border-mist px-3 py-3">
+      <p className="mb-2 text-[11px] font-medium tracking-wide text-stone">추출하기</p>
+      <div className="mb-2 flex items-center gap-2">
+        <ExportThumb
+          src={(node as (CanvasNode & { image?: string }) | undefined)?.image}
+          kind={isPage ? "page" : node?.type ?? "flat"}
+          fill={isPage ? pageDims.fill : style.fill}
+          category={product.category}
+          name={exportName}
+        />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[12px] font-medium">{exportName}</p>
+          <p className="truncate text-[10px] text-stone">
+            {isPage ? "페이지" : node ? node.type : "layer"}
+          </p>
+        </div>
+      </div>
+      <label className="relative mb-2 block">
+        <span className="sr-only">파일 형태</span>
+        <select
+          value={exportFmt}
+          onChange={(e) => setExportFmt(e.target.value as ExportFmt)}
+          className="h-8 w-full appearance-none rounded-md border border-mist bg-paper py-1.5 pr-7 pl-2 text-[11px] font-medium uppercase tracking-wide outline-none hover:border-ink"
+        >
+          {EXPORT_FMTS.map((fmt) => (
+            <option key={fmt.value} value={fmt.value}>
+              {fmt.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          size={12}
+          strokeWidth={1.8}
+          className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-stone"
+        />
+      </label>
+      <button
+        type="button"
+        onClick={() =>
+          exportTarget(exportFmt, exportName, {
+            w: isPage ? pageDims.w : style.w,
+            h: isPage ? pageDims.h : style.h,
+            fill: isPage ? pageDims.fill : style.fill,
+            stroke: style.stroke,
+            strokeWidth: style.strokeWidth,
+          })
+        }
+        className="h-8 w-full rounded-md bg-ink text-[12px] font-medium text-snow hover:opacity-90"
+      >
+        추출하기
+      </button>
+    </div>
+  );
+}
+
+export function PropertiesPanel({
+  product,
+  selectedTarget,
+  tabs,
+}: {
+  product: Product;
+  selectedTarget: { id: string; label: string } | null;
+  tabs?: ReactNode;
+}) {
+  const { updateNode, setSpecArtboard } = useWorkspace();
   const [page, setPage] = useState({
     name: product.name,
     w: ARTBOARD.w,
@@ -157,7 +241,6 @@ export function PropertiesPanel({
 
   const node = product.nodes.find((n) => n.id === selectedTarget?.id);
   const isPage = !selectedTarget || selectedTarget.id === "page-1";
-  const exportName = isPage ? page.name : selectedTarget?.label ?? product.name;
   const objectStyle = useMemo(() => {
     if (isPage) return { ...page, x: 0, y: 0, stroke: "#e7e4dd", strokeWidth: 1 };
     const base = defaultsFor(node);
@@ -189,8 +272,9 @@ export function PropertiesPanel({
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="min-h-0 flex-1 overflow-auto px-3 py-3">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-mist bg-snow shadow-sm">
+        {tabs}
+        <div className="min-h-0 flex-1 overflow-auto px-3 py-3">
         {isPage ? (
           <section>
             <p className="mb-2 text-[11px] font-medium tracking-wide text-stone">페이지 속성</p>
@@ -211,8 +295,30 @@ export function PropertiesPanel({
           </section>
         ) : (
           <>
-            <p className="mb-1 truncate text-[12px] font-medium">{selectedTarget.label}</p>
-            <p className="mb-3 text-[10px] text-stone">{node ? node.type : "layer"}</p>
+            <div className="mb-1 flex items-start gap-1">
+              <p className="min-w-0 flex-1 truncate text-[12px] font-medium">{selectedTarget.label}</p>
+              {node?.type === "flat" && node.boardKind === "specs" && <SpecRoleHint />}
+            </div>
+            <p className="mb-3 text-[10px] text-stone">
+              {node?.type === "flat" && node.boardKind === "specs" ? "spec용 도식화" : node ? node.type : "layer"}
+            </p>
+            {node?.type === "flat" && (
+              <div className="mb-3 rounded-xl bg-paper px-2.5 py-2">
+                {node.boardKind === "specs" ? (
+                  <p className="text-[11px] leading-relaxed text-stone">
+                    이 대지가 작업지시서 spec입니다. 여기에 쓴 원단·부자재·측정이 채워집니다.
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setSpecArtboard(product.id, node.id)}
+                    className="w-full rounded-full bg-ink px-3 py-1.5 text-[12px] text-snow hover:opacity-90"
+                  >
+                    spec용 도식화로 지정
+                  </button>
+                )}
+              </div>
+            )}
 
             <Section title="레이아웃">
               <div className="grid grid-cols-2 gap-2">
@@ -265,60 +371,14 @@ export function PropertiesPanel({
             </Section>
           </>
         )}
-      </div>
-
-      <div className="shrink-0 border-t border-mist px-3 py-3">
-        <p className="mb-2 text-[11px] font-medium tracking-wide text-stone">추출하기</p>
-        <div className="mb-2 flex items-center gap-2">
-          <ExportThumb
-            src={(node as (CanvasNode & { image?: string }) | undefined)?.image}
-            kind={isPage ? "page" : node?.type ?? "flat"}
-            fill={isPage ? page.fill : objectStyle.fill}
-            category={product.category}
-            name={exportName}
-          />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[12px] font-medium">{exportName}</p>
-            <p className="truncate text-[10px] text-stone">
-              {isPage ? "페이지" : node ? node.type : "layer"}
-            </p>
-          </div>
         </div>
-        <label className="relative mb-2 block">
-          <span className="sr-only">파일 형태</span>
-          <select
-            value={exportFmt}
-            onChange={(e) => setExportFmt(e.target.value as ExportFmt)}
-            className="h-8 w-full appearance-none rounded-md border border-mist bg-paper py-1.5 pr-7 pl-2 text-[11px] font-medium uppercase tracking-wide outline-none hover:border-ink"
-          >
-            {EXPORT_FMTS.map((fmt) => (
-              <option key={fmt.value} value={fmt.value}>
-                {fmt.label}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            size={12}
-            strokeWidth={1.8}
-            className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-stone"
-          />
-        </label>
-        <button
-          type="button"
-          onClick={() =>
-            exportTarget(exportFmt, exportName, {
-              w: isPage ? page.w : objectStyle.w,
-              h: isPage ? page.h : objectStyle.h,
-              fill: isPage ? page.fill : objectStyle.fill,
-              stroke: objectStyle.stroke,
-              strokeWidth: objectStyle.strokeWidth,
-            })
-          }
-          className="h-8 w-full rounded-md bg-ink text-[12px] font-medium text-snow hover:opacity-90"
-        >
-          추출하기
-        </button>
-      </div>
+
+      <PropertiesExportFooter
+        product={product}
+        selectedTarget={selectedTarget}
+        page={page}
+        objectStyle={objectStyle}
+      />
     </div>
   );
 }

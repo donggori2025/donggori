@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
   BookmarkPlus,
@@ -32,7 +32,6 @@ import { useWorkspace } from "@/lib/store";
 import type { Colorway, MeasurementRow, Product, SpecAttribute, SpecIdentity } from "@/lib/types";
 import { specTabFill, type SpecTabId } from "@/lib/product-readiness";
 import { cn } from "@/lib/utils";
-import { MiscBoard } from "@/components/misc-board";
 
 type SpecTab = SpecTabId;
 
@@ -42,26 +41,11 @@ const TABS: { id: SpecTab; label: string }[] = [
   { id: "size", label: "사이즈·수량" },
   { id: "notes", label: "작업 시 주의사항" },
   { id: "print", label: "인쇄" },
-  { id: "misc", label: "기타" },
 ];
-
-const GUIDES: Partial<Record<SpecTab, string[]>> = {
-  basic: ["제품의 이름, 시즌, 아이템 등 기본 식별 정보를 입력하세요."],
-  fabric: [
-    "제품에 사용되는 메인 원단과 배색 원단을 등록하세요.",
-    "지퍼, 단추, 스트링 등 생산에 필요한 부자재를 추가하세요.",
-  ],
-  size: ["기준 사이즈를 입력하면 사이즈별 스펙을 관리할 수 있습니다."],
-  notes: ["공장에서 놓치지 말아야 할 작업 시 주의사항을 적어 주세요."],
-  misc: ["A4 페이지에 포장, 케어, 행택 등 기타 정보를 슬라이드처럼 정리하세요."],
-  print: ["라벨과 인쇄물 시안을 나눠 업로드하고, 각 파일이 어디에 쓰이는지 적어 주세요."],
-};
 
 const DOT_FILLED = "bg-[#7cb98a]";
 const DOT_EMPTY = "bg-[#e89a4a]";
 const SPECS_COL = "max-w-[1400px] ml-[max(0px,calc((100vw-1400px)/2-1.25rem))]";
-
-const SpecsNav = createContext<{ toTechPack?: () => void }>({});
 
 function TechPackButton({ onClick }: { onClick: () => void }) {
   return (
@@ -111,11 +95,9 @@ export function SpecsView({
       ? "fabric"
       : initialTab === "size" || initialTab === "quantity"
         ? "size"
-        : initialTab === "notes"
+        : initialTab === "notes" || initialTab === "misc" || initialTab === "packaging"
           ? "notes"
-          : initialTab === "misc" || initialTab === "packaging"
-            ? "misc"
-            : initialTab === "print" || initialTab === "files" || initialTab === "label"
+          : initialTab === "print" || initialTab === "files" || initialTab === "label"
               ? "print"
               : "basic";
   const [tab, setTab] = useState<SpecTab>(tabFromFocus);
@@ -131,13 +113,7 @@ export function SpecsView({
   const tabTitle = tabLabel === "기본" ? "기본 정보" : tabLabel;
 
   return (
-    <SpecsNav.Provider value={{ toTechPack: onOpenTechPack }}>
-    <div
-      className={cn(
-        "relative h-full min-h-0 bg-paper",
-        tab === "misc" ? "flex flex-col overflow-hidden" : "canvas-dot overflow-x-hidden overflow-y-auto",
-      )}
-    >
+    <div className="relative h-full min-h-0 overflow-x-hidden overflow-y-auto bg-paper canvas-dot">
       <div className="sticky top-0 z-30 h-12 shrink-0 overflow-hidden border-b border-mist bg-paper canvas-dot">
         <div className="flex h-12 w-screen items-center justify-center">
           <div className="flex items-center gap-1">
@@ -180,51 +156,26 @@ export function SpecsView({
         </div>
       </div>
 
-      {tab === "misc" ? (
-        <div className="flex min-h-0 flex-1 canvas-dot">
-          <MiscBoard product={product} />
-        </div>
-      ) : (
       <div className="px-5 py-6">
         <div className={SPECS_COL}>
           <div className="mb-5 flex items-center justify-between">
             <h1 className="text-[22px] font-semibold tracking-tight">{tabTitle}</h1>
           </div>
 
-          {GUIDES[tab]?.map((line) => (
-            <p key={line} className="mb-1 text-[13px] text-stone">
-              {line}
-            </p>
-          ))}
-          <div className={GUIDES[tab] ? "mt-4" : undefined}>
           {tab === "basic" && <BasicTab product={product} brand={ws?.name ?? "내 워크스페이스"} ownerName={owner?.name ?? ""} />}
           {tab === "fabric" && <FabricTab product={product} />}
           {tab === "size" && <SizeTab product={product} />}
           {tab === "notes" && <NotesTab product={product} />}
           {tab === "print" && <PrintTab product={product} />}
-          </div>
         </div>
       </div>
-      )}
     </div>
-    </SpecsNav.Provider>
   );
 }
 
 function Card({ children, className }: { children: React.ReactNode; className?: string }) {
-  const { toTechPack } = useContext(SpecsNav);
   return (
     <section className={cn("relative rounded-[20px] bg-snow p-6 shadow-[0_1px_0_rgba(0,0,0,0.04)]", className)}>
-      {toTechPack && (
-        <button
-          type="button"
-          onClick={toTechPack}
-          aria-label="Tech Pack으로"
-          className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-md text-stone hover:bg-paper hover:text-ink"
-        >
-          <ArrowUpRight size={16} />
-        </button>
-      )}
       {children}
     </section>
   );

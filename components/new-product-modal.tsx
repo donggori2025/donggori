@@ -5,10 +5,16 @@ import { useRouter } from "next/navigation";
 import { ImagePlus, LayoutTemplate, SquareDashed } from "lucide-react";
 import { useWorkspace } from "@/lib/store";
 
-export function NewProductModal({ onClose }: { onClose: () => void }) {
+export function NewProductModal({
+  onClose,
+  start = "choose",
+}: {
+  onClose: () => void;
+  start?: "choose" | "blank";
+}) {
   const router = useRouter();
   const { createProduct } = useWorkspace();
-  const [step, setStep] = useState<"choose" | "blank" | "reference">("choose");
+  const [step, setStep] = useState<"choose" | "blank" | "reference">(start);
   const [name, setName] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -73,8 +79,8 @@ export function NewProductModal({ onClose }: { onClose: () => void }) {
               className="mt-4 h-11 w-full rounded-2xl bg-paper px-4 text-[14px] outline-none"
             />
             <div className="mt-4 flex justify-end gap-2">
-              <button type="button" onClick={() => setStep("choose")} className="rounded-full px-3 py-1.5 text-[13px] text-stone">
-                뒤로
+              <button type="button" onClick={() => (start === "blank" ? onClose() : setStep("choose"))} className="rounded-full px-3 py-1.5 text-[13px] text-stone">
+                {start === "blank" ? "취소" : "뒤로"}
               </button>
               <button className="rounded-full bg-ink px-4 py-1.5 text-[13px] text-snow">만들기</button>
             </div>

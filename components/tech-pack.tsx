@@ -1,44 +1,40 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
-  CircleDot,
+  Columns3,
   Download,
   ExternalLink,
   FileText,
   FolderDown,
-  Hash,
   Link2,
-  Package,
-  PenTool,
-  Pencil,
   Plus,
   Printer,
+  Check,
+  LayoutGrid,
+  List,
   RotateCcw,
-  Ruler,
   Share2,
-  Shirt,
   SquareArrowOutUpRight,
-  StickyNote,
-  Tag,
   Trash2,
   Upload,
   X,
 } from "lucide-react";
-import { CompletenessMenu } from "./completeness-bar";
+import { ComposePalette } from "./pack-compose-cards";
 import { SharePageModal } from "./share-page-modal";
 import { MiniFlat } from "./ui";
 import { NotesEditor } from "./notes-editor";
 import { Mockup2D, Mockup3D } from "./flats";
 import { LibraryImportModal } from "./library-import-modal";
-import { MiscPageSurface, MiscPageToolbar, useMiscPageSession } from "./misc-board";
 import { collections, userById } from "@/lib/data";
 import { materialFromAsset, trimFromAsset } from "@/lib/library-import";
-import { emptyMiscPage, miscBoardOf, pageSize } from "@/lib/misc-board";
 import { isImageFile, printShareFiles, downloadProductFile, readFilesAsProductFiles } from "@/lib/product-files";
+import { pageSize } from "@/lib/misc-board";
+import { FABRIC_PACK_COLUMNS, TRIM_PACK_COLUMNS, togglePackColumn, visiblePackColumns } from "@/lib/pack-columns";
+import { artboardsOf, specArtboardOf, specsFromArtboard, uniquifyPackExtraTitles, uniquePackExtraTitle } from "@/lib/spec-artboard";
 import { useWorkspace } from "@/lib/store";
 import type {
   CanvasNode,
@@ -46,7 +42,7 @@ import type {
   LabelSpec,
   Material,
   MeasurementRow,
-  MiscPage,
+  PackExtra,
   Product,
   ProductFile,
   SpecIdentity,
@@ -83,6 +79,19 @@ const NAMED_SWATCH: Record<string, string> = {
   Natural: "#E8E4DC",
 };
 
+function withPackItemColumns(product: Product, kind: "fabric" | "trim", next: string[]): Product {
+  return {
+    ...product,
+    specs: {
+      ...product.specs,
+      packItemColumns: {
+        ...product.specs.packItemColumns,
+        [kind]: next,
+      },
+    },
+  };
+}
+
 const STATIC_SECTIONS = [
   { id: "basic", label: "기본 정보" },
   { id: "fabric", label: "원단" },
@@ -98,13 +107,13 @@ type SectionDef = {
   label: string;
   badge?: "specs" | "일반";
   subtitle?: string;
-  kind: "flatSpecs" | "drawing" | "basic" | "fabric" | "trim" | "label" | "size" | "qty" | "notes";
+  kind: "flatSpecs" | "drawing" | "basic" | "fabric" | "trim" | "label" | "size" | "qty" | "notes" | "table" | "memo";
   node?: CanvasNode;
+  extra?: PackExtra;
 };
 
 type ShareAlbumItem =
   | { id: string; kind: "pack"; packPage: number }
-  | { id: string; kind: "misc"; page: MiscPage; index: number }
   | { id: string; kind: "prints"; files: ProductFile[] };
 
 function isHexColor(value: string) {
@@ -125,10 +134,6 @@ function colorLabel(color?: string, colorName?: string) {
     if (named) return named[0];
   }
   return "";
-}
-
-function drawingNodes(product: Product) {
-  return product.nodes.filter((n) => n.type === "flat" || n.type === "mockup2d" || n.type === "mockup3d");
 }
 
 function linkedMockups(product: Product, flatId?: string) {
@@ -171,18 +176,36 @@ function isLinkedMockupCovered(section: SectionDef, visible: SectionDef[]) {
 }
 
 function buildSections(product: Product): SectionDef[] {
-  const drawings = drawingNodes(product);
+  const spec = specArtboardOf(product);
+  const others = artboardsOf(product).filter((n) => n.id !== spec?.id);
+  const extras = uniquifyPackExtraTitles(product.specs.packExtras ?? []);
   return [
-    { id: "flatSpecs", label: "도식화", badge: "specs", kind: "flatSpecs" },
-    ...drawings.map((n, i) => ({
+    ...(spec
+      ? [
+          {
+            id: "flatSpecs",
+            label: spec.title || "도식화",
+            badge: "specs" as const,
+            subtitle: "spec용 도식화",
+            kind: "flatSpecs" as const,
+            node: spec,
+          },
+        ]
+      : []),
+    ...others.map((n) => ({
       id: `draw:${n.id}`,
-      label: "도식화",
-      badge: "일반" as const,
-      subtitle: n.title || `Technical Drawing (${i + 1})`,
+      label: n.title || "아트보드",
+      subtitle: "아트보드",
       kind: "drawing" as const,
       node: n,
     })),
     ...STATIC_SECTIONS.map((s) => ({ id: s.id, label: s.label, kind: s.id })),
+    ...extras.map((extra) => ({
+      id: `extra:${extra.id}`,
+      label: extra.title,
+      kind: extra.kind,
+      extra,
+    })),
   ];
 }
 
@@ -240,19 +263,73 @@ function jumpKind(kind: SectionDef["kind"]) {
   if (kind === "trim") return "fabric";
   if (kind === "qty") return "size";
   if (kind === "label") return "print";
+  if (kind === "table" || kind === "memo") return "";
   return kind;
 }
 
-function defaultOn(sections: SectionDef[]): Record<string, boolean> {
-  const next: Record<string, boolean> = {};
-  for (const s of sections) next[s.id] = s.kind !== "drawing";
+function defaultPagesOf(sections: SectionDef[]): Record<string, number[]> {
+  const next: Record<string, number[]> = {};
+  const hasSpec = sections.some((s) => s.kind === "flatSpecs");
+  let firstDrawing = true;
+  for (const s of sections) {
+    if (s.kind === "table" || s.kind === "memo") next[s.id] = [];
+    else if (s.kind === "drawing") {
+      next[s.id] = !hasSpec && firstDrawing ? [1] : [];
+      firstDrawing = false;
+    } else next[s.id] = [1];
+  }
   return next;
 }
 
-function defaultPages(sections: SectionDef[]): Record<string, number> {
-  const next: Record<string, number> = {};
-  for (const s of sections) next[s.id] = 1;
+function remapPagesOf(map: Record<string, number[]>, removed: number) {
+  const next: Record<string, number[]> = {};
+  for (const [id, list] of Object.entries(map)) {
+    next[id] = (list ?? [])
+      .filter((page) => page !== removed)
+      .map((page) => (page > removed ? page - 1 : page));
+  }
   return next;
+}
+
+function PackLiveThumb({
+  product,
+  workspaceName,
+  ownerName,
+  season,
+  page,
+  showPageNo,
+  sections,
+  layoutNonce,
+}: {
+  product: Product;
+  workspaceName: string;
+  ownerName: string;
+  season: string;
+  page: number;
+  showPageNo: boolean;
+  sections: SectionDef[];
+  layoutNonce: number;
+}) {
+  return (
+    <div className="aspect-[297/210] w-full overflow-hidden rounded-lg border border-mist bg-white">
+      <div className="pointer-events-none h-full w-full select-none" aria-hidden="true" inert>
+        <FitA4Landscape>
+          <Sheet
+            product={product}
+            workspaceName={workspaceName}
+            ownerName={ownerName}
+            season={season}
+            page={page}
+            showPageNo={showPageNo}
+            sections={sections}
+            compact
+            resizable={false}
+            layoutNonce={layoutNonce}
+          />
+        </FitA4Landscape>
+      </div>
+    </div>
+  );
 }
 
 const CM_PER_INCH = 2.54;
@@ -449,7 +526,7 @@ function formatDate(value?: string) {
 }
 
 export function printTechPackSheets() {
-  const sheets = Array.from(document.querySelectorAll<HTMLElement>(".tech-pack-sheet"));
+  const sheets = Array.from(document.querySelectorAll<HTMLElement>("[data-pack-main] .tech-pack-sheet"));
   if (!sheets.length) return;
 
   const prev = document.querySelector("iframe[data-tech-pack-print]");
@@ -577,45 +654,42 @@ export function TechPackPreview({
   onClose,
   variant = "editor",
   onJumpSpecs,
+  onPackSidebarWidth,
 }: {
   product: Product;
   onClose?: () => void;
   variant?: "editor" | "share" | "workspace";
   onJumpSpecs?: (section: string) => void;
+  onPackSidebarWidth?: (width: number) => void;
 }) {
-  const { workspaces, updateSpecsField } = useWorkspace();
+  const { workspaces, addPackExtra, removePackExtra, updateSpecsField, deleteNode } = useWorkspace();
   const ws = workspaces.find((w) => w.id === product.workspaceId);
   const owner = userById(product.ownerId);
   const sections = useMemo(() => buildSections(product), [product]);
   const isShare = variant === "share";
 
-  const [onePage, setOnePage] = useState(true);
-  const [pageCount, setPageCount] = useState(2);
+  const [pageCount, setPageCount] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [on, setOn] = useState<Record<string, boolean>>(() => defaultOn(sections));
-  const [pageOf, setPageOf] = useState<Record<string, number>>(() => defaultPages(sections));
+  const [composeTab, setComposeTab] = useState<"print" | "compose">("print");
+  const [pagesOf, setPagesOf] = useState<Record<string, number[]>>(() => defaultPagesOf(sections));
+  const [composeDrag, setComposeDrag] = useState<{ dropPage: number | null } | null>(null);
   const [albumIndex, setAlbumIndex] = useState(0);
   const printPack = () => printTechPackSheets();
 
   const season = seasonLabel(product);
-  const [miscOn, setMiscOn] = useState<Record<string, boolean>>({});
   const [layoutNonce, setLayoutNonce] = useState(0);
-  const miscPages = useMemo(() => miscBoardOf(product.specs), [product]);
-  const isMiscOn = (id: string) => miscOn[id] !== false;
+  const sidebarRef = useRef<HTMLElement>(null);
+  const [printTwoUp, setPrintTwoUp] = useState(false);
   const pages = Array.from({ length: Math.max(1, pageCount) }, (_, i) => i + 1);
-  const sheetPages = onePage ? [1] : pages;
+  const sheetPages = pages;
 
   const album = useMemo(() => {
-    const packPages = onePage ? [1] : Array.from({ length: Math.max(1, pageCount) }, (_, i) => i + 1);
+    const packPages = Array.from({ length: Math.max(1, pageCount) }, (_, i) => i + 1);
     const items: ShareAlbumItem[] = packPages.map((packPage) => ({
       id: `pack-${packPage}`,
       kind: "pack" as const,
       packPage,
     }));
-    for (const [index, page] of miscPages.entries()) {
-      if (!isMiscOn(page.id)) continue;
-      items.push({ id: `misc-${page.id}`, kind: "misc", page, index });
-    }
     if (isShare) {
       const prints = printShareFiles(product.files);
       if (prints.length) {
@@ -623,111 +697,77 @@ export function TechPackPreview({
       }
     }
     return items;
-  }, [isShare, miscOn, miscPages, onePage, pageCount, product]);
+  }, [isShare, pageCount, product]);
 
   const safeAlbumIndex = Math.min(albumIndex, Math.max(0, album.length - 1));
   const currentAlbum = album[safeAlbumIndex] ?? album[0];
-  const showPager = album.length > 1;
   const pagerCount = album.length;
   const pagerView = safeAlbumIndex + 1;
   const viewPage =
-    currentAlbum?.kind === "pack" ? currentAlbum.packPage : onePage ? 1 : Math.min(currentPage, pages.length);
-  const albumCaption =
-    currentAlbum?.kind === "pack"
-      ? sheetPages.length > 1
-        ? `작업지시서 ${currentAlbum.packPage}`
-        : "작업지시서"
-      : currentAlbum?.kind === "misc"
-        ? currentAlbum.page.title?.trim() || `기타 ${currentAlbum.index + 1}`
-        : currentAlbum?.kind === "prints"
-          ? "인쇄"
-          : "";
+    currentAlbum?.kind === "pack" ? currentAlbum.packPage : Math.min(currentPage, pages.length);
+
+  useEffect(() => {
+    setPagesOf((map) => {
+      let changed = false;
+      const next = { ...map };
+      for (const s of sections) {
+        if (s.id in next) continue;
+        next[s.id] = s.kind === "table" || s.kind === "memo" ? [viewPage] : s.kind === "drawing" ? [] : [1];
+        changed = true;
+      }
+      return changed ? next : map;
+    });
+  }, [sections, viewPage]);
 
   const visibleOnPage = (page: number) =>
-    sections.filter((s) => on[s.id] && (onePage || (pageOf[s.id] ?? 1) === page));
+    sections.filter((s) => (pagesOf[s.id] ?? []).includes(page));
 
-  const toggleOnePage = () => {
-    setOnePage((v) => {
-      if (v && pageCount < 2) setPageCount(2);
-      return !v;
+  const addSectionToPage = (id: string, page: number) => {
+    setPagesOf((map) => {
+      const cur = map[id] ?? [];
+      if (cur.includes(page)) return map;
+      return { ...map, [id]: [...cur, page].sort((a, b) => a - b) };
     });
   };
 
-  const addPage = () => setPageCount((n) => n + 1);
+  const removeSectionFromPage = (id: string, page: number) => {
+    setPagesOf((map) => {
+      const cur = map[id] ?? [];
+      if (!cur.includes(page)) return map;
+      return { ...map, [id]: cur.filter((n) => n !== page) };
+    });
+  };
+
+  const addPage = () => {
+    const next = pageCount + 1;
+    setPageCount(next);
+    setCurrentPage(next);
+    setAlbumIndex(pageCount);
+  };
 
   const removePage = (page: number) => {
     if (pageCount <= 1) return;
-    setPageOf((map) => {
-      const next: Record<string, number> = {};
-      for (const [id, p] of Object.entries(map)) {
-        if (p === page) next[id] = 1;
-        else if (p > page) next[id] = p - 1;
-        else next[id] = p;
-      }
-      return next;
-    });
+    const viewingPack = currentAlbum?.kind === "pack";
+    const viewPackPage = viewingPack ? currentAlbum.packPage : currentPage;
+    let nextPage = viewPackPage;
+    if (nextPage === page) nextPage = Math.max(1, page - 1);
+    else if (nextPage > page) nextPage -= 1;
+    setPagesOf((map) => remapPagesOf(map, page));
     setPageCount((n) => Math.max(1, n - 1));
-    setCurrentPage((c) => {
-      if (c === page) return Math.max(1, page - 1);
-      if (c > page) return c - 1;
-      return c;
-    });
+    setCurrentPage(nextPage);
+    setAlbumIndex((i) => (viewingPack ? nextPage - 1 : Math.max(0, i - 1)));
   };
 
   const reset = () => {
-    setOn(defaultOn(sections));
-    setPageOf(defaultPages(sections));
-    setMiscOn({});
+    setPagesOf(defaultPagesOf(sections));
+    setPageCount(1);
+    setCurrentPage(1);
     clearPackLayout(product.id);
     setLayoutNonce((n) => n + 1);
   };
 
-  const renameMiscPage = (id: string, title: string) => {
-    const next = title.trim();
-    if (!next) return;
-    updateSpecsField(product.id, (p) => ({
-      ...p,
-      specs: {
-        ...p.specs,
-        miscBoard: miscBoardOf(p.specs).map((page) => (page.id === id ? { ...page, title: next } : page)),
-      },
-    }));
-  };
-
-  const patchMiscPage = (id: string, next: MiscPage) => {
-    updateSpecsField(product.id, (p) => ({
-      ...p,
-      specs: {
-        ...p.specs,
-        miscBoard: miscBoardOf(p.specs).map((page) => (page.id === id ? next : page)),
-      },
-    }));
-  };
-
-  const deleteMiscPage = (id: string) => {
-    updateSpecsField(product.id, (p) => ({
-      ...p,
-      specs: { ...p.specs, miscBoard: miscBoardOf(p.specs).filter((page) => page.id !== id) },
-    }));
-    setMiscOn((m) => {
-      const next = { ...m };
-      delete next[id];
-      return next;
-    });
-    setAlbumIndex((i) => Math.max(0, i - 1));
-  };
-
-  const addMiscPage = () => {
-    const next = emptyMiscPage(miscPages.length + 1);
-    updateSpecsField(product.id, (p) => ({
-      ...p,
-      specs: { ...p.specs, miscBoard: [...miscBoardOf(p.specs), next] },
-    }));
-    setMiscOn((m) => ({ ...m, [next.id]: true }));
-    const packLen = onePage ? 1 : pageCount;
-    const before = miscPages.filter((p) => isMiscOn(p.id)).length;
-    setAlbumIndex(packLen + before);
-  };
+  const embedded = variant === "workspace";
+  const showCompose = variant !== "share";
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -740,8 +780,15 @@ export function TechPackPreview({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const embedded = variant === "workspace";
-  const showCompose = variant !== "share";
+  useLayoutEffect(() => {
+    const el = sidebarRef.current;
+    if (!el) return;
+    const apply = () => setPrintTwoUp(el.clientWidth >= PACK_PRINT_TWO_UP_PX);
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [showCompose]);
 
   return (
     <div
@@ -752,11 +799,7 @@ export function TechPackPreview({
     >
       {variant === "share" ? (
         <ShareCopyLinkButton />
-      ) : variant === "workspace" ? (
-        <div className="tech-pack-chrome pointer-events-none absolute top-3 right-4 z-20 print:hidden">
-          {onJumpSpecs && <CompletenessMenu product={product} onJump={onJumpSpecs} />}
-        </div>
-      ) : (
+      ) : variant === "workspace" ? null : (
         <header className="tech-pack-chrome flex h-12 shrink-0 items-center justify-between border-b border-mist bg-snow px-4 print:hidden">
           <div className="flex items-center gap-2">
             <button
@@ -773,164 +816,227 @@ export function TechPackPreview({
       )}
 
       <div className="tech-pack-body flex min-h-0 flex-1 overflow-hidden">
-        {showCompose && (
-        <aside className="tech-pack-chrome flex w-[268px] shrink-0 flex-col border-r border-mist bg-snow print:hidden">
-          <div className="px-3.5 pt-4 pb-3">
-            <p className="text-[10px] font-medium tracking-[0.18em] text-stone uppercase">출력</p>
-            <div className="mt-2.5 rounded-2xl bg-paper px-3 py-2.5">
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[13px] tracking-tight">한 장에 모두</p>
-                  <p className="mt-0.5 text-[11px] leading-snug text-stone">
-                    {onePage ? "섹션을 한 페이지에 모읍니다" : "페이지를 나눠 배치합니다"}
-                  </p>
-                </div>
-                <Switch on={onePage} onClick={toggleOnePage} />
-              </div>
-              {!onePage && (
-                <div className="mt-2.5 space-y-1.5 border-t border-mist pt-2.5">
-                  {pages.map((n) => (
+        <div className="tech-pack-stage relative flex min-h-0 flex-1 flex-col overflow-hidden">
+        <PackFitRow
+          dropPage={currentAlbum?.kind === "pack" ? viewPage : undefined}
+          flushEnd={embedded}
+          onSidebarWidth={onPackSidebarWidth}
+          sidebar={showCompose ? (
+        <aside
+          ref={sidebarRef}
+          data-pack-sidebar
+          className={cn("tech-pack-chrome relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden border border-mist bg-snow shadow-sm print:hidden", PACK_PANEL_RADIUS)}
+        >
+          <div className="mx-3.5 mt-3 flex shrink-0 border-b border-mist" role="tablist" aria-label="작업지시서 사이드바">
+            {([
+              ["print", "출력"],
+              ["compose", "구성"],
+            ] as const).map(([id, label]) => {
+              const active = composeTab === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setComposeTab(id)}
+                  className={cn(
+                    "-mb-px flex-1 pb-2 text-[13px]",
+                    active
+                      ? "border-b-2 border-ink text-ink"
+                      : "border-b-2 border-transparent text-stone hover:text-ink",
+                  )}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className={cn("flex min-h-0 flex-1 flex-col pt-3", composeTab !== "print" && "hidden")}>
+            <div className="min-h-0 flex-1 overflow-auto px-3.5 pb-3">
+              <div className={cn("grid gap-2", printTwoUp ? "grid-cols-2" : "grid-cols-1")}>
+                {pages.map((n) => {
+                  const selected = n === viewPage;
+                  return (
                     <div
                       key={n}
+                      data-pack-drop-page={n}
                       className={cn(
-                        "flex h-8 items-center justify-between rounded-full px-2.5 text-[12px]",
-                        n === viewPage ? "bg-snow text-ink" : "text-stone hover:bg-snow/70",
+                        "rounded-2xl p-1.5",
+                        selected ? "bg-paper ring-1 ring-ink/15" : "hover:bg-paper/70",
+                        composeDrag?.dropPage === n && "ring-2 ring-[#0d99ff]",
                       )}
                     >
-                      <button
-                        type="button"
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${n}장 미리보기`}
                         onClick={() => {
                           setCurrentPage(n);
                           const idx = album.findIndex((item) => item.kind === "pack" && item.packPage === n);
                           if (idx >= 0) setAlbumIndex(idx);
                         }}
-                        className="min-w-0 flex-1 text-left"
+                        onKeyDown={(e) => {
+                          if (e.key !== "Enter" && e.key !== " ") return;
+                          e.preventDefault();
+                          setCurrentPage(n);
+                          const idx = album.findIndex((item) => item.kind === "pack" && item.packPage === n);
+                          if (idx >= 0) setAlbumIndex(idx);
+                        }}
+                        className="block w-full cursor-pointer"
                       >
-                        {n}페이지
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removePage(n)}
-                        disabled={pageCount <= 1}
-                        className="flex h-6 w-6 items-center justify-center rounded-full text-stone hover:bg-paper hover:text-ink disabled:opacity-30"
-                        aria-label={`${n}페이지 삭제`}
-                      >
-                        <Trash2 size={12} />
-                      </button>
+                        <PackLiveThumb
+                          product={product}
+                          workspaceName={ws?.name ?? "내 워크스페이스"}
+                          ownerName={owner?.name ?? "—"}
+                          season={season}
+                          page={n}
+                          showPageNo={pageCount > 1}
+                          sections={visibleOnPage(n)}
+                          layoutNonce={layoutNonce}
+                        />
+                      </div>
+                      <div className="mt-1 flex h-7 items-center justify-between px-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCurrentPage(n);
+                            const idx = album.findIndex((item) => item.kind === "pack" && item.packPage === n);
+                            if (idx >= 0) setAlbumIndex(idx);
+                          }}
+                          className={cn("text-[12px]", selected ? "text-ink" : "text-stone")}
+                        >
+                          {n}장
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removePage(n)}
+                          disabled={pageCount <= 1}
+                          className="flex h-6 w-6 items-center justify-center rounded-full text-stone hover:bg-snow hover:text-ink disabled:opacity-30"
+                          aria-label={`${n}장 삭제`}
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
                     </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addPage}
-                    className="flex h-8 w-full items-center justify-center gap-1 rounded-full text-[12px] text-stone hover:bg-snow hover:text-ink"
-                  >
-                    <Plus size={12} />
-                    페이지 추가
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between px-3.5 pb-2">
-            <p className="text-[10px] font-medium tracking-[0.18em] text-stone uppercase">구성</p>
-            <button
-              type="button"
-              onClick={reset}
-              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] text-stone hover:bg-paper hover:text-ink"
-            >
-              <RotateCcw size={11} />
-              초기화
-            </button>
-          </div>
-          <div className="min-h-0 flex-1 overflow-auto px-3 pb-4">
-            <p className="px-1 pb-1.5 text-[11px] text-stone">도식화</p>
-            <div className="space-y-1">
-              {sections
-                .filter((s) => s.kind === "flatSpecs" || s.kind === "drawing")
-                .filter((s) => !isLinkedMockupCovered(s, sections))
-                .map((sec) => (
-                  <SectionRow
-                    key={sec.id}
-                    section={sec}
-                    on={Boolean(on[sec.id])}
-                    onePage={onePage}
-                    page={pageOf[sec.id] ?? 1}
-                    pages={pages}
-                    onToggle={() => setOn((s) => ({ ...s, [sec.id]: !s[sec.id] }))}
-                    onPage={(n) => setPageOf((m) => ({ ...m, [sec.id]: n }))}
-                  />
-                ))}
-            </div>
-            <p className="px-1 pb-1.5 pt-3.5 text-[11px] text-stone">스펙</p>
-            <div className="space-y-1">
-              {sections
-                .filter((s) => s.kind !== "flatSpecs" && s.kind !== "drawing")
-                .map((sec) => (
-                  <SectionRow
-                    key={sec.id}
-                    section={sec}
-                    on={Boolean(on[sec.id])}
-                    onePage={onePage}
-                    page={pageOf[sec.id] ?? 1}
-                    pages={pages}
-                    onToggle={() => setOn((s) => ({ ...s, [sec.id]: !s[sec.id] }))}
-                    onPage={(n) => setPageOf((m) => ({ ...m, [sec.id]: n }))}
-                  />
-                ))}
-            </div>
-            <p className="px-1 pb-1.5 pt-3.5 text-[11px] text-stone">기타</p>
-            <div className="space-y-1">
-              {miscPages.length === 0 ? (
+                  );
+                })}
                 <button
                   type="button"
-                  onClick={addMiscPage}
-                  className="flex h-8 w-full items-center justify-center gap-1 rounded-full text-[12px] text-stone hover:bg-snow hover:text-ink"
+                  onClick={addPage}
+                  className={cn(
+                    "flex w-full items-center justify-center gap-1 text-[12px] text-stone hover:bg-paper hover:text-ink",
+                    printTwoUp
+                      ? "flex-col rounded-2xl p-1.5"
+                      : "h-8 rounded-full",
+                  )}
                 >
-                  <Plus size={12} />
-                  페이지 추가
+                  {printTwoUp ? (
+                    <>
+                      <span className="flex aspect-[297/210] w-full flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-mist">
+                        <Plus size={12} />
+                        장 추가
+                      </span>
+                      <span className="mt-1 h-7" />
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={12} />
+                      장 추가
+                    </>
+                  )}
                 </button>
-              ) : (
-                miscPages.map((page, index) => (
-                  <MiscRow
-                    key={page.id}
-                    title={page.title?.trim() || `${index + 1}페이지`}
-                    on={isMiscOn(page.id)}
-                    onToggle={() => {
-                      const nextOn = !isMiscOn(page.id);
-                      setMiscOn((m) => ({ ...m, [page.id]: nextOn }));
-                      if (nextOn) {
-                        const packLen = onePage ? 1 : pageCount;
-                        const before = miscPages.filter((p, i) => i < index && isMiscOn(p.id)).length;
-                        setAlbumIndex(packLen + before);
-                      }
-                    }}
-                    onTitle={(title) => renameMiscPage(page.id, title)}
-                    onOpen={() => {
-                      if (!isMiscOn(page.id)) return;
-                      const packLen = onePage ? 1 : pageCount;
-                      const before = miscPages.filter((p, i) => i < index && isMiscOn(p.id)).length;
-                      setAlbumIndex(packLen + before);
-                    }}
-                  />
-                ))
-              )}
+              </div>
             </div>
           </div>
-        </aside>
-        )}
 
-        <div className="tech-pack-stage flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div className="tech-pack-stage-body flex min-h-0 flex-1 items-center justify-center overflow-hidden p-2">
-            <FitA4Landscape>
+          <div className={cn("flex min-h-0 flex-1 flex-col pt-3", composeTab !== "compose" && "hidden")}>
+            <div className="flex items-center justify-between gap-1 px-3.5 pb-2">
+              <p className="min-w-0 truncate text-[11px] text-stone">{viewPage}장 · 끌어다 넣기</p>
+              <button
+                type="button"
+                onClick={reset}
+                className="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] text-stone hover:bg-paper hover:text-ink"
+              >
+                <RotateCcw size={11} />
+                초기화
+              </button>
+            </div>
+            <ComposePalette
+              product={product}
+              viewPage={viewPage}
+              pagesOf={pagesOf}
+              groups={[
+                {
+                  title: "아트보드",
+                  items: sections
+                    .filter((s) => s.kind === "flatSpecs" || s.kind === "drawing")
+                    .filter((s) => !isLinkedMockupCovered(s, sections)),
+                },
+                {
+                  title: "스펙",
+                  items: sections.filter(
+                    (s) => s.kind !== "flatSpecs" && s.kind !== "drawing" && s.kind !== "table" && s.kind !== "memo",
+                  ),
+                },
+                {
+                  title: "표 · 메모",
+                  canCreate: true,
+                  items: sections.filter((s) => s.kind === "table" || s.kind === "memo"),
+                },
+              ]}
+              onAddToPage={addSectionToPage}
+              onCreateExtra={(kind) => {
+                const id = addPackExtra(product.id, kind);
+                setPagesOf((map) => ({ ...map, [`extra:${id}`]: [viewPage] }));
+              }}
+              onRemove={(id) => {
+                const sec = sections.find((s) => s.id === id);
+                if (!sec) return;
+                if (sec.extra) removePackExtra(product.id, sec.extra.id);
+                else if (sec.node) deleteNode(product.id, sec.node.id);
+                setPagesOf((map) => {
+                  if (!(id in map)) return map;
+                  const next = { ...map };
+                  delete next[id];
+                  return next;
+                });
+              }}
+              onRename={(id, title) => {
+                const extra = sections.find((s) => s.id === id)?.extra;
+                if (!extra) return;
+                updateSpecsField(product.id, (p) => {
+                  const extras = p.specs.packExtras ?? [];
+                  const nextTitle = uniquePackExtraTitle(title, extras, extra.kind, extra.id);
+                  return {
+                    ...p,
+                    specs: {
+                      ...p.specs,
+                      packExtras: extras.map((e) => (e.id === extra.id ? { ...e, title: nextTitle } : e)),
+                    },
+                  };
+                });
+              }}
+              onDragState={setComposeDrag}
+            />
+          </div>
+          {composeDrag && (
+            <div className="pointer-events-none absolute inset-0 z-20 bg-paper/70" aria-hidden="true" />
+          )}
+        </aside>
+          ) : null}
+        >
               {sheetPages.map((page) => {
                 const packVisible = currentAlbum?.kind === "pack" && currentAlbum.packPage === page;
                 return (
                 <div
                   key={page}
+                  data-pack-drop-page={packVisible ? page : undefined}
                   className={cn(
                     "h-full w-full",
                     !packVisible && "hidden print:block",
+                    composeDrag && packVisible && composeDrag.dropPage === page && "ring-2 ring-[#0d99ff]",
                   )}
                 >
                   <Sheet
@@ -939,80 +1045,69 @@ export function TechPackPreview({
                     ownerName={owner?.name ?? "—"}
                     season={season}
                     page={page}
-                    showPageNo={!onePage}
+                    showPageNo={pageCount > 1}
                     sections={visibleOnPage(page)}
                     compact={embedded}
                     resizable={!isShare}
                     layoutNonce={layoutNonce}
                     onJump={isShare ? undefined : onJumpSpecs}
+                    onUnassign={isShare ? undefined : (id) => removeSectionFromPage(id, page)}
                   />
                 </div>
                 );
               })}
-              {currentAlbum?.kind === "misc" && (
-                <ShareMiscSheet
-                  key={currentAlbum.page.id}
-                  page={currentAlbum.page}
-                  index={currentAlbum.index}
-                  compact={embedded}
-                  productCode={product.code}
-                  version={product.version}
-                  onJump={isShare ? undefined : () => onJumpSpecs?.("misc")}
-                  onTitle={isShare ? undefined : (title) => renameMiscPage(currentAlbum.page.id, title)}
-                  onDeletePage={isShare ? undefined : () => deleteMiscPage(currentAlbum.page.id)}
-                  onChangePage={isShare ? undefined : (next) => patchMiscPage(currentAlbum.page.id, next)}
-                />
-              )}
               {isShare && currentAlbum?.kind === "prints" && <SharePrintSheet files={currentAlbum.files} />}
-            </FitA4Landscape>
-          </div>
-          {showPager && (
-            <div className="tech-pack-chrome flex shrink-0 flex-col items-center justify-center gap-1.5 pb-3 print:hidden">
-              <div className="flex items-center justify-center gap-3">
+        </PackFitRow>
+          <nav
+            data-pack-pager
+            aria-label="페이지"
+            className="tech-pack-chrome pointer-events-none absolute z-20 flex justify-center print:hidden"
+            style={{
+              left: showCompose ? PACK_FLOAT_INSET + PACK_SIDEBAR_W + PACK_PAIR_GAP_PX : 0,
+              right: 0,
+              bottom: PACK_FLOAT_INSET,
+            }}
+          >
+            <div className="pointer-events-auto inline-flex h-9 items-center gap-0.5 rounded-full border border-mist bg-snow px-1.5 shadow-sm">
               <button
                 type="button"
                 onClick={() => setAlbumIndex((i) => Math.max(0, i - 1))}
                 disabled={pagerView <= 1}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-mist disabled:opacity-30"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-stone hover:bg-paper hover:text-ink disabled:text-stone/35 disabled:hover:bg-transparent"
                 aria-label="이전 페이지"
               >
-                <ChevronLeft size={16} />
+                <ChevronLeft size={16} strokeWidth={1.75} />
               </button>
-              <div className="flex items-center gap-1.5">
-                {album.map((item, i) => {
-                  const n = i + 1;
-                  const active = n === pagerView;
-                  return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    aria-label={`${n}페이지`}
-                    aria-current={active ? "page" : undefined}
-                    onClick={() => setAlbumIndex(i)}
-                    className={cn(
-                      "h-2 w-2 rounded-full",
-                      active ? "bg-ink" : "bg-black/15 hover:bg-black/30",
-                    )}
-                  />
-                  );
-                })}
-              </div>
-              <p className="min-w-[3.5rem] text-center text-[12px] tabular-nums text-stone">
-                {pagerView} / {pagerCount}
+              <p className="min-w-[2.25rem] px-0.5 text-center text-[13px] tabular-nums text-ink">
+                {pagerView}/{pagerCount}
               </p>
               <button
                 type="button"
                 onClick={() => setAlbumIndex((i) => Math.min(album.length - 1, i + 1))}
                 disabled={pagerView >= pagerCount}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-mist disabled:opacity-30"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-stone hover:bg-paper hover:text-ink disabled:text-stone/35 disabled:hover:bg-transparent"
                 aria-label="다음 페이지"
               >
-                <ChevronRight size={16} />
+                <ChevronRight size={16} strokeWidth={1.75} />
               </button>
+            </div>
+          </nav>
+          {composeDrag && (
+            <div className="pointer-events-none absolute inset-0 z-30 print:hidden">
+              <div className="pointer-events-auto absolute bottom-16 left-1/2 flex -translate-x-1/2 gap-2">
+                {pages.map((n) => (
+                  <div
+                    key={n}
+                    data-pack-drop-page={n}
+                    className={cn(
+                      "rounded-full border bg-snow px-3.5 py-2 text-[13px] shadow-[0_8px_24px_rgba(26,25,22,0.12)]",
+                      composeDrag.dropPage === n ? "border-ink ring-2 ring-[#0d99ff]" : "border-mist",
+                    )}
+                  >
+                    {n}장
+                  </div>
+                ))}
               </div>
-              {albumCaption && (
-                <p className="text-[11px] text-stone">{albumCaption}</p>
-              )}
             </div>
           )}
         </div>
@@ -1133,162 +1228,137 @@ function ShareCopyLinkButton() {
   );
 }
 
-function sectionIcon(kind: SectionDef["kind"]) {
-  const props = { size: 13, strokeWidth: 1.7 };
-  if (kind === "flatSpecs") return <PenTool {...props} />;
-  if (kind === "drawing") return <Pencil {...props} />;
-  if (kind === "basic") return <FileText {...props} />;
-  if (kind === "fabric") return <Shirt {...props} />;
-  if (kind === "trim") return <CircleDot {...props} />;
-  if (kind === "label") return <Tag {...props} />;
-  if (kind === "size") return <Ruler {...props} />;
-  if (kind === "qty") return <Hash {...props} />;
-  if (kind === "notes") return <StickyNote {...props} />;
-  return <Package {...props} />;
+
+/** Fixed 출력/구성 rail width. Does not absorb leftover canvas width. */
+export const PACK_SIDEBAR_W = 272;
+export const PACK_SIDEBAR_MIN_PX = PACK_SIDEBAR_W;
+/** Tech Pack-only 속성 card width. Narrower than Design so the A4 sheet can grow. */
+export const PACK_RIGHT_RAIL_W = 268;
+/** Viewport inset matching Design `top-3` / `left-3` / `right-3` (12px). */
+export const PACK_FLOAT_INSET = 12;
+export const PACK_FLOAT_INSET_RIGHT = PACK_FLOAT_INSET;
+/** 출력 thumbs sit two-up only if this modest rail is wide enough — it is not. */
+export const PACK_PRINT_TWO_UP_PX = 280;
+const PACK_PAIR_GAP_PX = 12;
+const PACK_FIT = 1;
+const PACK_CHROME_RADIUS_PX = 8;
+const PACK_PANEL_RADIUS = "rounded-[8px]";
+const PACK_SHEET_RADIUS = "rounded-[8px]";
+export const PACK_CHROME_CHIP_H = 52;
+
+function contentBoxSize(el: HTMLElement) {
+  const cs = getComputedStyle(el);
+  const padX = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+  const padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+  return {
+    w: Math.max(0, el.clientWidth - padX),
+    h: Math.max(0, el.clientHeight - padY),
+  };
 }
 
-function MiscRow({
-  title,
-  on,
-  onToggle,
-  onTitle,
-  onOpen,
+function PackFitRow({
+  sidebar,
+  dropPage,
+  flushEnd,
+  onSidebarWidth,
+  children,
 }: {
-  title: string;
-  on: boolean;
-  onToggle: () => void;
-  onTitle: (title: string) => void;
-  onOpen?: () => void;
+  sidebar: ReactNode;
+  dropPage?: number;
+  flushEnd?: boolean;
+  onSidebarWidth?: (width: number) => void;
+  children: ReactNode;
 }) {
-  return (
-    <div className={cn("rounded-2xl transition-colors", on ? "bg-paper" : "hover:bg-paper/70")}>
-      <div className="flex items-start gap-2 px-2 py-2">
-        <button
-          type="button"
-          onClick={onOpen ?? onToggle}
-          className={cn(
-            "mt-px flex h-7 w-7 shrink-0 items-center justify-center rounded-xl",
-            on ? "bg-snow text-ink" : "bg-snow/80 text-stone",
-          )}
-          aria-label="기타 페이지 보기"
-        >
-          <ArrowUpRight size={13} strokeWidth={1.7} />
-        </button>
-        <input
-          key={title}
-          defaultValue={title}
-          aria-label="기타 페이지 제목"
-          onBlur={(e) => {
-            const next = e.target.value.trim();
-            if (next && next !== title) onTitle(next);
-            else e.target.value = title;
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-          }}
-          className={cn(
-            "mt-0.5 h-6 min-w-0 flex-1 bg-transparent text-[13px] tracking-tight outline-none",
-            !on && "text-stone",
-          )}
-        />
-        <span className="mt-0.5">
-          <Switch on={on} onClick={onToggle} />
-        </span>
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const onSidebarWidthRef = useRef(onSidebarWidth);
+  onSidebarWidthRef.current = onSidebarWidth;
+  const { w, h } = pageSize();
+  const [zoom, setZoom] = useState(0.01);
+  const hasSidebar = Boolean(sidebar);
+  const sidebarW = hasSidebar ? PACK_SIDEBAR_W : 0;
+
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const apply = () => {
+      const { w: pw, h: ph } = pageSize();
+      const { w: innerW, h: innerH } = contentBoxSize(el);
+      const sidebarSpace = hasSidebar ? PACK_SIDEBAR_W + PACK_PAIR_GAP_PX : 0;
+      const next =
+        Math.min((innerW - sidebarSpace) / pw, innerH / ph) * PACK_FIT;
+      const nextZoom = Number.isFinite(next) && next > 0 ? next : 0.01;
+      setZoom(nextZoom);
+      onSidebarWidthRef.current?.(hasSidebar ? PACK_SIDEBAR_W : 0);
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [hasSidebar]);
+
+  const paperW = w * zoom;
+  const paperH = h * zoom;
+
+  const sheet = (
+    <div
+      data-pack-main
+      className={cn("tech-pack-pages relative isolate shrink-0 overflow-hidden shadow-sm", PACK_SHEET_RADIUS)}
+      style={{
+        width: paperW,
+        height: paperH,
+        clipPath: `inset(0 round ${PACK_CHROME_RADIUS_PX}px)`,
+        ["--pack-zoom" as string]: String(zoom),
+        ["--pack-chrome-radius" as string]: `${PACK_CHROME_RADIUS_PX}px`,
+      }}
+    >
+      <div
+        className="absolute top-0 left-0 origin-top-left overflow-hidden"
+        style={{
+          width: w,
+          height: h,
+          transform: `scale(${zoom})`,
+          borderRadius: PACK_CHROME_RADIUS_PX / zoom,
+        }}
+      >
+        {children}
       </div>
     </div>
   );
-}
 
-function SectionRow({
-  section,
-  on,
-  onePage,
-  page,
-  pages,
-  onToggle,
-  onPage,
-}: {
-  section: SectionDef;
-  on: boolean;
-  onePage: boolean;
-  page: number;
-  pages: number[];
-  onToggle: () => void;
-  onPage: (n: number) => void;
-}) {
   return (
-    <div className={cn("rounded-2xl transition-colors", on ? "bg-paper" : "hover:bg-paper/70")}>
-      <div className="flex items-start gap-2 px-2 py-2">
-        <button type="button" onClick={onToggle} className="flex min-w-0 flex-1 items-start gap-2.5 text-left">
-          <span
-            className={cn(
-              "mt-px flex h-7 w-7 shrink-0 items-center justify-center rounded-xl",
-              on ? "bg-snow text-ink" : "bg-snow/80 text-stone",
-            )}
-          >
-            {sectionIcon(section.kind)}
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="flex min-w-0 items-center gap-1.5">
-              <span className={cn("truncate text-[13px] tracking-tight", !on && "text-stone")}>{section.label}</span>
-              {section.badge && (
-                <span
-                  className={cn(
-                    "shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-medium",
-                    section.badge === "specs" ? "bg-sky text-sky-ink" : "bg-mist text-stone",
-                  )}
-                >
-                  {section.badge}
-                </span>
-              )}
-            </span>
-            {section.subtitle && (
-              <span className="mt-0.5 block truncate text-[11px] text-stone">{section.subtitle}</span>
-            )}
-          </span>
-        </button>
-        <span className="mt-0.5">
-          <Switch on={on} onClick={onToggle} />
-        </span>
-      </div>
-      {!onePage && on && (
-        <div className="px-2 pb-2">
-          <select
-            value={page}
-            onChange={(e) => onPage(Number(e.target.value))}
-            className="h-7 w-full rounded-full border-0 bg-snow px-2.5 text-[11px] text-stone outline-none"
-          >
-            {pages.map((n) => (
-              <option key={n} value={n}>
-                {n}페이지
-              </option>
-            ))}
-          </select>
+    <div
+      ref={wrapRef}
+      className={cn(
+        "tech-pack-stage-body flex min-h-0 flex-1 flex-col overflow-hidden py-3",
+        hasSidebar ? "justify-start" : "items-center justify-center px-4",
+      )}
+      style={
+        hasSidebar
+          ? {
+              paddingLeft: PACK_FLOAT_INSET,
+              paddingRight: flushEnd ? 0 : PACK_FLOAT_INSET,
+            }
+          : undefined
+      }
+      data-pack-drop-page={dropPage}
+    >
+      {hasSidebar ? (
+        <div className="flex min-h-0 w-full flex-1 gap-3">
+          <div className="flex min-h-0 shrink-0 flex-col self-stretch" style={{ width: sidebarW }}>
+            {sidebar}
+          </div>
+          <div className="relative flex min-h-0 min-w-0 flex-1 justify-center">
+            <div className="relative shrink-0 self-start" style={{ width: paperW, height: paperH }}>
+              {sheet}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="relative flex h-full min-h-0 w-full items-center justify-center">
+          {sheet}
         </div>
       )}
     </div>
-  );
-}
-
-function Switch({ on, onClick }: { on: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={on}
-      onClick={onClick}
-      className={cn(
-        "relative h-[18px] w-8 shrink-0 rounded-full transition-colors",
-        on ? "bg-ink" : "bg-fog",
-      )}
-    >
-      <span
-        className={cn(
-          "absolute top-[2px] h-3.5 w-3.5 rounded-full bg-snow shadow-sm transition-[left]",
-          on ? "left-[14px]" : "left-[2px]",
-        )}
-      />
-    </button>
   );
 }
 
@@ -1319,146 +1389,6 @@ function FitA4Landscape({ children }: { children: ReactNode }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function ShareMiscSheet({
-  page,
-  index,
-  compact,
-  productCode,
-  version,
-  onJump,
-  onTitle,
-  onDeletePage,
-  onChangePage,
-}: {
-  page: MiscPage;
-  index: number;
-  compact?: boolean;
-  productCode: string;
-  version: number;
-  onJump?: () => void;
-  onTitle?: (title: string) => void;
-  onDeletePage?: () => void;
-  onChangePage?: (page: MiscPage) => void;
-}) {
-  const editable = Boolean(onChangePage);
-  const session = useMiscPageSession(page, onChangePage ?? (() => {}), editable);
-  const title = page.title?.trim() || `${index + 1}페이지`;
-  const livePage = editable ? session.page : page;
-
-  return (
-    <article className="tech-pack-sheet flex h-full w-full flex-col overflow-hidden border border-[#e6e4de] bg-white">
-      <div className={cn("flex shrink-0 items-start justify-between", compact ? "px-2 pt-1.5 pb-0.5" : "px-3 pt-2 pb-1")}>
-        <div className="min-w-0 flex-1">
-          {onTitle ? (
-            <input
-              key={title}
-              defaultValue={title}
-              aria-label="기타 페이지 제목"
-              onBlur={(e) => {
-                const next = e.target.value.trim();
-                if (next && next !== title) onTitle(next);
-                else e.target.value = title;
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-              }}
-              className={cn(
-                "w-full min-w-0 bg-transparent font-bold tracking-tight outline-none",
-                compact ? "text-[12px] print:text-[16px]" : "text-[16px]",
-              )}
-            />
-          ) : (
-            <p className={cn("truncate font-bold tracking-tight", compact ? "text-[12px] print:text-[16px]" : "text-[16px]")}>
-              {title}
-            </p>
-          )}
-          <p className={cn("mt-0.5 text-stone", compact ? "text-[8px] print:text-[11px]" : "text-[11px]")}>
-            {productCode} · Tech Pack v{version}.1
-          </p>
-        </div>
-        <div className="ml-2 flex shrink-0 items-center gap-0.5 print:hidden">
-          {onDeletePage && (
-            <button
-              type="button"
-              onClick={onDeletePage}
-              aria-label="기타 페이지 삭제"
-              className="flex h-6 w-6 items-center justify-center rounded-full text-stone hover:bg-[#f3f2ef] hover:text-ink"
-            >
-              <Trash2 size={13} />
-            </button>
-          )}
-          {onJump && (
-            <button
-              type="button"
-              onClick={onJump}
-              aria-label="기타 상세 수정"
-              className="flex h-6 w-6 items-center justify-center rounded-md text-stone hover:bg-[#f3f2ef] hover:text-ink"
-            >
-              <SquareArrowOutUpRight size={13} strokeWidth={2} />
-            </button>
-          )}
-        </div>
-      </div>
-      <div
-        ref={editable ? session.pageRef : undefined}
-        className={cn(
-          "relative min-h-0 flex-1 overflow-hidden border-t border-[#e6e4de]",
-          editable && (session.tool === "text" || session.tool === "note" || session.tool === "arrow") && "cursor-crosshair",
-        )}
-        onPointerDown={editable ? session.onPagePointerDown : undefined}
-        onPointerMove={editable ? session.onPagePointerMove : undefined}
-        onPointerUp={editable ? session.onPagePointerUp : undefined}
-      >
-        <MiscPageSurface
-          page={livePage}
-          selectedId={editable ? session.selectedId : undefined}
-          editingId={editable ? session.editingId : undefined}
-          draftArrow={editable ? session.draftArrow : undefined}
-          onSelect={
-            editable
-              ? (id) => {
-                  session.setSelectedId(id);
-                  if (session.editingId && session.editingId !== id) session.setEditingId(null);
-                }
-              : undefined
-          }
-          onEdit={editable ? session.setEditingId : undefined}
-          onMoveStart={editable ? session.startMove : undefined}
-          onResizeStart={editable ? session.startResize : undefined}
-          onEndpointStart={editable ? session.startEndpoint : undefined}
-          onChangeText={editable ? session.changeText : undefined}
-        />
-        {editable && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-2 z-20 flex justify-center print:hidden">
-            <div className="pointer-events-auto">
-              <MiscPageToolbar
-                compact
-                tool={session.tool}
-                selectedId={session.selectedId}
-                onPickTool={session.pickTool}
-                onRemove={session.removeSelected}
-                textStyle={session.textStyle}
-                arrowStyle={session.arrowStyle}
-                onTextStyle={session.patchSelectedText}
-                onArrowStyle={session.patchArrowStyle}
-              />
-            </div>
-          </div>
-        )}
-        {editable && (
-          <input
-            ref={session.fileRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={session.onFileChange}
-          />
-        )}
-      </div>
-    </article>
   );
 }
 
@@ -1525,6 +1455,7 @@ function Sheet({
   resizable,
   layoutNonce = 0,
   onJump,
+  onUnassign,
 }: {
   product: Product;
   workspaceName: string;
@@ -1537,7 +1468,11 @@ function Sheet({
   resizable?: boolean;
   layoutNonce?: number;
   onJump?: (section: string) => void;
+  onUnassign?: (id: string) => void;
 }) {
+  const live = specsFromArtboard(product);
+  const liveProduct = { ...product, specs: live };
+  const extras = sections.filter((s) => s.kind === "table" || s.kind === "memo");
   const has = (kind: SectionDef["kind"]) => sections.some((s) => s.kind === kind);
   const drawings = sections.filter((s) => s.kind === "flatSpecs" || s.kind === "drawing");
 
@@ -1679,8 +1614,13 @@ function Sheet({
       </div>
 
       {has("basic") && (
-        <div className="shrink-0">
-          <SectionBar title="기본 정보" compact={compact} onJump={onJump ? () => onJump("basic") : undefined} />
+        <div className="group/packsec shrink-0">
+          <SectionBar
+            title="기본 정보"
+            compact={compact}
+            onJump={onJump ? () => onJump("basic") : undefined}
+            onUnassign={onUnassign ? () => onUnassign("basic") : undefined}
+          />
           <InfoTable
             product={product}
             workspaceName={workspaceName}
@@ -1692,7 +1632,7 @@ function Sheet({
         </div>
       )}
 
-      {cols.length === 0 && !has("basic") && (
+      {cols.length === 0 && !has("basic") && extras.length === 0 && (
         <p className="px-5 py-10 text-center text-[12px] text-stone">이 페이지에 배정된 섹션이 없습니다.</p>
       )}
 
@@ -1722,21 +1662,54 @@ function Sheet({
                             section={d}
                             compact={compact}
                             onJump={onJump ? () => onJump(jumpKind(d.kind)) : undefined}
+                            onUnassign={onUnassign ? () => onUnassign(d.id) : undefined}
                           />
                         ))}
                       </div>
                     ) : kind === "fabric" ? (
-                      <FabricBlock product={product} materials={product.specs.materials} compact={compact} onJump={jump} />
+                      <FabricBlock
+                        product={liveProduct}
+                        materials={live.materials}
+                        compact={compact}
+                        onJump={jump}
+                        onUnassign={onUnassign ? () => onUnassign("fabric") : undefined}
+                      />
                     ) : kind === "trim" ? (
-                      <TrimBlock product={product} trims={product.specs.trims} compact={compact} onJump={jump} />
+                      <TrimBlock
+                        product={liveProduct}
+                        trims={live.trims}
+                        compact={compact}
+                        onJump={jump}
+                        onUnassign={onUnassign ? () => onUnassign("trim") : undefined}
+                      />
                     ) : kind === "size" ? (
-                      <SizeBlock product={product} compact={compact} onJump={jump} />
+                      <SizeBlock
+                        product={liveProduct}
+                        compact={compact}
+                        onJump={jump}
+                        onUnassign={onUnassign ? () => onUnassign("size") : undefined}
+                      />
                     ) : kind === "qty" ? (
-                      <QtyBlock product={product} compact={compact} onJump={jump} />
+                      <QtyBlock
+                        product={product}
+                        compact={compact}
+                        onJump={jump}
+                        onUnassign={onUnassign ? () => onUnassign("qty") : undefined}
+                      />
                     ) : kind === "label" ? (
-                      <LabelBlock product={product} compact={compact} onJump={jump} />
+                      <LabelBlock
+                        product={product}
+                        compact={compact}
+                        onJump={jump}
+                        onUnassign={onUnassign ? () => onUnassign("label") : undefined}
+                      />
                     ) : kind === "notes" ? (
-                      <NotesBlock product={product} compact={compact} onJump={jump} />
+                      <NotesBlock
+                        product={product}
+                        compact={compact}
+                        onJump={jump}
+                        onUnassign={onUnassign ? () => onUnassign("notes") : undefined}
+                      />
                     ) : null;
                   return (
                     <div
@@ -1769,7 +1742,144 @@ function Sheet({
           ))}
         </div>
       )}
+      {extras.length > 0 && (
+        <div className={cn("shrink-0 border-t border-[#e6e4de]", compact ? "px-2 py-1.5" : "px-3 py-2")}>
+          {extras.map((sec) => (
+            <ExtraBlock
+              key={sec.id}
+              extra={sec.extra!}
+              compact={compact}
+              productId={product.id}
+              editable={Boolean(onJump)}
+              onUnassign={onUnassign ? () => onUnassign(sec.id) : undefined}
+            />
+          ))}
+        </div>
+      )}
     </article>
+  );
+}
+
+function ExtraBlock({
+  extra,
+  compact,
+  productId,
+  editable,
+  onUnassign,
+}: {
+  extra: PackExtra;
+  compact?: boolean;
+  productId: string;
+  editable?: boolean;
+  onUnassign?: () => void;
+}) {
+  const { updateSpecsField } = useWorkspace();
+  const patch = (next: PackExtra) => {
+    updateSpecsField(productId, (p) => ({
+      ...p,
+      specs: {
+        ...p.specs,
+        packExtras: (p.specs.packExtras ?? []).map((e) => (e.id === extra.id ? next : e)),
+      },
+    }));
+  };
+  const rename = (title: string) => {
+    updateSpecsField(productId, (p) => {
+      const extras = p.specs.packExtras ?? [];
+      const nextTitle = uniquePackExtraTitle(title, extras, extra.kind, extra.id);
+      return {
+        ...p,
+        specs: {
+          ...p.specs,
+          packExtras: extras.map((e) => (e.id === extra.id ? { ...e, title: nextTitle } : e)),
+        },
+      };
+    });
+  };
+  return (
+    <div className={cn("group/packsec relative mb-2 last:mb-0", compact && "mb-1")}>
+      <div className="flex items-start gap-1">
+        {editable && !compact ? (
+          <input
+            key={extra.title}
+            defaultValue={extra.title}
+            aria-label="이름"
+            onBlur={(e) => {
+              const next = e.target.value.trim();
+              if (!next) {
+                e.target.value = extra.title;
+                return;
+              }
+              if (next !== extra.title) rename(next);
+            }}
+            className="mb-1 min-w-0 flex-1 bg-transparent text-[12px] font-medium outline-none"
+          />
+        ) : (
+          <p className={cn("min-w-0 flex-1 font-medium", compact ? "text-[9px] print:text-[12px]" : "text-[12px]")}>{extra.title}</p>
+        )}
+        {onUnassign && (
+          <button
+            type="button"
+            aria-label={`${extra.title}을 작업지시서에서 빼기`}
+            onClick={onUnassign}
+            className="mt-px flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] text-stone hover:bg-white hover:text-ink print:hidden"
+          >
+            <X size={11} strokeWidth={2} />
+          </button>
+        )}
+      </div>
+      {extra.kind === "memo" ? (
+        <textarea
+          key={extra.body}
+          defaultValue={extra.body ?? ""}
+          readOnly={!editable || compact}
+          placeholder="메모"
+          onBlur={(e) => {
+            if (e.target.value !== (extra.body ?? "")) patch({ ...extra, body: e.target.value });
+          }}
+          className={cn(
+            "mt-1 w-full resize-none rounded-lg border border-[#e6e4de] bg-white px-2 py-1.5 outline-none",
+            compact ? "h-12 text-[8px] print:text-[11px]" : "h-20 text-[12px]",
+          )}
+        />
+      ) : (
+        <table className={cn("mt-1 w-full border-collapse", compact ? "text-[8px] print:text-[11px]" : "text-[12px]")}>
+          <thead>
+            <tr>
+              {(extra.table?.head ?? ["항목", "내용"]).map((h, i) => (
+                <th key={i} className="border border-[#e6e4de] bg-[#f7f6f2] px-2.5 py-1 text-left font-medium">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {(extra.table?.rows ?? [["", ""]]).map((row, ri) => (
+              <tr key={ri}>
+                {row.map((cell, ci) => (
+                  <td key={ci} className="border border-[#e6e4de] px-2.5 py-1">
+                    {editable && !compact ? (
+                      <input
+                        defaultValue={cell}
+                        onBlur={(e) => {
+                          const rows = (extra.table?.rows ?? []).map((r, i) =>
+                            i === ri ? r.map((c, j) => (j === ci ? e.target.value : c)) : r,
+                          );
+                          patch({ ...extra, table: { head: extra.table?.head ?? ["항목", "내용"], rows } });
+                        }}
+                        className="w-full bg-transparent outline-none"
+                      />
+                    ) : (
+                      cell || "—"
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }
 
@@ -1891,7 +2001,7 @@ function PackAddMenu({
       {open && (
         <div
           role="menu"
-          className="absolute top-0 left-[calc(100%+4px)] z-30 w-[132px] overflow-hidden rounded-xl border border-[#e6e4de] bg-white p-1 shadow-sm"
+          className="absolute top-[calc(100%+4px)] left-0 z-30 w-[132px] overflow-hidden rounded-xl border border-[#e6e4de] bg-white p-1 shadow-sm"
         >
           <button
             type="button"
@@ -1941,30 +2051,47 @@ function SectionBar({
   extra,
   compact,
   onJump,
+  onUnassign,
+  actions,
 }: {
   title: string;
   extra?: string;
   compact?: boolean;
   onJump?: () => void;
+  onUnassign?: () => void;
+  actions?: ReactNode;
 }) {
   return (
     <div
       className={cn(
         "flex items-center justify-between border-b border-[#e6e4de] bg-[#f3f2ef]",
-        compact ? "px-2 py-0.5" : "px-2.5 py-1",
+        compact ? "px-2.5 py-0.5" : "px-3 py-1",
       )}
     >
-      <p className={cn("font-semibold text-ink", compact ? "text-[10px] print:text-[12px]" : "text-[11px]")}>{title}</p>
-      <div className="flex items-center gap-1">
-        {extra && <p className={cn("text-stone", compact ? "text-[9px] print:text-[10px]" : "text-[9px]")}>{extra}</p>}
+      <div className="flex min-w-0 items-center gap-0.5">
+        <p className={cn("min-w-0 font-semibold text-ink", compact ? "text-[10px] print:text-[12px]" : "text-[11px]")}>{title}</p>
         {onJump && (
           <button
             type="button"
             onClick={onJump}
             aria-label={`${title} 수정`}
-            className="flex h-4 w-4 items-center justify-center rounded-[3px] text-stone hover:bg-white hover:text-ink print:hidden"
+            className="flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] text-stone hover:bg-white hover:text-ink print:hidden"
           >
             <SquareArrowOutUpRight size={11} strokeWidth={2} />
+          </button>
+        )}
+      </div>
+      <div className="flex items-center gap-1">
+        {actions}
+        {extra && <p className={cn("text-stone", compact ? "text-[9px] print:text-[10px]" : "text-[9px]")}>{extra}</p>}
+        {onUnassign && (
+          <button
+            type="button"
+            onClick={onUnassign}
+            aria-label={`${title}을 작업지시서에서 빼기`}
+            className="flex h-4 w-4 items-center justify-center rounded-[3px] text-stone hover:bg-white hover:text-ink print:hidden"
+          >
+            <X size={11} strokeWidth={2} />
           </button>
         )}
       </div>
@@ -2045,7 +2172,7 @@ function InfoTable({
 
   const removeExtra = (id: string) => patchExtras((current) => current.filter((a) => a.id !== id));
 
-  const cell = compact ? "border border-[#e6e4de] px-1.5 py-0.5" : "border border-[#e6e4de] px-2 py-1";
+  const cell = compact ? "border border-[#e6e4de] px-2.5 py-0.5" : "border border-[#e6e4de] px-3 py-1";
   const type = compact ? "text-[10px] print:text-[12px]" : "text-[11px]";
 
   const extraSlots = editable ? [...attrs, { id: "__add", label: "", value: "" }] : attrs;
@@ -2129,11 +2256,13 @@ function DrawingBlock({
   section,
   compact,
   onJump,
+  onUnassign,
 }: {
   product: Product;
   section: SectionDef;
   compact?: boolean;
   onJump?: () => void;
+  onUnassign?: () => void;
 }) {
   const slides = drawingSlides(product, section);
   const [index, setIndex] = useState(0);
@@ -2143,8 +2272,8 @@ function DrawingBlock({
   const title = many ? `도식화 · ${slide.label}` : section.kind === "flatSpecs" ? "도식화 · 도식화" : `도식화 · ${section.subtitle ?? "도식화"}`;
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <SectionBar title={title} compact={compact} onJump={onJump} />
+    <div className="group/packsec flex h-full min-h-0 flex-col">
+      <SectionBar title={title} compact={compact} onJump={onJump} onUnassign={onUnassign} />
       <div className="relative flex min-h-0 flex-1 items-center justify-center bg-white">
         {slide.type === "mockup2d" ? (
           <Mockup2D category={product.category} />
@@ -2196,7 +2325,121 @@ function DrawingBlock({
 }
 
 function CardRow({ children }: { children: ReactNode }) {
-  return <div className="flex flex-nowrap gap-1.5 overflow-x-auto">{children}</div>;
+  return <div className="flex flex-wrap content-start gap-1.5">{children}</div>;
+}
+
+type ItemView = "list" | "grid";
+
+function ItemViewToggle({
+  value,
+  onChange,
+}: {
+  value: ItemView;
+  onChange: (next: ItemView) => void;
+}) {
+  return (
+    <div className="flex items-center rounded-[3px] print:hidden" role="group" aria-label="보기 방식">
+      <button
+        type="button"
+        aria-pressed={value === "list"}
+        aria-label="리스트 보기"
+        onClick={() => onChange("list")}
+        className={cn(
+          "flex h-4 w-4 items-center justify-center rounded-[3px]",
+          value === "list" ? "bg-white text-ink" : "text-stone hover:bg-white/80 hover:text-ink",
+        )}
+      >
+        <List size={10} strokeWidth={2.2} />
+      </button>
+      <button
+        type="button"
+        aria-pressed={value === "grid"}
+        aria-label="그리드 보기"
+        onClick={() => onChange("grid")}
+        className={cn(
+          "flex h-4 w-4 items-center justify-center rounded-[3px]",
+          value === "grid" ? "bg-white text-ink" : "text-stone hover:bg-white/80 hover:text-ink",
+        )}
+      >
+        <LayoutGrid size={10} strokeWidth={2.2} />
+      </button>
+    </div>
+  );
+}
+
+function ColumnPicker({
+  options,
+  selected,
+  onChange,
+}: {
+  options: { key: string; label: string }[];
+  selected?: string[];
+  onChange: (next: string[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const visible = visiblePackColumns(options, selected).map((col) => col.key);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={menuRef} className="relative print:hidden">
+      <button
+        type="button"
+        aria-label="컬럼"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          "flex h-4 w-4 items-center justify-center rounded-[3px]",
+          open ? "bg-white text-ink" : "text-stone hover:bg-white/80 hover:text-ink",
+        )}
+      >
+        <Columns3 size={10} strokeWidth={2.2} />
+      </button>
+      {open && (
+        <div className="absolute top-5 right-0 z-30 w-[6.25rem] rounded-lg border border-[#e6e4de] bg-white p-0.5 shadow-sm">
+          <p className="px-1.5 py-0.5 text-[9px] text-stone">컬럼</p>
+          {options.map((col) => {
+            const on = visible.includes(col.key);
+            return (
+              <button
+                key={col.key}
+                type="button"
+                role="menuitemcheckbox"
+                aria-checked={on}
+                onClick={() => onChange(togglePackColumn(options, visible, col.key))}
+                className="flex w-full items-center gap-1.5 rounded-md px-1.5 py-0.5 text-left hover:bg-paper"
+              >
+                <span
+                  className={cn(
+                    "flex h-3 w-3 shrink-0 items-center justify-center rounded-[3px] border",
+                    on ? "border-ink bg-ink text-snow" : "border-fog bg-snow",
+                  )}
+                >
+                  {on && <Check size={8} strokeWidth={2.8} />}
+                </span>
+                <span className="text-[11px] leading-4 text-ink">{col.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function FabricBlock({
@@ -2204,16 +2447,24 @@ function FabricBlock({
   materials,
   compact,
   onJump,
+  onUnassign,
 }: {
   product: Product;
   materials: Material[];
   compact?: boolean;
   onJump?: () => void;
+  onUnassign?: () => void;
 }) {
   const { updateSpecsField } = useWorkspace();
   const fileRef = useRef<HTMLInputElement>(null);
   const [importOpen, setImportOpen] = useState(false);
+  const [view, setView] = useState<ItemView>("grid");
   const editable = Boolean(onJump);
+  const showViewToggle = Boolean(onJump);
+  const type = compact ? "text-[9px] print:text-[11px]" : "text-[11px]";
+  const columns = visiblePackColumns(FABRIC_PACK_COLUMNS, product.specs.packItemColumns?.fabric);
+  const showName = columns.some((col) => col.key === "name");
+  const extraCols = columns.filter((col) => col.key !== "name");
 
   const patchMaterial = (id: string, patch: Partial<Material>) =>
     updateSpecsField(product.id, (p) => ({
@@ -2249,17 +2500,65 @@ function FabricBlock({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col border-t border-[#e6e4de]">
-      <SectionBar title="원단" compact={compact} onJump={onJump} />
-      <div className={cn("min-h-0 flex-1 overflow-auto", compact ? "p-1.5" : "p-2")}>
+    <div className="group/packsec flex h-full min-h-0 flex-col border-t border-[#e6e4de]">
+      <SectionBar
+        title="원단"
+        compact={compact}
+        onJump={onJump}
+        onUnassign={onUnassign}
+        actions={
+          showViewToggle ? (
+            <span className="flex items-center gap-0.5">
+              <ColumnPicker
+                options={FABRIC_PACK_COLUMNS}
+                selected={product.specs.packItemColumns?.fabric}
+                onChange={(next) => updateSpecsField(product.id, (p) => withPackItemColumns(p, "fabric", next))}
+              />
+              <ItemViewToggle value={view} onChange={setView} />
+            </span>
+          ) : undefined
+        }
+      />
+      <div className={cn("min-h-0 flex-1 overflow-auto", view === "list" ? "" : compact ? "p-1.5" : "p-2", type)}>
         {materials.length === 0 && !editable ? (
-          <p className={cn("py-3 text-center text-stone", compact ? "text-[9px]" : "text-[11px]")}>없음</p>
+          <p className="py-3 text-center text-stone">없음</p>
+        ) : view === "list" ? (
+          <ItemTable
+            nameLabel="품명"
+            showName={showName}
+            columns={extraCols}
+            items={materials.map((m) => ({
+              id: m.id,
+              src: m.image,
+              color: m.color,
+              name: m.name,
+              values: {
+                position: m.position ?? "",
+                colorName: colorLabel(m.color, m.colorName),
+                consumption: m.consumption || m.weight || "",
+                yardage: m.yardage ?? "",
+                price: m.price ?? "",
+              },
+              onPatch: (patch) => patchMaterial(m.id, patch),
+              onRemove: () =>
+                updateSpecsField(product.id, (p) => ({
+                  ...p,
+                  specs: { ...p.specs, materials: p.specs.materials.filter((row) => row.id !== m.id) },
+                })),
+            }))}
+            editable={editable}
+            compact={compact}
+            addLabel="원단 추가"
+            onAddAsset={() => setImportOpen(true)}
+            onAddUpload={() => fileRef.current?.click()}
+          />
         ) : (
           <CardRow>
             {materials.map((m) => (
               <MaterialCard
                 key={m.id}
                 material={m}
+                columns={columns}
                 editable={editable}
                 onPatch={(patch) => patchMaterial(m.id, patch)}
                 onRemove={() =>
@@ -2317,17 +2616,24 @@ function TrimBlock({
   trims,
   compact,
   onJump,
+  onUnassign,
 }: {
   product: Product;
   trims: TrimItem[];
   compact?: boolean;
   onJump?: () => void;
+  onUnassign?: () => void;
 }) {
   const { updateSpecsField } = useWorkspace();
   const fileRef = useRef<HTMLInputElement>(null);
   const [importOpen, setImportOpen] = useState(false);
+  const [view, setView] = useState<ItemView>("list");
   const editable = Boolean(onJump);
+  const showViewToggle = Boolean(onJump);
   const type = compact ? "text-[9px] print:text-[11px]" : "text-[11px]";
+  const columns = visiblePackColumns(TRIM_PACK_COLUMNS, product.specs.packItemColumns?.trim);
+  const showName = columns.some((col) => col.key === "name");
+  const extraCols = columns.filter((col) => col.key !== "name");
 
   const patchTrim = (id: string, patch: Partial<TrimItem>) =>
     updateSpecsField(product.id, (p) => ({
@@ -2359,25 +2665,35 @@ function TrimBlock({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <SectionBar title="부자재" compact={compact} onJump={onJump} />
-      <div className={cn("min-h-0 flex-1 overflow-auto", compact ? "p-1.5" : "p-2", type)}>
+    <div className="group/packsec flex h-full min-h-0 flex-col">
+      <SectionBar
+        title="부자재"
+        compact={compact}
+        onJump={onJump}
+        onUnassign={onUnassign}
+        actions={
+          showViewToggle ? (
+            <span className="flex items-center gap-0.5">
+              <ColumnPicker
+                options={TRIM_PACK_COLUMNS}
+                selected={product.specs.packItemColumns?.trim}
+                onChange={(next) => updateSpecsField(product.id, (p) => withPackItemColumns(p, "trim", next))}
+              />
+              <ItemViewToggle value={view} onChange={setView} />
+            </span>
+          ) : undefined
+        }
+      />
+      <div className={cn("min-h-0 flex-1 overflow-auto", view === "grid" ? (compact ? "p-1.5" : "p-2") : "", type)}>
         {trims.length === 0 && !editable ? (
           <p className="py-3 text-center text-stone">없음</p>
-        ) : (
-          <div className="divide-y divide-[#eee]">
+        ) : view === "grid" ? (
+          <CardRow>
             {trims.map((t) => (
-              <ItemListRow
+              <TrimCard
                 key={t.id}
-                src={t.image}
-                color={t.color}
-                name={t.name}
-                nameLabel="품명"
-                lines={[
-                  { key: "position", value: t.position ?? "", label: "위치" },
-                  { key: "type", value: t.type ?? "", label: "종류" },
-                  { key: "qty", value: t.qty || t.spec || "", label: "수량" },
-                ]}
+                trim={t}
+                columns={columns}
                 editable={editable}
                 onPatch={(patch) => patchTrim(t.id, patch)}
                 onRemove={() =>
@@ -2389,15 +2705,43 @@ function TrimBlock({
               />
             ))}
             {editable && (
-              <div className="pt-1">
-                <PackAddMenu
-                  label="부자재 추가"
-                  onAsset={() => setImportOpen(true)}
-                  onUpload={() => fileRef.current?.click()}
-                />
-              </div>
+              <PackAddMenu
+                label="부자재 추가"
+                onAsset={() => setImportOpen(true)}
+                onUpload={() => fileRef.current?.click()}
+              />
             )}
-          </div>
+          </CardRow>
+        ) : (
+          <ItemTable
+            nameLabel="품명"
+            showName={showName}
+            columns={extraCols}
+            items={trims.map((t) => ({
+              id: t.id,
+              src: t.image,
+              color: t.color,
+              name: t.name,
+              values: {
+                position: t.position ?? "",
+                type: t.type ?? "",
+                qty: t.qty || t.spec || "",
+                yardage: t.yardage ?? "",
+                price: t.price ?? "",
+              },
+              onPatch: (patch) => patchTrim(t.id, patch),
+              onRemove: () =>
+                updateSpecsField(product.id, (p) => ({
+                  ...p,
+                  specs: { ...p.specs, trims: p.specs.trims.filter((row) => row.id !== t.id) },
+                })),
+            }))}
+            editable={editable}
+            compact={compact}
+            addLabel="부자재 추가"
+            onAddAsset={() => setImportOpen(true)}
+            onAddUpload={() => fileRef.current?.click()}
+          />
         )}
       </div>
       <input
@@ -2434,6 +2778,99 @@ function TrimBlock({
 
 const CARD_SIZE = "w-[132px]";
 
+function ItemTable({
+  nameLabel,
+  showName = true,
+  columns,
+  items,
+  editable,
+  compact,
+  addLabel,
+  onAddAsset,
+  onAddUpload,
+}: {
+  nameLabel: string;
+  showName?: boolean;
+  columns: { key: string; label: string }[];
+  items: {
+    id: string;
+    src?: string;
+    color?: string;
+    name: string;
+    values: Record<string, string>;
+    onPatch: (patch: Record<string, string>) => void;
+    onRemove: () => void;
+  }[];
+  editable?: boolean;
+  compact?: boolean;
+  addLabel?: string;
+  onAddAsset?: () => void;
+  onAddUpload?: () => void;
+}) {
+  const cell = compact ? "border border-[#e6e4de] px-2.5 py-0.5" : "border border-[#e6e4de] px-3 py-1";
+  const thumb = compact ? 18 : 24;
+  const colSpan = 1 + (showName ? 1 : 0) + columns.length + (editable ? 1 : 0);
+
+  return (
+    <table className="w-full border-collapse">
+      <thead>
+        <tr className="bg-[#f3f2ef]">
+          <th className={cn(cell, "w-7")} />
+          {showName && <th className={cn(cell, "text-left font-medium text-stone")}>{nameLabel}</th>}
+          {columns.map((col) => (
+            <th key={col.key} className={cn(cell, "text-left font-medium text-stone")}>
+              {col.label}
+            </th>
+          ))}
+          {editable && <th className={cn(cell, "w-5 print:hidden")} />}
+        </tr>
+      </thead>
+      <tbody>
+        {items.map((item) => (
+          <tr key={item.id} className="group">
+            <td className={cn(cell, "w-7 p-0.5")}>
+              <ListThumb src={item.src} color={item.color} label={`${item.name} 썸네일`} side={thumb} />
+            </td>
+            {showName && (
+              <td className={cn(cell, "font-medium")}>
+                {editable ? (
+                  <PackInput value={item.name} onCommit={(name) => item.onPatch({ name })} />
+                ) : (
+                  <span className="block truncate">{item.name || "—"}</span>
+                )}
+              </td>
+            )}
+            {columns.map((col) => (
+              <td key={col.key} className={cell}>
+                {editable ? (
+                  <PackInput
+                    value={item.values[col.key] ?? ""}
+                    onCommit={(next) => item.onPatch({ [col.key]: next })}
+                  />
+                ) : (
+                  <span className="block truncate">{item.values[col.key] || "—"}</span>
+                )}
+              </td>
+            ))}
+            {editable && (
+              <td className={cn(cell, "w-5 text-center print:hidden")}>
+                <PackDel label={`${item.name} 삭제`} onClick={item.onRemove} />
+              </td>
+            )}
+          </tr>
+        ))}
+        {editable && addLabel && onAddAsset && onAddUpload && (
+          <tr className="print:hidden">
+            <td className={cell} colSpan={colSpan}>
+              <PackAddMenu label={addLabel} onAsset={onAddAsset} onUpload={onAddUpload} />
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
+}
+
 function FieldLine({
   label,
   value,
@@ -2468,49 +2905,128 @@ function FieldLine({
 
 function MaterialCard({
   material,
+  columns,
   editable,
   onPatch,
   onRemove,
 }: {
   material: Material;
+  columns: { key: string; label: string }[];
   editable?: boolean;
   onPatch?: (patch: Partial<Material>) => void;
+  onRemove?: () => void;
+}) {
+  const values: Record<string, string> = {
+    name: material.name,
+    position: material.position ?? "",
+    colorName: colorLabel(material.color, material.colorName),
+    consumption: material.consumption || material.weight || "",
+    yardage: material.yardage ?? "",
+    price: material.price ?? "",
+  };
+  return (
+    <ItemCard
+      src={material.image}
+      color={material.color}
+      name={material.name}
+      nameLabel="품명"
+      showName={columns.some((col) => col.key === "name")}
+      lines={columns
+        .filter((col) => col.key !== "name")
+        .map((col) => ({ key: col.key, label: col.label, value: values[col.key] ?? "" }))}
+      editable={editable}
+      onPatch={onPatch}
+      onRemove={onRemove}
+    />
+  );
+}
+
+function TrimCard({
+  trim,
+  columns,
+  editable,
+  onPatch,
+  onRemove,
+}: {
+  trim: TrimItem;
+  columns: { key: string; label: string }[];
+  editable?: boolean;
+  onPatch?: (patch: Partial<TrimItem>) => void;
+  onRemove?: () => void;
+}) {
+  const values: Record<string, string> = {
+    name: trim.name,
+    position: trim.position ?? "",
+    type: trim.type ?? "",
+    qty: trim.qty || trim.spec || "",
+    yardage: trim.yardage ?? "",
+    price: trim.price ?? "",
+  };
+  return (
+    <ItemCard
+      src={trim.image}
+      color={trim.color}
+      name={trim.name}
+      nameLabel="품명"
+      showName={columns.some((col) => col.key === "name")}
+      lines={columns
+        .filter((col) => col.key !== "name")
+        .map((col) => ({ key: col.key, label: col.label, value: values[col.key] ?? "" }))}
+      editable={editable}
+      onPatch={onPatch}
+      onRemove={onRemove}
+    />
+  );
+}
+
+function ItemCard({
+  src,
+  color,
+  name,
+  nameLabel,
+  showName = true,
+  lines,
+  editable,
+  onPatch,
+  onRemove,
+}: {
+  src?: string;
+  color?: string;
+  name: string;
+  nameLabel: string;
+  showName?: boolean;
+  lines: { key: string; value: string; label: string }[];
+  editable?: boolean;
+  onPatch?: (patch: Record<string, string>) => void;
   onRemove?: () => void;
 }) {
   return (
     <div className={cn(CARD_SIZE, "group relative shrink-0 overflow-hidden border border-[#e6e4de] bg-white")}>
       {editable && onRemove && (
         <span className="absolute top-0.5 right-0.5 z-10">
-          <PackDel label={`${material.name} 삭제`} onClick={onRemove} />
+          <PackDel label={`${name} 삭제`} onClick={onRemove} />
         </span>
       )}
-      <CardThumb src={material.image} color={material.color} label={`${material.name} 썸네일`} />
+      <CardThumb src={src} color={color} label={`${name} 썸네일`} />
       <div className={cn("space-y-px px-1 py-1", "text-[9px] print:text-[11px]")}>
-        <FieldLine
-          label="원단명"
-          value={material.name}
-          strong
-          editable={editable}
-          onCommit={(name) => onPatch?.({ name })}
-        />
-        <FieldLine
-          label="위치"
-          value={material.position ?? ""}
-          editable={editable}
-          onCommit={(position) => onPatch?.({ position })}
-        />
-        <FieldLine
-          label="컬러"
-          value={colorLabel(material.color, material.colorName)}
-          editable={editable}
-          onCommit={(colorName) => onPatch?.({ colorName })}
-        />
-        <FieldLine
-          label="소요량"
-          value={material.consumption || material.weight || ""}
-          editable={editable}
-          onCommit={(consumption) => onPatch?.({ consumption })}
-        />
+        {showName && (
+          <FieldLine
+            label={nameLabel}
+            value={name}
+            strong
+            editable={editable}
+            onCommit={(next) => onPatch?.({ name: next })}
+          />
+        )}
+        {lines.map((line) => (
+          <FieldLine
+            key={line.key}
+            label={line.label}
+            value={line.value}
+            editable={editable}
+            onCommit={(next) => onPatch?.({ [line.key]: next })}
+          />
+        ))}
       </div>
     </div>
   );
@@ -2549,7 +3065,7 @@ function ItemListRow({
   }, []);
 
   return (
-    <div className="group flex items-start gap-1.5 py-1">
+    <div className="group flex items-start gap-1.5 px-2.5 py-1">
       <ListThumb src={src} color={color} label={`${name} 썸네일`} side={side} />
       <div ref={textRef} className="min-w-0 flex-1 space-y-px">
         <FieldLine
@@ -2630,17 +3146,19 @@ function SizeBlock({
   product,
   compact,
   onJump,
+  onUnassign,
 }: {
   product: Product;
   compact?: boolean;
   onJump?: () => void;
+  onUnassign?: () => void;
 }) {
   const { updateSpecsField } = useWorkspace();
   const sizes = productSizes(product);
   const rows = product.specs.measurements.length ? product.specs.measurements : DEFAULT_MEASURE_ROWS;
   const editable = Boolean(onJump);
   const type = compact ? "text-[10px] print:text-[12px]" : "text-[11px]";
-  const cell = compact ? "border-b border-[#eee] px-1 py-0.5" : "border-b border-[#eee] px-2 py-1";
+  const cell = compact ? "border-b border-[#eee] px-2.5 py-0.5" : "border-b border-[#eee] px-3 py-1";
   const patch = (updater: (p: Product) => Product) => updateSpecsField(product.id, updater);
 
   const commitInch = (pom: string, size: string, raw: string) => {
@@ -2683,8 +3201,8 @@ function SizeBlock({
     }));
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <SectionBar title="Size Spec" extra="inch/단면" compact={compact} onJump={onJump} />
+    <div className="group/packsec flex h-full min-h-0 flex-col">
+      <SectionBar title="Size Spec" extra="inch/단면" compact={compact} onJump={onJump} onUnassign={onUnassign} />
       <div className="min-h-0 flex-1 overflow-auto">
       <table className={cn("w-full border-collapse", type)}>
         <thead>
@@ -2769,10 +3287,12 @@ function QtyBlock({
   product,
   compact,
   onJump,
+  onUnassign,
 }: {
   product: Product;
   compact?: boolean;
   onJump?: () => void;
+  onUnassign?: () => void;
 }) {
   const { updateSpecsField } = useWorkspace();
   const sizes = productSizes(product);
@@ -2781,7 +3301,7 @@ function QtyBlock({
     : [{ id: "x", name: "—", hex: "#ddd", main: "", sub: "", code: "" }];
   const editable = Boolean(onJump);
   const type = compact ? "text-[10px] print:text-[12px]" : "text-[11px]";
-  const cell = compact ? "border-b border-[#eee] px-1 py-0.5" : "border-b border-[#eee] px-2 py-1";
+  const cell = compact ? "border-b border-[#eee] px-2.5 py-0.5" : "border-b border-[#eee] px-3 py-1";
   const patch = (updater: (p: Product) => Product) => updateSpecsField(product.id, updater);
 
   const commitQty = (colorId: string, size: string, raw: string) => {
@@ -2810,8 +3330,8 @@ function QtyBlock({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col border-t border-[#e6e4de]">
-      <SectionBar title="색상/사이즈 별 수량" compact={compact} onJump={onJump} />
+    <div className="group/packsec flex h-full min-h-0 flex-col border-t border-[#e6e4de]">
+      <SectionBar title="색상/사이즈 별 수량" compact={compact} onJump={onJump} onUnassign={onUnassign} />
       <div className="min-h-0 flex-1 overflow-auto">
       <table className={cn("w-full border-collapse", type)}>
         <thead>
@@ -2902,10 +3422,12 @@ function LabelBlock({
   product,
   compact,
   onJump,
+  onUnassign,
 }: {
   product: Product;
   compact?: boolean;
   onJump?: () => void;
+  onUnassign?: () => void;
 }) {
   const { updateSpecsField } = useWorkspace();
   const editable = Boolean(onJump);
@@ -2928,11 +3450,11 @@ function LabelBlock({
     }));
 
   return (
-    <div className="flex h-full min-h-0 flex-col border-t border-[#e6e4de]">
-      <SectionBar title="라벨" compact={compact} onJump={onJump} />
-      <div className={cn("min-h-0 flex-1 overflow-auto", compact ? "p-1.5" : "p-2", type)}>
+    <div className="group/packsec flex h-full min-h-0 flex-col border-t border-[#e6e4de]">
+      <SectionBar title="라벨" compact={compact} onJump={onJump} onUnassign={onUnassign} />
+      <div className={cn("min-h-0 flex-1 overflow-auto", type)}>
         {labels.length === 0 && !editable ? (
-          <p className="py-3 text-center text-stone">없음</p>
+          <p className="px-2.5 py-3 text-center text-stone">없음</p>
         ) : (
           <div className="divide-y divide-[#eee]">
             {labels.map((lb) => (
@@ -2957,7 +3479,7 @@ function LabelBlock({
               />
             ))}
             {editable && (
-              <div className="pt-1">
+              <div className="px-2.5 pt-1">
                 <PackAdd label="라벨 추가" onClick={addLabel} />
               </div>
             )}
@@ -2972,10 +3494,12 @@ function NotesBlock({
   product,
   compact,
   onJump,
+  onUnassign,
 }: {
   product: Product;
   compact?: boolean;
   onJump?: () => void;
+  onUnassign?: () => void;
 }) {
   const { updateSpecsField } = useWorkspace();
   const editable = Boolean(onJump);
@@ -2994,8 +3518,8 @@ function NotesBlock({
     }));
 
   return (
-    <div className="flex h-full min-h-0 flex-col border-t border-[#e6e4de]">
-      <SectionBar title="주의사항" compact={compact} onJump={onJump} />
+    <div className="group/packsec flex h-full min-h-0 flex-col border-t border-[#e6e4de]">
+      <SectionBar title="주의사항" compact={compact} onJump={onJump} onUnassign={onUnassign} />
       {editable ? (
         <div className="min-h-0 flex-1 overflow-hidden">
           <NotesEditor compact={compact} value={body} onChange={commitBody} />

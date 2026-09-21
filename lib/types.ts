@@ -149,6 +149,8 @@ export interface Material {
   position?: string;
   consumption?: string;
   colorName?: string;
+  yardage?: string;
+  price?: string;
   memo?: string;
   status?: string;
   image?: string;
@@ -163,6 +165,8 @@ export interface TrimItem {
   position?: string;
   qty?: string;
   attach?: string;
+  yardage?: string;
+  price?: string;
   memo?: string;
   status?: string;
   image?: string;
@@ -237,6 +241,23 @@ export interface ProductSpecs {
   misc?: string;
   /** A4 slide board for 기타. */
   miscBoard?: MiscPage[];
+  /** Tech Pack-only blocks (표/메모). Not linked to Design. */
+  packExtras?: PackExtra[];
+  /** Visible Tech Pack columns for 원단·부자재. */
+  packItemColumns?: {
+    fabric?: string[];
+    trim?: string[];
+  };
+}
+
+export type PackExtraKind = "table" | "memo";
+
+export interface PackExtra {
+  id: string;
+  kind: PackExtraKind;
+  title: string;
+  body?: string;
+  table?: { head: string[]; rows: string[][] };
 }
 
 export type MiscObjectType = "text" | "image" | "arrow" | "note";
@@ -275,6 +296,36 @@ export interface MiscPage {
   objects: MiscObject[];
 }
 
+export type CanvasGenerateKind = "image" | "svg";
+
+export interface CanvasGenerate {
+  kind: CanvasGenerateKind;
+  version: number;
+  revised?: boolean;
+  /** Parent 디자인 보드 when this node is an SVG extract. */
+  sourceBoardId?: string;
+}
+
+export interface GeneratePrompt {
+  id: string;
+  text: string;
+  boardId: string;
+  action: "create" | "edit";
+  createdAt: string;
+}
+
+export interface AddNodeOptions {
+  linkedTo?: string;
+  boardKind?: "general" | "specs";
+  title?: string;
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
+  imageSrc?: string;
+  generate?: CanvasGenerate;
+}
+
 export interface CanvasNode {
   id: string;
   type: CanvasNodeType;
@@ -289,6 +340,11 @@ export interface CanvasNode {
   hiddenParts?: string[];
   linkedTo?: string;
   boardKind?: "general" | "specs";
+  usedMaterialIds?: string[];
+  usedTrimIds?: string[];
+  usedMeasurementPoms?: string[];
+  imageSrc?: string;
+  generate?: CanvasGenerate;
 }
 
 export interface Comment {
@@ -362,6 +418,7 @@ export interface Product {
   missing: string[];
   specs: ProductSpecs;
   files?: ProductFile[];
+  generatePrompts?: GeneratePrompt[];
   nodes: CanvasNode[];
   collaborators: ProductCollaborator[];
   anyoneAccess: LinkAccess;

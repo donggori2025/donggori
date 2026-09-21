@@ -2,15 +2,14 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { Palette, Pencil, Settings, Trash2, Users } from "lucide-react";
+import { Pencil, Settings, Trash2, Users } from "lucide-react";
 import { InviteModal } from "@/components/invite-modal";
-import { WorkspaceBackgroundModal } from "@/components/workspace-backdrop";
 import { useWorkspace } from "@/lib/store";
 import type { User, Workspace } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { AvatarStack } from "./ui";
 
-type Panel = "menu" | "rename" | "background" | "members" | "delete" | null;
+type Panel = "menu" | "rename" | "members" | "delete" | null;
 
 export function WorkspaceCard({ workspace }: { workspace: Workspace }) {
   const router = useRouter();
@@ -92,11 +91,6 @@ export function WorkspaceCard({ workspace }: { workspace: Workspace }) {
               icon={<Pencil size={15} strokeWidth={1.7} />}
               label="이름 변경"
               onClick={() => setPanel("rename")}
-            />
-            <MenuItem
-              icon={<Palette size={15} strokeWidth={1.7} />}
-              label="배경 변경"
-              onClick={() => setPanel("background")}
             />
             <MenuItem
               icon={<Trash2 size={15} strokeWidth={1.7} />}
@@ -186,10 +180,6 @@ export function WorkspaceCard({ workspace }: { workspace: Workspace }) {
             </div>
           </form>
         </Overlay>
-      )}
-
-      {panel === "background" && (
-        <WorkspaceBackgroundModal workspace={workspace} onClose={() => setPanel(null)} />
       )}
 
       {panel === "delete" && (
