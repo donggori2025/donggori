@@ -4,6 +4,53 @@ import test from "node:test";
 import { getFactoryImages, getStoredFactoryImages } from "../lib/factoryImages.ts";
 import { buildFactoryPatch } from "../lib/factoryAdminFields.ts";
 import { writeFactoryImages } from "../lib/factoryImageStorage.ts";
+import { getFactoryCertifications } from "../lib/factoryCertifications.ts";
+import { validateFactoryPatch } from "../lib/adminHelpers.ts";
+import { insertFactoryWithLegacyId } from "../lib/factoryCreation.ts";
+
+test("only the five operator-confirmed factories receive the sewing qualification", () => {
+  for (const name of ["꼬메오패션", "호프", "케이스타일", "더시크컴퍼니", "재희패턴"]) {
+    assert.deepEqual(getFactoryCertifications(name), ["봉제기능사"]);
+  }
+  for (const name of ["", "미호패션", "꼬메오", "호프2"]) assert.deepEqual(getFactoryCertifications(name), []);
+});
+
+test("full galleries can be reordered without losing photos or accepting unsafe URLs", async () => {
+  const original = getFactoryImages({ company_name: "더시크컴퍼니" });
+  const remaining = [original[1], original[0], original[2], ...original.slice(6)];
+  assert.equal(remaining.length, 25);
+  const validated = validateFactoryPatch({ images: remaining, image: remaining[0] });
+  assert.equal(validated.ok, true);
+  let stored;
+  await writeFactoryImages(validated.data, async (row) => {
+    if ("images" in row) return { error: { code: "42703", message: 'column "images" does not exist' } };
+    stored = row;
+    return { error: null };
+  });
+  assert.deepEqual(getFactoryImages({ company_name: "더시크컴퍼니", ...stored }), remaining);
+  assert.equal(validateFactoryPatch({ images: Array(51).fill("https://example.com/a.jpg") }).ok, false);
+  assert.equal(validateFactoryPatch({ images: ["javascript:alert(1)"] }).ok, false);
+});
+
+test("legacy factory creation retries ID collisions but never unrelated failures", async () => {
+  const row = { company_name: "재희패턴", contact_name: "김재희", address: "서울특별시 동대문구 답십리로48길 5, 지층(답십리동)" };
+  assert.equal(validateFactoryPatch(row, true).ok, true);
+  const attempts = [];
+  let id = 328;
+  const result = await insertFactoryWithLegacyId(row, async (data) => {
+    attempts.push(data);
+    if (!("id" in data)) return { error: { code: "23502", message: 'null value in column "id"' } };
+    if (data.id === 329) return { error: { code: "23505", message: 'duplicate key violates constraint "donggori_pkey"' } };
+    return { error: null };
+  }, async () => ++id);
+  assert.equal(result.error, null);
+  assert.deepEqual(attempts, [row, { ...row, id: 329 }, { ...row, id: 330 }]);
+  for (const error of [null, { code: "42501", message: "permission denied" }, { code: "23502", message: 'null value in column "address"' }]) {
+    let calls = 0;
+    assert.deepEqual(await insertFactoryWithLegacyId(row, async () => { calls++; return { error }; }, async () => { throw Error("must not allocate ID"); }), { error });
+    assert.equal(calls, 1);
+  }
+});
 
 test("legacy image-only tables preserve photo lists without retrying unrelated failures", async () => {
   const photos = ["https://example.com/a.jpg", "https://example.com/b.jpg"];

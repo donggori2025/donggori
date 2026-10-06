@@ -1,5 +1,6 @@
 import { getFactoryImages, getFactoryMainImage } from "./factoryImages";
 import type { Factory } from "./factoryCatalog";
+import { getFactoryCertifications } from "./factoryCertifications";
 
 /** 공개 목록/상세에 노출해도 되는 업장 컬럼 (연락처·이메일·상세주소·대표자명 제외) */
 export const PUBLIC_FACTORY_SELECT = [
@@ -55,6 +56,7 @@ export function mapPublicFactoryRow(item: Record<string, unknown>): Factory {
   return {
     id: String(item.id || ""),
     name: companyName,
+    certifications: getFactoryCertifications(companyName),
     ownerUserId: "unknown",
     region: String(item.admin_district || "지역 없음"),
     items: [],

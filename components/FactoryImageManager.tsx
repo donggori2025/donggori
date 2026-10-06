@@ -18,6 +18,10 @@ export default function FactoryImageManager({
   const [deletingAll, setDeletingAll] = useState(false);
 
   const handleDeleteImage = async (imageUrl: string) => {
+    if (isEditing) {
+      onImagesChange(images.filter(img => img !== imageUrl));
+      return;
+    }
     if (!confirm("이 이미지를 삭제하시겠습니까?")) return;
 
     setDeletingImages(prev => new Set(prev).add(imageUrl));
@@ -57,6 +61,10 @@ export default function FactoryImageManager({
   };
 
   const handleDeleteAllImages = async () => {
+    if (isEditing) {
+      onImagesChange([]);
+      return;
+    }
     if (!confirm("모든 이미지를 삭제하시겠습니까?")) return;
 
     setDeletingAll(true);
@@ -135,9 +143,19 @@ export default function FactoryImageManager({
                 {deletingImages.has(imageUrl) ? "..." : "×"}
               </button>
             )}
-            <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+            <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
               {index + 1}
             </div>
+            {isEditing && (
+              <button
+                type="button"
+                disabled={index === 0}
+                onClick={() => onImagesChange([imageUrl, ...images.filter(img => img !== imageUrl)])}
+                className="mt-2 w-full rounded border px-2 py-1 text-xs disabled:bg-gray-100 disabled:text-gray-500"
+              >
+                {index === 0 ? "대표 이미지" : "대표로 설정"}
+              </button>
+            )}
           </div>
         ))}
       </div>

@@ -439,6 +439,9 @@ export default function FactoriesPage() {
           });
         }
         
+        for (const label of f.certifications || []) {
+          chips.push({ label, color: '#92400e', bg: '#fef3c7' });
+        }
         return [f.id ?? idx, chips];
       })
     );
