@@ -8,6 +8,7 @@ export interface Factory {
   description: string;
   image: string;
   images?: string[];
+  certifications?: string[];
   contact: string;
   lat: number;
   lng: number;

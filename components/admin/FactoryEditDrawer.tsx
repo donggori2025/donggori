@@ -3,7 +3,7 @@
 import ImageUpload from "@/components/ImageUpload";
 import FactoryImageManager from "@/components/FactoryImageManager";
 import FactoryBlobImageManager from "@/components/FactoryBlobImageManager";
-import { getStoredFactoryImages } from "@/lib/factoryImages";
+import { getFactoryImages } from "@/lib/factoryImages";
 import { Factory, ColumnSchema } from "@/lib/types";
 import {
   FACTORY_FIELD_SECTIONS,
@@ -94,7 +94,7 @@ export default function FactoryEditDrawer({
     .map((c) => c.column_name)
     .filter((name) => !assignedFields.has(name) && !IMAGE_FACTORY_FIELDS.has(name));
 
-  const displayImages = getStoredFactoryImages(factory);
+  const displayImages = getFactoryImages(factory);
 
   return (
     <>

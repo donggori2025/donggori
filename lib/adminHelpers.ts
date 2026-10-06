@@ -111,8 +111,8 @@ export function validateFactoryPatch(input: unknown, requireIdentity = false): F
   for (const [key, raw] of Object.entries(body)) {
     if (!FACTORY_FIELDS.has(key) || raw === undefined) continue;
     if (key === "images") {
-      if (!Array.isArray(raw) || raw.length > 12 || raw.some((value) => typeof value !== "string" || value.length > 2000 || !isPublicImageUrl(value))) {
-        return { ok: false, error: "이미지는 최대 12개의 HTTPS 또는 사이트 내부 URL만 허용됩니다." };
+      if (!Array.isArray(raw) || raw.length > 50 || raw.some((value) => typeof value !== "string" || value.length > 2000 || !isPublicImageUrl(value))) {
+        return { ok: false, error: "이미지는 최대 50개의 HTTPS 또는 사이트 내부 URL만 허용됩니다." };
       }
       data[key] = raw;
       continue;

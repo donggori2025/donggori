@@ -302,9 +302,12 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             <div className="flex items-start justify-between gap-3 mb-5">
               <div>
                 <h1 className="text-3xl font-bold leading-[1.08] tracking-[-0.04em] text-[#111111] sm:text-4xl lg:text-[44px]">{factoryName}</h1>
-                <div className="flex items-center gap-2 mt-3">
+                <div className="flex flex-wrap items-center gap-2 mt-3">
                   <span className="px-3 py-1 rounded-full bg-[#f1f2f4] text-[12px] font-semibold text-[#555]">{primaryBadge}</span>
                   <span className="px-3 py-1 rounded-full bg-gray-100 text-[12px] font-semibold text-dg-ink">{secondaryBadge}</span>
+                  {factory.certifications?.map((label) => (
+                    <span key={label} className="px-3 py-1 rounded-full bg-amber-100 text-[12px] font-semibold text-amber-800">{label}</span>
+                  ))}
                 </div>
               </div>
               <button
