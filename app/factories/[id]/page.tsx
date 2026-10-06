@@ -305,6 +305,9 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 <div className="flex flex-wrap items-center gap-2 mt-3">
                   <span className="px-3 py-1 rounded-full bg-[#f1f2f4] text-[12px] font-semibold text-[#555]">{primaryBadge}</span>
                   <span className="px-3 py-1 rounded-full bg-gray-100 text-[12px] font-semibold text-dg-ink">{secondaryBadge}</span>
+                  {factory.serviceTags?.map((label) => (
+                    <span key={label} className="px-3 py-1 rounded-full bg-sky-100 text-[12px] font-semibold text-sky-800">{label}</span>
+                  ))}
                   {factory.certifications?.map((label) => (
                     <span key={label} className="px-3 py-1 rounded-full bg-amber-100 text-[12px] font-semibold text-amber-800">{label}</span>
                   ))}

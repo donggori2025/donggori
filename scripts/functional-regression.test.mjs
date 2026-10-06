@@ -4,14 +4,17 @@ import test from "node:test";
 import { getFactoryImages, getStoredFactoryImages } from "../lib/factoryImages.ts";
 import { buildFactoryPatch } from "../lib/factoryAdminFields.ts";
 import { writeFactoryImages } from "../lib/factoryImageStorage.ts";
-import { getFactoryCertifications } from "../lib/factoryCertifications.ts";
+import { getFactoryCertifications, getFactoryServiceTags } from "../lib/factoryBadges.ts";
 import { validateFactoryPatch } from "../lib/adminHelpers.ts";
 import { insertFactoryWithLegacyId } from "../lib/factoryCreation.ts";
 
-test("only the five operator-confirmed factories receive the sewing qualification", () => {
-  for (const name of ["꼬메오패션", "호프", "케이스타일", "더시크컴퍼니", "재희패턴"]) {
+test("operator-corrected badges distinguish services from qualifications", () => {
+  for (const name of ["꼬메오패션", "호프", "케이스타일", "재희패턴"]) {
     assert.deepEqual(getFactoryCertifications(name), ["봉제기능사"]);
+    assert.deepEqual(getFactoryServiceTags(name), []);
   }
+  assert.deepEqual(getFactoryCertifications("더시크컴퍼니"), []);
+  assert.deepEqual(getFactoryServiceTags("더시크컴퍼니"), ["패턴/샘플"]);
   for (const name of ["", "미호패션", "꼬메오", "호프2"]) assert.deepEqual(getFactoryCertifications(name), []);
 });
 
