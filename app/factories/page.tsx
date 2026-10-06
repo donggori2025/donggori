@@ -439,6 +439,9 @@ export default function FactoriesPage() {
           });
         }
         
+        for (const label of f.serviceTags || []) {
+          chips.push({ label, color: '#0369a1', bg: '#e0f2fe' });
+        }
         for (const label of f.certifications || []) {
           chips.push({ label, color: '#92400e', bg: '#fef3c7' });
         }

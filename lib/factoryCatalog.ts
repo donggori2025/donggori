@@ -9,6 +9,7 @@ export interface Factory {
   image: string;
   images?: string[];
   certifications?: string[];
+  serviceTags?: string[];
   contact: string;
   lat: number;
   lng: number;
