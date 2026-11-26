@@ -221,6 +221,7 @@ export default function NaverMap({
               width: ${markerSize}px;
               height: ${markerSize}px;
               cursor: pointer;
+              color: var(--dg-brand, #0a5fda);
               position: relative;
               transform: translate(-50%, -100%);
               transition: all 0.2s ease-in-out;
@@ -243,8 +244,8 @@ export default function NaverMap({
                 <!-- 핀 몸체 -->
                 <path
                   d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                  fill="#0ACF83"
-                  stroke="#0ACF83"
+                  fill="currentColor"
+                  stroke="currentColor"
                   stroke-width="0.5"
                 />
                 <!-- 핀 상단 흰색 원 -->
@@ -253,7 +254,7 @@ export default function NaverMap({
                   cy="9"
                   r="3"
                   fill="#ffffff"
-                  stroke="#0ACF83"
+                  stroke="currentColor"
                   stroke-width="0.5"
                 />
                 ${isSelected ? `
@@ -263,7 +264,7 @@ export default function NaverMap({
                   cy="9"
                   r="6"
                   fill="none"
-                  stroke="#0ACF83"
+                  stroke="currentColor"
                   stroke-width="1"
                   opacity="0.6"
                 />
@@ -272,7 +273,7 @@ export default function NaverMap({
                   cy="9"
                   r="4"
                   fill="none"
-                  stroke="#0ACF83"
+                  stroke="currentColor"
                   stroke-width="1"
                   opacity="0.3"
                 />

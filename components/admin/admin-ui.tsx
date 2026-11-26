@@ -12,7 +12,7 @@ export function AdminPageHeader({
   return (
     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{title}</h1>
+        <h1 className="text-3xl font-bold text-dg-ink tracking-tight">{title}</h1>
         {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
       </div>
       {action && <div className="flex-shrink-0">{action}</div>}
@@ -32,7 +32,7 @@ export function AdminCard({
   className?: string;
 }) {
   return (
-    <div className={`bg-white rounded-2xl border border-gray-200/80 shadow-sm ${className}`}>
+    <div className={`dg-panel ${className}`}>
       {(title || description) && (
         <div className="px-6 py-5 border-b border-gray-100">
           {title && <h2 className="text-base font-semibold text-gray-900">{title}</h2>}
@@ -54,7 +54,7 @@ export function AdminInput({
     <label className={`flex flex-col gap-1.5 ${className}`}>
       {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
       <input
-        className="w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 disabled:opacity-60 disabled:cursor-not-allowed transition"
+        className="w-full rounded-lg border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-dg-brand focus:outline-none focus:ring-2 focus:ring-blue-100 disabled:opacity-60 disabled:cursor-not-allowed transition"
         {...props}
       />
       {hint && <span className="text-xs text-gray-400">{hint}</span>}
@@ -72,7 +72,7 @@ export function AdminTextarea({
     <label className={`flex flex-col gap-1.5 ${className}`}>
       {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
       <textarea
-        className="min-h-[88px] w-full resize-y rounded-lg border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 disabled:opacity-60"
+        className="min-h-[88px] w-full resize-y rounded-lg border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-dg-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 disabled:opacity-60"
         {...props}
       />
       {hint && <span className="text-xs text-gray-400">{hint}</span>}
@@ -83,7 +83,7 @@ export function AdminTextarea({
 type ButtonVariant = "primary" | "secondary" | "danger" | "ghost";
 
 const buttonStyles: Record<ButtonVariant, string> = {
-  primary: "bg-gray-900 text-white hover:bg-gray-800 disabled:bg-gray-300",
+  primary: "dg-action disabled:opacity-70",
   secondary: "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 disabled:opacity-50",
   danger: "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300",
   ghost: "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
@@ -174,7 +174,7 @@ export function AdminSearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+        className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:border-dg-brand focus:outline-none focus:ring-2 focus:ring-blue-100"
       />
     </div>
   );
@@ -196,8 +196,8 @@ export function AdminToggle({
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 ${
-          checked ? "bg-gray-900" : "bg-gray-200"
+        className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-dg-brand focus:ring-offset-2 ${
+          checked ? "bg-dg-brand" : "bg-gray-200"
         }`}
       >
         <span

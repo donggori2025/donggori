@@ -11,14 +11,14 @@ export default function SiteFrame({ children }: { children: ReactNode }) {
   const isAdmin = pathname.startsWith("/admin");
 
   if (isAdmin) {
-    return <main className="min-h-screen w-full flex-1">{children}</main>;
+    return <main className="dg-interior min-h-screen w-full flex-1">{children}</main>;
   }
 
   return (
     <>
       <GlobalPopups />
       <Header />
-      <main id="public-content" className="w-full flex-1">{children}</main>
+      <main id="public-content" className={pathname === "/" ? "w-full flex-1" : "dg-interior w-full flex-1"}>{children}</main>
       <Footer />
     </>
   );

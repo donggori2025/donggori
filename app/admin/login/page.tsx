@@ -32,13 +32,13 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
-      <form onSubmit={onSubmit} className="w-full max-w-sm border rounded-xl p-6 shadow-sm bg-white">
-        <h1 className="text-xl font-bold mb-4">관리자 로그인</h1>
+      <form onSubmit={onSubmit} className="dg-panel w-full max-w-sm p-7 sm:p-8">
+        <h1 className="text-2xl font-bold tracking-tight mb-5">관리자 로그인</h1>
         <div className="space-y-3">
-          <input className="w-full border rounded px-3 py-2" placeholder="아이디" value={id} onChange={(e)=>setId(e.target.value)} />
-          <input className="w-full border rounded px-3 py-2" type="password" placeholder="비밀번호" value={password} onChange={(e)=>setPassword(e.target.value)} />
+          <input className="w-full border border-dg-line rounded-xl px-3 py-2.5" placeholder="아이디" value={id} onChange={(e)=>setId(e.target.value)} />
+          <input className="w-full border border-dg-line rounded-xl px-3 py-2.5" type="password" placeholder="비밀번호" value={password} onChange={(e)=>setPassword(e.target.value)} />
           {error && <div className="text-red-600 text-sm">{error}</div>}
-          <button disabled={loading} className="w-full bg-black text-white rounded px-3 py-2 disabled:opacity-50">{loading ? "로그인 중..." : "로그인"}</button>
+          <button disabled={loading} className="w-full dg-action rounded-xl px-3 py-2.5 font-semibold disabled:opacity-50">{loading ? "로그인 중..." : "로그인"}</button>
         </div>
         
       </form>

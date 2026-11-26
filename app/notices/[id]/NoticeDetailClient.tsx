@@ -19,12 +19,12 @@ interface NoticeDetailClientProps {
 export default function NoticeDetailClient({ notice }: NoticeDetailClientProps) {
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-[65vh]">
       <div className={`${PAGE_CONTAINER_CLASS} py-16`}>
         {/* 상단 섹션 */}
         <div className="mb-12">
-          <div className="text-sm text-gray-500 mb-2">{notice.category || '공지'}</div>
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          <div className="text-sm font-semibold text-dg-brand mb-2">{notice.category || '공지'}</div>
+          <h1 className="dg-page-title mb-4">
             {notice.title}
           </h1>
           <div className="text-lg text-gray-600 mb-8">{(notice.start_at || notice.created_at || '').slice(0,10)}</div>
@@ -33,7 +33,7 @@ export default function NoticeDetailClient({ notice }: NoticeDetailClientProps) 
         {/* 메인 콘텐츠 */}
         <div className="space-y-8">
           {/* 공지 내용 */}
-          <div className="bg-white border border-gray-200 rounded-lg p-8">
+          <div className="dg-panel p-5 sm:p-8">
             <div className="text-gray-700 whitespace-pre-line leading-relaxed text-lg">
               {notice.content}
             </div>

@@ -90,7 +90,7 @@ function ChatBubble({
   return (
     <div className="flex flex-col items-end w-full">
       <div
-        className="max-w-[85%] animate-fade-in rounded-lg bg-[#111] px-4 py-2.5 text-sm leading-relaxed text-white md:text-[15px]"
+        className="max-w-[85%] animate-fade-in rounded-lg bg-dg-brand px-4 py-2.5 text-sm leading-relaxed text-white md:text-[15px]"
         style={{ minHeight: 40 }}
       >
         {content}
@@ -732,7 +732,7 @@ type ScoredFactory = Factory & { score: number };
 
             
             return (
-              <div key={f.id ?? idx} className="rounded-xl bg-white overflow-hidden border border-gray-200">
+              <div key={f.id ?? idx} className="dg-panel overflow-hidden">
                 {/* 이미지 영역 - 데스크톱에서만 표시 */}
                 <div className="hidden md:block w-full h-32 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-xl group">
                   <MatchingFactoryImage factory={f} idx={idx} />
@@ -760,7 +760,7 @@ type ScoredFactory = Factory & { score: number };
                   </div>
                   
                   <button
-                    className="w-full mt-3 bg-[#333333] text-white rounded-lg py-2 font-semibold hover:bg-[#222] transition text-sm md:text-base"
+                    className="w-full mt-3 dg-action rounded-lg py-2 font-semibold transition text-sm md:text-base"
                     onClick={() => {
                       if (!isSignedIn) {
                         alert('로그인 후 이용 가능합니다.');
@@ -815,7 +815,7 @@ type ScoredFactory = Factory & { score: number };
   function renderLoading() {
     return (
       <div className="w-full flex flex-col items-center justify-center min-h-[500px] animate-fade-in">
-        <div className="w-16 h-16 border-4 border-gray-300 border-t-[#222222] rounded-full animate-spin mb-6"></div>
+        <div className="w-16 h-16 border-4 border-gray-300 border-t-dg-brand rounded-full animate-spin mb-6"></div>
         <div className="text-lg font-semibold">추천 결과를 분석 중입니다...</div>
       </div>
     );
@@ -915,10 +915,10 @@ type ScoredFactory = Factory & { score: number };
 
   // 왼쪽: 질문/선택지 or 결과 카드 or 로딩
   return (
-    <div className="min-h-screen bg-[#f5f5f3]">
-      <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-6`}>
+    <div className="min-h-screen">
+      <div className={`${PAGE_CONTAINER_CLASS} py-10 md:py-14 space-y-6`}>
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">맞춤 추천</h1>
+          <h1 className="dg-page-title">맞춤 추천</h1>
           <p className="mt-2 text-sm md:text-base text-gray-600">
             몇 가지 정보만 알려주시면 가장 적합한 봉제공장 3곳을 추천해드립니다.
           </p>
@@ -926,7 +926,7 @@ type ScoredFactory = Factory & { score: number };
 
         <div className="flex flex-col lg:flex-row gap-4 items-stretch justify-center flex-1 transition-opacity duration-700 min-h-[78vh]">
         {/* 왼쪽: 질문/선택지 or 결과 카드 or 로딩 */}
-        <div className="flex min-h-[620px] w-full flex-col rounded-lg border border-dg-line bg-white p-4 md:min-h-[700px] md:p-6 lg:max-h-[860px] lg:min-h-[760px] lg:flex-[2]">
+        <div className="flex min-h-[620px] w-full flex-col dg-panel p-4 md:min-h-[700px] md:p-6 lg:max-h-[860px] lg:min-h-[760px] lg:flex-[2]">
           {isResultStage ? (
             resultLoading ? (
               <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] animate-fade-in">
@@ -954,7 +954,7 @@ type ScoredFactory = Factory & { score: number };
                     직접 찾기
                   </button>
                   <button
-                    className="flex-1 flex items-center justify-center gap-2 rounded-lg py-3 text-sm md:text-base font-semibold bg-[#111] text-white hover:bg-black transition"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-lg py-3 text-sm md:text-base font-semibold dg-action transition"
                     onClick={handleRestart}
                   >
                     <RotateCcw className="w-4 h-4" />
@@ -991,7 +991,7 @@ type ScoredFactory = Factory & { score: number };
                         }
                       }}
                       placeholder="예: 여성 니트 상의 소량 생산 가능한 공장을 찾고 싶어요"
-                      className="w-full h-10 md:h-11 rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-900"
+                      className="w-full h-10 md:h-11 rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-blue-100 focus:border-dg-brand"
                     />
                     <button
                       type="button"
@@ -999,7 +999,7 @@ type ScoredFactory = Factory & { score: number };
                       disabled={!quickInput.trim()}
                       className={`h-10 md:h-11 px-4 rounded-lg text-sm font-bold whitespace-nowrap transition ${
                         quickInput.trim()
-                          ? "bg-dg-ink text-white hover:bg-black"
+                          ? "dg-action"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     >
@@ -1010,10 +1010,10 @@ type ScoredFactory = Factory & { score: number };
                 <hr className="my-4 border-gray-200" />
                 <div className="flex gap-2 mb-6">
                   {QUESTIONS.map((_, idx) => (
-                    <div key={idx} className={`h-1 w-8 md:w-12 rounded-full ${idx <= step ? "bg-dg-ink" : "bg-gray-200"}`}></div>
+                    <div key={idx} className={`h-1 w-8 md:w-12 rounded-full ${idx <= step ? "bg-dg-brand" : "bg-gray-200"}`}></div>
                   ))}
                 </div>
-                <div className="text-xs md:text-sm font-semibold ai-matching-glow mb-2">
+                <div className="text-xs md:text-sm font-semibold text-dg-brand mb-2">
                   {step + 1} / {QUESTIONS.length}
                 </div>
                 <div className="text-lg md:text-xl font-bold mb-6 text-gray-900">{QUESTIONS[step].question}</div>
@@ -1024,9 +1024,10 @@ type ScoredFactory = Factory & { score: number };
                     <button
                       key={option}
                       type="button"
+                      aria-pressed={selectedOptions.includes(option)}
                       className={`rounded-xl bg-white shadow-sm text-xs md:text-[15px] font-medium py-4 md:py-8 transition border flex items-center justify-center
                         ${selectedOptions.includes(option)
-                          ? "border-dg-ink ring-2 ring-gray-200"
+                          ? "dg-selected ring-2 ring-blue-100"
                           : "border-gray-200 hover:border-gray-400"}
                       `}
                       onClick={() => handleOptionToggle(option)}
@@ -1041,9 +1042,9 @@ type ScoredFactory = Factory & { score: number };
               <div className="pt-4 pb-6 border-t border-gray-200 flex justify-between items-center gap-4 shrink-0 bg-white">
                 <button className="text-sm md:text-base text-gray-500 underline" onClick={() => router.push("/")}>나가기</button>
                 <div className="flex gap-2">
-                  <Button variant="ghost" className="text-[#333333] text-sm md:text-base px-4 md:px-6 py-2 md:py-3" onClick={handleSkip}>건너뛰기</Button>
+                  <Button variant="ghost" className="text-dg-muted text-sm md:text-base px-4 md:px-6 py-2 md:py-3" onClick={handleSkip}>건너뛰기</Button>
                   <Button
-                    className="bg-[#222222] hover:bg-black text-white rounded-lg px-6 md:px-8 py-2 md:py-3 font-bold text-sm md:text-base"
+                    className="dg-action rounded-lg px-6 md:px-8 py-2 md:py-3 font-bold text-sm md:text-base"
                     onClick={handleConfirm}
                     disabled={selectedOptions.length === 0}
                   >
@@ -1055,13 +1056,13 @@ type ScoredFactory = Factory & { score: number };
           )}
         </div>
         {/* 오른쪽: 채팅 UI */}
-        <div className="flex max-h-[44vh] min-h-[280px] w-full flex-col overflow-hidden rounded-lg border border-dg-line bg-white md:max-h-[50vh] md:min-h-[340px] lg:max-h-[860px] lg:min-h-[760px] lg:flex-[1]">
+        <div className="flex max-h-[44vh] min-h-[280px] w-full flex-col overflow-hidden dg-panel md:max-h-[50vh] md:min-h-[340px] lg:max-h-[860px] lg:min-h-[760px] lg:flex-[1]">
           <div className="px-4 py-3 border-b border-gray-200 bg-white shrink-0">
             <p className="font-bold text-sm text-gray-900">동고리 매칭 도우미</p>
             <p className="text-xs text-gray-500 mt-0.5">질문에 답하면 최적의 공장을 추천해드려요</p>
           </div>
           <div
-            className="flex-1 overflow-y-auto p-4 md:p-5 flex flex-col gap-4 bg-[#f8f9fc]"
+            className="flex-1 overflow-y-auto p-4 md:p-5 flex flex-col gap-4 bg-dg-canvas"
             ref={chatScrollRef}
           >
           {/* 기존 채팅/인트로 UI */}

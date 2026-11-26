@@ -387,7 +387,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
   ].filter((item): item is { label: string; value: string } => Boolean(item));
 
   return (
-    <div className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 sm:py-20">
+    <div className="site-wide py-10 sm:py-14">
       {/* 뒤로가기 링크 */}
       <div className="mb-6">
         <button 
@@ -404,7 +404,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         <div className="flex-1 min-w-0">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 기본 정보 */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="dg-panel p-5 sm:p-6">
               <h2 className="font-bold text-lg mb-4">기본 정보</h2>
               <div className="space-y-4">
                 <div>
@@ -414,7 +414,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     placeholder="브랜드명을 입력해주세요."
                     value={formData.brandName}
                     onChange={(e) => handleInputChange("brandName", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-100 focus:border-dg-brand"
                   />
                 </div>
                 <div>
@@ -425,7 +425,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-100 focus:border-dg-brand"
                   />
                 </div>
                 <div>
@@ -436,14 +436,14 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     value={formData.contact}
                     onChange={(e) => handleInputChange("contact", e.target.value)}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-100 focus:border-dg-brand"
                   />
                 </div>
               </div>
             </div>
 
             {/* 샘플/패턴 유무 */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="dg-panel p-5 sm:p-6">
               <h2 className="font-bold text-lg mb-4">샘플/패턴 유무</h2>
               <div className="space-y-4">
                 {[
@@ -485,7 +485,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* 작업지시서 */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="dg-panel p-5 sm:p-6">
               <h2 className="font-bold text-lg mb-4">작업지시서</h2>
               <div className="space-y-4">
                 {/* 상세 설명 */}
@@ -495,7 +495,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     placeholder="제품, 원단, 수량, 납기 등 상세 설명을 입력해주세요"
                     value={formData.detailDescription}
                     onChange={(e) => handleInputChange("detailDescription", e.target.value)}
-                    className="w-full h-28 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                    className="w-full h-28 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-100 focus:border-dg-brand"
                   />
                 </div>
                 {/* 상세 요청사항 */}
@@ -505,7 +505,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                     placeholder="특이사항, 요청사항, 참고사항을 입력해주세요"
                     value={formData.detailRequest}
                     onChange={(e) => handleInputChange("detailRequest", e.target.value)}
-                    className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                    className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-100 focus:border-dg-brand"
                   />
                 </div>
                 <p className="rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
@@ -536,7 +536,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
                         value={newLink}
                         onChange={handleLinkInputChange}
                         onKeyPress={handleLinkKeyPress}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                        className="min-w-0 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-100 focus:border-dg-brand"
                       />
                       <button
                         type="button"
@@ -557,7 +557,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* 개인정보 동의 */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="dg-panel p-5 sm:p-6">
               <div className="flex items-start space-x-3">
                 <input
                   type="checkbox"
@@ -588,7 +588,7 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
               disabled={submitting || loading || !factory || !(factory.company_name || factory.name) || !formData.agreeToTerms}
               className={`w-full py-4 rounded-lg font-bold ${
                 formData.agreeToTerms && factory && (factory.company_name || factory.name) && !loading && !submitting
-                  ? "bg-gray-800 text-white hover:bg-gray-900" 
+                  ? "dg-action"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
@@ -605,8 +605,8 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         </div>
 
         {/* 오른쪽: 업장 요약 */}
-        <div className="w-full lg:w-[380px] flex-shrink-0">
-          <div className="rounded-lg border border-dg-line bg-white p-6 lg:sticky lg:top-24">
+        <div className="w-full lg:w-[32%] flex-shrink-0">
+          <div className="dg-panel p-6 lg:sticky lg:top-24">
             <div className="font-bold text-lg mb-1">{factoryName}</div>
             <div className="text-xs text-gray-500 mb-4">{factoryType}</div>
 

@@ -108,7 +108,7 @@ function SignUpForm() {
 
   if (!provider) {
     return (
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow">
+      <div className="w-full max-w-md dg-panel p-6 sm:p-8">
         <h2 className="text-center text-xl font-bold">소셜 계정으로 회원가입</h2>
         <p className="mb-6 mt-2 text-center text-sm text-gray-500">별도의 이메일 비밀번호 가입은 현재 운영하지 않습니다.</p>
         <SocialButtons loading={loading === "kakao" || loading === "naver" ? loading : null} onSelect={handleSocial} />
@@ -117,7 +117,7 @@ function SignUpForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xl rounded-xl bg-white p-8 shadow">
+    <form onSubmit={handleSubmit} className="w-full max-w-xl dg-panel p-6 sm:p-8">
       <h2 className="text-xl font-bold">가입 정보 확인</h2>
       <p className="mb-6 mt-1 text-sm text-gray-500">{provider === "kakao" ? "카카오" : "네이버"} 인증이 완료되었습니다.</p>
 
@@ -148,7 +148,7 @@ function SignUpForm() {
         </div>
 
         {error && <p className="text-center text-sm text-red-500">{error}</p>}
-        <button type="submit" disabled={contextLoading || loading !== null || !email || !name.trim() || !agreeTerms || !agreePrivacy} className="mt-2 flex h-12 items-center justify-center rounded bg-black font-bold text-white disabled:bg-gray-200 disabled:text-gray-400">
+        <button type="submit" disabled={contextLoading || loading !== null || !email || !name.trim() || !agreeTerms || !agreePrivacy} className="mt-2 flex h-12 items-center justify-center rounded-xl dg-action font-bold disabled:bg-gray-200 disabled:text-gray-400">
           {contextLoading || loading === "submit" ? <Loader className="h-5 w-5 animate-spin" /> : "회원가입 완료"}
         </button>
       </div>
@@ -158,11 +158,11 @@ function SignUpForm() {
 
 export default function SignUpPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-white">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       <div className={`${PAGE_CONTAINER_CLASS} flex flex-col items-center py-12`}>
         <div className="mb-8 flex flex-col items-center text-center">
           <Image src="/logo_donggori_0914_transparent.svg" alt="동고리 로고" width={798} height={266} sizes="112px" className="mb-2 h-auto w-28" />
-          <h1 className="text-4xl font-extrabold tracking-tight">DONGGORI</h1>
+          <h1 className="dg-page-title">DONGGORI</h1>
           <p className="mt-2 text-sm text-gray-500">이미 계정이 있으신가요? <Link href="/sign-in" className="font-semibold text-blue-500">로그인</Link></p>
         </div>
         <Suspense fallback={<Loader className="h-8 w-8 animate-spin text-gray-400" />}>

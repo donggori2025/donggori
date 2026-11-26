@@ -47,7 +47,7 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
   const factoryName = factory.company_name || '공장명 없음';
 
   return (
-    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-96 bg-white rounded-xl shadow-xl border border-gray-200 z-10">
+    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-[min(24rem,calc(100%-1rem))] dg-panel z-10">
       <div className="p-4">
         <div className="flex items-start gap-4">
           {/* 이미지 */}
@@ -115,7 +115,7 @@ export default function FactoryInfoPopup({ factory, onDetailClick }: FactoryInfo
       <div className="px-4 pb-4">
         <button
           onClick={onDetailClick}
-          className="w-full bg-black text-white py-2 rounded-lg font-semibold hover:bg-gray-900 transition text-sm"
+          className="w-full dg-action py-2 rounded-lg font-semibold transition text-sm"
         >
           🔍 상세페이지 보기
         </button>

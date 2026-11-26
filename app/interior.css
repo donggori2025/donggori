@@ -1,0 +1,87 @@
+/* The subpages share the landing's blue palette. Keep administrative status
+   colors, social providers, and the factory process legend independent. */
+.dg-interior {
+  --dg-ink: var(--dg-navy);
+  --dg-muted: #50647d;
+  --dg-line: #d4e1ef;
+  --dg-canvas: #eff5fc;
+  --color-gray-50: #f3f7fc;
+  --color-gray-100: #eaf1fa;
+  --color-gray-200: #d4e1ef;
+  --color-gray-300: #b6c8df;
+  --color-gray-400: #5a6f89;
+  --color-gray-500: #50647d;
+  --color-gray-600: #415974;
+  --color-gray-700: #334b68;
+  --color-gray-800: #243d5c;
+  --color-gray-900: var(--dg-navy);
+  --primary: var(--dg-brand);
+  --primary-foreground: white;
+  --foreground: var(--dg-ink);
+  --muted-foreground: var(--dg-muted);
+  --accent: #e6f0ff;
+  --accent-foreground: #124eac;
+  --border: var(--dg-line);
+  --input: #b6c8df;
+  --ring: var(--dg-brand);
+  color: var(--dg-ink);
+  background:
+    radial-gradient(ellipse 65% 290px at 94% 0, #cfe2fc 0, transparent 90%) top / 100% 420px no-repeat,
+    linear-gradient(165deg, #e8f4fe 0, #f7faff 55%, white 92%) top / 100% 460px no-repeat,
+    white;
+  font-family: "Donggori Pretendard", Pretendard, -apple-system, sans-serif;
+}
+.dg-interior ::selection { background: #174e9e; color: white; }
+.dg-interior :where(h1, h2, h3) { text-wrap: pretty; word-break: keep-all; }
+.dg-interior :where(input, button, textarea, select) { accent-color: var(--dg-brand); }
+.dg-interior :is(a, button, input, textarea, select, summary):focus-visible {
+  outline: 2px solid var(--dg-brand);
+  outline-offset: 2px;
+}
+.dg-interior .dg-page-title {
+  color: var(--dg-navy);
+  font-size: clamp(2rem, 3.25vw, 3.5rem);
+  font-weight: 740;
+  letter-spacing: -.055em;
+  line-height: 1.17;
+}
+.dg-panel {
+  background-color: white;
+  border: 1px solid var(--dg-line);
+  border-radius: clamp(16px, 1.4vw, 22px);
+  box-shadow: 0 12px 32px -20px rgb(42 82 137 / 34%);
+}
+.dg-panel-link { transition: border-color .18s ease, box-shadow .18s ease; }
+.dg-panel-link:is(:hover, :focus-visible) {
+  border-color: #8eb7ef;
+  box-shadow: 0 14px 32px -17px rgb(38 85 151 / 42%);
+}
+.dg-action {
+  color: white;
+  background: var(--dg-action-fill);
+}
+.dg-action:is(a, button):not(:disabled):hover { background: linear-gradient(110deg, #0d59aa, #1047a4); }
+.dg-action:disabled { color: #53667f; background: #dce6f3; box-shadow: none; }
+.dg-selected {
+  color: #164f9c;
+  background-color: #e6f0ff;
+  border-color: #82adea;
+}
+.dg-interior .dg-prompt-link {
+  border: 1px solid #b9d3f8;
+  border-radius: 20px;
+  background: linear-gradient(115deg, white, #edf5ff);
+  box-shadow: 0 7px 22px -16px rgb(26 80 148 / 48%);
+}
+.dg-interior .dg-document {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dg-panel-link { transition: none; }
+}
+@media (forced-colors: active) {
+  .dg-action, .dg-selected { border: 1px solid ButtonText; }
+}

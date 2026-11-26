@@ -226,13 +226,13 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
     displayImages.length > 0 ? Math.min(currentImageIndex, displayImages.length - 1) : 0;
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6 sm:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-[640px_1fr] gap-8 xl:gap-9 items-start">
-          <section>
+    <div className="min-h-screen">
+      <div className="site-wide py-10 sm:py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] gap-8 xl:gap-9 items-start">
+          <section className="min-w-0">
             {displayImages.length > 0 ? (
               <div className="relative">
-                <div className="relative h-[560px] w-full overflow-hidden rounded-lg bg-[#f5f5f3] md:h-[620px] lg:h-[640px] xl:h-[660px]">
+                <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-dg-line bg-white">
                   <Image
                     src={displayImages[activeImageIndex]}
                     alt={`${factoryName} 이미지 ${activeImageIndex + 1}`}
@@ -275,7 +275,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                           aria-current={index === activeImageIndex ? "true" : undefined}
                           onClick={() => setCurrentImageIndex(index)}
                           className={`relative w-[66px] h-[66px] shrink-0 snap-start rounded-md overflow-hidden border ${
-                            index === activeImageIndex ? "border-black" : "border-gray-200"
+                            index === activeImageIndex ? "border-dg-brand" : "border-gray-200"
                           }`}
                         >
                           <Image src={image} alt={`${factoryName} 썸네일 ${index + 1}`} fill sizes="66px" className="object-cover" />
@@ -286,7 +286,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                       {displayImages.map((_, index) => (
                         <span
                           key={index}
-                          className={`w-1.5 h-1.5 rounded-full ${index === activeImageIndex ? "bg-black" : "bg-gray-300"}`}
+                          className={`w-1.5 h-1.5 rounded-full ${index === activeImageIndex ? "bg-dg-brand" : "bg-gray-300"}`}
                         />
                       ))}
                     </div>
@@ -294,16 +294,16 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 )}
               </div>
             ) : (
-              <FactoryImagePlaceholder className="h-[560px] rounded-xl md:h-[620px] lg:h-[640px] xl:h-[660px]" />
+              <FactoryImagePlaceholder className="aspect-square rounded-2xl" />
             )}
           </section>
 
-          <section className="pt-1 lg:pt-0.5">
+          <section className="dg-panel min-w-0 p-5 md:p-7">
             <div className="flex items-start justify-between gap-3 mb-5">
               <div>
-                <h1 className="text-3xl font-bold leading-[1.08] tracking-[-0.04em] text-[#111111] sm:text-4xl lg:text-[44px]">{factoryName}</h1>
+                <h1 className="dg-page-title">{factoryName}</h1>
                 <div className="flex flex-wrap items-center gap-2 mt-3">
-                  <span className="px-3 py-1 rounded-full bg-[#f1f2f4] text-[12px] font-semibold text-[#555]">{primaryBadge}</span>
+                  <span className="px-3 py-1 rounded-full bg-blue-50 text-[12px] font-semibold text-dg-brand">{primaryBadge}</span>
                   <span className="px-3 py-1 rounded-full bg-gray-100 text-[12px] font-semibold text-dg-ink">{secondaryBadge}</span>
                   {factory.serviceTags?.map((label) => (
                     <span key={label} className="px-3 py-1 rounded-full bg-sky-100 text-[12px] font-semibold text-sky-800">{label}</span>
@@ -322,7 +322,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
               </button>
             </div>
 
-            <div className="space-y-4 text-[15px] text-[#222] leading-[1.62]">
+            <div className="space-y-4 text-[15px] text-dg-ink leading-[1.62]">
               <div><span className="font-semibold">• 한 줄 소개</span><p className="mt-0.5">{factory.intro || "-"}</p></div>
               <div><span className="font-semibold">• 위치</span><p className="mt-0.5">{factory.address || factory.admin_district || "-"}</p></div>
               <div><span className="font-semibold">• 작업 가능 원단</span><p className="mt-0.5">{factory.main_fabrics || "-"}</p></div>
@@ -360,31 +360,31 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             <div className="grid grid-cols-3 gap-3 mt-7">
-              <div className="rounded-lg bg-[#f5f6f8] py-4 px-3 text-center min-h-[84px] flex flex-col justify-center">
+              <div className="rounded-lg bg-dg-canvas py-4 px-3 text-center min-h-[84px] flex flex-col justify-center">
                 <div className="text-xs text-gray-500 mb-1">행정동</div>
                 <div className="text-sm font-semibold">{factory.admin_district || "-"}</div>
               </div>
-              <div className="rounded-lg bg-[#f5f6f8] py-4 px-3 text-center min-h-[84px] flex flex-col justify-center">
+              <div className="rounded-lg bg-dg-canvas py-4 px-3 text-center min-h-[84px] flex flex-col justify-center">
                 <div className="text-xs text-gray-500 mb-1">대표자</div>
                 <div className="text-sm font-semibold">{factory.contact_name || "-"}</div>
               </div>
-              <div className="rounded-lg bg-[#f5f6f8] py-4 px-3 text-center min-h-[84px] flex flex-col justify-center">
+              <div className="rounded-lg bg-dg-canvas py-4 px-3 text-center min-h-[84px] flex flex-col justify-center">
                 <div className="text-xs text-gray-500 mb-1">업력</div>
                 <div className="text-sm font-semibold">{experienceText}</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,195px),1fr))] gap-3 mt-6">
               <Button
                 onClick={handleConsultRequest}
-                className="h-[50px] rounded-md bg-[#111111] hover:bg-[#000000] text-white font-semibold text-[15px] flex items-center justify-between px-4"
+                className="h-[50px] rounded-md dg-action font-semibold text-[15px] flex items-center justify-between px-4"
               >
                 <span className="flex items-center gap-2"><FileText className="w-4 h-4" />작업지시서 상담 예약</span>
                 <span>→</span>
               </Button>
               <Button
                 onClick={handleKakaoInquiry}
-                className="h-[50px] rounded-md bg-[#111111] hover:bg-[#000000] text-white font-semibold text-[15px] flex items-center justify-between px-4"
+                className="h-[50px] rounded-md dg-action font-semibold text-[15px] flex items-center justify-between px-4"
               >
                 <span className="flex items-center gap-2">
                   <MessageCircle className="w-4 h-4" />
@@ -416,7 +416,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-base font-bold text-[#111]">주요 생산품목</h3>
+              <h3 className="text-base font-bold text-dg-ink">주요 생산품목</h3>
               <button
                 type="button"
                 onClick={() => setShowMajorItemsModal(false)}
@@ -425,7 +425,7 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 닫기
               </button>
             </div>
-            <p className="text-sm text-[#222] leading-relaxed whitespace-pre-wrap">
+            <p className="text-sm text-dg-ink leading-relaxed whitespace-pre-wrap">
               {majorItems || "-"}
             </p>
           </div>

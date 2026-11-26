@@ -1,7 +1,7 @@
 .pg-page {
-  --pg-blue: #3182f6;
-  --pg-action: #0a5fda;
-  --pg-ink: #192f50;
+  --pg-blue: var(--dg-blue);
+  --pg-action: var(--dg-brand);
+  --pg-ink: var(--dg-navy);
   --pg-secondary: #354d69;
   --pg-mist: color-mix(in srgb, var(--pg-blue) 7%, white);
   --pg-sky: color-mix(in srgb, var(--pg-blue) 30%, white);

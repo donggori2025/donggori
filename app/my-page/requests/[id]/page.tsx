@@ -29,11 +29,11 @@ export default function MyRequestDetailPage() {
   }, [requestId]);
 
   if (loading) {
-    return <div className="max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center">로딩 중...</div>;
+    return <div className="max-w-md mx-auto mt-20 dg-panel p-8 text-center">로딩 중...</div>;
   }
 
   if (!request) {
-    return <div className="max-w-md mx-auto mt-20 bg-white rounded-xl shadow-md p-8 text-center">의뢰내역을 찾을 수 없습니다.</div>;
+    return <div className="max-w-md mx-auto mt-20 dg-panel p-8 text-center">의뢰내역을 찾을 수 없습니다.</div>;
   }
 
   const additionalInfo = (() => {
@@ -62,10 +62,10 @@ export default function MyRequestDetailPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg p-8">
-        <div className="flex justify-between items-start mb-8">
+      <div className="dg-panel p-5 sm:p-8">
+        <div className="flex flex-wrap justify-between items-start gap-3 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">의뢰 상세보기</h1>
+            <h1 className="dg-page-title mb-2">의뢰 상세보기</h1>
             <p className="text-gray-600">의뢰 ID: {request.id}</p>
           </div>
           <div className="flex items-center gap-4">

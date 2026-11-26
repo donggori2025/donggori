@@ -37,6 +37,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-dg-brand: var(--dg-brand);
   --color-dg-canvas: var(--dg-canvas);
   --color-dg-surface: var(--dg-surface);
   --color-dg-ink: var(--dg-ink);
@@ -49,6 +50,10 @@
 }
 
 :root {
+  --dg-brand: #0a5fda;
+  --dg-blue: #3182f6;
+  --dg-navy: #192f50;
+  --dg-action-fill: linear-gradient(110deg, #106bc8, var(--dg-brand) 55%, #234bb1);
   --radius: 0.5rem;
   --dg-canvas: #f5f5f3;
   --dg-surface: #ffffff;

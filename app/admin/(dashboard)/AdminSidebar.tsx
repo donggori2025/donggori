@@ -72,33 +72,34 @@ export default function AdminSidebar() {
     exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-gray-200/80 bg-white">
-      <div className="px-6 py-6 border-b border-gray-100">
+    <aside className="flex flex-wrap items-center border-b border-dg-line bg-white md:fixed md:inset-y-0 md:left-0 md:z-30 md:w-56 md:flex-col md:flex-nowrap md:items-stretch md:border-b-0 md:border-r xl:w-64">
+      <div className="flex-1 px-4 py-3 md:flex-none md:border-b md:border-dg-line md:px-6 md:py-6">
         <div className="text-lg font-bold text-gray-900 tracking-tight">동고리</div>
         <div className="text-xs text-gray-400 mt-0.5">관리자 콘솔</div>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="order-last flex w-full flex-wrap gap-1 px-2 pb-2 md:order-none md:block md:w-auto md:flex-1 md:space-y-1 md:px-3 md:py-4">
         {NAV.map((item) => {
           const active = isActive(item.href, item.exact);
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+              aria-current={active ? "page" : undefined}
+              className={`flex items-center gap-1.5 rounded-xl px-2 py-2 text-xs md:gap-3 md:px-3 md:py-2.5 md:text-sm font-medium transition ${
                 active
-                  ? "bg-gray-900 text-white shadow-sm"
+                  ? "dg-selected"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
-              <span className={active ? "text-white" : "text-gray-400"}>{item.icon}</span>
+              <span className={active ? "text-dg-brand" : "text-gray-400"}>{item.icon}</span>
               {item.label}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-gray-100">
+      <div className="px-3 md:border-t md:border-dg-line md:p-4">
         <button
           onClick={handleLogout}
           disabled={isLoggingOut}

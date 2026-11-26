@@ -132,7 +132,7 @@ export default function MyPage() {
       <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <p className="text-sm font-semibold text-dg-ink">MY DONGGORI</p>
-          <h1 className="mt-1 text-3xl font-bold text-gray-900">마이페이지</h1>
+          <h1 className="mt-1 dg-page-title">마이페이지</h1>
           <p className="mt-2 text-sm text-gray-500">프로필과 내가 등록한 의뢰를 관리합니다.</p>
         </div>
         <button
@@ -145,7 +145,7 @@ export default function MyPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)]">
-        <nav aria-label="마이페이지 메뉴" className="h-fit rounded-2xl border border-gray-200 bg-white p-2">
+        <nav aria-label="마이페이지 메뉴" className="h-fit dg-panel p-2">
           {([
             ["profile", "프로필"],
             ["requests", "의뢰내역"],
@@ -155,7 +155,7 @@ export default function MyPage() {
               type="button"
               onClick={() => setMenu(value)}
               className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${
-                menu === value ? "bg-dg-ink text-white" : "text-gray-700 hover:bg-gray-50"
+                menu === value ? "dg-selected" : "text-gray-700 hover:bg-gray-50"
               }`}
             >
               {label}
@@ -164,7 +164,7 @@ export default function MyPage() {
         </nav>
 
         {menu === "profile" ? (
-          <section className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
+          <section className="dg-panel p-6 md:p-8">
             <div className="mb-7 flex items-center gap-4 border-b border-gray-100 pb-7">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-xl font-bold text-dg-ink">
                 {(user.name || user.email).slice(0, 1).toUpperCase()}
@@ -183,7 +183,7 @@ export default function MyPage() {
                   maxLength={50}
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-dg-ink focus:ring-2 focus:ring-gray-200"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-dg-brand focus:ring-2 focus:ring-blue-100"
                 />
               </label>
               <label className="block text-sm font-medium text-gray-700">
@@ -201,7 +201,7 @@ export default function MyPage() {
                   value={phoneNumber}
                   onChange={(event) => setPhoneNumber(formatPhone(event.target.value))}
                   placeholder="010-1234-5678"
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-dg-ink focus:ring-2 focus:ring-gray-200"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-dg-brand focus:ring-2 focus:ring-blue-100"
                 />
               </label>
               {profileMessage && (
@@ -210,7 +210,7 @@ export default function MyPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex items-center gap-2 rounded-lg bg-dg-ink px-5 py-2.5 text-sm font-bold text-white hover:bg-black disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-lg dg-action px-5 py-2.5 text-sm font-bold disabled:opacity-50"
               >
                 {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
                 저장하기
@@ -231,13 +231,13 @@ export default function MyPage() {
             </div>
           </section>
         ) : (
-          <section className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
+          <section className="dg-panel p-6 md:p-8">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">의뢰내역</h2>
                 <p className="mt-1 text-sm text-gray-500">내 계정으로 등록한 의뢰만 표시됩니다.</p>
               </div>
-              <Link href="/factories" className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white">
+              <Link href="/factories" className="rounded-lg dg-action px-4 py-2 text-sm font-semibold">
                 공장 찾기
               </Link>
             </div>

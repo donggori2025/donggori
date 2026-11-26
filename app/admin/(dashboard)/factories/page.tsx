@@ -318,7 +318,7 @@ export default function AdminFactoriesPage() {
             return (
               <div
                 key={item.id}
-                className="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden hover:shadow-md transition"
+                className="dg-panel dg-panel-link overflow-hidden"
               >
                 {displayImages[0] && (
                   <div className="h-36 bg-gray-100 overflow-hidden">

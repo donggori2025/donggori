@@ -67,7 +67,7 @@ function ChipGroup<T extends string>({
             onClick={() => onChange(opt)}
             className={`px-3 py-1.5 rounded-full text-sm border transition ${
               value === opt
-                ? "bg-[#111] text-white border-[#111]"
+                ? "dg-selected"
                 : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
             }`}
           >
@@ -212,13 +212,13 @@ export default function DesignRequestPage() {
   };
 
   const inputClass =
-    "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-dg-ink transition";
+    "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-dg-brand transition";
 
   return (
-    <div className="min-h-screen bg-[#f5f5f3]">
-      <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-10`}>
+    <div className="min-h-screen">
+      <div className={`${PAGE_CONTAINER_CLASS} py-10 md:py-14 space-y-10`}>
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">디자인 의뢰하기</h1>
+          <h1 className="dg-page-title">디자인 의뢰하기</h1>
           <p className="mt-2 text-sm md:text-base text-gray-600">
             원하시는 상품 정보를 남겨주시면 디자인 가능 여부와 진행 방안을 안내드립니다.
           </p>
@@ -233,9 +233,9 @@ export default function DesignRequestPage() {
             {GUIDE_STEPS.map((item) => (
               <div
                 key={item.step}
-                className="rounded-lg border border-dg-line bg-white p-5 md:p-6"
+                className="dg-panel p-5 md:p-6"
               >
-                <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-900 text-white text-sm font-bold mb-3">
+                <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-blue-50 text-dg-brand text-sm font-bold mb-3">
                   {item.step}
                 </div>
                 <p className="text-sm text-gray-700 leading-relaxed">{item.text}</p>
@@ -245,7 +245,7 @@ export default function DesignRequestPage() {
         </section>
 
         {/* 진행 플로우 */}
-        <section className="rounded-lg border border-dg-line bg-white p-6 md:p-8">
+        <section className="dg-panel p-6 md:p-8">
           <h2 className="text-lg font-bold text-gray-900 mb-6">진행 플로우</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {FLOW_STEPS.map((step, index) => {
@@ -268,7 +268,7 @@ export default function DesignRequestPage() {
         {/* 의뢰 폼 */}
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
           <div className="space-y-6">
-            <section className="space-y-5 rounded-lg border border-dg-line bg-white p-5 md:p-6">
+            <section className="space-y-5 dg-panel p-5 md:p-6">
               <div className="flex items-center gap-2">
                 <Palette className="w-5 h-5 text-gray-700" />
                 <h2 className="text-lg font-bold text-gray-900">의뢰 정보</h2>
@@ -356,7 +356,7 @@ export default function DesignRequestPage() {
               </div>
             </section>
 
-            <section className="space-y-4 rounded-lg border border-dg-line bg-white p-5 md:p-6">
+            <section className="space-y-4 dg-panel p-5 md:p-6">
               <div className="flex items-center gap-2">
                 <Send className="w-5 h-5 text-gray-700" />
                 <h2 className="text-lg font-bold text-gray-900">요청 내용</h2>
@@ -369,7 +369,7 @@ export default function DesignRequestPage() {
               />
             </section>
 
-            <section className="rounded-lg border border-dg-line bg-white p-5 md:p-6">
+            <section className="dg-panel p-5 md:p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Upload className="w-5 h-5 text-gray-700" />
                 <h2 className="text-lg font-bold text-gray-900">레퍼런스 이미지</h2>
@@ -417,7 +417,7 @@ export default function DesignRequestPage() {
           </div>
 
           <aside className="lg:sticky lg:top-24 h-fit">
-            <div className="rounded-lg border border-dg-line bg-white p-5 md:p-6">
+            <div className="dg-panel p-5 md:p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-2">의뢰 접수</h2>
               <p className="text-sm text-gray-600 leading-relaxed mb-5">
                 접수 후 의뢰 내용이 클립보드에 복사되며, 카카오 오픈채팅으로 상담을 이어갈 수 있습니다.
@@ -430,7 +430,7 @@ export default function DesignRequestPage() {
               <Button
                 type="submit"
                 disabled={submitting}
-                className="w-full h-12 text-base font-bold bg-[#111] hover:bg-black"
+                className="w-full h-12 text-base font-bold dg-action"
               >
                 {submitting ? (
                   <span className="inline-flex items-center gap-2">

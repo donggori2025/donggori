@@ -45,15 +45,15 @@ export default function NoticesPage() {
           title="공지사항"
           description="동고리의 새로운 소식과 주요 안내를 확인하세요."
         />
-        <div className="flex border-b border-gray-200">
+        <div className="flex flex-wrap gap-1 border-b border-dg-line">
           {TABS.map((t) => (
             <button
               key={t.key}
               type="button"
-              className={`px-5 py-3 text-base font-bold transition-colors sm:px-6 ${
+              className={`px-3 py-3 text-sm sm:text-base font-bold transition-colors sm:px-6 ${
                 tab === t.key
-                  ? "-mb-px border-b-2 border-black text-black"
-                  : "text-gray-400 hover:text-black"
+                  ? "-mb-px border-b-2 border-dg-brand text-dg-brand"
+                  : "text-dg-muted hover:text-dg-brand"
               }`}
               onClick={() => setTab(t.key)}
             >
@@ -67,17 +67,17 @@ export default function NoticesPage() {
           <div className="col-span-7">제목/내용</div>
           <div className="col-span-2 text-center">등록일</div>
         </div>
-        <ul>
+        <ul className="dg-panel overflow-hidden">
           {loading ? (
             <li className="py-16 text-center text-gray-400 text-lg">로딩 중...</li>
           ) : sorted.length === 0 ? (
             <li className="py-16 text-center text-gray-400 text-lg">등록된 공지사항이 없습니다.</li>
           ) : (
             sorted.map((notice: any, index: number) => (
-              <li key={notice.id} className="group grid grid-cols-12 items-center border-b border-gray-100 py-5 transition hover:bg-gray-50 sm:py-6">
+              <li key={notice.id} className="group grid grid-cols-12 items-center border-b border-gray-100 last:border-b-0 py-5 transition hover:bg-gray-50 sm:py-6">
                 <div className="col-span-1 text-center text-gray-400">{index + 1}</div>
                 <div className="col-span-2 text-center">
-                  <span className="text-xs font-semibold text-gray-500">{notice.category}</span>
+                  <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-dg-brand">{notice.category}</span>
                 </div>
                 <div className="col-span-7">
                   <Link href={`/notices/${notice.id}`} className="font-medium text-gray-900 group-hover:underline block mb-1">
