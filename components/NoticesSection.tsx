@@ -1,95 +1,87 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import type { PublicNotice } from "@/lib/notices";
 import { getPressArticles } from "@/lib/press-news";
 
 const articles = getPressArticles();
-const featured = articles.find((article) => article.id === "shinailbo-20260709");
-const pressBriefs = articles.filter((article) => article !== featured);
+const featured = articles.find(({ id }) => id === "shinailbo-20260709");
+const briefs = ["startupn-20260605", "herald-20251121", "hkbs-20260709"].flatMap((id) =>
+  articles.filter((article) => article.id === id),
+);
 
-interface Notice {
-  id: string;
-  title: string;
-  content: string;
-  category: string;
-  created_at: string;
-  start_at?: string;
+function NewsMeta({ press, source, date }: { press?: boolean; source: string; date: string }) {
+  return (
+    <div className="pg-news-meta">
+      <span>{press ? "보도자료" : "공지사항"}</span>
+      <span>{source}</span>
+      {date && <time dateTime={date}>{date.replaceAll("-", ".")}</time>}
+    </div>
+  );
 }
 
-const NoticesSection = () => {
-  const [notices, setNotices] = useState<Notice[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function NoticesSection() {
+  const [notice, setNotice] = useState<PublicNotice | null>(null);
 
   useEffect(() => {
-    const fetchNotices = async () => {
+    const controller = new AbortController();
+    async function loadLatestNotice() {
       try {
-        const response = await fetch('/api/notices');
-        const json = await response.json();
-        
-        if (response.ok && json.success) {
-          // 최신 공지사항 5개 (최신순 정렬)
-          const latestNotices = (json.data || [])
-            .sort((a: Notice, b: Notice) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-            .slice(0, 5);
-          
-          setNotices(latestNotices);
-        } else {
-          console.error('공지사항 로드 실패:', json.error);
+        const response = await fetch("/api/notices", { signal: controller.signal });
+        if (!response.ok) return;
+        const payload = await response.json();
+        if (payload.success && Array.isArray(payload.data) && !controller.signal.aborted) {
+          setNotice(payload.data[0] ?? null);
         }
       } catch (error) {
-        console.error('공지사항 로드 중 오류:', error);
-      } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) console.error("공지사항을 불러오지 못했습니다.", error);
       }
-    };
-
-    fetchNotices();
+    }
+    void loadLatestNotice();
+    return () => controller.abort();
   }, []);
 
   return (
-    <section className="landing-news site-wide" aria-labelledby="landing-news-title">
-      <div className="section-heading">
-        <h2 id="landing-news-title">동고리 소식</h2>
-        <Link className="landing-link" href="/news">보도자료 전체보기 <ArrowRight size={16} /></Link>
-      </div>
-      <div className="news-spread">
+    <section id="pg-news" className="site-wide pg-news" aria-labelledby="pg-news-title">
+      <h2 id="pg-news-title">동고리 소식</h2>
+      <div className="pg-news-spread">
         {featured && (
-          <a href={featured.url} className="news-feature" target="_blank" rel="noopener noreferrer">
-            <div className="news-photo">
-              <Image src={featured.image} alt="" fill sizes="(max-width: 700px) 92vw, 36vw" className="object-cover" />
+          <a href={featured.url} className="pg-news-feature" target="_blank" rel="noopener noreferrer">
+            <div className="pg-news-photo">
+              <Image src={featured.image} fill sizes="(max-width: 720px) 92vw, 38vw" alt="" />
             </div>
-            <p>보도자료 · {featured.source} · <time dateTime={featured.date}>{featured.date}</time></p>
-            <h3>{featured.title} <ArrowUpRight size={18} /></h3>
+            <NewsMeta press source={featured.source} date={featured.date} />
+            <h3>{featured.title} <ArrowUpRight aria-hidden="true" /></h3>
           </a>
         )}
-        <div>
-          <ul className="news-rows" aria-label="최근 공지사항과 보도자료">
-            {loading && <li role="status">공지사항을 불러오는 중입니다.</li>}
-            {notices.map((notice) => (
-              <li key={notice.id}>
+        <div className="pg-news-briefs">
+          <ul className="pg-news-list" aria-label="공지사항과 보도자료">
+            {notice && (
+              <li>
                 <Link href={`/notices/${notice.id}`}>
-                  <small>{notice.category || "공지사항"} · {(notice.start_at || notice.created_at || "").slice(0, 10)}</small>
-                  <strong>{notice.title}</strong>
-                  {notice.content && <span className="line-clamp-2">{notice.content}</span>}
+                  <NewsMeta source="동고리" date={(notice.start_at || notice.created_at || "").slice(0, 10)} />
+                  <div className="pg-news-headline"><strong>{notice.title}</strong><ArrowRight size={16} aria-hidden="true" /></div>
                 </Link>
               </li>
-            ))}
-            {pressBriefs.slice(0, Math.max(0, 3 - notices.length)).map((article) => (
+            )}
+            {briefs.slice(0, notice ? 2 : 3).map((article) => (
               <li key={article.id}>
                 <a href={article.url} target="_blank" rel="noopener noreferrer">
-                  <small>보도자료 · {article.source} · {article.date}</small>
-                  <strong>{article.title}</strong>
+                  <NewsMeta press source={article.source} date={article.date} />
+                  <div className="pg-news-headline"><strong>{article.title}</strong><ArrowUpRight size={16} aria-hidden="true" /></div>
                 </a>
               </li>
             ))}
           </ul>
-          <Link className="landing-link mt-4" href="/notices">공지사항 전체보기 <ArrowRight size={16} /></Link>
+          <div className="pg-news-links">
+            <Link href="/notices">공지사항 전체보기 <ArrowRight size={16} aria-hidden="true" /></Link>
+            <Link href="/news">보도자료 전체보기 <ArrowRight size={16} aria-hidden="true" /></Link>
+          </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default NoticesSection;
+}

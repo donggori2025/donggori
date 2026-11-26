@@ -4,8 +4,6 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import LandingSections from "@/components/home/LandingSections";
 import type { Metadata } from "next";
 import FactoryShowcase from "@/components/home/FactoryShowcase";
-import StepSection from "@/components/StepSection";
-import RecommendSection from "@/components/RecommendSection";
 import NoticesSection from "@/components/NoticesSection";
 
 
@@ -26,14 +24,12 @@ export default function HomePage() {
   return (
     <LandingSections>
       <FactoryShowcase />
-      <StepSection />
-      <RecommendSection />
       <NoticesSection />
-      <section className="landing-faq" aria-labelledby="faq-heading">
+      <section id="pg-faq" className="pg-faq" aria-labelledby="faq-heading">
         <div className="site-wide faq-layout">
           <div>
             <h2 id="faq-heading">자주 묻는 질문</h2>
-            <Link href="/service" className="landing-link">서비스 이용안내 <ArrowRight size={16} /></Link>
+            <Link href="/service" className="landing-link mt-2">서비스 이용안내 <ArrowRight size={16} /></Link>
           </div>
           <div className="faq-rows">
             {faq.map(([question, answer]) => (

@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 import sharp from "sharp";
+import { productionItems } from "../lib/factoryCatalog.ts";
+import { groupDistrictFactories } from "../lib/dongdaemunMap.ts";
 import { getPressArticles } from "../lib/press-news.ts";
 
 test("press articles have unique IDs, valid links and local image assets", async () => {
@@ -24,10 +26,21 @@ test("home factory carousel preserves catalog order and shows district, name and
   assert.doesNotMatch(source, /\.sort\(|\.toSorted\(|factory\.(?:moq|minOrder|factory_type|main_fabrics)/);
   assert.match(source, /factory\.admin_district \|\| factory\.region/);
   assert.match(source, /factory\.company_name \|\| factory\.name/);
-  assert.match(source, /startsWith\("top_items_"\)/);
+  assert.match(source, /productionItems\(factory\)/);
+  assert.deepEqual(productionItems({ top_items_upper: "셔츠, 재킷", top_items_outer: "재킷|코트", items: [] }), ["셔츠", "재킷", "코트"]);
+  assert.deepEqual(productionItems({ items: ["니트"] }), ["니트"]);
   assert.match(source, /FactoryImagePlaceholder/);
   assert.match(source, /onError/);
   assert.doesNotMatch(source, /fallbackFactories|Math\.random|Math\.sin|supabaseClient/);
+});
+
+test("landing map groups coarsened public positions only inside Dongdaemun", () => {
+  const inside = { lat: 37.58, lng: 127.04 };
+  const rows = [{ ...inside, id: "a" }, { ...inside, id: "b" }, { lat: 0, lng: 0 }, { lat: 37.6, lng: 127.01 }];
+  const pins = groupDistrictFactories(rows);
+  assert.equal(pins.length, 1);
+  assert.deepEqual(pins[0].factories.map((f) => f.id), ["a", "b"]);
+  assert.ok(pins[0].x > 0 && pins[0].x < 100 && pins[0].y > 0 && pins[0].y < 100);
 });
 
 test("navigation keeps server-backed auth and composition-safe Korean prompt entry", async () => {

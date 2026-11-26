@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import HeroSection from "@/components/HeroSection";
 import InfoSection from "@/components/InfoSection";
 import { fetchFactoriesFromDB, type Factory } from "@/lib/factoryCatalog";
+import FactoryMap from "./FactoryMap";
 import FactoryPortraits from "./FactoryPortraits";
 import UsageStats from "./UsageStats";
 
@@ -22,5 +23,6 @@ export default function FactoryShowcase() {
     </div>
     <UsageStats />
     <InfoSection rows={rows ?? []} loading={rows === null} />
+    <FactoryMap rows={rows ?? []} loading={rows === null} />
   </>;
 }

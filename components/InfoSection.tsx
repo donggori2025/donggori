@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
-import type { Factory } from "@/lib/factoryCatalog";
+import { productionItems, type Factory } from "@/lib/factoryCatalog";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import FactoryImagePlaceholder from "@/components/FactoryImagePlaceholder";
 
@@ -13,12 +13,7 @@ function FactoryCard({ factory }: { factory: Factory }) {
   const [photoIndex, setPhotoIndex] = useState(0);
   const photo = images[photoIndex];
   const district = factory.admin_district || factory.region;
-  const items = Object.entries(factory)
-    .filter(([key, value]) => key.startsWith("top_items_") && typeof value === "string")
-    .flatMap(([, value]) => String(value).split(/[,|]/))
-    .map((item) => item.trim())
-    .filter(Boolean);
-  const itemNames = [...new Set(items.length ? items : factory.items)].join(" · ");
+  const itemNames = productionItems(factory).join(" · ");
 
   return (
     <Link href={`/factories/${factory.id}`} prefetch={false} className="factory-card">
