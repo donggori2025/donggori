@@ -17,10 +17,14 @@ test("press articles have unique IDs, valid links and local image assets", async
   }
 });
 
-test("home redesign keeps server data, real badges and image error fallback", async () => {
+test("home factory carousel preserves catalog order and shows district, name and production items", async () => {
   const source = await readFile("components/InfoSection.tsx", "utf8");
   assert.match(source, /from "@\/lib\/factoryCatalog"/);
-  assert.match(source, /f\.factory_type, f\.main_fabrics/);
+  assert.match(source, /withImages\.length >= 10 \? withImages : rows\)\.slice\(0, 10\)/);
+  assert.doesNotMatch(source, /\.sort\(|\.toSorted\(|factory\.(?:moq|minOrder|factory_type|main_fabrics)/);
+  assert.match(source, /factory\.admin_district \|\| factory\.region/);
+  assert.match(source, /factory\.company_name \|\| factory\.name/);
+  assert.match(source, /startsWith\("top_items_"\)/);
   assert.match(source, /FactoryImagePlaceholder/);
   assert.match(source, /onError/);
   assert.doesNotMatch(source, /fallbackFactories|Math\.random|Math\.sin|supabaseClient/);
