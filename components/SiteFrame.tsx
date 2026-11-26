@@ -18,7 +18,7 @@ export default function SiteFrame({ children }: { children: ReactNode }) {
     <>
       <GlobalPopups />
       <Header />
-      <main className="w-full flex-1">{children}</main>
+      <main id="public-content" className="w-full flex-1">{children}</main>
       <Footer />
     </>
   );

@@ -1,18 +1,14 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchFactoriesFromDB, type Factory } from "@/lib/factoryCatalog";
+import type { Factory } from "@/lib/factoryCatalog";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
-import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import FactoryImagePlaceholder from "@/components/FactoryImagePlaceholder";
 
 function getCardFabricsById(factories: Factory[]) {
-  const colors = [
-    { color: '#0ACF83', bg: 'rgba(10, 207, 131, 0.1)' },
-    { color: '#08B7FF', bg: 'rgba(8, 183, 255, 0.1)' },
-  ] as const;
   return Object.fromEntries(
     factories.map((f, idx) => {
       const labels = [f.factory_type, f.main_fabrics]
@@ -22,28 +18,28 @@ function getCardFabricsById(factories: Factory[]) {
         .slice(0, 2);
       return [
         f.id ?? idx,
-        labels.map((label, chipIndex) => ({ label, ...colors[chipIndex % colors.length] })),
+        labels,
       ];
     })
   );
 }
 
 
-function FactoryImageCard({ factory, idx }: { factory: Factory; idx: number }) {
+function FactoryImageCard({ factory }: { factory: Factory }) {
   const { images } = useFactoryImages(factory);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const imageSrc = images[0];
   
   return (
-    <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg sm:rounded-t-xl group">
+    <div className="factory-card-photo">
       {imageSrc && imageSrc !== '/logo_donggori.png' && failedSrc !== imageSrc ? (
         <Image
           src={imageSrc}
           alt={typeof factory.company_name === 'string' ? factory.company_name : '공장 이미지'}
-          className="object-cover w-full h-full rounded-t-lg sm:rounded-t-xl group-hover:scale-110 transition-transform duration-300"
+          className="h-full w-full object-cover"
           width={400}
           height={192}
-          priority={idx < 4}
+          sizes="(max-width: 650px) 78vw, (max-width: 1000px) 40vw, 360px"
           onError={() => setFailedSrc(imageSrc)}
         />
       ) : (
@@ -54,88 +50,61 @@ function FactoryImageCard({ factory, idx }: { factory: Factory; idx: number }) {
 }
 
 
-export default function InfoSection() {
-  const [factories, setFactories] = useState<Factory[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function InfoSection({ rows, loading }: { rows: Factory[]; loading: boolean }) {
   const viewportRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let active = true;
-    fetchFactoriesFromDB().then((data) => {
-      if (!active) return;
-      const withImages = data.filter((factory) => factory.images?.length && !factory.images[0].includes("logo_donggori"));
-      setFactories((withImages.length >= 10 ? withImages : data).slice(0, 10));
-      setLoading(false);
-    });
-    return () => { active = false; };
-  }, []);
-
+  const withImages = rows.filter((factory) => factory.images?.length && !factory.images[0].includes("logo_donggori"));
+  const factories = (withImages.length >= 10 ? withImages : rows).slice(0, 10);
   const fabricsById = getCardFabricsById(factories);
 
   return (
-    <section className="dg-section w-full bg-white">
-      <div className={PAGE_CONTAINER_CLASS}>
-        <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-center lg:gap-10 xl:gap-14">
-          <div className="flex flex-col items-start text-left">
-            <h2 className="dg-section-title">조건에 맞는<br />봉제공장</h2>
-            <p className="mt-4 max-w-sm text-sm leading-7 text-gray-500 sm:text-base">
-              지역, 생산 품목, 원단과 최소 주문 수량을 비교해 적합한 공장을 찾아보세요.
-            </p>
-            <Link href="/factories" className="mt-6 inline-flex items-center gap-3 rounded-md bg-dg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">
-              봉제공장 찾아보기 <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-          <div className="w-full min-w-0">
-            {loading ? (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3" role="status" aria-label="공장 목록 불러오는 중">
-                {[0, 1, 2].map((id) => <div key={id} className="h-72 animate-pulse rounded-lg bg-gray-50" />)}
-              </div>
-            ) : factories.length === 0 ? (
-              <p className="rounded-lg border border-dg-line px-6 py-16 text-center text-sm text-gray-500">
-                공장 정보를 불러오지 못했습니다. 공장 찾기에서 다시 확인해주세요.
-              </p>
-            ) : (
-              <>
-                <div ref={viewportRef} tabIndex={0} role="region" aria-label="등록된 봉제공장"
-                  className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 py-3 scrollbar-hide focus-visible:outline-2 focus-visible:outline-gray-500">
-                  {factories.map((factory, idx) => {
-                    const name = factory.name || factory.company_name || "공장";
-                    const mainItems = [factory.top_items_upper, factory.top_items_lower, factory.top_items_outer, factory.top_items_dress_skirt]
-                      .filter((value) => typeof value === "string" && value.length > 0).join(", ") || "미등록";
-                    return (
-                      <Link key={factory.id ?? idx} href={`/factories/${factory.id}`}
-                        className="flex w-[72vw] max-w-[270px] shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-dg-line bg-white transition-shadow hover:shadow-md sm:w-[230px]">
-                        <FactoryImageCard factory={factory} idx={idx} />
-                        <div className="flex flex-1 flex-col px-4 py-4">
-                          <div className="mb-2 flex flex-wrap gap-1">
-                            {(fabricsById[factory.id ?? idx] || []).map((chip) => (
-                              <span key={chip.label} style={{ color: chip.color, background: chip.bg }} className="rounded-full px-2 py-1 text-xs font-semibold">{chip.label}</span>
-                            ))}
-                          </div>
-                          <h3 className="mb-2 text-sm font-bold text-gray-900">{name}</h3>
-                          <p className="truncate text-xs leading-6 text-gray-500">주요품목 {mainItems}</p>
-                          <p className="text-xs leading-6 text-gray-500">MOQ {factory.moq ?? factory.minOrder ?? "미등록"}</p>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-                <div className="mt-4 flex justify-end gap-2">
-                  {[-1, 1].map((direction) => (
-                    <button key={direction} type="button" aria-label={direction < 0 ? "이전 공장" : "다음 공장"}
-                      onClick={() => {
-                        const viewport = viewportRef.current;
-                        if (viewport) viewport.scrollBy({ left: direction * viewport.clientWidth * 0.75, behavior: "smooth" });
-                      }}
-                      className="flex h-10 w-10 items-center justify-center rounded-md border border-dg-line text-gray-700 hover:bg-gray-50">
-                      <span aria-hidden="true">{direction < 0 ? "←" : "→"}</span>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+    <section className="factory-showcase" aria-labelledby="factory-showcase-title">
+      <div className="site-wide">
+        <div className="factory-intro">
+          <h2 id="factory-showcase-title">동고리와 함께하는<br /><span>우리 동네 봉제공장</span></h2>
+          <p>셔츠부터 재킷까지, 어떤 옷을 만드는지<br />공장마다 다른 작업 현장을 만나보세요.</p>
+          <Link href="/factories" className="landing-action">전체 공장 보기 <ArrowRight size={17} /></Link>
+          {factories.length > 1 && (
+            <div className="factory-controls">
+              {[-1, 1].map((direction) => (
+                <button key={direction} type="button" aria-label={direction < 0 ? "이전 공장" : "다음 공장"} onClick={() => {
+                  const viewport = viewportRef.current;
+                  if (viewport) viewport.scrollBy({
+                    left: direction * viewport.clientWidth * 0.75,
+                    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+                  });
+                }}>
+                  {direction < 0 ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+        {loading || !factories.length ? (
+          <p className="factory-status" role="status">
+            {loading ? "공장 목록을 불러오는 중입니다." : "공장 정보를 불러오지 못했습니다. 전체 공장 보기에서 다시 확인해 주세요."}
+          </p>
+        ) : (
+          <div ref={viewportRef} tabIndex={0} role="region" aria-label="등록된 봉제공장" className="factory-rail">
+            {factories.map((factory, idx) => {
+              const name = factory.name || factory.company_name || "공장";
+              const items = [factory.top_items_upper, factory.top_items_lower, factory.top_items_outer, factory.top_items_dress_skirt]
+                .filter(Boolean).join(", ") || "미등록";
+              return (
+                <Link key={factory.id} href={`/factories/${factory.id}`} prefetch={false} className="factory-card">
+                  <FactoryImageCard factory={factory} />
+                  <div className="factory-caption">
+                    <div className="factory-tags">
+                      {(fabricsById[factory.id ?? idx] || []).map((label) => <span key={label}>{label}</span>)}
+                    </div>
+                    <h3>{name}</h3>
+                    <p className="line-clamp-2">주요 품목 {items}</p>
+                    <p>최소 주문 수량 {factory.moq ?? factory.minOrder ?? "미등록"}</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

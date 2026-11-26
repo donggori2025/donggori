@@ -363,3 +363,56 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
 }
+
+@font-face {
+  font-family:"Donggori Pretendard";
+  src:url("/fonts/pretendard/PretendardVariable.woff2") format("woff2");
+  font-weight:100 900;
+  font-display:swap;
+}
+
+
+.site-header, .site-footer, .pg-page {
+  font-family: "Donggori Pretendard", Pretendard, -apple-system, sans-serif;
+}
+.site-wide {
+  width: min(78.2%, 1600px);
+  margin-inline: auto;
+}
+@media (max-width: 1100px) { .site-wide { width: 86%; } }
+@media (max-width: 900px) { .site-wide { width: 88%; } }
+@media (max-width: 650px) { .site-wide { width: calc(100% - 36px); } }
+.site-header { color: #192f50; }
+.site-footer {
+  background: white;
+  border-top: 1px solid #dce5ef;
+  color: #4b5a6c;
+  padding: 24px 0 32px;
+}
+.footer-top, .footer-details, .footer-links nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 20px;
+}
+.footer-links nav {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  font-size: 14px;
+}
+.footer-links nav + nav { margin-top: 8px; }
+.footer-links a { padding-block: 3px; }
+.footer-links a:hover { text-decoration: underline; }
+.footer-links a[href="/terms/privacy"] { color: #0a5fda; font-weight: 650; }
+.footer-details {
+  align-items: flex-end;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e3e9f3;
+  font-size: 12px;
+  line-height: 1.75;
+}
+@media (max-width: 650px) {
+  .footer-top { align-items: flex-start; flex-direction: column-reverse; gap: 16px; }
+  .footer-details { align-items: flex-start; flex-direction: column; }
+}
