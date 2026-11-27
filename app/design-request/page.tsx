@@ -215,59 +215,25 @@ export default function DesignRequestPage() {
     "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-dg-ink transition";
 
   return (
-    <div className="min-h-screen bg-[#f5f5f3]">
+    <div className="service-workspace min-h-screen">
       <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-10`}>
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">디자인 의뢰하기</h1>
+        <div className="dg-service-heading">
+          <h1>디자인 의뢰하기</h1>
           <p className="mt-2 text-sm md:text-base text-gray-600">
             원하시는 상품 정보를 남겨주시면 디자인 가능 여부와 진행 방안을 안내드립니다.
           </p>
         </div>
-        {/* 이용 안내 */}
-        <section>
-          <div className="mb-4">
-            <h2 className="text-xl font-bold text-gray-900">이용 안내</h2>
-            <p className="text-sm text-gray-600 mt-1">디자인 의뢰부터 제작 연계까지의 진행 방식을 확인하세요.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {GUIDE_STEPS.map((item) => (
-              <div
-                key={item.step}
-                className="rounded-lg border border-dg-line bg-white p-5 md:p-6"
-              >
-                <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-900 text-white text-sm font-bold mb-3">
-                  {item.step}
-                </div>
-                <p className="text-sm text-gray-700 leading-relaxed">{item.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* 진행 플로우 */}
-        <section className="rounded-lg border border-dg-line bg-white p-6 md:p-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">진행 플로우</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {FLOW_STEPS.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <div key={step.label} className="relative flex flex-col items-center text-center">
-                  {index < FLOW_STEPS.length - 1 && (
-                    <div className="hidden md:block absolute top-9 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] h-px bg-gradient-to-r from-gray-300 to-transparent" />
-                  )}
-                  <div className="w-16 h-16 md:w-[4.5rem] md:h-[4.5rem] rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-center mb-3">
-                    <Icon className="w-7 h-7 text-gray-800" />
-                  </div>
-                  <div className="text-sm font-semibold text-gray-800">{step.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
+        <div className="civic-procedure">
+          <h2>의뢰 절차</h2>
+          <ol>{FLOW_STEPS.map((step) => <li key={step.label}>{step.label}</li>)}</ol>
+        </div>
+        <details className="civic-guide">
+          <summary>의뢰 전 확인사항</summary>
+          <ul>{GUIDE_STEPS.map((item) => <li key={item.step}>{item.text}</li>)}</ul>
+        </details>
         {/* 의뢰 폼 */}
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
-          <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="request-form grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
+          <div className="request-fields space-y-6">
             <section className="space-y-5 rounded-lg border border-dg-line bg-white p-5 md:p-6">
               <div className="flex items-center gap-2">
                 <Palette className="w-5 h-5 text-gray-700" />

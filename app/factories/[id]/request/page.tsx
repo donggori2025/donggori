@@ -398,11 +398,11 @@ export default function FactoryRequestPage({ params }: { params: Promise<{ id: s
         </button>
       </div>
 
-      {/* 2단 레이아웃 */}
+      <header className="dg-service-heading mb-7"><h1>공장 제작 의뢰</h1></header>
       <div className="flex flex-col lg:flex-row gap-8">
         {/* 왼쪽: 의뢰 폼 */}
         <div className="flex-1 min-w-0">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="request-fields space-y-6">
             {/* 기본 정보 */}
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h2 className="font-bold text-lg mb-4">기본 정보</h2>

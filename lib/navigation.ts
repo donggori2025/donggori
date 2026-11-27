@@ -1,8 +1,9 @@
 export const SITE_NAV_ITEMS = [
-  { href: "/factories", label: "봉제공장" },
-  { href: "/news", label: "News" },
+  { href: "/matching", label: "맞춤 추천" },
+  { href: "/factories", label: "제작업체" },
+  { href: "/design-request", label: "디자인 의뢰" },
+  { href: "/news", label: "소식" },
   { href: "/esg", label: "ESG" },
-  { href: "/notices", label: "공지사항" },
 ] as const;
 
 export const SERVICE_LINKS = [
@@ -14,7 +15,7 @@ export const SERVICE_LINKS = [
 export const SUPPORT_LINKS = [
   { href: "/faq", label: "자주 묻는 질문" },
   { href: "/notices", label: "공지사항" },
-  { href: "/news", label: "News" },
+  { href: "/news", label: "동고리 소식" },
   { href: "/esg", label: "ESG" },
   { href: "/terms/service", label: "이용약관" },
   { href: "/terms/privacy", label: "개인정보처리방침" },

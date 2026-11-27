@@ -1,4 +1,4 @@
-import React from 'react';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { PageHeader, PageShell } from '@/components/ui/app-ui';
 
@@ -12,9 +12,10 @@ export default function WorkOrderPage() {
   return (
     <PageShell readable>
       <PageHeader
-        title="디지털 작업지시서로 효율적인 생산 관리"
-        description="생산 현장에 필요한 정보와 자료를 한곳에 모아 의류 제작과 품질 관리를 더 명확하게 만듭니다."
+        title="작업지시서 이용안내"
+        description="공장 상세 화면에서 제작 의뢰를 열고 제품, 원단, 수량, 납기를 입력하세요. Faddit 작업지시서가 있다면 링크를 함께 등록할 수 있습니다."
       />
+      <Link href="/factories" className="civic-action">의뢰할 공장 찾기 →</Link>
     </PageShell>
   );
 }

@@ -9,6 +9,7 @@ function configuredSupabaseHostname() {
 }
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   // 이미지 최적화 설정
   images: {
     remotePatterns: [
@@ -81,6 +82,11 @@ const nextConfig: NextConfig = {
   // 리다이렉트 설정
   async redirects() {
     return [
+      {
+        source: '/factories/map',
+        destination: '/factories',
+        permanent: true,
+      },
       {
         source: '/home',
         destination: '/',

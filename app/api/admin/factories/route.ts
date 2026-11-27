@@ -1,3 +1,5 @@
+import { revalidateTag } from "next/cache";
+import { FACTORY_LIST_TAG } from "@/lib/factoryCatalog";
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
@@ -71,6 +73,7 @@ export async function POST(req: Request) {
       supabase.from("donggori").insert(data)
     );
     if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    revalidateTag(FACTORY_LIST_TAG);
     return NextResponse.json({ success: true });
   } catch (e) {
     return NextResponse.json({ success: false, error: "서버 오류" }, { status: 500 });

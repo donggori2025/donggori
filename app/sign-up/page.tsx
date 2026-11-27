@@ -158,11 +158,11 @@ function SignUpForm() {
 
 export default function SignUpPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-white">
+    <div className="account-surface flex min-h-screen flex-col items-center justify-center">
       <div className={`${PAGE_CONTAINER_CLASS} flex flex-col items-center py-12`}>
         <div className="mb-8 flex flex-col items-center text-center">
           <Image src="/logo_donggori_0914_transparent.svg" alt="동고리 로고" width={798} height={266} sizes="112px" className="mb-2 h-auto w-28" />
-          <h1 className="text-4xl font-extrabold tracking-tight">DONGGORI</h1>
+          <h1 className="text-4xl font-extrabold tracking-tight">회원가입</h1>
           <p className="mt-2 text-sm text-gray-500">이미 계정이 있으신가요? <Link href="/sign-in" className="font-semibold text-blue-500">로그인</Link></p>
         </div>
         <Suspense fallback={<Loader className="h-8 w-8 animate-spin text-gray-400" />}>

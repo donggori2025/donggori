@@ -1,3 +1,4 @@
+import { readPublicNoticePreview, usePublicNoticePreview } from "@/lib/publicNoticePreview";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getServiceSupabase } from "@/lib/supabaseService";
@@ -7,6 +8,10 @@ import NoticeDetailClient from "./NoticeDetailClient";
 export const dynamic = "force-dynamic";
 
 async function getNotice(id: string) {
+  if (usePublicNoticePreview()) {
+    const notices = await readPublicNoticePreview();
+    return { notice: notices.find(notice => notice.id === id) ?? null, error: null };
+  }
   const supabase = getServiceSupabase();
   const { data, error } = await supabase
     .from("notices")

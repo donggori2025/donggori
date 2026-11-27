@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getMatchRequestById, MatchRequest } from "@/lib/matchRequests";
-import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
+import Link from "next/link";
+import PortalPage from "@/components/PortalPage";
 
 export default function MyRequestDetailPage() {
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function MyRequestDetailPage() {
     request.factoryId === "design-request";
 
   return (
-    <div className={`${PAGE_CONTAINER_CLASS} py-16`}>
+    <PortalPage title="의뢰 상세보기">
       <div className="mb-8">
         <button
           onClick={() => router.back()}
@@ -62,10 +63,9 @@ export default function MyRequestDetailPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg p-8">
-        <div className="flex justify-between items-start mb-8">
+      <div className="pg-panel break-words p-5 sm:p-8">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">의뢰 상세보기</h1>
             <p className="text-gray-600">의뢰 ID: {request.id}</p>
           </div>
           <div className="flex items-center gap-4">
@@ -296,14 +296,9 @@ export default function MyRequestDetailPage() {
 
         {/* 하단 버튼 */}
         <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
-          <button
-            onClick={() => router.back()}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors"
-          >
-            목록으로
-          </button>
+          <Link className="pg-primary" href="/my-page">의뢰 목록으로</Link>
         </div>
       </div>
-    </div>
+    </PortalPage>
   );
-} 
+}

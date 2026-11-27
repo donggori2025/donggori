@@ -77,6 +77,8 @@ export function mapPublicFactoryRow(item: Record<string, unknown>): Factory {
     sewing_machines: item.sewing_machines as string | undefined,
     pattern_machines: item.pattern_machines as string | undefined,
     special_machines: item.special_machines as string | undefined,
+    special_tech: item.special_tech as string | undefined,
+    employees: item.employees as number | string | undefined,
     top_items_upper: item.top_items_upper as string | undefined,
     top_items_lower: item.top_items_lower as string | undefined,
     top_items_outer: item.top_items_outer as string | undefined,

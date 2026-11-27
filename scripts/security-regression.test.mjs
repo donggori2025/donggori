@@ -45,7 +45,7 @@ test("critical auth bypasses stay removed", async () => {
     readFile("app/factories/[id]/page.tsx", "utf8"),
     readFile("lib/factoryPrivacy.ts", "utf8"),
     readFile("components/FactoryInfoPopup.tsx", "utf8"),
-    readFile("app/api/factories/route.ts", "utf8"),
+    readFile("lib/publicFactoryList.ts", "utf8"),
     readFile("app/api/popups/route.ts", "utf8"),
     readFile("app/api/match-requests/route.ts", "utf8"),
     readFile("lib/utils.ts", "utf8"),

@@ -9,13 +9,19 @@ const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || (() => {
   return crypto.randomBytes(32).toString("hex");
 })();
 
-export function createAdminSessionValue(): string {
+type SessionScope = "admin" | "coordinator";
+
+function signature(ts: string, scope: SessionScope) {
+  return crypto.createHmac("sha256", ADMIN_SESSION_SECRET).update(scope === "admin" ? ts : `coordinator:${ts}`).digest("hex");
+}
+
+export function createAdminSessionValue(scope: SessionScope = "admin"): string {
   const ts = Date.now().toString();
-  const sig = crypto.createHmac("sha256", ADMIN_SESSION_SECRET).update(ts).digest("hex");
+  const sig = signature(ts, scope);
   return `${ts}.${sig}`;
 }
 
-export function verifyAdminSession(value: string): boolean {
+export function verifyAdminSession(value: string, scope: SessionScope = "admin"): boolean {
   try {
     const dot = value.indexOf(".");
     if (dot < 1) return false;
@@ -23,12 +29,19 @@ export function verifyAdminSession(value: string): boolean {
     const sig = value.slice(dot + 1);
     const num = parseInt(ts, 10);
     if (isNaN(num) || Date.now() - num > 24 * 60 * 60 * 1000) return false;
-    const expected = crypto.createHmac("sha256", ADMIN_SESSION_SECRET).update(ts).digest("hex");
+    const expected = signature(ts, scope);
     if (sig.length !== expected.length) return false;
     return crypto.timingSafeEqual(Buffer.from(sig, "hex"), Buffer.from(expected, "hex"));
   } catch {
     return false;
   }
+}
+
+export async function studioStaffRole(): Promise<SessionScope | null> {
+  const jar = await cookies();
+  if (verifyAdminSession(jar.get("admin_session")?.value ?? "")) return "admin";
+  if (verifyAdminSession(jar.get("coordinator_session")?.value ?? "", "coordinator")) return "coordinator";
+  return null;
 }
 
 export async function requireAdmin(): Promise<NextResponse | null> {

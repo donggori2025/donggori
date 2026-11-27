@@ -1,12 +1,12 @@
 import Image from "next/image";
-import { PageShell } from "@/components/ui/app-ui";
-
-const TAGS = ["#공유생산", "#지역상생", "#맞춤추천", "#투명운영"];
+import PortalPage from "@/components/PortalPage";
+import { ArrowDownRight } from "lucide-react";
 
 const PILLARS = [
   {
     id: "environment",
     key: "E",
+    goals: ["가까운 생산 연결", "공유 생산·교육 가치 확산"],
     title: "Environment",
     subtitle: "공유 생산 환경 (동대문 패션복합지원센터)",
     image: "/images/esg/e.jpg",
@@ -16,6 +16,7 @@ const PILLARS = [
   {
     id: "social",
     key: "S",
+    goals: ["지역 일감 매칭", "숙련 생산자와 브랜드의 만남"],
     title: "Social",
     subtitle: "지역상생과 일감 매칭",
     image: "/images/esg/s.jpg",
@@ -25,6 +26,7 @@ const PILLARS = [
   {
     id: "governance",
     key: "G",
+    goals: ["공장 정보 명확 제공", "운영 기준의 투명한 안내"],
     title: "Governance",
     subtitle: "지역 협력과 투명한 운영",
     image: "/images/esg/g.jpg",
@@ -40,143 +42,46 @@ const PRINCIPLES = [
   "서비스 운영 전반에 ESG 방향을 반영하고, 동대문의 생산 경험과 새로운 브랜드가 함께 성장하도록 노력합니다.",
 ] as const;
 
-const STRATEGY = [
-  {
-    heading: "환경",
-    goals: ["가까운 생산 연결", "공유 생산·교육 가치 확산"],
-  },
-  {
-    heading: "사회",
-    goals: ["지역 일감 매칭", "숙련 생산자와 브랜드의 만남"],
-  },
-  {
-    heading: "거버넌스",
-    goals: ["공장 정보 명확 제공", "운영 기준의 투명한 안내"],
-  },
-] as const;
-
-function SectionTitle({ children }: { children: string }) {
-  return (
-    <div className="mb-8 flex items-stretch gap-3 sm:mb-10">
-      <span className="w-1 shrink-0 bg-dg-ink" aria-hidden />
-      <h2 className="text-2xl font-bold tracking-tight text-dg-ink sm:text-3xl">{children}</h2>
-    </div>
-  );
-}
-
 export default function EsgContent() {
   return (
-    <PageShell>
-      <header className="mb-8 border-b border-dg-line pb-6 sm:mb-10">
-        <h1 className="dg-page-title">ESG</h1>
-      </header>
-
-      <section className="pb-16 sm:pb-20">
-        <SectionTitle>ESG란?</SectionTitle>
-        <p className="-mt-4 mb-5 max-w-3xl text-sm leading-7 text-dg-muted sm:-mt-6 sm:text-base">
-          동고리는 옷을 만드는 사람과 잘 만드는 공장을 잇는 과정에서 환경·사회·거버넌스를 함께 생각합니다.
-        </p>
-        <ul className="mb-10 flex flex-wrap gap-2">
-          {TAGS.map((tag) => (
-            <li
-              key={tag}
-              className="rounded-full border border-gray-200 bg-[#f7f7f5] px-3 py-1.5 text-xs text-gray-700"
-            >
-              {tag}
-            </li>
-          ))}
-        </ul>
-
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
-          {PILLARS.map((pillar) => (
-            <article key={pillar.id} className="flex flex-col overflow-hidden border border-dg-line bg-white">
-              <a href={`#${pillar.id}`} className="group block">
-                <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
-                  <Image
-                    src={pillar.image}
-                    alt={pillar.imageAlt}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 100vw"
-                    className="object-cover transition duration-300 group-hover:scale-[1.03]"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col px-5 py-6">
-                  <p className="text-xl font-bold text-dg-ink">{pillar.title}</p>
-                  <p className="mt-1 text-sm text-gray-500">{pillar.subtitle}</p>
-                  <span className="mt-6 text-xs font-semibold text-gray-400 group-hover:text-gray-800">
-                    &gt; 자세히 보기
-                  </span>
-                </div>
-              </a>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="pb-16 sm:pb-20">
-        <SectionTitle>ESG 운영 방침</SectionTitle>
-        <p className="max-w-3xl text-sm leading-7 text-dg-muted sm:text-base">
-          동고리는 동대문의 생산 경험과 새로운 브랜드의 아이디어가 더 빠르고 정확하게 만나도록,
-          서비스의 방향에 ESG를 담습니다. 확인되지 않은 실적이나 인증을 내세우지 않고,
-          지금 운영하는 연결과 공개 기준을 바탕으로 책임을 다하겠습니다.
-        </p>
-        <ol className="mt-10 grid gap-8 sm:grid-cols-2">
-          {PRINCIPLES.map((text, index) => (
-            <li key={text} className="border border-dg-line bg-[#fafafa] px-6 py-7">
-              <span className="text-3xl font-light text-[#c9c9c4]" aria-hidden>
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <p className="mt-4 text-sm leading-7 text-gray-600">{text}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section>
-        <SectionTitle>ESG 전략</SectionTitle>
-        <div className="overflow-hidden border border-dg-line">
-          <div className="grid grid-cols-1 md:grid-cols-3">
-            {STRATEGY.map((column, index) => (
-              <div
-                key={column.heading}
-                className={`border-dg-line ${index > 0 ? "border-t md:border-t-0 md:border-l" : ""}`}
-              >
-                <p className="bg-[#f3f3f0] px-5 py-3 text-center text-sm font-bold text-dg-ink">{column.heading}</p>
+    <PortalPage title="동고리 ESG" description="동대문 봉제산업의 공유 생산 환경과 지역상생, 투명한 운영을 위한 동고리의 방향입니다.">
+      <div className="grid gap-5 md:grid-cols-3">
+        {PILLARS.map((pillar) => (
+          <a key={pillar.id} href={`#${pillar.id}`} className="pg-panel group overflow-hidden" aria-label={`${pillar.subtitle} 자세히 보기`}>
+            <div className="relative aspect-[2/1] overflow-hidden">
+              <Image src={pillar.image} alt={pillar.imageAlt} fill sizes="(min-width: 768px) 28vw, 92vw" className="object-cover motion-safe:transition-transform motion-safe:group-hover:scale-[1.03]" />
+            </div>
+            <div className="grid gap-2 p-5 sm:p-6">
+              <span className="text-sm font-bold text-[#0a5fda]" lang="en">{pillar.title}</span>
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-lg font-bold">{pillar.subtitle}</h2>
+                <ArrowDownRight aria-hidden="true" size={20} className="shrink-0" />
               </div>
-            ))}
-          </div>
-          <p className="bg-dg-ink px-5 py-3 text-center text-sm font-semibold text-white">전략 방향</p>
-          <div className="grid grid-cols-1 md:grid-cols-3">
-            {STRATEGY.map((column, index) => (
-              <ul
-                key={`${column.heading}-goals`}
-                className={`space-y-3 px-5 py-6 text-center text-sm leading-6 text-gray-700 ${
-                  index > 0 ? "border-t border-dg-line md:border-t-0 md:border-l" : ""
-                }`}
-              >
-                {column.goals.map((goal) => (
-                  <li key={goal}>{goal}</li>
-                ))}
-              </ul>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-12 grid gap-8 lg:grid-cols-3">
+            </div>
+          </a>
+        ))}
+      </div>
+      <section className="pg-editorial-section">
+        <h2>ESG 전략</h2>
+        <div className="divide-y divide-blue-100 border-y border-blue-100">
           {PILLARS.map((pillar) => (
-            <article key={`${pillar.id}-detail`} id={pillar.id} className="scroll-mt-28">
-              <p className="text-3xl font-extrabold tracking-tight text-dg-ink">
-                {pillar.key}
-                <span className="ml-1 text-base font-semibold tracking-normal text-gray-400">
-                  {pillar.title.slice(1)}
-                </span>
-              </p>
-              <h3 className="mt-3 text-lg font-bold text-gray-900">{pillar.subtitle}</h3>
-              <p className="mt-3 text-sm leading-7 text-gray-600">{pillar.body}</p>
+            <article key={pillar.id} id={pillar.id} className="grid scroll-mt-24 grid-cols-[2rem_1fr] gap-4 py-6">
+              <span aria-hidden="true" className="pg-search-brand text-3xl font-bold">{pillar.key}</span>
+              <div>
+                <h3 className="text-lg font-bold">{pillar.subtitle}</h3>
+                <p className="mt-2 max-w-prose leading-relaxed text-dg-muted">{pillar.body}</p>
+                <p className="mt-3 text-sm font-semibold text-[#1754a2]">{pillar.goals.join(" · ")}</p>
+              </div>
             </article>
           ))}
         </div>
       </section>
-    </PageShell>
+      <section className="pg-editorial-section">
+        <h2>ESG 운영 방침</h2>
+        <ul className="grid gap-x-8 gap-y-5 rounded-2xl bg-blue-50/70 p-6 leading-relaxed text-dg-muted sm:grid-cols-2 sm:p-8">
+          {PRINCIPLES.map((text) => <li key={text}>{text}</li>)}
+        </ul>
+      </section>
+    </PortalPage>
   );
 }

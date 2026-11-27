@@ -26,6 +26,9 @@ export const config = {
   },
 };
 
+export const naverMapScriptUrl = config.naverMap.clientId
+  ? `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(config.naverMap.clientId)}` : "";
+
 // 배포 환경에서 동적으로 리다이렉트 URI 생성
 function getRedirectUri(provider: 'naver' | 'kakao'): string {
   // 개발 환경

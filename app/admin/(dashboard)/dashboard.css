@@ -1,0 +1,23 @@
+.association-dashboard { max-width:1240px; margin:0 auto; color:#192f4d; }
+.association-dashboard h1 { margin:4px 0 clamp(20px,3vw,36px); font-size:clamp(29px,3.3vw,48px); font-weight:740; letter-spacing:-.06em; line-height:1.2; }
+.association-workshops { display:flex; position:relative; isolation:isolate; overflow:hidden; align-items:center; padding:clamp(24px,3vw,44px); border-radius:18px; color:#fff; background:linear-gradient(110deg,#125ac3,#176be0 48%,#3182f6); }
+.association-workshops::before { content:""; position:absolute; inset:0 0 0 29%; z-index:-1; background:url("/images/demo/makers-1.webp") center 52%/cover; mask-image:linear-gradient(90deg,transparent,#000 72%); mix-blend-mode:luminosity; opacity:.55; }
+.association-workshops h2,.association-panel h2 { font-size:clamp(18px,1.7vw,23px); font-weight:680; letter-spacing:-.04em; }
+.association-total { font-size:clamp(44px,5vw,68px); font-weight:650; line-height:1.22; font-variant-numeric:tabular-nums; }
+.association-total small { margin-left:6px; font-size:17px; }
+.association-open { display:inline-flex; align-items:center; gap:18px; padding:9px 15px; margin-top:16px; border-radius:7px; color:#1454aa; background:#fff; font-size:14px; font-weight:650; }
+.association-tools { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin-top:20px; }
+.association-panel { padding:clamp(18px,2vw,28px); background:#fff; border:1px solid #d4e2f2; border-radius:14px; }
+.association-panel h2 { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.association-panel a { display:flex; align-items:center; gap:12px; min-height:54px; padding:10px 3px; border-top:1px solid #e1ebf6; font-weight:600; }
+.association-panel a svg { width:17px; flex:none; color:#1965ce; }
+.association-panel a span { flex:1; }
+.association-panel a small { display:block; color:#52647b; font-size:13px; font-weight:400; }
+.association-panel a b { font-size:14px; font-variant-numeric:tabular-nums; }
+.association-panel .association-all { min-height:44px; font-size:13px; color:#1759ae; }
+.association-panel a:hover { background:#f1f7ff; }
+.association-workshops:hover .association-open { background:#e2efff; }
+.association-dashboard a:focus-visible { outline:3px solid #3182f6; outline-offset:3px; }
+@media(max-width:950px){.association-tools {grid-template-columns:1fr}}
+@media(max-width:767px){.association-sidebar {display:grid;grid-template-columns:1fr auto}.association-sidebar>div {padding:8px 16px;border:0}.association-sidebar nav {grid-row:2;grid-column:1/-1;display:flex;overflow-x:auto;padding:4px 8px 8px;gap:4px}.association-sidebar nav a {flex:none;gap:5px;padding:8px;font-size:13px}.association-sidebar nav svg {width:16px}}
+@media(max-width:767px){.association-nav-group{display:contents}}

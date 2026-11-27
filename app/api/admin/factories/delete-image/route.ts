@@ -1,3 +1,5 @@
+import { revalidateTag } from "next/cache";
+import { FACTORY_LIST_TAG } from "@/lib/factoryCatalog";
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { deleteImageFromBlob } from "@/lib/vercelBlobConfig";
@@ -51,6 +53,8 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
+
+    revalidateTag(FACTORY_LIST_TAG);
 
     // 4. Vercel Blob에서 이미지 파일 삭제
     try {

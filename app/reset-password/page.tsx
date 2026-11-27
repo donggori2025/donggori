@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function ResetPasswordPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-white px-4">
+    <div className="account-surface flex min-h-[70vh] items-center justify-center bg-white px-4">
       <section className="w-full max-w-md rounded-xl bg-white p-8 text-center shadow">
         <h1 className="text-2xl font-bold">소셜 로그인을 이용해주세요</h1>
         <p className="mt-3 text-sm leading-6 text-gray-500">
@@ -12,6 +12,6 @@ export default function ResetPasswordPage() {
           로그인으로 이동
         </Link>
       </section>
-    </main>
+    </div>
   );
 }

@@ -17,7 +17,7 @@ const square = await sharp(symbol)
 // A real ICO container, with PNG frames for browser tabs and Google Search.
 // Next.js reads the first frame for the generated <link sizes> attribute.
 const sizes = [96, 48, 32, 16];
-const frames = await Promise.all(sizes.map((size) => sharp(square).resize(size, size).png().toBuffer()));
+const frames = await Promise.all(sizes.map((size) => sharp(square).resize(size, size).ensureAlpha().png().toBuffer()));
 const directory = Buffer.alloc(6 + 16 * sizes.length);
 directory.writeUInt16LE(1, 2);
 directory.writeUInt16LE(sizes.length, 4);

@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useAppAuth } from "@/contexts/AuthContext";
-import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
+import PortalPage from "@/components/PortalPage";
 import type { MatchRequest } from "@/lib/matchRequests";
-
-type Menu = "profile" | "requests";
 
 const STATUS_LABELS: Record<MatchRequest["status"], string> = {
   pending: "접수 대기",
@@ -32,9 +30,13 @@ function formatPhone(value: string) {
 }
 
 export default function MyPage() {
+  return <Suspense fallback={null}><AccountWorkspace /></Suspense>;
+}
+
+function AccountWorkspace() {
   const { user, isSignedIn, isLoaded, signOut, refresh } = useAppAuth();
   const router = useRouter();
-  const [menu, setMenu] = useState<Menu>("profile");
+  const menu = useSearchParams().get("tab") === "profile" ? "profile" : "requests";
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [profileMessage, setProfileMessage] = useState("");
@@ -46,9 +48,10 @@ export default function MyPage() {
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
-      router.replace("/sign-in?next=/my-page");
+      const next = menu === "profile" ? "/my-page?tab=profile" : "/my-page";
+      router.replace(`/sign-in?next=${encodeURIComponent(next)}`);
     }
-  }, [isLoaded, isSignedIn, router]);
+  }, [isLoaded, isSignedIn, menu, router]);
 
   useEffect(() => {
     setName(user?.name || "");
@@ -128,43 +131,19 @@ export default function MyPage() {
   }
 
   return (
-    <main className={`${PAGE_CONTAINER_CLASS} py-10 md:py-14`}>
-      <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div>
-          <p className="text-sm font-semibold text-dg-ink">MY DONGGORI</p>
-          <h1 className="mt-1 text-3xl font-bold text-gray-900">마이페이지</h1>
-          <p className="mt-2 text-sm text-gray-500">프로필과 내가 등록한 의뢰를 관리합니다.</p>
+    <PortalPage title="마이페이지" description="신청한 의뢰의 진행 상황을 확인하고 내 정보를 관리하세요.">
+      <div className="pg-account">
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <nav aria-label="마이페이지 메뉴" className="pg-segments">
+            <Link href="/my-page" scroll={false} aria-current={menu === "requests" ? "page" : undefined}>내 의뢰</Link>
+            <Link href="/my-page?tab=profile" scroll={false} aria-current={menu === "profile" ? "page" : undefined}>내 정보</Link>
+          </nav>
+          <button type="button" onClick={() => void signOut()} className="min-h-10 px-2 text-sm font-semibold text-dg-muted hover:underline">
+            로그아웃
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => void signOut()}
-          className="self-start rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-        >
-          로그아웃
-        </button>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)]">
-        <nav aria-label="마이페이지 메뉴" className="h-fit rounded-2xl border border-gray-200 bg-white p-2">
-          {([
-            ["profile", "프로필"],
-            ["requests", "의뢰내역"],
-          ] as const).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setMenu(value)}
-              className={`w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${
-                menu === value ? "bg-dg-ink text-white" : "text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </nav>
-
         {menu === "profile" ? (
-          <section className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
+          <section className="pg-panel p-5 sm:p-8">
             <div className="mb-7 flex items-center gap-4 border-b border-gray-100 pb-7">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-xl font-bold text-dg-ink">
                 {(user.name || user.email).slice(0, 1).toUpperCase()}
@@ -231,13 +210,13 @@ export default function MyPage() {
             </div>
           </section>
         ) : (
-          <section className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
+          <section className="pg-panel p-5 sm:p-8">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">의뢰내역</h2>
                 <p className="mt-1 text-sm text-gray-500">내 계정으로 등록한 의뢰만 표시됩니다.</p>
               </div>
-              <Link href="/factories" className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white">
+              <Link href="/factories" className="pg-primary">
                 공장 찾기
               </Link>
             </div>
@@ -280,6 +259,6 @@ export default function MyPage() {
           </section>
         )}
       </div>
-    </main>
+    </PortalPage>
   );
 }

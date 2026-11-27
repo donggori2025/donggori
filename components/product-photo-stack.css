@@ -1,0 +1,17 @@
+.parka-stack { position:relative; width:100%; height:100%; isolation:isolate; }
+.parka-print {
+  position:absolute; left:50%; top:50%; height:86%; max-width:55%; aspect-ratio: .79;
+  overflow:hidden; border:3px solid white; border-radius:6px;
+  background-color:#ececed;
+  box-shadow:0 12px 22px -10px #0d27575c;
+  transform:translate(-50%,-50%) translateX(calc(var(--spread) * 18%)) rotate(calc(var(--spread) * 4deg));
+}
+.parka-print[data-visible=false] { visibility:hidden; }
+.parka-print img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.parka-retry { position:absolute; bottom:2%; left:50%; transform:translateX(-50%); background:white; padding:6px 12px; border-radius:10px; }
+.parka-print span { position:absolute; bottom:5px; left:5px; padding:1px 5px; font-size:11px; color:#1e3451; background:#ffffffe0; border-radius:3px; }
+@media (prefers-reduced-motion:no-preference) {
+  .parka-print { transition:transform 580ms cubic-bezier(.2,.72,.22,1); }
+  .parka-print[data-visible=true] { animation:parka-deal 620ms cubic-bezier(.18,.72,.22,1) backwards; }
+  @keyframes parka-deal { from { opacity:0; transform:translate(-37%,-64%) scale(1.045) rotate(8deg); } }
+}

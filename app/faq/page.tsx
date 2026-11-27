@@ -1,3 +1,4 @@
+import { serviceFaq } from "@/lib/serviceFaq";
 import React from 'react';
 import type { Metadata } from 'next';
 import { PageHeader, PageShell } from '@/components/ui/app-ui';
@@ -15,6 +16,11 @@ export default function FAQPage() {
         title="자주 묻는 질문"
         description="동고리 서비스 이용 중 궁금하신 점을 빠르게 해결할 수 있도록 자주 묻는 질문과 답변을 정리했습니다."
       />
+      {serviceFaq.map(([question, answer]) => (
+        <details key={question} className="civic-guide border-b border-dg-line py-5">
+          <summary>{question}</summary><p className="mt-3 leading-7 text-dg-muted">{answer}</p>
+        </details>
+      ))}
     </PageShell>
   );
 }

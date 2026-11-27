@@ -1,4 +1,5 @@
-import React from 'react';
+import Link from 'next/link';
+import { SERVICE_LINKS } from '@/lib/navigation';
 import type { Metadata } from 'next';
 import { PageHeader, PageShell } from '@/components/ui/app-ui';
 
@@ -12,9 +13,10 @@ export default function ServiceIntroPage() {
   return (
     <PageShell readable>
       <PageHeader
-        title="동고리 서비스의 핵심 기능"
+        title="서비스 이용안내"
         description="동고리는 봉제공장과 디자이너를 연결하는 의류 제작 플랫폼으로, 프로젝트 매칭과 작업지시서 디지털화를 통해 생산 효율성을 높입니다."
       />
+      {SERVICE_LINKS.map((item) => <Link className="civic-row" key={item.href} href={item.href}><strong>{item.label}</strong><span aria-hidden>→</span></Link>)}
     </PageShell>
   );
 }

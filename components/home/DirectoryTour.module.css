@@ -1,0 +1,201 @@
+.section {
+  --tour-ramp: linear-gradient(105deg, var(--pg-action), var(--pg-blue) 62%, #569df9);
+  padding-block: clamp(48px, 3.4vw, 70px) clamp(30px, 3.2vw, 64px);
+  background:
+    linear-gradient(to bottom, transparent 90%, white),
+    radial-gradient(ellipse 78% 35% at 76% 86%, var(--pg-ice), transparent),
+    white;
+  color: var(--pg-ink);
+}
+.intro {
+  width: min(66%, 1100px);
+  margin-inline: auto;
+  text-align: center;
+}
+.intro h2 {
+  font-size: clamp(38px, 3.55vw, 62px);
+  line-height: 1.18;
+  letter-spacing: -0.058em;
+  font-weight: 780;
+}
+.intro h2 span {
+  display: inline-block;
+  background: var(--tour-ramp);
+  background-clip: text;
+  color: transparent;
+}
+.intro > p {
+  margin-top: clamp(22px, 2.3vw, 38px);
+  font-size: clamp(17px, 1.36vw, 22px);
+  line-height: 1.6;
+  letter-spacing: -0.035em;
+  color: var(--pg-secondary);
+}
+.actions, .controls, .all {
+  display: flex;
+  align-items: center;
+}
+.actions {
+  flex-direction: column;
+  gap: clamp(16px, 1.5vw, 24px);
+  margin-top: clamp(18px, 1.6vw, 28px);
+}
+.all {
+  min-height: clamp(46px, 3.55vw, 56px);
+  padding: 0 21px 0 24px;
+  gap: 6px;
+  width: fit-content;
+  border-radius: 100px;
+  background: linear-gradient(105deg, #064db5, var(--pg-action) 54%, #216bd1);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+}
+.all svg { font-size: 20px; }
+.controls { gap: 7px; }
+.controls button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--tour-ramp);
+  color: white;
+  font-size: 24px;
+}
+.controls button:hover, .all:hover { filter: brightness(0.94); }
+.counter {
+  margin-left: clamp(8px, 1.3vw, 24px);
+  color: var(--pg-action);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.counter > span:last-child { color: #547299; }
+.progress {
+  width: clamp(48px, 8.6vw, 135px);
+  height: 2px;
+  margin-inline: 5px;
+  background: var(--pg-ice);
+}
+.progress i {
+  display: block;
+  height: 100%;
+  background: var(--tour-ramp);
+  transform-origin: left;
+  transition: transform .3s ease;
+}
+.controls .play {
+  background: transparent;
+  border: 1px solid var(--pg-denim);
+  color: var(--pg-action);
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+}
+.track {
+  width: min(100%, 1700px);
+  margin: clamp(24px, 2.3vw, 40px) auto 0;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+}
+.track::-webkit-scrollbar { display: none; }
+.group {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding: 6px clamp(20px, 2.95vw, 50px) 26px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 34px);
+  align-items: start;
+  align-content: start;
+  scroll-snap-align: start;
+}
+.card {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  background: white;
+  border-radius: clamp(28px, 3.5vw, 56px);
+  box-shadow: 0 8px 26px -7px #1f75c523, 0 1px 0 #1a62bb0d;
+  transition: box-shadow 220ms ease;
+  text-decoration: none;
+}
+.card:nth-child(even) { margin-top: clamp(32px, 5.3vw, 88px); }
+.card:hover { text-decoration: none; }
+.card:hover h3 { text-decoration: underline; text-underline-offset: 4px; }
+.card:focus-visible { box-shadow: 0 12px 24px -10px rgb(18 47 80 / 32%); }
+@media (hover: hover) and (pointer: fine) {
+  .card:hover { box-shadow: 0 12px 24px -10px rgb(18 47 80 / 32%); }
+}
+.photo {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--pg-mist);
+}
+.photo > img {
+  object-fit: cover;
+  object-position: center 38%;
+}
+.caption {
+  padding: clamp(18px, 1.55vw, 26px) clamp(20px, 1.95vw, 32px) clamp(24px, 2vw, 32px);
+  min-height: clamp(156px, 11.8vw, 190px);
+  text-align: center;
+}
+.district {
+  display: inline-flex;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: linear-gradient(110deg, var(--pg-ice), #eef6ff);
+  color: #135bb5;
+  font-size: 14px;
+  font-weight: 680;
+}
+.caption h3 {
+  font-size: clamp(19px, 1.58vw, 27px);
+  font-weight: 740;
+  line-height: 1.35;
+  margin-block: 9px 8px;
+}
+.caption p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: #506078;
+  line-height: 1.5;
+  font-size: clamp(14px, 1.05vw, 17px);
+}
+.status { width: min(66%, 1100px); margin: 52px auto; color: var(--pg-secondary); }
+@media (max-width: 1000px) {
+  .intro { width: 84%; }
+  .group { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-inline: 5%; }
+  .caption { min-height: 158px; }
+}
+@media (max-width: 620px) {
+  .section { padding-block: 40px 20px; }
+  .intro, .status { width: calc(100% - 40px); }
+  .intro h2 { font-size: clamp(32px, 8.5vw, 42px); }
+  .intro > p { margin-top: 16px; font-size: 16px; }
+  .actions { gap: 14px; }
+  .all { padding-inline: 16px 12px; font-size: 14px; }
+  .controls { gap: 4px; }
+  .controls button, .controls .play { width: 36px; height: 36px; }
+  .counter { margin-inline: 4px; font-size: 12px; }
+  .progress { display: none; }
+  .track { margin-top: 24px; }
+  .group { padding-inline: 20px; grid-template-columns: minmax(0, 1fr); }
+  .card:nth-child(even) { margin: 0; }
+  .caption { padding: 18px 22px 22px; min-height: 142px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress i, .card { transition: none; }
+}
+@media (forced-colors: active) {
+  .intro h2 span { color: CanvasText; }
+}

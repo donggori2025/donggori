@@ -23,8 +23,9 @@ export async function POST(req: Request) {
     const ADMIN_ID = process.env.ADMIN_ID;
     const ADMIN_PW = process.env.ADMIN_PW;
 
-    if (!ADMIN_ID || !ADMIN_PW) {
-      console.error("[SECURITY] ADMIN_ID 또는 ADMIN_PW 환경변수가 설정되지 않았습니다.");
+    const coordinatorId = process.env.COORDINATOR_ID;
+    const coordinatorPw = process.env.COORDINATOR_PW;
+    if ((!ADMIN_ID || !ADMIN_PW) && (!coordinatorId || !coordinatorPw)) {
       return NextResponse.json({ success: false, error: "서버 설정 오류" }, { status: 500 });
     }
 
@@ -32,10 +33,14 @@ export async function POST(req: Request) {
     const idStr = typeof id === "string" ? id : "";
     const pwStr = typeof password === "string" ? password : "";
 
-    const idMatch = safeTimingEqual(idStr, ADMIN_ID);
-    const pwMatch = safeTimingEqual(pwStr, ADMIN_PW);
-
-    if (!idMatch || !pwMatch) {
+    const matches = (login?: string, secret?: string) => {
+      if (!login || !secret) return false;
+      const idMatch = safeTimingEqual(idStr, login);
+      const pwMatch = safeTimingEqual(pwStr, secret);
+      return idMatch && pwMatch;
+    };
+    const scope = matches(ADMIN_ID, ADMIN_PW) ? "admin" : matches(coordinatorId, coordinatorPw) ? "coordinator" : null;
+    if (!scope) {
       recordLoginFailure(ip);
       return NextResponse.json({ success: false, error: "아이디 또는 비밀번호가 올바르지 않습니다." }, { status: 401 });
     }
@@ -43,7 +48,8 @@ export async function POST(req: Request) {
     clearLoginAttempts(ip);
 
     const res = NextResponse.json({ success: true });
-    res.cookies.set("admin_session", createAdminSessionValue(), {
+    res.cookies.delete(scope === "admin" ? "coordinator_session" : "admin_session");
+    res.cookies.set(`${scope}_session`, createAdminSessionValue(scope), {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",

@@ -1,0 +1,13 @@
+textarea.auto-grow-input {
+  field-sizing: content;
+  box-sizing: content-box;
+  min-height: 1lh;
+  max-height: min(6lh, 24svh);
+  resize: none;
+  overflow-y: auto;
+}
+
+textarea.auto-grow-input:placeholder-shown {
+  height: 1lh;
+  overflow: hidden;
+}

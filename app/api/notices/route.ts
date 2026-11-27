@@ -1,8 +1,16 @@
+import { readPublicNoticePreview, usePublicNoticePreview } from "@/lib/publicNoticePreview";
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { isPublicNoticeVisible, PUBLIC_NOTICE_SELECT, type PublicNotice } from "@/lib/notices";
 
 export async function GET() {
+  if (usePublicNoticePreview()) {
+    try {
+      return NextResponse.json({ success: true, data: await readPublicNoticePreview() });
+    } catch {
+      return NextResponse.json({ success: false, error: "공지를 불러오지 못했습니다." }, { status: 502 });
+    }
+  }
   const supabase = getServiceSupabase();
   const { data, error } = await supabase
     .from("notices")

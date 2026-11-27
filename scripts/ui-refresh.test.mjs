@@ -17,18 +17,22 @@ test("press articles have unique IDs, valid links and local image assets", async
   }
 });
 
-test("home redesign keeps server data, real badges and image error fallback", async () => {
-  const source = await readFile("components/InfoSection.tsx", "utf8");
+test("home loads the public factory catalog and the directory handles missing images", async () => {
+  const page = await readFile("app/page.tsx", "utf8");
+  assert.match(page, /<HomeLanding\s*\/>/);
+  const source = await readFile("components/home/HomeLanding.tsx", "utf8");
   assert.match(source, /from "@\/lib\/factoryCatalog"/);
-  assert.match(source, /f\.factory_type, f\.main_fabrics/);
-  assert.match(source, /FactoryImagePlaceholder/);
-  assert.match(source, /onError/);
+  assert.match(source, /fetchFactoriesFromDB\(/);
+  const entry = await readFile("components/FactoryDirectoryEntry.tsx", "utf8");
+  assert.match(entry, /factory\.main_fabrics/);
+  assert.match(entry, /FactoryImagePlaceholder/);
+  assert.match(entry, /onError/);
   assert.doesNotMatch(source, /fallbackFactories|Math\.random|Math\.sin|supabaseClient/);
 });
 
 test("navigation keeps server-backed auth and composition-safe Korean prompt entry", async () => {
   const header = await readFile("components/Header.tsx", "utf8");
-  const hero = await readFile("components/HeroSection.tsx", "utf8");
+  const hero = await readFile("components/FactoryPrompt.tsx", "utf8");
   assert.match(header, /useAppAuth/);
   assert.doesNotMatch(header, /localStorage|document\.cookie|factoryAuth|kakao_user|naver_user/);
   assert.match(hero, /!event\.nativeEvent\.isComposing/);
@@ -69,7 +73,7 @@ test("interactive UI uses neutral accents while preserving the print category co
     assert.doesNotMatch(source, /(?:violet|purple|fuchsia)-\d|#(?:fff7fb|fff0f7|a73370|fdf0f2|8f5b62)/i, path);
     assert.match(source, /(?:bg|text|border)-dg-ink/, path);
   }
-  for (const path of ["app/factories/page.tsx", "app/matching/page.tsx"]) {
+  for (const path of ["app/matching/page.tsx"]) {
     const source = await readFile(path, "utf8");
     assert.match(source, /'나염': \{ color: '#A259FF', bg: 'rgba\(162, 89, 255, 0\.1\)' \}/, path);
   }

@@ -1,3 +1,4 @@
+import { readPublicFactories, isPublicFactoryPreview } from "@/lib/publicFactoryPreview";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { mapPublicFactoryRow, PUBLIC_FACTORY_SELECT } from "@/lib/factoryPrivacy";
@@ -23,6 +24,7 @@ export async function GET(
       return NextResponse.json({ success: false, error: "id가 필요합니다." }, { status: 400 });
     }
 
+    if (isPublicFactoryPreview()) return await readPublicFactories(id);
     const supabase = getSupabase();
     if (!supabase) {
       return NextResponse.json({ success: false, error: "서버 설정 오류" }, { status: 500 });

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useAppAuth } from "@/contexts/AuthContext";
-import { isSelectableRegion, type Factory } from "@/lib/factoryCatalog";
+import { fetchFactoriesFromDB, isSelectableRegion, type Factory } from "@/lib/factoryCatalog";
 import { useFactoryImages } from "@/lib/hooks/useFactoryImages";
 import { recommendFactoriesFromPrompt, takeMeaningfulMatches } from "@/lib/factoryMatching";
 import { FACTORY_TYPES, MAIN_FABRICS, type FactoryType, type MainFabric } from "@/lib/types";
@@ -51,78 +51,23 @@ function MatchingFactoryImage({ factory, idx }: { factory: Factory; idx: number 
   return <FactoryImagePlaceholder />;
 }
 
-// 채팅 말풍선 컴포넌트 (fade-in + 타이핑 효과)
-function ChatBubble({
-  text,
-  type,
-  isTyping,
-  showCursor,
-  onEdit,
-}: {
-  text: string;
-  type: "question" | "answer";
-  isTyping?: boolean;
-  showCursor?: boolean;
-  onEdit?: () => void;
-}) {
-  const content = isTyping ? (
-    <span>
-      {text}
-      {showCursor && <span className="inline-block w-2 animate-blink ml-0.5">|</span>}
-    </span>
-  ) : (
-    <span className="whitespace-pre-line">{text}</span>
-  );
-
-  if (type === "question") {
-    return (
-      <div className="flex flex-col items-start w-full">
-        <div
-          className="max-w-[85%] animate-fade-in rounded-lg border border-dg-line bg-white px-4 py-2.5 text-sm leading-relaxed text-gray-800 md:text-[15px]"
-          style={{ minHeight: 40 }}
-        >
-          {content}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col items-end w-full">
-      <div
-        className="max-w-[85%] animate-fade-in rounded-lg bg-[#111] px-4 py-2.5 text-sm leading-relaxed text-white md:text-[15px]"
-        style={{ minHeight: 40 }}
-      >
-        {content}
-      </div>
-      {onEdit && (
-        <button
-          type="button"
-          className="mt-1.5 text-xs text-gray-400 underline hover:text-gray-700"
-          onClick={onEdit}
-        >
-          수정
-        </button>
-      )}
-    </div>
-  );
-}
-
-const INTRO_GREETINGS = ["반갑습니다:)", "동고리가 봉제공장을 추천해드릴게요!"] as const;
-const INTRO_MESSAGE_COUNT = INTRO_GREETINGS.length + 1;
-
 export default function MatchingPage() {
   const { isSignedIn } = useAppAuth();
   // 공장 데이터 state
   const [factories, setFactories] = useState<Factory[]>([]);
 
+  const [catalogState, setCatalogState] = useState<"loading" | "ready" | "failed">("loading");
   useEffect(() => {
-    async function fetchFactories() {
-      const response = await fetch("/api/factories", { cache: "no-store" });
-      const payload = response.ok ? await response.json() : null;
-      setFactories(Array.isArray(payload?.data) ? payload.data : []);
-    }
-    fetchFactories();
+    let active = true;
+    fetchFactoriesFromDB().then((data) => {
+      if (active) {
+        setFactories(data);
+        setCatalogState("ready");
+      }
+    }).catch(() => {
+      if (active) setCatalogState("failed");
+    });
+    return () => { active = false; };
   }, []);
 
   // factories state 기반 옵션 추출 함수 (함수 내부에서 선언)
@@ -152,94 +97,15 @@ type ScoredFactory = Factory & { score: number };
 
   // 동적 질문/옵션 useMemo는 반드시 함수 내부에서 호출
   const QUESTIONS = useMemo(() => [
-    { question: "어떤 공정을 원하시나요?", key: "factory_type", options: FACTORY_TYPES },
-    { question: "주요 원단을 선택하세요", key: "main_fabrics", options: MAIN_FABRICS },
-    { question: "지역을 선택하세요", key: "admin_district", options: getOptions("admin_district") },
-    { question: "MOQ(최소 주문 수량)을 선택하세요", key: "moq", options: moqRanges.map(r => r.label) },
-    { question: "재봉기를 선택하세요", key: "sewing_machines", options: getOptions("sewing_machines") },
-    { question: "패턴기를 선택하세요", key: "pattern_machines", options: getOptions("pattern_machines") },
-    { question: "특수기를 선택하세요", key: "special_machines", options: getOptions("special_machines") },
-    { question: "어떤 품목을 원하시나요?", key: "items", options: getOptions("items") },
+    { question: "어떤 공정을 원하시나요?", key: "factory_type", label: "공정", options: FACTORY_TYPES },
+    { question: "주요 원단을 선택하세요", key: "main_fabrics", label: "원단", options: MAIN_FABRICS },
+    { question: "지역을 선택하세요", key: "admin_district", label: "지역", options: getOptions("admin_district") },
+    { question: "MOQ(최소 주문 수량)을 선택하세요", key: "moq", label: "주문수량", options: moqRanges.map(r => r.label) },
+    { question: "재봉기를 선택하세요", key: "sewing_machines", label: "재봉기", options: getOptions("sewing_machines") },
+    { question: "패턴기를 선택하세요", key: "pattern_machines", label: "패턴기", options: getOptions("pattern_machines") },
+    { question: "특수기를 선택하세요", key: "special_machines", label: "특수기", options: getOptions("special_machines") },
+    { question: "어떤 품목을 원하시나요?", key: "items", label: "품목", options: getOptions("items") },
   ], [getOptions]);
-  // 채팅 메시지(질문/답변 순서대로)
-  const [chat, setChat] = useState<{ type: "question" | "answer"; text: string }[]>([]);
-  const [introDone, setIntroDone] = useState(false);
-
-  // 인트로 타이핑 상태 추가
-  const [typingText, setTypingText] = useState("");
-  const [introStep, setIntroStep] = useState(0);
-  const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const introTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const [introRestartKey, setIntroRestartKey] = useState(0);
-  const suspendIntroRef = useRef(false);
-  const questionsRef = useRef(QUESTIONS);
-  questionsRef.current = QUESTIONS;
-
-  useEffect(() => {
-    let cancelled = false;
-    introTimersRef.current.forEach(clearTimeout);
-    introTimersRef.current = [];
-    if (typingTimer.current) {
-      clearTimeout(typingTimer.current);
-      typingTimer.current = null;
-    }
-
-    const schedule = (fn: () => void, ms: number) => {
-      const id = setTimeout(() => {
-        if (!cancelled && !suspendIntroRef.current) fn();
-      }, ms);
-      introTimersRef.current.push(id);
-      return id;
-    };
-
-    setChat([]);
-    setIntroDone(false);
-    setTypingText("");
-    setIntroStep(0);
-
-    const firstQuestion =
-      questionsRef.current[0]?.question || "어떤 공정을 원하시나요?";
-    const messages = [...INTRO_GREETINGS, firstQuestion];
-
-    let currentMsgIdx = 0;
-    let currentCharIdx = 0;
-
-    function typeNextChar() {
-      if (cancelled || suspendIntroRef.current) return;
-      const msg = messages[currentMsgIdx];
-      if (currentCharIdx < msg.length) {
-        setTypingText(msg.slice(0, currentCharIdx + 1));
-        currentCharIdx++;
-        typingTimer.current = schedule(typeNextChar, 40);
-      } else {
-        setChat((prev) => [...prev, { type: "question", text: msg }]);
-        setTypingText("");
-        setIntroStep(2);
-        if (currentMsgIdx < messages.length - 1) {
-          currentMsgIdx++;
-          currentCharIdx = 0;
-          schedule(() => {
-            setIntroStep(0);
-            typeNextChar();
-          }, 280);
-        } else {
-          setIntroDone(true);
-        }
-      }
-    }
-
-    typeNextChar();
-
-    return () => {
-      cancelled = true;
-      introTimersRef.current.forEach(clearTimeout);
-      introTimersRef.current = [];
-      if (typingTimer.current) {
-        clearTimeout(typingTimer.current);
-        typingTimer.current = null;
-      }
-    };
-  }, [introRestartKey]);
   // 현재 질문 인덱스
   const [step, setStep] = useState(0);
   // 사용자가 선택한 답변들
@@ -254,10 +120,6 @@ type ScoredFactory = Factory & { score: number };
   const [textMatchMode, setTextMatchMode] = useState(false);
   // 추천 결과 로딩 상태 추가
   const [resultLoading, setResultLoading] = useState(false);
-  const [showResultMsg1, setShowResultMsg1] = useState(false);
-  const [showResultMsg2, setShowResultMsg2] = useState(false);
-  // 채팅 스크롤 ref
-  const chatScrollRef = useRef<HTMLDivElement>(null);
   const processedPromptRef = useRef<string>("");
 
 
@@ -314,58 +176,10 @@ type ScoredFactory = Factory & { score: number };
     );
   };
 
-  // 1. showResult, loading 등 결과 오버레이/전체화면 관련 상태/코드 제거
-  // 2. handleConfirm, handleSkip에서 setShowResult, setLoading 등 제거, 대신 answers가 7개(마지막)까지 쌓이면 결과 상태로 전환
-  // 3. 왼쪽: 7개 답변이 모두 끝나면 질문/선택지 대신 추천 3개 카드만 표시
-  // 4. 오른쪽: 기존 채팅 UI 아래에 결과 안내 메시지(답변 말풍선) 추가
-
-  // handleConfirm 내부
-  const handleConfirm = () => {
-    if (selectedOptions.length === 0) return;
-    const newAnswers = [...answers, selectedOptions];
-    setAnswers(newAnswers);
-    setChat(prev => [
-      ...prev,
-      { type: "answer", text: selectedOptions.join(", ") },
-    ]);
+  const advance = (values: string[]) => {
+    setAnswers([...answers, values]);
     setSelectedOptions([]);
-    // 다음 질문이 있으면 추가
-    if (step + 1 < QUESTIONS.length) {
-      setTimeout(() => {
-        setChat(prev => [
-          ...prev,
-          { type: "question", text: QUESTIONS[step + 1].question },
-        ]);
-        setStep(prev => prev + 1);
-      }, 400);
-    } else {
-      // 7개 완료 시 추천 결과만 상태에 저장
-      const rec = getRecommendedFactories(newAnswers.map(a => a.join(", ")));
-      setRecommended(rec);
-      // step, answers 등은 그대로 두고, showResult/로딩 등은 사용하지 않음
-    }
-  };
-  // handleSkip도 동일하게 showResult/로딩 제거
-  const handleSkip = () => {
-    const newAnswers = [...answers, []];
-    setAnswers(newAnswers);
-    setChat(prev => [
-      ...prev,
-      { type: "answer", text: "(건너뜀)" },
-    ]);
-    setSelectedOptions([]);
-    if (step + 1 < QUESTIONS.length) {
-      setTimeout(() => {
-        setChat(prev => [
-          ...prev,
-          { type: "question", text: QUESTIONS[step + 1].question },
-        ]);
-        setStep(prev => prev + 1);
-      }, 400);
-    } else {
-      const rec = getRecommendedFactories(newAnswers.map(a => a.join(", ")));
-      setRecommended(rec);
-    }
+    if (step + 1 < QUESTIONS.length) setStep(step + 1);
   };
 
   const normalizeToken = (value: string) => String(value || "").toLowerCase().replace(/\s+/g, "");
@@ -634,39 +448,27 @@ type ScoredFactory = Factory & { score: number };
     const trimmed = String(prompt || "").trim();
     if (!trimmed) return;
 
-    suspendIntroRef.current = true;
     setTextPrompt(trimmed);
     setQuickInput(trimmed);
     setTextMatchMode(true);
-    setIntroDone(true);
     setStep(0);
     setAnswers([]);
     setSelectedOptions([]);
     setRecommended([]);
     setResultLoading(true);
-    setShowResultMsg1(false);
-    setShowResultMsg2(false);
-    setChat([]);
-
-    if (typingTimer.current) {
-      clearTimeout(typingTimer.current);
-      typingTimer.current = null;
-    }
-
     const rec = getRecommendedFactoriesFromPrompt(trimmed);
     setRecommended(rec);
     setResultLoading(false);
-    setChat([{ type: "question", text: "분석이 완료되었어요. 추천 결과를 확인해주세요." }]);
   }, [getRecommendedFactoriesFromPrompt]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const promptFromQuery = String(new URLSearchParams(window.location.search).get("prompt") || "").trim();
-    if (!promptFromQuery || factories.length === 0) return;
+    if (!promptFromQuery || catalogState === "loading") return;
     if (processedPromptRef.current === promptFromQuery) return;
     processedPromptRef.current = promptFromQuery;
     startTextMatching(promptFromQuery);
-  }, [factories.length, startTextMatching]);
+  }, [catalogState, startTextMatching]);
 
   const [feedbackRatings, setFeedbackRatings] = useState<{[key: number]: number}>({});
 
@@ -692,6 +494,7 @@ type ScoredFactory = Factory & { score: number };
 
   // 추천 결과 카드 UI (공장 정보 상세)
   function renderResultCards() {
+    if (catalogState === "failed") return <p role="status">공장 정보 연결 후 추천 결과를 확인할 수 있습니다.</p>;
     if (recommended.length === 0) {
       return (
         <div className="w-full max-w-xl rounded-2xl border border-gray-200 bg-gray-50 px-6 py-12 text-center">
@@ -815,7 +618,7 @@ type ScoredFactory = Factory & { score: number };
   function renderLoading() {
     return (
       <div className="w-full flex flex-col items-center justify-center min-h-[500px] animate-fade-in">
-        <div className="w-16 h-16 border-4 border-gray-300 border-t-[#222222] rounded-full animate-spin mb-6"></div>
+        <div className="w-16 h-16 border-4 border-gray-300 border-t-dg-ink rounded-full animate-spin mb-6"></div>
         <div className="text-lg font-semibold">추천 결과를 분석 중입니다...</div>
       </div>
     );
@@ -827,7 +630,6 @@ type ScoredFactory = Factory & { score: number };
     setStep(editStep);
     setSelectedOptions(answers[editStep] || []);
     setAnswers(answers.slice(0, editStep));
-    setChat(chat.slice(0, INTRO_MESSAGE_COUNT + editStep * 2));
   };
 
   // 추천 결과(매칭 완료) 시 왼쪽 하단에 '직접 찾기'와 '다시하기' 버튼을 추가합니다. '직접 찾기'는 /factories로 이동, '다시하기'는 매칭 상태(answers, step, chat 등) 초기화. 버튼은 Figma 예시처럼 스타일링(직접 찾기: 흰색, 다시하기: 검정 배경, 아이콘 포함)합니다.
@@ -837,28 +639,12 @@ type ScoredFactory = Factory & { score: number };
     setStep(0);
     setAnswers([]);
     setSelectedOptions([]);
-    setChat([]);
-    setIntroDone(false);
     setRecommended([]); // 결과 초기화
     setResultLoading(false);
-    setShowResultMsg1(false);
-    setShowResultMsg2(false);
     setTextMatchMode(false);
     setTextPrompt("");
     setQuickInput("");
     processedPromptRef.current = "";
-    suspendIntroRef.current = false;
-    setTypingText("");
-    setIntroStep(0);
-    
-    // 타이핑 타이머 초기화
-    if (typingTimer.current) {
-      clearTimeout(typingTimer.current);
-      typingTimer.current = null;
-    }
-    
-    // 인트로 재시작을 위한 키 변경
-    setIntroRestartKey(prev => prev + 1);
     router.replace("/matching");
   };
 
@@ -874,59 +660,23 @@ type ScoredFactory = Factory & { score: number };
     }
   }, [answers.length, QUESTIONS.length, getRecommendedFactories, answers, textMatchMode]);
 
-  // 채팅 자동 스크롤 useEffect
-  useEffect(() => {
-    if (chatScrollRef.current) {
-      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
-    }
-  }, [chat, recommended, resultLoading]);
-
-  // --- [결과 안내 메시지 타이밍 제어 useEffect 수정] ---
-  useEffect(() => {
-    if (
-      (answers.length === QUESTIONS.length || textMatchMode) &&
-      recommended.length > 0 &&
-      !resultLoading
-    ) {
-      setShowResultMsg1(false);
-      setShowResultMsg2(false);
-      const t1 = setTimeout(() => setShowResultMsg1(true), 500); // 0.5초 후 첫 메시지
-      const t2 = setTimeout(() => {
-        if (!textMatchMode) setShowResultMsg2(true);
-      }, 1500); // 1.5초 후 두 번째 메시지(텍스트 모드 제외)
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
-    } else {
-      setShowResultMsg1(false);
-      setShowResultMsg2(false);
-    }
-  }, [answers.length, recommended, resultLoading, QUESTIONS.length, textMatchMode]);
-
-  // 결과 안내 메시지 등장 시 채팅창 자동 스크롤
-  useEffect(() => {
-    if ((showResultMsg1 || showResultMsg2) && chatScrollRef.current) {
-      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
-    }
-  }, [showResultMsg1, showResultMsg2]);
-
   const isResultStage = textMatchMode || answers.length === QUESTIONS.length;
 
   // 왼쪽: 질문/선택지 or 결과 카드 or 로딩
   return (
-    <div className="min-h-screen bg-[#f5f5f3]">
+    <div className="service-workspace min-h-screen">
       <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-6`}>
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">맞춤 추천</h1>
+        <div className="dg-service-heading">
+          <h1>맞춤 추천</h1>
           <p className="mt-2 text-sm md:text-base text-gray-600">
             몇 가지 정보만 알려주시면 가장 적합한 봉제공장 3곳을 추천해드립니다.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-4 items-stretch justify-center flex-1 transition-opacity duration-700 min-h-[78vh]">
+        {catalogState === "failed" && <p role="status" className="border-l-4 border-dg-ink bg-white p-4 text-sm">공장 정보를 불러오지 못해 추천이 제한됩니다. <button className="underline" onClick={() => window.location.reload()}>다시 시도</button></p>}
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch justify-center flex-1 transition-opacity duration-700 min-h-[52vh]">
         {/* 왼쪽: 질문/선택지 or 결과 카드 or 로딩 */}
-        <div className="flex min-h-[620px] w-full flex-col rounded-lg border border-dg-line bg-white p-4 md:min-h-[700px] md:p-6 lg:max-h-[860px] lg:min-h-[760px] lg:flex-[2]">
+        <div className="flex min-h-[480px] w-full flex-col rounded-lg border border-dg-line bg-white p-4 md:min-h-[540px] md:p-6 lg:max-h-[860px] lg:min-h-[560px] lg:flex-[2]">
           {isResultStage ? (
             resultLoading ? (
               <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] animate-fade-in">
@@ -963,15 +713,6 @@ type ScoredFactory = Factory & { score: number };
                 </div>
               </div>
             )
-          ) : !introDone ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-6">
-              <p className="text-sm text-gray-500">동고리가 맞춤 공장을 찾고 있어요...</p>
-              <div className="flex gap-1">
-                <span className="w-2 h-2 rounded-full bg-dg-ink animate-bounce [animation-delay:0ms]" />
-                <span className="w-2 h-2 rounded-full bg-dg-ink animate-bounce [animation-delay:150ms]" />
-                <span className="w-2 h-2 rounded-full bg-dg-ink animate-bounce [animation-delay:300ms]" />
-              </div>
-            </div>
           ) : (
             // 기존 질문/선택지 UI
             <>
@@ -979,14 +720,15 @@ type ScoredFactory = Factory & { score: number };
               <div className="flex-1 min-h-0 flex flex-col gap-4">
                 <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 md:p-4">
                   <div className="text-xs md:text-sm font-semibold text-gray-700 mb-2">
-                    텍스트로 바로 매칭하기
+                    제작 조건 직접 입력
                   </div>
                   <div className="flex flex-col md:flex-row gap-2">
                     <input
+                      aria-label="제작 조건 직접 입력"
                       value={quickInput}
                       onChange={(e) => setQuickInput(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" && quickInput.trim()) {
+                        if (e.key === "Enter" && !e.nativeEvent.isComposing && catalogState !== "loading" && quickInput.trim()) {
                           startTextMatching(quickInput);
                         }
                       }}
@@ -996,14 +738,14 @@ type ScoredFactory = Factory & { score: number };
                     <button
                       type="button"
                       onClick={() => startTextMatching(quickInput)}
-                      disabled={!quickInput.trim()}
+                      disabled={!quickInput.trim() || catalogState === "loading"}
                       className={`h-10 md:h-11 px-4 rounded-lg text-sm font-bold whitespace-nowrap transition ${
                         quickInput.trim()
                           ? "bg-dg-ink text-white hover:bg-black"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     >
-                      분석 시작
+                      공장 추천받기
                     </button>
                   </div>
                 </div>
@@ -1014,9 +756,9 @@ type ScoredFactory = Factory & { score: number };
                   ))}
                 </div>
                 <div className="text-xs md:text-sm font-semibold ai-matching-glow mb-2">
-                  {step + 1} / {QUESTIONS.length}
+                  조건 선택 {step + 1} / {QUESTIONS.length}
                 </div>
-                <div className="text-lg md:text-xl font-bold mb-6 text-gray-900">{QUESTIONS[step].question}</div>
+                <h2 className="mb-5 text-xl font-bold text-dg-ink md:text-2xl">{QUESTIONS[step].question}</h2>
                 {/* 선택지 영역 */}
                 <div className={QUESTIONS[step].key === 'items' ? 'bg-gray-50 rounded-xl p-4 md:p-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 overflow-y-auto flex-1' : 'bg-gray-50 rounded-xl p-4 md:p-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 overflow-y-auto flex-1'}
                   style={QUESTIONS[step].key === 'items' ? { maxHeight: 'unset' } : {}}>
@@ -1024,11 +766,12 @@ type ScoredFactory = Factory & { score: number };
                     <button
                       key={option}
                       type="button"
-                      className={`rounded-xl bg-white shadow-sm text-xs md:text-[15px] font-medium py-4 md:py-8 transition border flex items-center justify-center
+                      className={`rounded bg-white text-sm md:text-[15px] font-medium py-4 transition border flex items-center justify-center
                         ${selectedOptions.includes(option)
                           ? "border-dg-ink ring-2 ring-gray-200"
                           : "border-gray-200 hover:border-gray-400"}
                       `}
+                      aria-pressed={selectedOptions.includes(option)}
                       onClick={() => handleOptionToggle(option)}
                     >
                       {option}
@@ -1041,10 +784,10 @@ type ScoredFactory = Factory & { score: number };
               <div className="pt-4 pb-6 border-t border-gray-200 flex justify-between items-center gap-4 shrink-0 bg-white">
                 <button className="text-sm md:text-base text-gray-500 underline" onClick={() => router.push("/")}>나가기</button>
                 <div className="flex gap-2">
-                  <Button variant="ghost" className="text-[#333333] text-sm md:text-base px-4 md:px-6 py-2 md:py-3" onClick={handleSkip}>건너뛰기</Button>
+                  <Button variant="ghost" className="text-[#333333] text-sm md:text-base px-4 md:px-6 py-2 md:py-3" onClick={() => advance([])}>건너뛰기</Button>
                   <Button
-                    className="bg-[#222222] hover:bg-black text-white rounded-lg px-6 md:px-8 py-2 md:py-3 font-bold text-sm md:text-base"
-                    onClick={handleConfirm}
+                    className="bg-dg-ink hover:bg-black text-white rounded-lg px-6 md:px-8 py-2 md:py-3 font-bold text-sm md:text-base"
+                    onClick={() => advance(selectedOptions)}
                     disabled={selectedOptions.length === 0}
                   >
                     다음
@@ -1054,51 +797,19 @@ type ScoredFactory = Factory & { score: number };
             </>
           )}
         </div>
-        {/* 오른쪽: 채팅 UI */}
-        <div className="flex max-h-[44vh] min-h-[280px] w-full flex-col overflow-hidden rounded-lg border border-dg-line bg-white md:max-h-[50vh] md:min-h-[340px] lg:max-h-[860px] lg:min-h-[760px] lg:flex-[1]">
-          <div className="px-4 py-3 border-b border-gray-200 bg-white shrink-0">
-            <p className="font-bold text-sm text-gray-900">동고리 매칭 도우미</p>
-            <p className="text-xs text-gray-500 mt-0.5">질문에 답하면 최적의 공장을 추천해드려요</p>
-          </div>
-          <div
-            className="flex-1 overflow-y-auto p-4 md:p-5 flex flex-col gap-4 bg-[#f8f9fc]"
-            ref={chatScrollRef}
-          >
-          {/* 기존 채팅/인트로 UI */}
-          {chat.map((msg, idx) => (
-            <div key={`${idx}-${msg.text.slice(0, 12)}`} className="w-full">
-              <ChatBubble
-                text={msg.text}
-                type={msg.type}
-                onEdit={msg.type === "answer" && introDone ? () => handleEdit(Math.floor((idx - INTRO_MESSAGE_COUNT) / 2)) : undefined}
-              />
-            </div>
-          ))}
-          {/* 현재 타이핑 중인 메시지 */}
-          {!introDone && typingText && (
-            <div className="w-full">
-              <ChatBubble text={typingText} type="question" isTyping={true} showCursor={introStep === 0} />
-            </div>
-          )}
-          {/* 결과 안내 메시지(답변 말풍선) - 두 개로 분리, 순차 등장 */}
-          {showResultMsg1 && recommended.length > 0 && (
-            <div className="w-full">
-              <ChatBubble
-                text={`가장 적합한 봉제공장은\n${recommended.map(f => (typeof f.name === 'string' && f.name) ? f.name : (typeof f.company_name === 'string' && f.company_name) ? f.company_name : '이름 없음').join(', ')} 입니다!`}
-                type="answer"
-              />
-            </div>
-          )}
-          {showResultMsg2 && (
-            <div className="w-full">
-              <ChatBubble
-                text={`봉제를 진행할 공장을 선택하여\n공정을 시작해보세요:)`}
-                type="answer"
-              />
-            </div>
-          )}
-          </div>
-        </div>
+        <aside className="condition-ledger w-full self-start p-5 lg:flex-1">
+          <h2 className="mb-4 text-xl font-bold">나의 제작 조건</h2>
+          {textMatchMode ? <p className="leading-7">{textPrompt}</p> :
+            <ol className="divide-y divide-dg-line border-b border-dg-line">
+              {QUESTIONS.map((q, i) => (
+                <li key={q.key} className="grid grid-cols-[5rem_1fr_auto] items-baseline gap-2 py-3 text-sm">
+                  <strong>{q.label}</strong>
+                  <span className="text-dg-muted">{answers[i]?.join(", ") || (i < answers.length ? "건너뜀" : "미선택")}</span>
+                  {i < answers.length && <button className="text-dg-ink underline" aria-label={q.label + " 수정"} onClick={() => handleEdit(i)}>수정</button>}
+                </li>
+              ))}
+            </ol>}
+        </aside>
       </div>
       {/* 로그인 필요 모달 */}
       {showLoginModal && (

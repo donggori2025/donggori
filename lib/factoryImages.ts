@@ -924,10 +924,13 @@ export function getFactoryImages(value: unknown): string[] {
 
   // A migrated single legacy thumbnail is a cover, not a complete gallery.
   // Keep its cover order; explicitly managed custom images/galleries still win.
-  if (storedImages.length === 1 && legacyImages.includes(storedImages[0])) {
-    return Array.from(new Set([...storedImages, ...legacyImages]));
-  }
-  return storedImages.length > 0 ? storedImages : legacyImages;
+  const images = storedImages.length === 1 && legacyImages.includes(storedImages[0])
+    ? Array.from(new Set([...storedImages, ...legacyImages]))
+    : storedImages.length > 0 ? storedImages : legacyImages;
+
+  if (companyName !== "미호패션") return images;
+  const sidewaysPortrait = `${LEGACY_BLOB_BASE}/${encodeURIComponent("미호패션")}/20250716_090508.jpg`;
+  return images.map(url => url === sidewaysPortrait ? "/images/miho-fashion-portrait.webp" : url);
 }
 
 export function getFactoryMainImage(value: unknown): string {

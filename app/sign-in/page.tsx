@@ -85,10 +85,10 @@ function SignInForm() {
 
 export default function SignInPage() {
   return (
-    <div className="flex min-h-[70vh] flex-col items-center justify-center bg-white px-4 py-14 sm:py-20">
-      <div className="mb-8 flex flex-col items-center text-center">
-        <h1 className="mb-2 text-4xl font-extrabold tracking-tight">DONGGORI</h1>
-        <p className="text-lg font-semibold text-gray-700">봉제공장이 필요한 순간, 동고리</p>
+    <div className="account-surface workroom-login">
+      <div className="login-intro">
+        <h1 className="mb-2 text-4xl font-extrabold tracking-tight">로그인</h1>
+        <p className="text-lg font-semibold text-gray-700">제작 의뢰와 진행 내역을 확인하세요.</p>
       </div>
       <Suspense fallback={<Loader className="h-10 w-10 animate-spin text-black" />}>
         <SignInForm />

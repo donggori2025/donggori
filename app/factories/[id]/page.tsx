@@ -228,11 +228,11 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6 sm:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-[640px_1fr] gap-8 xl:gap-9 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,.94fr)] gap-8 xl:gap-9 items-start">
           <section>
             {displayImages.length > 0 ? (
               <div className="relative">
-                <div className="relative h-[560px] w-full overflow-hidden rounded-lg bg-[#f5f5f3] md:h-[620px] lg:h-[640px] xl:h-[660px]">
+                <div className="relative aspect-[5/4] w-full overflow-hidden rounded-2xl bg-dg-canvas">
                   <Image
                     src={displayImages[activeImageIndex]}
                     alt={`${factoryName} 이미지 ${activeImageIndex + 1}`}
@@ -294,11 +294,11 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 )}
               </div>
             ) : (
-              <FactoryImagePlaceholder className="h-[560px] rounded-xl md:h-[620px] lg:h-[640px] xl:h-[660px]" />
+              <FactoryImagePlaceholder className="aspect-[5/4] rounded-2xl" />
             )}
           </section>
 
-          <section className="pt-1 lg:pt-0.5">
+          <section className="factory-dossier">
             <div className="flex items-start justify-between gap-3 mb-5">
               <div>
                 <h1 className="text-3xl font-bold leading-[1.08] tracking-[-0.04em] text-[#111111] sm:text-4xl lg:text-[44px]">{factoryName}</h1>
@@ -316,12 +316,12 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
               </button>
             </div>
 
-            <div className="space-y-4 text-[15px] text-[#222] leading-[1.62]">
-              <div><span className="font-semibold">• 한 줄 소개</span><p className="mt-0.5">{factory.intro || "-"}</p></div>
-              <div><span className="font-semibold">• 위치</span><p className="mt-0.5">{factory.address || factory.admin_district || "-"}</p></div>
-              <div><span className="font-semibold">• 작업 가능 원단</span><p className="mt-0.5">{factory.main_fabrics || "-"}</p></div>
+            <div className="factory-specs">
+              <div><span className="font-semibold">한 줄 소개</span><p className="mt-0.5">{factory.intro || "-"}</p></div>
+              <div><span className="font-semibold">위치</span><p className="mt-0.5">{factory.address || factory.admin_district || "-"}</p></div>
+              <div><span className="font-semibold">작업 가능 원단</span><p className="mt-0.5">{factory.main_fabrics || "-"}</p></div>
               <div>
-                <span className="font-semibold">• 주요 생산품목</span>
+                <span className="font-semibold">주요 생산품목</span>
                 <p
                   ref={majorItemsRef}
                   className="mt-0.5"
@@ -345,12 +345,12 @@ export default function FactoryDetailPage({ params }: { params: Promise<{ id: st
                 )}
               </div>
               <div>
-                <span className="font-semibold">• 최소 발주수량</span>
+                <span className="font-semibold">최소 발주수량</span>
                 <p className="mt-0.5">최소수량: {minOrderText} &nbsp;|&nbsp; 최대수량: {maxCapaText}</p>
               </div>
-              <div><span className="font-semibold">• 개발 의뢰 방식</span><p className="mt-0.5">작업지시서 기반 상담/의뢰</p></div>
-              <div><span className="font-semibold">• 주요 거래처</span><p className="mt-0.5">{factory.distribution || "-"}</p></div>
-              <div><span className="font-semibold">• 주요 브랜드</span><p className="mt-0.5">{factory.brands_supplied || "-"}</p></div>
+              <div><span className="font-semibold">개발 의뢰 방식</span><p className="mt-0.5">작업지시서 기반 상담/의뢰</p></div>
+              <div><span className="font-semibold">주요 거래처</span><p className="mt-0.5">{factory.distribution || "-"}</p></div>
+              <div><span className="font-semibold">주요 브랜드</span><p className="mt-0.5">{factory.brands_supplied || "-"}</p></div>
             </div>
 
             <div className="grid grid-cols-3 gap-3 mt-7">

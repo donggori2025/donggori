@@ -37,3 +37,12 @@ test("wizard results never fill empty slots with low-score factories", () => {
   ]);
   assert.deepEqual(results, [{ id: "strong", score: 65 }]);
 });
+
+
+test("production totals distinguish color allocations from alternatives and production stages", async () => {
+  const { requestQuantity } = await import("../lib/presentationDemo.ts");
+  assert.equal(requestQuantity("블랙 30장, 네이비 20장"), 50);
+  assert.equal(requestQuantity("블랙 30장 또는 네이비 20장"), null);
+  assert.equal(requestQuantity("샘플 1장, 본생산 100장"), null);
+  assert.equal(requestQuantity("총 50장 (블랙 30장, 네이비 20장)"), 50);
+});

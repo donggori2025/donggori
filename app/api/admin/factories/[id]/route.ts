@@ -1,3 +1,5 @@
+import { revalidateTag } from "next/cache";
+import { FACTORY_LIST_TAG } from "@/lib/factoryCatalog";
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabaseService";
 import { requireAdmin } from "@/lib/adminSession";
@@ -16,6 +18,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     supabase.from("donggori").update(data).eq("id", id)
   );
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  revalidateTag(FACTORY_LIST_TAG);
   return NextResponse.json({ success: true });
 }
 
@@ -26,5 +29,6 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("donggori").delete().eq("id", id);
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  revalidateTag(FACTORY_LIST_TAG);
   return NextResponse.json({ success: true });
 }
