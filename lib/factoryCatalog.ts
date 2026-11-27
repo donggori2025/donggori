@@ -47,6 +47,15 @@ export interface Factory {
   [key: string]: string | number | string[] | undefined;
 }
 
+export function productionItems(factory: Factory): string[] {
+  const items = Object.entries(factory)
+    .filter(([key, value]) => key.startsWith("top_items_") && typeof value === "string")
+    .flatMap(([, value]) => String(value).split(/[,|]/))
+    .map((item) => item.trim())
+    .filter(Boolean);
+  return [...new Set(items.length ? items : factory.items)];
+}
+
 export function isSelectableRegion(region: string | undefined | null): boolean {
   const value = String(region ?? "").trim();
   return value.endsWith("동") && value !== "용신동";

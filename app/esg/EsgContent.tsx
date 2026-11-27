@@ -58,7 +58,7 @@ const STRATEGY = [
 function SectionTitle({ children }: { children: string }) {
   return (
     <div className="mb-8 flex items-stretch gap-3 sm:mb-10">
-      <span className="w-1 shrink-0 bg-dg-ink" aria-hidden />
+      <span className="w-1 shrink-0 rounded-full bg-dg-brand" aria-hidden />
       <h2 className="text-2xl font-bold tracking-tight text-dg-ink sm:text-3xl">{children}</h2>
     </div>
   );
@@ -80,7 +80,7 @@ export default function EsgContent() {
           {TAGS.map((tag) => (
             <li
               key={tag}
-              className="rounded-full border border-gray-200 bg-[#f7f7f5] px-3 py-1.5 text-xs text-gray-700"
+              className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs text-gray-700"
             >
               {tag}
             </li>
@@ -89,7 +89,7 @@ export default function EsgContent() {
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
           {PILLARS.map((pillar) => (
-            <article key={pillar.id} className="flex flex-col overflow-hidden border border-dg-line bg-white">
+            <article key={pillar.id} className="dg-panel dg-panel-link flex flex-col overflow-hidden">
               <a href={`#${pillar.id}`} className="group block">
                 <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
                   <Image
@@ -103,7 +103,7 @@ export default function EsgContent() {
                 <div className="flex flex-1 flex-col px-5 py-6">
                   <p className="text-xl font-bold text-dg-ink">{pillar.title}</p>
                   <p className="mt-1 text-sm text-gray-500">{pillar.subtitle}</p>
-                  <span className="mt-6 text-xs font-semibold text-gray-400 group-hover:text-gray-800">
+                  <span className="mt-6 text-xs font-semibold text-dg-brand group-hover:underline">
                     &gt; 자세히 보기
                   </span>
                 </div>
@@ -122,8 +122,8 @@ export default function EsgContent() {
         </p>
         <ol className="mt-10 grid gap-8 sm:grid-cols-2">
           {PRINCIPLES.map((text, index) => (
-            <li key={text} className="border border-dg-line bg-[#fafafa] px-6 py-7">
-              <span className="text-3xl font-light text-[#c9c9c4]" aria-hidden>
+            <li key={text} className="dg-panel px-6 py-7">
+              <span className="text-3xl font-light text-dg-brand" aria-hidden>
                 {String(index + 1).padStart(2, "0")}
               </span>
               <p className="mt-4 text-sm leading-7 text-gray-600">{text}</p>
@@ -134,18 +134,18 @@ export default function EsgContent() {
 
       <section>
         <SectionTitle>ESG 전략</SectionTitle>
-        <div className="overflow-hidden border border-dg-line">
+        <div className="dg-panel overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-3">
             {STRATEGY.map((column, index) => (
               <div
                 key={column.heading}
                 className={`border-dg-line ${index > 0 ? "border-t md:border-t-0 md:border-l" : ""}`}
               >
-                <p className="bg-[#f3f3f0] px-5 py-3 text-center text-sm font-bold text-dg-ink">{column.heading}</p>
+                <p className="bg-dg-canvas px-5 py-3 text-center text-sm font-bold text-dg-ink">{column.heading}</p>
               </div>
             ))}
           </div>
-          <p className="bg-dg-ink px-5 py-3 text-center text-sm font-semibold text-white">전략 방향</p>
+          <p className="dg-action px-5 py-3 text-center text-sm font-semibold text-white">전략 방향</p>
           <div className="grid grid-cols-1 md:grid-cols-3">
             {STRATEGY.map((column, index) => (
               <ul

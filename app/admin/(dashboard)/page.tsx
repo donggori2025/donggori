@@ -43,7 +43,7 @@ export default function AdminDashboardPage() {
           <Link key={card.href} href={card.href} className="group">
             <AdminCard className="h-full hover:border-gray-300 hover:shadow-md transition">
               <div className="text-sm text-gray-500 mb-1">{card.label}</div>
-              <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-gray-700 transition">
+              <div className="text-3xl font-bold text-dg-brand mb-2 group-hover:text-gray-700 transition">
                 {loading ? "—" : (card.value ?? 0).toLocaleString()}
               </div>
               <div className="text-xs text-gray-400">{card.desc}</div>
@@ -56,7 +56,7 @@ export default function AdminDashboardPage() {
         <div className="flex flex-wrap gap-2">
           <Link
             href="/admin/factories"
-            className="inline-flex items-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition"
+            className="inline-flex items-center rounded-xl dg-action px-4 py-2.5 text-sm font-medium transition"
           >
             업장 추가/수정
           </Link>

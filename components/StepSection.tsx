@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
+import { ArrowRight } from "lucide-react";
 
 const matchingSteps = [
   {
@@ -25,62 +25,25 @@ const matchingSteps = [
 ];
 
 const StepSection = () => (
-  <section className="dg-section w-full bg-[#f5f5f3]">
-    <div className={PAGE_CONTAINER_CLASS}>
-      <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.55fr)] lg:items-start lg:gap-10 xl:gap-12">
-        <div className="order-2 grid grid-cols-1 border border-gray-200 bg-white sm:grid-cols-3 lg:order-1">
-          {matchingSteps.map((step, idx) => (
-            <div
-              key={`step-${idx}-${step.title}`}
-              className={`p-5 transition-colors duration-200 hover:bg-gray-50 md:p-6 ${
-                idx < matchingSteps.length - 1 ? "border-b border-gray-200 sm:border-b-0 sm:border-r" : ""
-              }`}
-            >
-              <div className="mb-5 flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-gray-50">
-                <Image
-                  src={step.image}
-                  alt={`맞춤 추천 인터페이스 ${idx + 1}`}
-                  width={480}
-                  height={360}
-                  className="h-full w-full object-contain"
-                  unoptimized
-                />
-              </div>
-              <h3 className="mb-2 text-base font-bold text-gray-900 md:text-lg">{step.title}</h3>
-              <p className="mb-3 text-sm leading-relaxed text-gray-500">{step.desc}</p>
-              <div className="space-y-1.5">
-                {step.features.map((feature, featureIdx) => (
-                  <div
-                    key={`feature-${featureIdx}-${feature}`}
-                    className="flex items-center text-xs text-gray-500 sm:text-sm"
-                  >
-                    <div className="ai-spectrum-bg mr-2 h-1.5 w-1.5 shrink-0 rounded-full" />
-                    {feature}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="order-1 flex flex-col items-start text-left lg:order-2 lg:pt-2">
-          <h2 className="text-3xl font-bold leading-tight tracking-[-0.035em] text-dg-ink break-keep sm:text-4xl">
-            맞춤 추천으로
-            <br />
-            빠르게 찾는 봉제공장
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-gray-500 md:text-base">
-            등록된 공장의 품목, 원단, 지역과 생산 조건을 비교해 적합한 공장을 추천합니다.
-          </p>
-          <Link
-            href="/matching"
-            className="mt-8 inline-flex items-center gap-3 rounded-md bg-dg-ink px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-black"
-          >
-            맞춤 추천 시작
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-sm">→</span>
-          </Link>
-        </div>
+  <section className="matching-guide" aria-labelledby="matching-guide-title">
+    <div className="site-wide">
+      <div className="section-heading">
+        <h2 id="matching-guide-title">맞춤 추천 이용방법</h2>
+        <Link className="landing-link" href="/matching">맞춤 추천 시작 <ArrowRight size={16} /></Link>
       </div>
+      <ol className="guide-steps">
+        {matchingSteps.map((step, i) => (
+          <li key={step.title}>
+            <div className="guide-preview">
+              <Image src={step.image} alt={`맞춤 추천 인터페이스 ${i + 1}`} width={480} height={360}
+                className="h-full w-full object-contain" unoptimized />
+            </div>
+            <h3>{step.title}</h3>
+            <p>{step.desc}</p>
+            <ul>{step.features.map((feature) => <li key={feature}>{feature}</li>)}</ul>
+          </li>
+        ))}
+      </ol>
     </div>
   </section>
 );

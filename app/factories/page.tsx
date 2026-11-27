@@ -21,7 +21,7 @@ function getFilterChipClass(isOn: boolean, sm = false) {
     ? "rounded-full border px-2 sm:px-4 text-xs sm:text-sm"
     : "rounded-full border px-4";
   return isOn
-    ? `${base} bg-[#222222] text-white border-[#222222] hover:bg-[#444444] hover:text-white`
+    ? `${base} dg-selected font-semibold`
     : `${base} border-gray-200 bg-white hover:border-gray-400 hover:bg-gray-50`;
 }
 
@@ -472,11 +472,11 @@ export default function FactoriesPage() {
   }, [view, filtered, selectedFactory]);
 
   return (
-    <div className="min-h-screen bg-[#f5f5f3]">
-      <div className={`${PAGE_CONTAINER_CLASS} py-8 md:py-10 space-y-6`}>
+    <div className="min-h-screen">
+      <div className={`${PAGE_CONTAINER_CLASS} py-10 md:py-14 space-y-6`}>
       {loading && (
         <div className="flex flex-col items-center justify-center py-12 gap-3">
-          <div className="w-10 h-10 border-4 border-gray-200 border-t-[#222222] rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-gray-200 border-t-dg-brand rounded-full animate-spin" />
           <p className="text-sm text-gray-600">공장 정보를 불러오는 중입니다...</p>
         </div>
       )}
@@ -493,15 +493,15 @@ export default function FactoriesPage() {
       )}
 
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">봉제공장</h1>
+        <h1 className="dg-page-title">봉제공장</h1>
         <p className="mt-2 text-sm md:text-base text-gray-600">
           동대문 봉제공장을 검색·필터링하고, 조건에 맞는 업장을 바로 확인하세요.
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Link href="/matching" className="ai-prompt-composer group block">
-          <div className="flex h-full items-center justify-between gap-3 rounded-[1.15rem] bg-white/97 px-4 py-4 sm:px-5">
+        <Link href="/matching" className="dg-prompt-link group block">
+          <div className="flex h-full items-center justify-between gap-3 px-4 py-4 sm:px-5">
             <div>
               <p className="flex items-center gap-1.5 text-sm font-semibold text-gray-900">
                 <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
@@ -511,12 +511,12 @@ export default function FactoriesPage() {
                 몇 가지 조건만 알려주시면 맞춤 공장 3곳을 추천해드려요
               </p>
             </div>
-            <span className="inline-flex h-9 shrink-0 items-center rounded-full bg-dg-ink px-3.5 text-xs font-semibold text-white transition group-hover:bg-black">
+            <span className="inline-flex h-9 shrink-0 items-center rounded-full dg-action px-3.5 text-xs font-semibold">
               시작
             </span>
           </div>
         </Link>
-        <Link href="/design-request" className="group block rounded-[1.25rem] border border-gray-200 bg-white">
+        <Link href="/design-request" className="group block dg-panel dg-panel-link">
           <div className="flex h-full items-center justify-between gap-3 px-4 py-4 sm:px-5">
             <div>
               <p className="flex items-center gap-1.5 text-sm font-semibold text-gray-900">
@@ -527,7 +527,7 @@ export default function FactoriesPage() {
                 상품 정보와 레퍼런스를 남겨주시면 디자인 방향과 제작 흐름을 함께 정리해드립니다
               </p>
             </div>
-            <span className="inline-flex h-9 shrink-0 items-center rounded-full bg-dg-ink px-3.5 text-xs font-semibold text-white transition group-hover:bg-black">
+            <span className="inline-flex h-9 shrink-0 items-center rounded-full dg-action px-3.5 text-xs font-semibold">
               시작
             </span>
           </div>
@@ -540,10 +540,10 @@ export default function FactoriesPage() {
           className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-800 rounded-lg font-semibold shadow-sm text-sm hover:border-gray-400 transition"
           onClick={() => setShowMobileFilter(true)}
         >
-          <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
+          <SlidersHorizontal className="w-4 h-4 text-dg-brand" />
           필터
           {badges.length > 0 && (
-            <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs min-w-5 h-5 px-1">
+            <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs min-w-5 h-5 px-1">
               {badges.length}
             </span>
           )}
@@ -552,10 +552,10 @@ export default function FactoriesPage() {
 
       <div className="flex flex-row gap-6 lg:gap-8 items-start w-full">
         <aside className="w-72 shrink-0 hidden lg:block sticky top-24">
-          <div className="flex flex-col gap-2 rounded-lg border border-dg-line bg-white p-4">
+          <div className="flex flex-col gap-2 dg-panel p-4">
             <div className="font-bold flex items-center justify-between text-base pb-2">
               <span className="text-gray-900 flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
+                <SlidersHorizontal className="w-4 h-4 text-dg-brand" />
                 필터
               </span>
               <button
@@ -574,7 +574,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   공장 타입
                   {selected.factory_type.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.factory_type.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-5 h-5">{selected.factory_type.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.factory_type ? '' : 'rotate-180'}`} />
@@ -606,7 +606,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   주요 원단
                   {selected.main_fabrics.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.main_fabrics.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-5 h-5">{selected.main_fabrics.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`} />
@@ -638,7 +638,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   지역
                   {selected.admin_district.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.admin_district.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-5 h-5">{selected.admin_district.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.region ? '' : 'rotate-180'}`} />
@@ -672,7 +672,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   MOQ(최소수량)
                   {selected.moq.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.moq.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-5 h-5">{selected.moq.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.moq ? '' : 'rotate-180'}`} />
@@ -704,7 +704,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   재봉기
                   {selected.sewing_machines.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.sewing_machines.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-5 h-5">{selected.sewing_machines.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.sewing_machines ? '' : 'rotate-180'}`} />
@@ -736,7 +736,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   패턴기
                   {selected.pattern_machines.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.pattern_machines.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-5 h-5">{selected.pattern_machines.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.pattern_machines ? '' : 'rotate-180'}`} />
@@ -768,7 +768,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   특수기
                   {selected.special_machines.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.special_machines.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-5 h-5">{selected.special_machines.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.special_machines ? '' : 'rotate-180'}`} />
@@ -800,7 +800,7 @@ export default function FactoriesPage() {
                 <span className="font-bold text-[16px] flex items-center gap-3">
                   품목
                   {selected.items.length > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-5 h-5">{selected.items.length}</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-5 h-5">{selected.items.length}</span>
                   )}
                 </span>
                 <ChevronDownIcon className={`w-5 h-5 transition-transform ${openFilter.items ? '' : 'rotate-180'}`} />
@@ -840,7 +840,7 @@ export default function FactoriesPage() {
             <div className="relative flex max-h-[85vh] w-full max-w-md flex-col rounded-t-lg border border-dg-line bg-white shadow-lg sm:w-[90vw] sm:rounded-lg">
               <div className="p-4 sm:p-6 pb-3 border-b border-gray-200 flex-shrink-0 flex items-center justify-between">
                 <span className="font-bold text-gray-900 flex items-center gap-2">
-                  <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
+                  <SlidersHorizontal className="w-4 h-4 text-dg-brand" />
                   필터
                 </span>
                 <button
@@ -862,7 +862,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-2 sm:gap-3">
                     공장 타입
                     {selected.factory_type.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.factory_type.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.factory_type.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.factory_type ? '' : 'rotate-180'}`} />
@@ -894,7 +894,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-2 sm:gap-3">
                     주요 원단
                     {selected.main_fabrics.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.main_fabrics.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.main_fabrics.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.main_fabrics ? '' : 'rotate-180'}`} />
@@ -926,7 +926,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     지역
                     {selected.admin_district.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.admin_district.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.admin_district.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.region ? '' : 'rotate-180'}`} />
@@ -960,7 +960,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     MOQ(최소수량)
                     {selected.moq.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.moq.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.moq.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.moq ? '' : 'rotate-180'}`} />
@@ -992,7 +992,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     재봉기
                     {selected.sewing_machines.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.sewing_machines.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.sewing_machines.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.sewing_machines ? '' : 'rotate-180'}`} />
@@ -1024,7 +1024,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     패턴기
                     {selected.pattern_machines.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.pattern_machines.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.pattern_machines.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.pattern_machines ? '' : 'rotate-180'}`} />
@@ -1056,7 +1056,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     특수기
                     {selected.special_machines.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.special_machines.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.special_machines.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.special_machines ? '' : 'rotate-180'}`} />
@@ -1088,7 +1088,7 @@ export default function FactoriesPage() {
                   <span className="font-bold text-sm sm:text-[16px] flex items-center gap-1 sm:gap-2">
                     품목
                     {selected.items.length > 0 && (
-                      <span className="inline-flex items-center justify-center rounded-full bg-[#222222] text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.items.length}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-dg-brand text-white text-xs w-4 h-4 sm:w-5 sm:h-5">{selected.items.length}</span>
                     )}
                   </span>
                   <ChevronDownIcon className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${openFilter.items ? '' : 'rotate-180'}`} />
@@ -1121,7 +1121,7 @@ export default function FactoriesPage() {
         )}
         {/* 오른쪽: 검색+카드/지도 */}
         <div className="flex-1 min-w-0 flex flex-col items-stretch">
-          <div className="rounded-lg border border-dg-line bg-white p-4 md:p-5">
+          <div className="dg-panel p-4 md:p-5">
           <div className="flex flex-col sm:flex-row gap-3 mb-4 items-stretch sm:items-center w-full">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -1129,7 +1129,7 @@ export default function FactoriesPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="공장명, 키워드로 검색하세요"
-                className="w-full h-10 md:h-11 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm outline-none focus:ring-2 focus:ring-gray-200 focus:border-[#222222]"
+                className="w-full h-10 md:h-11 rounded-lg border border-gray-300 bg-white pl-10 pr-3 text-sm outline-none focus:ring-2 focus:ring-blue-100 focus:border-dg-brand"
               />
             </div>
             <div className="flex bg-gray-100 rounded-lg p-1 w-full sm:w-auto shrink-0">
@@ -1137,7 +1137,7 @@ export default function FactoriesPage() {
                 type="button"
                 className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md transition flex items-center justify-center gap-1.5 text-sm ${
                   view === "list"
-                    ? "bg-white text-[#222222] font-semibold shadow-sm"
+                    ? "bg-white text-dg-brand font-semibold shadow-sm"
                     : "bg-transparent text-gray-600 font-normal hover:text-gray-800"
                 }`}
                 onClick={() => setView("list")}
@@ -1148,7 +1148,7 @@ export default function FactoriesPage() {
                 type="button"
                 className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md transition flex items-center justify-center gap-1.5 text-sm ${
                   view === "map"
-                    ? "bg-white text-[#222222] font-semibold shadow-sm"
+                    ? "bg-white text-dg-brand font-semibold shadow-sm"
                     : "bg-transparent text-gray-600 font-normal hover:text-gray-800"
                 }`}
                 onClick={() => setView("map")}
@@ -1157,14 +1157,14 @@ export default function FactoriesPage() {
               </button>
             </div>
           </div>
-          <div className="mb-3 text-xs sm:text-sm font-semibold text-[#222222]">
+          <div className="mb-3 text-xs sm:text-sm font-semibold text-dg-brand">
             {sortedFiltered.length}개 업장
           </div>
           {/* 선택된 필터 뱃지 (오른쪽 컨테이너 내) */}
           {badges.length > 0 && (
             <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
               {badges.map((b) => (
-                <span key={b.key + b.val} className="bg-[#222222] text-white rounded-full px-2 sm:px-3 py-1 text-xs sm:text-[14px] font-semibold flex items-center gap-1">
+                <span key={b.key + b.val} className="bg-dg-brand text-white rounded-full px-2 sm:px-3 py-1 text-xs sm:text-[14px] font-semibold flex items-center gap-1">
                   {b.val}
                   <button onClick={() => setSelected(sel => ({
                     ...sel,
@@ -1172,16 +1172,16 @@ export default function FactoriesPage() {
                   }))} className="ml-1">×</button>
                 </span>
               ))}
-              <Button size="sm" variant="ghost" className="text-[#222222] hover:text-[#222222] hover:bg-gray-100" onClick={() => setSelected({ ...EMPTY_FILTERS })}>전체 해제</Button>
+              <Button size="sm" variant="ghost" className="text-dg-brand hover:text-dg-brand hover:bg-gray-100" onClick={() => setSelected({ ...EMPTY_FILTERS })}>전체 해제</Button>
             </div>
           )}
           {/* 카드 리스트/지도 뷰 */}
           <div className="flex-1 min-w-0">
             {view === 'list' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 {loading ? (
                   <div className="col-span-full flex flex-col items-center justify-center py-16 gap-3">
-                    <div className="w-10 h-10 border-4 border-gray-200 border-t-[#222222] rounded-full animate-spin" />
+                    <div className="w-10 h-10 border-4 border-gray-200 border-t-dg-brand rounded-full animate-spin" />
                     <p className="text-sm text-gray-600">공장 정보를 불러오는 중입니다...</p>
                   </div>
                 ) : factoriesData.length === 0 ? (
@@ -1202,7 +1202,7 @@ export default function FactoriesPage() {
                       <Link
                         href={`/factories/${f.id}`}
                         key={f.id ?? idx}
-                        className="group flex cursor-pointer flex-col overflow-hidden rounded-lg border border-dg-line bg-white transition-colors hover:bg-gray-50"
+                        className="dg-panel dg-panel-link group flex min-w-0 cursor-pointer flex-col overflow-hidden"
                       >
                         <div className="w-full h-40 sm:h-44 md:h-48 bg-gray-100 flex items-center justify-center overflow-hidden group">
                           <FactoriesPageImage factory={f} idx={idx} />

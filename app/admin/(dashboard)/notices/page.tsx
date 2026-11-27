@@ -190,7 +190,7 @@ export default function AdminNoticesPage() {
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-gray-700">카테고리</span>
             <select
-              className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm focus:bg-white focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm focus:bg-white focus:border-dg-brand focus:outline-none focus:ring-2 focus:ring-blue-100"
               value={form.category ?? "일반"}
               onChange={(e) => setForm((v) => ({ ...v, category: e.target.value as NoticeCategory }))}
             >
@@ -233,7 +233,7 @@ export default function AdminNoticesPage() {
                   <label className="flex flex-col gap-1.5">
                     <span className="text-sm font-medium text-gray-700">카테고리</span>
                     <select
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm focus:bg-white focus:border-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+                      className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3.5 py-2.5 text-sm focus:bg-white focus:border-dg-brand focus:outline-none focus:ring-2 focus:ring-blue-100"
                       value={editingItem.category ?? "일반"}
                       onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value as NoticeCategory })}
                     >

@@ -13,10 +13,10 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f3]">
+    <div className="min-h-screen">
       <AdminSidebar />
-      <div className="pl-64 min-h-screen flex flex-col">
-        <header className="sticky top-0 z-20 h-14 bg-white/90 backdrop-blur-md border-b border-gray-200/80 px-8 flex items-center justify-between">
+      <div className="min-w-0 md:pl-56 xl:pl-64 min-h-screen flex flex-col">
+        <header className="sticky top-0 z-20 h-14 bg-white/90 backdrop-blur-md border-b border-dg-line px-4 md:px-8 flex items-center justify-between">
           <span className="text-sm font-medium text-gray-500">동고리 관리자</span>
           <a
             href="/"
@@ -27,7 +27,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
             사이트 보기 ↗
           </a>
         </header>
-        <main className="flex-1 p-6 md:p-8">{children}</main>
+        <main className="min-w-0 flex-1 p-4 md:p-8">{children}</main>
       </div>
     </div>
   );

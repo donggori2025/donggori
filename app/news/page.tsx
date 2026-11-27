@@ -49,7 +49,7 @@ export default function NewsPage() {
             </div>
           </div>
         </header>
-        <ul className="divide-y divide-gray-100">
+        <ul className="dg-panel divide-y divide-dg-line px-4 sm:px-7">
           {visibleNews.map((article) => (
             <li key={article.id} className="py-6 sm:py-7">
               <a
@@ -70,11 +70,11 @@ export default function NewsPage() {
                   <p className="mt-1 text-sm leading-relaxed text-gray-500 line-clamp-2">
                     {article.summary}
                   </p>
-                  <span className="mt-2 inline-block text-xs font-bold text-gray-400 group-hover:text-gray-700">
+                  <span className="mt-2 inline-block text-xs font-bold text-dg-brand group-hover:underline">
                     원문 보기 →
                   </span>
                 </div>
-                <div className="relative h-20 w-28 shrink-0 overflow-hidden bg-gray-100 sm:h-24 sm:w-36">
+                <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:h-24 sm:w-36">
                   <Image
                     src={article.image}
                     alt=""
@@ -102,7 +102,7 @@ export default function NewsPage() {
                 key={n}
                 type="button"
                 onClick={() => setPage(n)}
-                className={`min-w-9 h-9 rounded-lg text-sm font-bold ${currentPage === n ? "bg-gray-900 text-white" : "text-gray-500 hover:bg-gray-50"}`}
+                className={`min-w-9 h-9 rounded-lg text-sm font-bold ${currentPage === n ? "dg-action" : "text-gray-500 hover:bg-gray-50"}`}
                 aria-current={currentPage === n ? "page" : undefined}
               >
                 {n}

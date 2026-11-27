@@ -172,9 +172,9 @@ export default function TermsDetailPage() {
 
   return (
     <div className={`${PAGE_CONTAINER_CLASS} py-16`}>
-      <div className="max-w-3xl">
-              <h1 className="text-[40px] font-extrabold text-gray-900 mb-2">{data.title}</h1>
-      <pre className="bg-gray-100 rounded p-4 whitespace-pre-wrap text-sm">{data.content}</pre>
+      <div className="mx-auto max-w-3xl">
+        <h1 className="dg-page-title mb-8">{data.title}</h1>
+        <pre className="dg-document dg-panel whitespace-pre-wrap p-5 sm:p-9">{data.content}</pre>
       </div>
     </div>
   );

@@ -106,7 +106,7 @@ export default function FactoryBlobImageManager({ folder, selectedImages, onImag
           <button
             onClick={onClickUpload}
             disabled={!folder || uploading}
-            className="px-3 py-1.5 rounded bg-black text-white text-sm disabled:opacity-50"
+            className="px-3 py-1.5 rounded-lg dg-action text-sm disabled:opacity-50"
           >
             {uploading ? "업로드 중..." : "이미지 추가"}
           </button>

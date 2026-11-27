@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 import sharp from "sharp";
+import { productionItems } from "../lib/factoryCatalog.ts";
+import { groupDistrictFactories } from "../lib/dongdaemunMap.ts";
 import { getPressArticles } from "../lib/press-news.ts";
 
 test("press articles have unique IDs, valid links and local image assets", async () => {
@@ -17,13 +19,28 @@ test("press articles have unique IDs, valid links and local image assets", async
   }
 });
 
-test("home redesign keeps server data, real badges and image error fallback", async () => {
+test("home factory carousel preserves catalog order and shows district, name and production items", async () => {
   const source = await readFile("components/InfoSection.tsx", "utf8");
   assert.match(source, /from "@\/lib\/factoryCatalog"/);
-  assert.match(source, /f\.factory_type, f\.main_fabrics/);
+  assert.match(source, /withImages\.length >= 10 \? withImages : rows\)\.slice\(0, 10\)/);
+  assert.doesNotMatch(source, /\.sort\(|\.toSorted\(|factory\.(?:moq|minOrder|factory_type|main_fabrics)/);
+  assert.match(source, /factory\.admin_district \|\| factory\.region/);
+  assert.match(source, /factory\.company_name \|\| factory\.name/);
+  assert.match(source, /productionItems\(factory\)/);
+  assert.deepEqual(productionItems({ top_items_upper: "셔츠, 재킷", top_items_outer: "재킷|코트", items: [] }), ["셔츠", "재킷", "코트"]);
+  assert.deepEqual(productionItems({ items: ["니트"] }), ["니트"]);
   assert.match(source, /FactoryImagePlaceholder/);
   assert.match(source, /onError/);
   assert.doesNotMatch(source, /fallbackFactories|Math\.random|Math\.sin|supabaseClient/);
+});
+
+test("landing map groups coarsened public positions only inside Dongdaemun", () => {
+  const inside = { lat: 37.58, lng: 127.04 };
+  const rows = [{ ...inside, id: "a" }, { ...inside, id: "b" }, { lat: 0, lng: 0 }, { lat: 37.6, lng: 127.01 }];
+  const pins = groupDistrictFactories(rows);
+  assert.equal(pins.length, 1);
+  assert.deepEqual(pins[0].factories.map((f) => f.id), ["a", "b"]);
+  assert.ok(pins[0].x > 0 && pins[0].x < 100 && pins[0].y > 0 && pins[0].y < 100);
 });
 
 test("navigation keeps server-backed auth and composition-safe Korean prompt entry", async () => {
@@ -56,7 +73,7 @@ test("esg page keeps directional copy without unverified claims", async () => {
   assert.doesNotMatch(source, /전국 9개|특구|AI 매칭|온실가스 배출량 측정/);
 });
 
-test("interactive UI uses neutral accents while preserving the print category color", async () => {
+test("inner pages use the landing palette while preserving the print category color", async () => {
   const paths = [
     "app/my-page/page.tsx",
     "app/matching/page.tsx",
@@ -67,7 +84,7 @@ test("interactive UI uses neutral accents while preserving the print category co
   for (const path of paths) {
     const source = await readFile(path, "utf8");
     assert.doesNotMatch(source, /(?:violet|purple|fuchsia)-\d|#(?:fff7fb|fff0f7|a73370|fdf0f2|8f5b62)/i, path);
-    assert.match(source, /(?:bg|text|border)-dg-ink/, path);
+    assert.match(source, /(?:bg|text|border)-dg-(?:ink|brand)|dg-action/, path);
   }
   for (const path of ["app/factories/page.tsx", "app/matching/page.tsx"]) {
     const source = await readFile(path, "utf8");
@@ -76,10 +93,10 @@ test("interactive UI uses neutral accents while preserving the print category co
   for (const path of ["app/my-page/page.tsx", "app/design-request/page.tsx"]) {
     const source = await readFile(path, "utf8");
     assert.match(source, /focus:ring-2/);
-    assert.match(source, /focus:border-dg-ink/);
+    assert.match(source, /focus:border-dg-brand/);
   }
   const matching = await readFile("app/matching/page.tsx", "utf8");
-  assert.match(matching, /selectedOptions\.includes\(option\)[\s\S]*?\? "border-dg-ink ring-2 ring-gray-200"\s*: "border-gray-200 hover:border-gray-400"/);
+  assert.match(matching, /selectedOptions\.includes\(option\)[\s\S]*?\? "dg-selected ring-2 ring-blue-100"\s*: "border-gray-200 hover:border-gray-400"/);
   assert.doesNotMatch(matching, /transition border border-gray-200 flex items-center justify-center/);
 });
 

@@ -1,9 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowUp } from "lucide-react";
-import { PAGE_CONTAINER_CLASS } from "@/lib/layout";
+import { Layers, MapPin, Ruler, Search } from "lucide-react";
 
 const PROMPT_EXAMPLES = [
   "여성 자켓 300장, 직기 원단",
@@ -11,10 +10,16 @@ const PROMPT_EXAMPLES = [
   "기능성 운동복 소량 제작",
 ];
 
+const conditions = [
+  { label: "수량", example: "100장", Icon: Ruler },
+  { label: "원단", example: "면 원단", Icon: Layers },
+  { label: "지역", example: "장안동", Icon: MapPin },
+];
+
 export default function HeroSection() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
-  const trimmedPrompt = useMemo(() => prompt.trim(), [prompt]);
+  const field = useRef<HTMLTextAreaElement>(null);
 
   const goToMatchingWithPrompt = (text: string) => {
     const value = text.trim();
@@ -23,73 +28,44 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="bg-white pb-8 pt-16 sm:pb-12 sm:pt-24 lg:pt-28">
-      <div className={PAGE_CONTAINER_CLASS}>
-        <div className="mx-auto max-w-3xl text-center">
-          <h1 className="dg-display text-[1.7rem] sm:text-5xl lg:text-7xl">
-            <span className="sr-only">옷을 만드는 사람과 잘 만드는 공장을 잇습니다.</span>
-            <span aria-hidden="true" className="flex flex-col items-center gap-[0.22em]">
-              <span className="whitespace-nowrap">
-                <span className="inline-block bg-dg-ink px-[0.16em] text-white">옷을 만드는 사람</span>과 잘 만드는
-              </span>
-              <span className="whitespace-nowrap">
-                <span className="inline-block bg-dg-ink px-[0.16em] text-white">공장</span>을 잇습니다.
-              </span>
-            </span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-dg-muted sm:text-base">
-            동대문의 생산 경험과 새로운 브랜드의 아이디어가 더 빠르고 정확하게 만나는 의류 생산 연결 플랫폼입니다.
-          </p>
-        </div>
-
-        <div className="mx-auto mt-10 w-full max-w-2xl sm:mt-12">
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              goToMatchingWithPrompt(prompt);
-            }}
-            className="ai-prompt-composer"
-          >
-            <div className="ai-prompt-composer-inner">
-              <textarea
-                aria-label="제작할 옷의 품목, 수량, 원단"
-                value={prompt}
-                rows={2}
-                onChange={(event) => setPrompt(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
-                    event.preventDefault();
-                    goToMatchingWithPrompt(prompt);
-                  }
-                }}
-                placeholder="어떤 옷을 만들고 싶으신가요? 품목, 수량, 원단을 알려주세요."
-                className="min-h-[72px] w-full resize-none bg-transparent px-1 py-1 text-[15px] leading-6 text-gray-900 outline-none placeholder:text-gray-400 sm:min-h-[84px] sm:text-base sm:leading-7"
-              />
-              <div className="mt-3 flex items-center justify-end gap-3">
-                <button
-                  type="submit"
-                  disabled={!trimmedPrompt}
-                  aria-label="맞춤 추천 시작"
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-dg-ink text-white transition hover:bg-black disabled:bg-gray-200 disabled:text-gray-400"
-                >
-                  <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
-                </button>
-              </div>
-            </div>
-          </form>
-
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
-            {PROMPT_EXAMPLES.map((example) => (
-              <button
-                key={example}
-                type="button"
-                onClick={() => goToMatchingWithPrompt(example)}
-                className="rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-xs text-gray-500 transition hover:border-gray-300 hover:text-gray-900"
-              >
-                {example}
+    <section className="pg-search" aria-labelledby="pg-search-title">
+      <h1 id="pg-search-title">
+        옷을 만들땐<br />이곳 <span className="pg-search-brand">동고리에서</span> 찾으세요!
+      </h1>
+      <div className="pg-prompt-stage">
+        <form className="dg-composer" onSubmit={(event) => {
+          event.preventDefault();
+          goToMatchingWithPrompt(prompt);
+        }}>
+          <textarea ref={field} aria-label="제작할 옷의 품목, 수량, 원단" value={prompt} rows={2}
+            placeholder="예를 들어, 면 티셔츠 100장을 만들고 싶어요."
+            onChange={(event) => setPrompt(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing && event.nativeEvent.keyCode !== 229) {
+                event.preventDefault();
+                goToMatchingWithPrompt(prompt);
+              }
+            }} />
+          <div className="dg-tools">
+            {conditions.map(({ label, example, Icon }) => (
+              <button type="button" className="dg-handle" key={label} onClick={() => {
+                const next = [prompt.trimEnd(), example].filter(Boolean).join(", ");
+                setPrompt(next);
+                field.current?.focus();
+                requestAnimationFrame(() => field.current?.setSelectionRange(next.length - example.length, next.length));
+              }}>
+                <Icon size={15} aria-hidden="true" />{label}
               </button>
             ))}
+            <button type="submit" className="dg-submit" disabled={!prompt.trim()} aria-label="맞춤 추천 시작">
+              <Search size={20} aria-hidden="true" />
+            </button>
           </div>
+        </form>
+        <div className="pg-examples" aria-label="추천 검색 예시">
+          {PROMPT_EXAMPLES.map((example) => (
+            <button key={example} type="button" onClick={() => goToMatchingWithPrompt(example)}>{example}</button>
+          ))}
         </div>
       </div>
     </section>
