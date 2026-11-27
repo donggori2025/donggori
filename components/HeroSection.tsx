@@ -30,7 +30,7 @@ export default function HeroSection() {
   return (
     <section className="pg-search" aria-labelledby="pg-search-title">
       <h1 id="pg-search-title">
-        옷을 만들땐<br />이곳 <span className="pg-search-brand">동고리에서</span> 찾으세요!
+        동대문구 봉제공장과<br />디자이너의 연결고리, <span className="pg-search-brand">동고리</span>
       </h1>
       <div className="pg-prompt-stage">
         <form className="dg-composer" onSubmit={(event) => {

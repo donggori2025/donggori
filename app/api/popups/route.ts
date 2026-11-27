@@ -45,6 +45,8 @@ function toPublicPopup(row: Record<string, unknown>): PopupItem {
 }
 
 function isPopupActive(popup: PopupItem, now: Date) {
+  // Retire this rate sheet without hiding future popups that use the same title.
+  if (popup.id === "f0ece881-53e3-4187-acf7-b72a539a80b0") return false;
   if (popup.is_active === false) return false;
   const start = popup.start_at ? new Date(popup.start_at) : null;
   const end = popup.end_at ? new Date(popup.end_at) : null;
